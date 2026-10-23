@@ -1,1 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Course Materials – Izountar Yousra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f7f8; --card:#ffffff; --ink:#12263a; --muted:#5b6b7a; --line:#d9e2e7;
+  --main:#0e6b6b; --course:#0e6b6b; --td:#3a5bd9; --tp:#d9822b;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0f1a24; --card:#172636; --ink:#e8f0f5; --muted:#9bb0c0; --line:#27394b;
+        --main:#3fb8b0; --course:#3fb8b0; --td:#7d97f5; --tp:#f0a45a;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.5}
+.wrap{max-width:900px;margin:0 auto;padding:0 20px 60px}
+header{background:var(--main);color:#fff;padding:40px 20px 56px}
+header .wrap{padding-bottom:0}
+header h1{margin:0 0 6px;font-size:clamp(2rem,6vw,3.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.05}
+header p{margin:0;opacity:.9;font-size:1.05rem}
+main{margin-top:-28px}
+.crumbs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 18px;font-size:.95rem}
+.crumbs button{all:unset;cursor:pointer;color:var(--main);font-weight:600;
+  padding:6px 12px;border-radius:99px;background:var(--card);border:1px solid var(--line)}
+.crumbs button:hover{border-color:var(--main)}
+.crumbs button:focus-visible,.tile:focus-visible,a:focus-visible{outline:3px solid var(--td);outline-offset:2px}
+.crumbs span{color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px}
+.panel h2{margin:0 0 4px;font-size:1.6rem}
+.panel .sub{margin:0 0 22px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.tile{all:unset;box-sizing:border-box;cursor:pointer;display:block;padding:20px;border-radius:14px;
+  border:1.5px solid var(--line);background:var(--bg);transition:transform .15s,border-color .15s}
+.tile:hover{transform:translateY(-3px);border-color:var(--c,var(--main))}
+.tile b{display:block;font-size:1.15rem;margin-bottom:4px}
+.tile small{color:var(--muted)}
+.tile.typed{border-left:7px solid var(--c)}
+.files{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.files a{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;border-radius:10px;
+  background:var(--bg);border:1px solid var(--line);color:var(--ink);text-decoration:none;font-weight:600}
+.files a:hover{border-color:var(--c)}
+.files a i{font-style:normal;color:var(--c)}
+.empty{padding:18px;border:1.5px dashed var(--line);border-radius:12px;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:.9rem;margin-top:28px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Course Materials</h1>
+    <p>Izountar Yousra &middot; University of Algiers 1 &middot; 2026/2027</p>
+  </div>
+</header>
 
+<main class="wrap">
+  <nav class="crumbs" id="crumbs" aria-label="Breadcrumb"></nav>
+  <section class="panel" id="view" aria-live="polite"></section>
+  <footer>Izountar Yousra &middot; University of Algiers 1 &middot; 2026/2027</footer>
+</main>
+
+<script>
+/* ============ EDIT YOUR CONTENT HERE ============
+   Structure: specialty -> module -> course / td / tp -> files
+   Each file: { t: "Title shown", f: "path/to/file.pdf" }
+   Put your files in folders and write the path in "f".
+================================================== */
+const DATA = [
+  {
+    name: "M2 ASD",
+    modules: [
+      {
+        name: "NoSQL Databases",
+        lectures: [
+          { t: "Lecture 1 – Introduction to NoSQL", f: "lectures/nosql/lecture1.pdf" }
+        ],
+        labs: [
+          { t: "Lab 1 – Getting started with MongoDB", f: "labs/nosql/lab1.pdf" }
+        ]
+      }
+    ]
+  },
+  {
+    name: "L3 ISIL",
+    modules: [
+      {
+        name: "Human-Computer Interaction (HCI)",
+        lectures: [
+          { t: "Lecture 1 – Introduction to HCI", f: "lectures/hci/lecture1.pdf" }
+        ],
+        labs: [
+          { t: "Lab 1 – Interface prototyping", f: "labs/hci/lab1.pdf" }
+        ],
+        tutorials: [
+          { t: "Tutorial 1 – Usability principles", f: "tutorials/hci/tutorial1.pdf" }
+        ]
+      }
+    ]
+  }
+];
+
+const TYPES = [
+  { key: "lectures",  label: "Lectures",  hint: "Lecture notes",      color: "var(--course)" },
+  { key: "labs",      label: "Labs",      hint: "Practical work",     color: "var(--tp)" },
+  { key: "tutorials", label: "Tutorials", hint: "Tutorial exercises", color: "var(--td)" }
+];
+const typesOf = m => TYPES.map((x,i) => [x,i]).filter(([x]) => m[x.key] !== undefined);
+
+const view = document.getElementById("view");
+const crumbs = document.getElementById("crumbs");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function go(h){ location.hash = h; }
+
+function render(){
+  const [s, m, t] = location.hash.slice(1).split("/").map(x => x === undefined || x === "" ? null : +x);
+  const spec = DATA[s]; const mod = spec && spec.modules[m];
+  const type = TYPES[t];
+  const trail = [["Specialties", ""]];
+  if (spec) trail.push([spec.name, `${s}`]);
+  if (mod) trail.push([mod.name, `${s}/${m}`]);
+  crumbs.innerHTML = trail.map((c,i) => i < trail.length-1
+    ? `<button data-h="${c[1]}">${esc(c[0])}</button><span>/</span>` : "").join("")
+    + (type ? `<button data-h="${s}/${m}/${t}" hidden></button>` : "");
+  crumbs.querySelectorAll("button[data-h]").forEach(b => b.onclick = () => go(b.dataset.h));
+
+  if (!spec){
+    view.innerHTML = `<h2>Choose your specialty</h2><p class="sub">Select your field of study to see its modules.</p>
+      <div class="grid">${DATA.map((d,i) => `<button class="tile" data-h="${i}"><b>${esc(d.name)}</b><small>${d.modules.length} module${d.modules.length>1?"s":""}</small></button>`).join("")}</div>`;
+  } else if (!mod){
+    view.innerHTML = `<h2>${esc(spec.name)}</h2><p class="sub">Choose a module.</p>
+      <div class="grid">${spec.modules.map((x,i) => `<button class="tile" data-h="${s}/${i}"><b>${esc(x.name)}</b><small>${typesOf(x).map(([t])=>t.label).join(", ")}</small></button>`).join("")}</div>`;
+  } else if (!type){
+    view.innerHTML = `<h2>${esc(mod.name)}</h2><p class="sub">What are you looking for?</p>
+      <div class="grid">${typesOf(mod).map(([x,i]) => `<button class="tile typed" style="--c:${x.color}" data-h="${s}/${m}/${i}"><b>${x.label}</b><small>${x.hint} &middot; ${(mod[x.key]||[]).length} file${(mod[x.key]||[]).length===1?"":"s"}</small></button>`).join("")}</div>`;
+  } else {
+    const files = mod[type.key] || [];
+    view.innerHTML = `<h2>${esc(mod.name)} &ndash; ${type.label}</h2><p class="sub">${type.hint}</p>`
+      + (files.length ? `<ul class="files" style="--c:${type.color}">${files.map(f => `<li><a href="${esc(f.f)}" target="_blank" rel="noopener"><span>${esc(f.t)}</span><i>Open</i></a></li>`).join("")}</ul>`
+        : `<div class="empty">No files yet. Check back soon.</div>`);
+    crumbs.innerHTML = trail.map(c => `<button data-h="${c[1]}">${esc(c[0])}</button>`).join("<span>/</span>");
+    crumbs.querySelectorAll("button[data-h]").forEach(b => b.onclick = () => go(b.dataset.h));
+  }
+  view.querySelectorAll("[data-h]").forEach(b => b.onclick = () => go(b.dataset.h));
+  window.scrollTo({top:0});
+}
+window.addEventListener("hashchange", render);
+render();
+</script>
+</body>
+</html>
