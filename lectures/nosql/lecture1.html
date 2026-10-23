@@ -1,1 +1,1099 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chapitre 1 – Fondements des bases de données parallèles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a1220; --panel:#101c2e; --panel2:#152740; --line:#24384f;
+  --ink:#e9f1fb; --ink-dim:#8aa0bf; --accent:#ffb454; --accent2:#5fd2ff;
+  --good:#6fd18f; --bad:#ff6f65; --accent-ink:#1a1206;
+  --sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --display:'Space Grotesk',var(--sans);
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --radius:7px; box-sizing:border-box;
+}
+:root[data-theme="light"]{
+  --bg:#eef2f6; --panel:#ffffff; --panel2:#e7edf3;
+  --line:#cdd9e4; --ink:#0f1e30; --ink-dim:#4c6178;
+  --accent:#b96e0a; --accent2:#0a83ab; --good:#177a44; --bad:#b8362c; --accent-ink:#fff9f0;
+}
+*{box-sizing:border-box;}
+html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%;}
+body{
+  height:100%; margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans);
+  overflow:hidden; transition:background .2s,color .2s;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  background-image:radial-gradient(var(--line) 1px, transparent 1px);
+  background-size:28px 28px;
+  background-position:-4px -4px;
+}
+:root[data-theme="light"] body{background-image:radial-gradient(var(--line) 1px, transparent 1px);}
+.deck{position:relative; height:100%; width:100%;}
+.slide{
+  position:absolute; inset:0; display:none; flex-direction:column;
+  padding:clamp(24px,5vw,64px) clamp(20px,7vw,100px);
+  padding-top:calc(clamp(24px,5vw,64px) + env(safe-area-inset-top,0px));
+  overflow-y:auto;
+}
+.slide.active{display:flex;}
+.kicker{
+  font-family:var(--mono); font-size:12px; color:var(--ink-dim); font-weight:500;
+  margin-bottom:14px; display:inline-flex; align-items:center; gap:8px;
+}
+.kicker::before{content:''; width:7px; height:7px; background:var(--accent2); border-radius:1px; transform:rotate(45deg); flex:0 0 auto;}
+h1{font-family:var(--display); font-size:clamp(28px,4.2vw,52px); line-height:1.06; margin:0 0 14px; font-weight:700; letter-spacing:-0.015em;}
+h2{font-family:var(--display); font-size:clamp(21px,2.8vw,32px); line-height:1.15; margin:0 0 16px; font-weight:700; letter-spacing:-0.01em;}
+h3{font-family:var(--display); font-size:17px; margin:0 0 8px; font-weight:600;}
+p{font-size:15.5px; line-height:1.6; color:var(--ink-dim); max-width:74ch; margin:0 0 10px;}
+.lead{font-size:18px; color:var(--ink); max-width:68ch;}
+.example{border-left:2px dashed var(--accent); background:var(--panel); padding:11px 15px; border-radius:0 6px 6px 0; margin-top:6px; position:relative;}
+.example b{color:var(--accent); font-weight:600; font-family:var(--mono); font-size:.93em;}
+.grid{display:grid; gap:14px; margin-top:12px;}
+.grid.cols-2{grid-template-columns:1fr 1fr;}
+.grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.grid.cols-5{grid-template-columns:repeat(5,1fr);}
+@media (max-width:800px){.grid.cols-2,.grid.cols-3,.grid.cols-5{grid-template-columns:1fr;}}
+.card{background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--accent2); border-radius:var(--radius); padding:15px 17px;}
+.card .n{color:var(--accent2); font-size:12px; font-weight:600; margin-bottom:6px; font-family:var(--mono); letter-spacing:.02em;}
+table{border-collapse:collapse; width:100%; margin-top:8px; font-size:14px;}
+th,td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top; line-height:1.5;}
+th{background:var(--panel2); color:var(--accent2); font-weight:600; font-size:12px; font-family:var(--mono); letter-spacing:.01em;}
+td{color:var(--ink-dim);}
+tr:nth-child(even) td{background:rgba(127,127,127,.05);}
+.proscons{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:8px;}
+@media (max-width:700px){.proscons{grid-template-columns:1fr;}}
+.proscons .box{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px;}
+.proscons .box.pro{border-left:3px solid var(--good);}
+.proscons .box.con{border-left:3px solid var(--bad);}
+.proscons ul{margin:0; padding-left:18px; font-size:14px; color:var(--ink-dim); line-height:1.6;}
+.proscons li{margin-bottom:6px;}
+.pillrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+.pill{background:var(--panel2); border:1px solid var(--line); border-radius:5px; padding:6px 13px; font-size:13px; color:var(--ink); font-family:var(--mono);}
+.footer{margin-top:auto; display:flex; align-items:center; justify-content:space-between; padding-top:14px; font-size:12px; color:var(--ink-dim); font-family:var(--mono); border-top:1px solid var(--line);}
+.num{position:fixed; top:calc(16px + env(safe-area-inset-top,0px) + 9px); right:100px; font-size:12px; color:var(--ink-dim); z-index:10; font-family:var(--mono);}
+.num::before{content:'// ';}
+.topbtns{position:fixed; top:calc(14px + env(safe-area-inset-top,0px)); right:16px; display:flex; gap:8px; z-index:20;}
+.iconbtn{background:var(--panel2); border:1px solid var(--line); color:var(--ink); width:34px; height:34px; border-radius:6px; cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center;}
+.iconbtn:hover{border-color:var(--accent2); color:var(--accent2);}
+.nav{position:fixed; bottom:calc(18px + env(safe-area-inset-bottom,0px)); right:24px; display:flex; gap:8px; z-index:10;}
+.nav button{background:var(--panel2); border:1px solid var(--line); color:var(--ink); width:38px; height:38px; border-radius:6px; cursor:pointer; font-size:16px;}
+.nav button:hover{border-color:var(--accent2); color:var(--accent2);}
+.progress{position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg,var(--accent2),var(--accent)); z-index:15; transition:width .25s;}
+.menu-overlay{position:fixed; inset:0; background:rgba(4,8,14,.7); display:none; align-items:center; justify-content:center; z-index:30;}
+.menu-overlay.open{display:flex;}
+.menu-panel{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px; width:min(440px,90vw); max-height:80vh; overflow-y:auto;}
+.menu-panel h4{margin:0 0 12px; font-size:12px; color:var(--ink-dim); letter-spacing:.04em; font-family:var(--mono); font-weight:500;}
+.menu-item{display:flex; gap:10px; align-items:center; padding:9px 10px; border-radius:6px; cursor:pointer; font-size:14px; border-left:2px solid transparent;}
+.menu-item:hover{background:var(--panel2); border-left-color:var(--line);}
+.menu-item.current{background:var(--panel2); color:var(--accent2); border-left-color:var(--accent2);}
+.menu-item .mi-n{color:var(--ink-dim); font-size:11px; width:30px; font-family:var(--mono);}
+::-webkit-scrollbar{width:8px;} ::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
 
+/* ---- Interactive widgets ---- */
+.demo{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; margin-top:14px; position:relative;}
+.demo::before{content:''; position:absolute; left:0; top:14px; bottom:14px; width:3px; background:var(--accent2); border-radius:0 2px 2px 0;}
+.demo h4{margin:0 0 4px; font-size:12.5px; color:var(--ink); letter-spacing:.02em; font-family:var(--mono); font-weight:600;}
+.demo .hint{font-size:13px; color:var(--ink-dim); margin-bottom:12px;}
+.btn{background:var(--accent); color:var(--accent-ink); border:none; padding:9px 18px; border-radius:6px; font-size:14px; font-weight:600; font-family:var(--sans); cursor:pointer;}
+.btn:hover{filter:brightness(1.08);}
+.btn.ghost{background:transparent; color:var(--accent2); border:1px solid var(--accent2);}
+.btnrow{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px;}
+.switch{display:inline-flex; border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+.switch button{background:var(--panel2); color:var(--ink-dim); border:none; padding:7px 14px; font-size:13px; cursor:pointer; font-family:var(--mono);}
+.switch button.on{background:var(--accent); color:var(--accent-ink); font-weight:700;}
+.slider-row{display:flex; align-items:center; gap:14px; margin-bottom:14px;}
+.slider-row input[type=range]{flex:1; accent-color:var(--accent2);}
+.slider-row .val{min-width:120px; text-align:right; font-weight:600; color:var(--accent2); font-size:13.5px; font-family:var(--mono);}
+.queue{display:flex; flex-direction:column; gap:6px;}
+.qline{display:flex; align-items:center; gap:10px;}
+.qline .lbl{width:74px; font-size:12px; color:var(--ink-dim); font-family:var(--mono);}
+.track{flex:1; height:16px; background:var(--panel2); border-radius:4px; overflow:hidden; position:relative; border:1px solid var(--line);}
+.fill{height:100%; width:0%; background:var(--accent2); border-radius:3px; transition:width .12s linear;}
+.qline .time{width:56px; font-size:12px; color:var(--ink-dim); text-align:right; font-family:var(--mono);}
+.barchart{display:flex; align-items:flex-end; gap:10px; height:150px; margin-top:8px; padding:0 4px;}
+.barchart .bwrap{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%;}
+.barchart .bar{width:100%; background:var(--accent2); border-radius:4px 4px 0 0; display:flex; align-items:flex-start; justify-content:center; color:var(--accent-ink); font-size:11.5px; font-weight:700; font-family:var(--mono); padding-top:5px; transition:height .35s ease;}
+.barchart .blabel{margin-top:6px; font-size:11px; color:var(--ink-dim); font-family:var(--mono);}
+.nodeflow{display:flex; align-items:center; justify-content:center; gap:14px; margin:14px 0; flex-wrap:wrap;}
+.node{width:58px; height:58px; border-radius:50%; background:var(--panel2); border:1.5px solid var(--accent2); display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--accent2); font-weight:600; font-family:var(--mono); cursor:pointer; transition:all .2s; text-align:center; line-height:1.15;}
+.node:hover{border-color:var(--accent); box-shadow:0 0 0 3px rgba(255,180,84,.15);}
+.node.down{background:rgba(255,111,101,.12); border-color:var(--bad); color:var(--bad); opacity:.6; text-decoration:line-through;}
+.node.active-pulse{animation:pulse 1s ease infinite;}
+.node.master{border-color:var(--accent); color:var(--accent); border-width:2px;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,180,84,.5);}70%{box-shadow:0 0 0 12px rgba(255,180,84,0);}100%{box-shadow:0 0 0 0 rgba(255,180,84,0);}}
+.arrow{color:var(--ink-dim); font-size:20px;}
+.status{font-size:13px; margin-top:10px; color:var(--ink); min-height:18px;}
+.status b{color:var(--accent2);}
+.arch-tabs{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;}
+.arch-tabs button{background:var(--panel2); border:1px solid var(--line); color:var(--ink-dim); padding:8px 14px; border-radius:6px; font-size:13px; cursor:pointer; font-family:var(--mono);}
+.arch-tabs button.on{background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:700;}
+.arch-box{border:1px solid var(--line); border-radius:var(--radius); background:var(--panel2); padding:16px; display:flex; flex-direction:column; gap:10px; align-items:center;}
+.arch-box .net{background:var(--panel); color:var(--accent2); font-size:11px; letter-spacing:.04em; padding:6px 10px; border-radius:4px; width:100%; text-align:center; font-family:var(--mono);
+  background-image:repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 12px); background-size:100% 1px; background-repeat:no-repeat; background-position:center;}
+.arch-box .row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
+.chip{border:1px solid var(--line); border-radius:5px; padding:8px 12px; font-size:12px; text-align:center; min-width:52px; transition:all .2s; font-family:var(--mono);}
+.chip.cpu{background:#1c2a3d;}
+.chip.disk{background:#2a2013; border-color:#4a3a1c; color:var(--accent);}
+.chip.mem{background:#132a38; border-color:#1f4a58; color:var(--accent2);}
+:root[data-theme="light"] .chip.cpu{background:#e4ecf7;}
+:root[data-theme="light"] .chip.disk{background:#f6ecd8;}
+:root[data-theme="light"] .chip.mem{background:#dcf3ec;}
+.chip.hot{box-shadow:0 0 0 3px var(--bad); border-color:var(--bad);}
+.unit{display:flex; flex-direction:column; gap:6px; align-items:center; padding:6px; border:1px dashed var(--line); border-radius:6px;}
+.shardline{display:flex; gap:2px; margin:14px 0; border-radius:6px; overflow:hidden; height:34px;}
+.shardline .seg{flex:1; display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:700; color:var(--accent-ink); transition:opacity .2s; font-family:var(--mono);}
+.shardmark{position:relative; height:20px; margin-top:-4px;}
+.shardmark .flag{position:absolute; top:0; transform:translateX(-50%); font-size:16px; transition:left .25s ease;}
+.numinput{background:var(--panel2); border:1px solid var(--line); color:var(--ink); padding:8px 12px; border-radius:6px; font-size:14px; width:160px; font-family:var(--mono);}
+.quiz-q{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin-bottom:12px;}
+.quiz-q .qt{font-size:14.5px; color:var(--ink); margin-bottom:10px; font-weight:600; font-family:var(--display);}
+.quiz-opts{display:flex; flex-direction:column; gap:7px; counter-reset:opt;}
+.quiz-opt{background:var(--panel2); border:1px solid var(--line); border-radius:6px; padding:9px 12px 9px 38px; font-size:13.5px; cursor:pointer; color:var(--ink-dim); position:relative;}
+.quiz-opt::before{counter-increment:opt; content:counter(opt,lower-alpha); position:absolute; left:12px; top:9px; font-family:var(--mono); color:var(--ink-dim); font-size:12px;}
+.quiz-opt:hover{border-color:var(--accent2);}
+.quiz-opt.correct{border-color:var(--good); color:var(--good); background:rgba(111,209,143,.1); font-weight:600;}
+.quiz-opt.correct::before{color:var(--good);}
+.quiz-opt.wrong{border-color:var(--bad); color:var(--bad); background:rgba(255,111,101,.1);}
+.quiz-opt.wrong::before{color:var(--bad);}
+.quiz-opt.disabled{pointer-events:none;}
+.scorebox{position:sticky; top:0; background:var(--panel2); border:1px solid var(--line); border-radius:var(--radius); padding:10px 16px; margin-bottom:14px; font-size:14px; display:flex; justify-content:space-between; align-items:center; font-family:var(--mono);}
+.timeline{display:flex; align-items:center; margin-top:20px; gap:0;}
+.tl-step{flex:1; text-align:center; position:relative;}
+.tl-step .dot2{width:11px; height:11px; background:var(--accent2); margin:0 auto 10px; border:2px solid var(--panel); box-shadow:0 0 0 1px var(--accent2); transform:rotate(45deg);}
+.tl-step .line{position:absolute; top:5px; left:50%; width:100%; height:1px; background-image:repeating-linear-gradient(90deg, var(--line) 0 5px, transparent 5px 10px); z-index:-1;}
+.tl-step:last-child .line{display:none;}
+.tl-step h5{font-size:13px; margin:0 0 4px; color:var(--ink); font-family:var(--mono); font-weight:600;}
+.tl-step p{font-size:12px; margin:0; max-width:none;}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck" id="deck">
+
+<!-- 1 -->
+<section class="slide active">
+  <div class="kicker">Chapitre 1 · bdd-paralleles / M2 ASD / 2026-2027   IZOUNTAR Yousra</div>
+  <h1>Fondements des bases<br>de données parallèles</h1>
+  <p class="lead">De l'architecture parallèle aux méthodes de répartition des données : un cours 100% interactif où chaque mécanisme se manipule, s'observe et se comprend en le faisant fonctionner.</p>
+  
+  <div class="footer"><span>Introduction</span><span>1 / 21</span></div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="kicker">Plan général</div>
+  <div class="grid" style="grid-template-columns:1fr;">
+    <div class="card"><div class="n">Partie 1 — Objectifs des BDD parallèles</div><h3>Pourquoi paralléliser, et sur quelle architecture ?</h3><p style="margin:0;">Limites du serveur unique, cinq objectifs recherchés, trois architectures (mémoire partagée, disque partagé, sans partage).</p></div>
+    <div class="card"><div class="n">Partie 2 — Méthodes de répartition des données</div><h3>Comment répartir concrètement les données ?</h3><p style="margin:0;">Définition de la répartition, raisons de répartir, puis les deux grandes méthodes : réplication et sharding.</p></div>
+  </div>
+  <div class="footer"><span>Plan</span><span>2 / 21</span></div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="kicker">1.1 — Introduction</div>
+  <h2>Du serveur unique au système distribué</h2>
+  <p class="lead">Une base <b style="color:var(--ink)">parallèle</b> répartit le chargement, le traitement des requêtes et la gestion des index sur plusieurs unités qui travaillent <b style="color:var(--ink)">simultanément</b> — au lieu qu'un seul serveur fasse tout, l'un après l'autre.</p>
+  <div class="demo">
+    <h4>Simulateur — traitement séquentiel vs parallèle</h4>
+    <div class="hint">4 requêtes arrivent en même temps. Lancez la simulation dans les deux modes et comparez le temps total.</div>
+    <div class="switch">
+      <button id="seqBtn" class="on">Serveur unique (séquentiel)</button>
+      <button id="parBtn">4 nœuds (parallèle)</button>
+    </div>
+    <div class="btnrow" style="margin-top:12px;">
+      <button class="btn" id="runSeqPar">▶ Lancer la simulation</button>
+      <span class="status" id="seqParStatus">Prêt.</span>
+    </div>
+    <div class="queue" id="seqParQueue"></div>
+  </div>
+  <div class="footer"><span>1.1 Introduction</span><span>3 / 21</span></div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="kicker">1.1 — Introduction</div>
+  <h2>Traditionnelle vs parallèle</h2>
+  <table>
+    <tr><th>Caractéristique</th><th>BDD traditionnelle</th><th>BDD parallèle</th><th>Exemple</th></tr>
+    <tr><td>Architecture</td><td>Centralisée, un ou quelques serveurs</td><td>Distribuée sur plusieurs serveurs</td><td>Site vitrine sur 1 serveur MySQL vs Amazon sur des milliers de nœuds</td></tr>
+    <tr><td>Traitement</td><td>Séquentiel — une opération à la fois</td><td>Parallèle — opérations simultanées</td><td>Guichet unique vs plusieurs caisses ouvertes</td></tr>
+    <tr><td>Performance</td><td>Limitée par un seul serveur</td><td>Élevée, tâches réparties</td><td>Google sur des milliards de pages en millisecondes</td></tr>
+    <tr><td>Scalabilité</td><td>Verticale — plus de RAM/CPU</td><td>Horizontale — on ajoute des machines</td><td>16→64 Go de RAM vs +10 serveurs cloud à la demande</td></tr>
+    <tr><td>Fiabilité</td><td>Point de défaillance unique</td><td>Redondance, tolérance aux pannes</td><td>Netflix continue même si un data center tombe</td></tr>
+  </table>
+  <div class="example" style="margin-top:14px;"><b>À retenir —</b> scalabilité verticale = un serveur plus costaud (coûteux, plafond matériel). Scalabilité horizontale = plus de serveurs standards (moins cher, quasi illimité).</div>
+  <div class="footer"><span>1.1 Introduction</span><span>4 / 21</span></div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="kicker">1.1 — Introduction</div>
+  <h2>Deux familles de systèmes</h2>
+  <p>Le parallélisme s'applique aussi bien aux bases relationnelles (SQL) qu'aux bases NoSQL. Cliquez pour explorer chaque famille.</p>
+  <div class="grid cols-2">
+    <div class="card">
+      <h3 style="color:var(--accent)">SQL</h3>
+      <p style="margin:0 0 10px;">Relationnel — tables, schéma fixe, jointures.</p>
+      <div class="example" style="margin:0;"><b>Analytical (OLAP) —</b> agrégation de gros volumes pour l'analyse décisionnelle. <i>Ex : Teradata, Amazon Redshift.</i></div>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--accent2)">NoSQL</h3>
+      <p style="margin:0 0 10px;">Schéma flexible, pensé pour la distribution et le volume.</p>
+      <div class="example" style="margin:0 0 6px;"><b>Key-Value —</b> <i>Redis, DynamoDB</i> — cache, sessions.</div>
+      <div class="example" style="margin:0 0 6px;"><b>Column-Family —</b> <i>Cassandra, HBase</i> — écritures massives.</div>
+      <div class="example" style="margin:0 0 6px;"><b>Document —</b> <i>MongoDB</i> — contenus semi-structurés (JSON).</div>
+      <div class="example" style="margin:0;"><b>Graph —</b> <i>Neo4j</i> — relations complexes.</div>
+    </div>
+  </div>
+  <div class="footer"><span>1.1 Introduction</span><span>5 / 21</span></div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <div class="kicker">1.2 — Objectifs</div>
+  <h2>Cinq objectifs recherchés</h2>
+  <p class="hint" style="color:var(--ink-dim); font-size:13px; margin-top:-6px;">Cliquez une carte pour afficher ou masquer un exemple concret d'application.</p>
+  <div class="grid cols-5" id="objGrid"></div>
+  <div class="footer"><span>1.2 Objectifs</span><span>6 / 21</span></div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <div class="kicker">1.3 — Architecture</div>
+  <h2>Explorateur d'architectures parallèles</h2>
+  <p class="hint" style="color:var(--ink-dim); font-size:13px; margin-top:-6px;">Choisissez une architecture, puis lancez une charge pour observer où se situe le goulot d'étranglement.</p>
+  <div class="demo">
+    <div class="arch-tabs" id="archTabs">
+      <button data-a="mem" class="on">Mémoire partagée</button>
+      <button data-a="disk">Disque partagé</button>
+      <button data-a="none">Sans partage (MPP)</button>
+    </div>
+    <div class="arch-box" id="archBox"></div>
+    <div class="btnrow" style="margin-top:12px;">
+      <button class="btn" id="archRun">⚡ Envoyer une charge de requêtes</button>
+    </div>
+    <div class="status" id="archStatus">Sélectionnez une architecture puis envoyez une charge.</div>
+    <div class="example" id="archExample" style="margin-top:10px;"></div>
+  </div>
+  <div class="footer"><span>1.3 Architecture</span><span>7 / 21</span></div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <div class="kicker">Synthèse</div>
+  <h2>Comparer les trois architectures</h2>
+  <table>
+    <tr><th>Architecture</th><th>Mémoire</th><th>Disque</th><th>Point fort</th><th>Point faible</th><th>Exemple</th></tr>
+    <tr><td>Mémoire partagée</td><td>Commune</td><td>Commun</td><td>Simplicité, rapidité locale</td><td>Goulot d'étranglement mémoire</td><td>SAP HANA</td></tr>
+    <tr><td>Disque partagé</td><td>Privée / nœud</td><td>Commun</td><td>Cohérence facilitée</td><td>Contention sur le disque</td><td>Oracle RAC</td></tr>
+    <tr><td>Sans partage (MPP)</td><td>Privée / nœud</td><td>Privé / nœud</td><td>Scalabilité quasi illimitée</td><td>Complexité de coordination</td><td>Hadoop, Teradata, BigQuery</td></tr>
+  </table>
+  <p class="lead" style="margin-top:16px;">Les BDD parallèles visent la performance, la disponibilité, la fiabilité, l'accès distribué et la maîtrise des coûts — en s'appuyant sur l'une de ces trois architectures.</p>
+  <div class="footer"><span>Synthèse — Partie 1</span><span>8 / 21</span></div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <div class="kicker">2.1 — Qu'est-ce que la répartition ?</div>
+  <h2>Diviser pour mieux régner</h2>
+  <p class="lead">La répartition des données consiste à diviser un ensemble de données et à le distribuer sur plusieurs nœuds, pour un traitement simultané des requêtes et un accès plus rapide.</p>
+  <div class="demo">
+    <h4>Simulateur — répartir une base sur N nœuds</h4>
+    <div class="slider-row">
+      <span style="font-size:13px; color:var(--ink-dim);">Nombre de nœuds</span>
+      <input type="range" id="nodeSlider" min="1" max="8" value="4">
+      <span class="val" id="nodeVal">4 nœuds</span>
+    </div>
+    <div class="slider-row">
+      <span style="font-size:13px; color:var(--ink-dim);">Taille de la base (enregistrements)</span>
+      <input type="range" id="sizeSlider" min="50000" max="1000000" step="50000" value="400000">
+      <span class="val" id="sizeVal">400 000</span>
+    </div>
+    <div class="barchart" id="repartBars"></div>
+    <div class="status" id="repartStatus"></div>
+  </div>
+  <div class="footer"><span>2.1 Répartition</span><span>9 / 21</span></div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <div class="kicker">2.2 — Pourquoi répartir ?</div>
+  <h2>Scalabilité horizontale vs Verticale</h2>
+  <p class="lead"><b style="color:var(--ink)">Montée en charge —</b> découvrez la différence d'impact entre l'extensibilité verticale (Scale-UP) et l'extensibilité horizontale (Scale-OUT).</p>
+  
+  <div class="demo">
+    <h4>Simulateur interactif de montée en charge</h4>
+    
+    <div class="switch" style="margin-bottom:12px;">
+      <button id="btnScaleVert" class="on">Scalabilité Verticale (Scale-UP)</button>
+      <button id="btnScaleHor">Scalabilité Horizontale (Scale-OUT)</button>
+    </div>
+
+    <div class="slider-row">
+      <span style="font-size:13px; color:var(--ink-dim);">Niveau de charge</span>
+      <input type="range" id="loadSlider" min="100" max="400" step="100" value="100">
+      <span class="val" id="loadVal">100 % de charge</span>
+    </div>
+
+    <div id="scaleVisual" style="display:flex; gap:16px; align-items:center; justify-content:center; min-height:160px; margin:16px 0; background:var(--panel2); border-radius:6px; padding:16px;">
+    </div>
+
+    <div class="status" id="scaleDesc"></div>
+  </div>
+  <div class="footer"><span>2.2 Scalabilité</span><span>10 / 21</span></div>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <div class="kicker">2.2 — Pourquoi répartir ?</div>
+  <h2>Performance</h2>
+  <div class="grid cols-2">
+    <div class="card"><h3>Temps de réponse</h3><p style="margin:0;">Chaque nœud ne gère qu'une fraction des données, ce qui réduit la latence.</p><div class="example" style="margin-top:10px;"><b>Ex —</b> chercher parmi 200 000 (1 nœud) est plus lent que parmi 50 000 (1 nœud sur 4).</div></div>
+    <div class="card"><h3>Répartition de la charge</h3><p style="margin:0;">Le travail est distribué sur plusieurs serveurs, évitant qu'un seul soit surchargé.</p><div class="example" style="margin-top:10px;"><b>Ex —</b> un load balancer répartit les requêtes web entrantes sur 5 serveurs identiques.</div></div>
+  </div>
+  <div class="demo">
+    <h4>Mini-simulateur — latence estimée selon le nombre de nœuds</h4>
+    <div class="slider-row">
+      <span style="font-size:13px; color:var(--ink-dim);">Nœuds actifs</span>
+      <input type="range" id="latSlider" min="1" max="10" value="1">
+      <span class="val" id="latVal">1 nœud</span>
+    </div>
+    <div class="track" style="height:22px;"><div class="fill" id="latFill" style="width:100%;"></div></div>
+    <div class="status" id="latStatus"></div>
+  </div>
+  <div class="footer"><span>2.2 Performance</span><span>11 / 21</span></div>
+</section>
+
+<!-- 12 -->
+<section class="slide">
+  <div class="kicker">2.2 — Pourquoi répartir ?</div>
+  <h2>Gros volumes, disponibilité, flexibilité</h2>
+  <div class="grid cols-3">
+    <div class="card"><h3>Gros volumes</h3><p style="margin:0; font-size:14px;">Segmenter facilite la gestion, la sauvegarde et la restauration. <i>Ex : sauvegarder 4 shards de 100 Go plutôt qu'un bloc de 400 Go.</i></p></div>
+    <div class="card"><h3>Disponibilité</h3><p style="margin:0; font-size:14px;">Si un nœud tombe, les autres continuent ; la réplication réduit le risque de perte. <i>Ex : un serveur en panne n'interrompt pas le service.</i></p></div>
+    <div class="card"><h3>Flexibilité</h3><p style="margin:0; font-size:14px;">Des modèles hétérogènes comme MongoDB adaptent la répartition à l'usage réel. <i>Ex : documents produits vs logs stockés différemment.</i></p></div>
+  </div>
+  <div class="footer"><span>2.2 Volumes / Dispo / Flexibilité</span><span>12 / 21</span></div>
+</section>
+
+<!-- 13 -->
+<section class="slide">
+  <div class="kicker">2.3 — Méthodes de répartition</div>
+  <h2>La distribution des données ("share nothing")</h2>
+  <p class="lead">Les données sont distribuées sur plusieurs nœuds indépendants, sans ressource partagée. Ce principe regroupe deux méthodes : la réplication et le sharding.</p>
+  <div class="demo">
+    <h4>Simulateur — tolérance aux pannes</h4>
+    <div class="hint">Cliquez sur un nœud pour simuler sa panne, puis observez si le service reste disponible.</div>
+    <div class="nodeflow" id="failNodes"></div>
+    <div class="status" id="failStatus">Tous les nœuds sont actifs.</div>
+  </div>
+  <div class="example"><b>Exemple —</b> Cassandra ou MongoDB en cluster : chaque nœud héberge sa propre part des données, sans disque ni mémoire partagés entre serveurs.</div>
+  <div class="footer"><span>2.3 Distribution</span><span>13 / 21</span></div>
+</section>
+
+<!-- 14 -->
+<section class="slide">
+  <div class="kicker">2.3 — Méthodes de répartition</div>
+  <h2>La réplication — Maître / Esclave</h2>
+  <p class="lead">Une ou plusieurs copies des données sont créées sur différents nœuds. Chaque écriture doit être propagée à toutes les répliques.</p>
+  <div class="demo">
+    <h4>Simulateur — écrire une donnée et observer sa propagation</h4>
+    <div class="switch">
+      <button id="syncBtn" class="on">Synchrone</button>
+      <button id="asyncBtn">Asynchrone</button>
+    </div>
+    <div class="btnrow" style="margin-top:12px;">
+      <button class="btn" id="writeBtn">✍ Écrire une donnée sur le maître</button>
+    </div>
+    <div class="nodeflow" id="replNodes"></div>
+    <div class="status" id="replStatus">Prêt à écrire.</div>
+  </div>
+  <table style="margin-top:14px;">
+    <tr><th>Type</th><th>Fonctionnement</th><th>Exemple</th></tr>
+    <tr><td>Synchrone</td><td>Chaque modification est appliquée à toutes les répliques avant de valider.</td><td>Système bancaire : le solde doit être identique partout, instantanément.</td></tr>
+    <tr><td>Asynchrone</td><td>Validée sur le maître, puis propagée après coup (quelques secondes).</td><td>Réseau social : un like propagé avec délai n'est pas critique.</td></tr>
+  </table>
+  <div class="footer"><span>2.3 Réplication</span><span>14 / 21</span></div>
+</section>
+
+<!-- 15 -->
+<section class="slide">
+  <div class="kicker">2.3 — Avantages / inconvénients</div>
+  <h2>La réplication</h2>
+  <div class="proscons">
+    <div class="box pro"><h3 style="color:var(--good);">Avantages</h3><ul>
+      <li>Haute disponibilité : une réplique prend le relais si un nœud tombe</li>
+      <li>Lecture rapide : les lectures sont réparties sur plusieurs répliques</li>
+      <li>Sécurité : restauration possible depuis une autre copie</li>
+    </ul></div>
+    <div class="box con"><h3 style="color:var(--bad);">Inconvénients</h3><ul>
+      <li>Consommation d'espace : chaque réplique stocke une copie complète</li>
+      <li>Synchronisation : délai possible en asynchrone → incohérence temporaire</li>
+      <li>Coût : plus de serveurs à héberger</li>
+    </ul></div>
+  </div>
+  <div class="footer"><span>2.3 Réplication — bilan</span><span>15 / 21</span></div>
+</section>
+
+<!-- 16 -->
+<section class="slide">
+  <div class="kicker">2.3 — Méthodes de répartition</div>
+  <h2>Le sharding (fragmentation)</h2>
+  <p class="lead">La base est divisée en plusieurs morceaux (shards) selon un critère ; chaque shard est stocké sur un serveur différent.</p>
+  <div class="demo">
+    <h4>Calculateur — dans quel shard va cet utilisateur ?</h4>
+    <div class="hint">Base de 1 000 000 d'utilisateurs, répartie par plage d'ID sur le nombre de shards choisi.</div>
+    <div class="slider-row">
+      <span style="font-size:13px; color:var(--ink-dim);">Nombre de shards</span>
+      <input type="range" id="shardCountSlider" min="2" max="8" value="4">
+      <span class="val" id="shardCountVal">4 shards</span>
+    </div>
+    <div class="btnrow">
+      <span style="font-size:13px; color:var(--ink-dim);">ID utilisateur (1 – 1 000 000)</span>
+      <input type="number" class="numinput" id="userIdInput" min="1" max="1000000" value="537219">
+      <button class="btn" id="shardCalcBtn">🔍 Localiser</button>
+    </div>
+    <div class="shardline" id="shardLine"></div>
+    <div class="status" id="shardStatus"></div>
+  </div>
+  <div class="footer"><span>2.3 Sharding</span><span>16 / 21</span></div>
+</section>
+
+<!-- 17 -->
+<section class="slide">
+  <div class="kicker">2.3 — Avantages / inconvénients</div>
+  <h2>Le sharding</h2>
+  <div class="proscons">
+    <div class="box pro"><h3 style="color:var(--good);">Avantages</h3><ul>
+      <li>Scalabilité horizontale : on ajoute des nœuds pour répartir la charge</li>
+      <li>Performance : le traitement est réparti entre serveurs</li>
+      <li>Espace efficace : pas de redondance, chaque nœud a des données uniques</li>
+    </ul></div>
+    <div class="box con"><h3 style="color:var(--bad);">Inconvénients</h3><ul>
+      <li>Requêtes complexes : une requête croisant plusieurs shards ralentit</li>
+      <li>Déséquilibre de charge : un shard mal réparti peut surcharger un nœud</li>
+    </ul></div>
+  </div>
+  <div class="footer"><span>2.3 Sharding — bilan</span><span>17 / 21</span></div>
+</section>
+
+<!-- 18 -->
+<section class="slide">
+  <div class="kicker">Synthèse — Partie 2</div>
+  <h2>Réplication vs Sharding — vue combinée</h2>
+  <table>
+    <tr><th>Critère</th><th>Réplication</th><th>Sharding</th></tr>
+    <tr><td>Principe</td><td>Copier les mêmes données sur plusieurs nœuds</td><td>Diviser les données entre plusieurs nœuds</td></tr>
+    <tr><td>Objectif principal</td><td>Disponibilité et fiabilité</td><td>Scalabilité et performance</td></tr>
+    <tr><td>Coût de stockage</td><td>Élevé (copies complètes)</td><td>Faible (données uniques par nœud)</td></tr>
+    <tr><td>Limite</td><td>Synchronisation et coût des serveurs</td><td>Requêtes croisées entre shards</td></tr>
+    <tr><td>Exemple</td><td>Réplicas MongoDB, MySQL master/slave</td><td>Cassandra, sharding MongoDB</td></tr>
+  </table>
+  <div class="demo">
+    <h4>Vue combinée — shards répliqués</h4>
+    <div class="hint">En pratique, chaque shard est lui-même répliqué : clic sur "Générer" pour visualiser un cluster réaliste.</div>
+    <div class="btnrow"><button class="btn" id="genClusterBtn">🧩 Générer un cluster (3 shards × 2 répliques)</button></div>
+    <div id="clusterView" style="display:flex; gap:22px; flex-wrap:wrap; justify-content:center; margin-top:10px;"></div>
+  </div>
+  <div class="footer"><span>Synthèse — Partie 2</span><span>18 / 21</span></div>
+</section>
+
+<!-- 19 -->
+<section class="slide">
+  <div class="kicker">Panorama</div>
+  <h2>De la BDD parallèle au NoSQL</h2>
+  <p class="lead">Les BDD parallèles ont posé les bases (partitionnement, shared-nothing, réplication) que le NoSQL a reprises et poussées à très grande échelle.</p>
+  <div class="timeline">
+    <div class="tl-step"><div class="dot2"></div><div class="line"></div><h5>BDD parallèle</h5><p>Shared-nothing, partitionnement, quelques dizaines de nœuds, même datacenter.</p></div>
+    <div class="tl-step"><div class="dot2"></div><div class="line"></div><h5>BDD distribuée</h5><p>Sites géographiquement éloignés, autonomie locale, réseau WAN.</p></div>
+    <div class="tl-step"><div class="dot2"></div><h5>NoSQL</h5><p>Sharding + réplication à très grande échelle, schéma flexible, cohérence relâchée (CAP).</p></div>
+  </div>
+  <div class="footer"><span>Panorama</span><span>19 / 21</span></div>
+</section>
+
+<!-- 20 -->
+<section class="slide">
+  <div class="kicker">Auto-évaluation</div>
+  <h2>Quiz interactif noté</h2>
+  <div class="scorebox"><span>Score</span><span id="quizScore">0 / 8</span></div>
+  <div id="quizArea"></div>
+  <div class="btnrow"><button class="btn ghost" id="quizReset">↺ Recommencer le quiz</button></div>
+  <div class="footer"><span>Quiz</span><span>20 / 21</span></div>
+</section>
+
+<!-- 21 -->
+<section class="slide">
+  <div class="kicker">Fin</div>
+  <h2>Ce qu'il faut retenir</h2>
+  <div class="grid cols-2">
+    <div class="card"><h3>Partie 1</h3><p style="margin:0;">Une BDD parallèle répartit calcul et stockage pour gagner en performance, disponibilité, fiabilité, accès distribué et coûts — via mémoire partagée, disque partagé ou sans partage.</p></div>
+    <div class="card"><h3>Partie 2</h3><p style="margin:0;">Répartir les données, c'est diviser (sharding) et/ou dupliquer (réplication) — deux méthodes complémentaires, souvent combinées en pratique.</p></div>
+  </div>
+  <p class="lead" style="margin-top:16px;">Merci d'avoir suivi ce cours interactif — rejouez les simulateurs autant que nécessaire pour bien ancrer les mécanismes.</p>
+  <div class="footer"><span>Fondements des BDD parallèles — fin</span><span>21 / 21</span></div>
+</section>
+
+</div>
+
+<div class="num" id="num">1 / 21</div>
+<div class="topbtns">
+  <button class="iconbtn" id="themeToggle" title="Mode clair / sombre">☀</button>
+  <button class="iconbtn" id="menuToggle" title="Aller à une section">☰</button>
+</div>
+<div class="nav">
+  <button id="prev" aria-label="Précédent">‹</button>
+  <button id="next" aria-label="Suivant">›</button>
+</div>
+
+<div class="menu-overlay" id="menuOverlay">
+  <div class="menu-panel">
+    <h4>NAVIGATION</h4>
+    <div id="menuList"></div>
+  </div>
+</div>
+
+<script>
+/* ===================== NAVIGATION ===================== */
+const slides = document.querySelectorAll('.slide');
+const titles = [
+  "Titre","Plan général","1.1 Serveur unique → distribué","1.1 Traditionnelle vs parallèle","1.1 SQL vs NoSQL",
+  "1.2 Cinq objectifs","1.3 Explorateur d'architectures","Synthèse Partie 1",
+  "2.1 Qu'est-ce que la répartition ?","2.2 Scalabilité","2.2 Performance","2.2 Volumes/Dispo/Flexibilité",
+  "2.3 Distribution (share nothing)","2.3 Réplication","2.3 Réplication — bilan",
+  "2.3 Sharding","2.3 Sharding — bilan","Synthèse Partie 2","Panorama BDD→NoSQL","Quiz interactif","Conclusion"
+];
+let i = 0;
+function show(n){
+  slides[i].classList.remove('active');
+  i = (n + slides.length) % slides.length;
+  slides[i].classList.add('active');
+  document.getElementById('num').textContent = (i+1) + ' / ' + slides.length;
+  document.getElementById('progress').style.width = (((i+1)/slides.length)*100) + '%';
+  renderMenu();
+}
+document.getElementById('next').onclick = () => show(i+1);
+document.getElementById('prev').onclick = () => show(i-1);
+window.addEventListener('keydown', (e) => {
+  if(document.getElementById('menuOverlay').classList.contains('open')) return;
+  const tag = document.activeElement.tagName;
+  if(tag === 'INPUT') return;
+  if(e.key === 'ArrowRight' || e.key === ' ') show(i+1);
+  if(e.key === 'ArrowLeft') show(i-1);
+  if(e.key === 'Escape') closeMenu();
+});
+let touchX = null;
+window.addEventListener('touchstart', e => touchX = e.touches[0].clientX);
+window.addEventListener('touchend', e => {
+  if(touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if(dx < -40) show(i+1);
+  if(dx > 40) show(i-1);
+  touchX = null;
+});
+const themeBtn = document.getElementById('themeToggle');
+let light = false;
+themeBtn.onclick = () => {
+  light = !light;
+  document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
+  themeBtn.textContent = light ? '☾' : '☀';
+};
+const menuOverlay = document.getElementById('menuOverlay');
+const menuList = document.getElementById('menuList');
+function renderMenu(){
+  menuList.innerHTML = '';
+  titles.forEach((t, idx) => {
+    const item = document.createElement('div');
+    item.className = 'menu-item' + (idx === i ? ' current' : '');
+    item.innerHTML = '<span class="mi-n">' + (idx+1) + '</span><span>' + t + '</span>';
+    item.onclick = () => { show(idx); closeMenu(); };
+    menuList.appendChild(item);
+  });
+}
+function closeMenu(){ menuOverlay.classList.remove('open'); }
+document.getElementById('menuToggle').onclick = () => { renderMenu(); menuOverlay.classList.add('open'); };
+menuOverlay.addEventListener('click', (e) => { if(e.target === menuOverlay) closeMenu(); });
+renderMenu();
+document.getElementById('progress').style.width = (100/slides.length) + '%';
+
+/* ===================== SLIDE 3 — Séquentiel vs parallèle ===================== */
+(function(){
+  const seqBtn = document.getElementById('seqBtn'), parBtn = document.getElementById('parBtn');
+  const runBtn = document.getElementById('runSeqPar');
+  const statusEl = document.getElementById('seqParStatus');
+  const queueEl = document.getElementById('seqParQueue');
+  let mode = 'seq';
+  const REQS = ['Requête A','Requête B','Requête C','Requête D'];
+  const DUR = 900; // ms per request unit
+
+  function build(){
+    queueEl.innerHTML = '';
+    REQS.forEach((r,idx)=>{
+      const line = document.createElement('div'); line.className='qline';
+      line.innerHTML = '<span class="lbl">'+r+'</span><div class="track"><div class="fill" id="f'+idx+'"></div></div><span class="time" id="t'+idx+'">0.0s</span>';
+      queueEl.appendChild(line);
+    });
+  }
+  build();
+  seqBtn.onclick = ()=>{ mode='seq'; seqBtn.classList.add('on'); parBtn.classList.remove('on'); build(); statusEl.textContent='Mode : serveur unique.'; };
+  parBtn.onclick = ()=>{ mode='par'; parBtn.classList.add('on'); seqBtn.classList.remove('on'); build(); statusEl.textContent='Mode : 4 nœuds en parallèle.'; };
+
+  runBtn.onclick = () => {
+    build();
+    runBtn.disabled = true;
+    const start = performance.now();
+    if(mode === 'par'){
+      statusEl.innerHTML = 'Traitement en cours <b>en parallèle</b>…';
+      REQS.forEach((r,idx)=> animateOne(idx, 0, DUR, start));
+      setTimeout(()=>{ statusEl.innerHTML = 'Terminé en <b>~'+(DUR/1000).toFixed(1)+'s</b> — tous les nœuds ont fini ensemble.'; runBtn.disabled=false; }, DUR+150);
+    } else {
+      statusEl.innerHTML = 'Traitement en cours <b>séquentiel</b>…';
+      REQS.forEach((r,idx)=> animateOne(idx, idx*DUR, DUR, start));
+      const total = REQS.length*DUR;
+      setTimeout(()=>{ statusEl.innerHTML = 'Terminé en <b>~'+(total/1000).toFixed(1)+'s</b> — 4× plus long que le mode parallèle.'; runBtn.disabled=false; }, total+150);
+    }
+  };
+  function animateOne(idx, delay, dur, start){
+    setTimeout(()=>{
+      const fill = document.getElementById('f'+idx), timeEl = document.getElementById('t'+idx);
+      const t0 = performance.now();
+      function step(now){
+        const p = Math.min(1, (now-t0)/dur);
+        fill.style.width = (p*100)+'%';
+        timeEl.textContent = (((now-start))/1000).toFixed(1)+'s';
+        if(p<1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }, delay);
+  }
+})();
+
+/* ===================== SLIDE 6 — Cinq objectifs (carte interactive) ===================== */
+(function(){
+  const objectifs = [
+    {
+      titre: "1. Performance",
+      desc: "Accélérer l'exécution des requêtes grâce à la division et au traitement simultané des tâches (parallélisme intra/inter-requête).",
+      exemple: "Indexation et recherche parmi des milliards de documents en une fraction de seconde."
+    },
+    {
+      titre: "2. Disponibilité",
+      desc: "Garantir un accès continu et sans interruption au service 24h/24 et 7j/7, même lors des pics de charge.",
+      exemple: "Système bancaire en ligne accessible mondialement sans arrêt de service."
+    },
+    {
+      titre: "3. Fiabilité",
+      desc: "Assurer la tolérance aux pannes par la redondance et la réplication des données sur plusieurs nœuds.",
+      exemple: "Si un serveur physique s'éteint brusquement, un autre prend le relais sans perte de données."
+    },
+    {
+      titre: "4. Accès distribué",
+      desc: "Permettre à des utilisateurs ou applications situés sur différents sites d'accéder aux données de manière transparente.",
+      exemple: "Des équipes distantes à Alger, Paris et Dubaï travaillent en simultané sur la même base."
+    },
+    {
+      titre: "5. Maîtrise des coûts",
+      desc: "Préférer un ensemble de serveurs standards bon marché (commodity hardware) plutôt qu'une seule machine surdimensionnée très coûteuse.",
+      exemple: "Un cluster cloud à la demande coûte nettement moins cher qu'un mainframe propriétaire."
+    }
+  ];
+
+  const grid = document.getElementById('objGrid');
+  if (grid) {
+    grid.innerHTML = '';
+    objectifs.forEach(obj => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.cursor = 'pointer';
+      card.style.minHeight = '140px';
+      
+      card.innerHTML = `
+        <div class="n">${obj.titre}</div>
+        <p style="margin:0 0 8px; font-size:13.5px; color:var(--ink);">${obj.desc}</p>
+        <div class="example" style="display:none; margin-top:8px;"><b>Exemple :</b> ${obj.exemple}</div>
+        <span style="font-size:11px; color:var(--accent2); font-family:var(--mono);">👉 Cliquez pour afficher/masquer l'exemple</span>
+      `;
+
+      card.onclick = () => {
+        const ex = card.querySelector('.example');
+        const isHidden = ex.style.display === 'none';
+        ex.style.display = isHidden ? 'block' : 'none';
+      };
+
+      grid.appendChild(card);
+    });
+  }
+})();
+
+/* ===================== SLIDE 7 — Architecture explorer ===================== */
+(function(){
+  const box = document.getElementById('archBox');
+  const tabs = document.getElementById('archTabs');
+  const statusEl = document.getElementById('archStatus');
+  const exampleEl = document.getElementById('archExample');
+  let current = 'mem';
+
+  const ARCH = {
+    mem: {
+      render: ()=>`
+        <div class="row"><div class="chip cpu" id="c1">CPU</div><div class="chip cpu" id="c2">CPU</div><div class="chip cpu" id="c3">CPU</div><div class="chip cpu" id="c4">CPU</div></div>
+        <div class="net">RÉSEAU D'INTERCONNEXION</div>
+        <div class="row"><div class="chip disk">DISK</div><div class="chip disk">DISK</div><div class="chip mem" id="shared">MÉMOIRE PARTAGÉE</div></div>`,
+      hot: 'shared',
+      status: 'Toutes les CPU accèdent à la <b>même mémoire</b> : rapide, mais elle sature vite sous forte charge.',
+      example: '<b>Exemple —</b> SAP HANA in-memory, PostgreSQL avec parallélisme intra-requête sur une machine multi-cœurs.'
+    },
+    disk: {
+      render: ()=>`
+        <div class="row"><div class="unit"><div class="chip mem">MEM</div><div class="chip cpu">CPU</div></div><div class="unit"><div class="chip mem">MEM</div><div class="chip cpu">CPU</div></div></div>
+        <div class="net">RÉSEAU</div>
+        <div class="row"><div class="chip disk" id="shared">DISK PARTAGÉ</div></div>`,
+      hot: 'shared',
+      status: 'Chaque nœud a sa mémoire propre, mais tous écrivent sur le <b>même disque</b> : contention possible en écriture.',
+      example: '<b>Exemple —</b> Oracle RAC : plusieurs serveurs de calcul partagent un unique système de stockage (baie SAN).'
+    },
+    none: {
+      render: ()=>`
+        <div class="row"><div class="unit"><div class="chip mem" id="s1">MEM</div><div class="chip cpu" id="s1b">CPU</div><div class="chip disk" id="s1c">DISK</div></div><div class="unit"><div class="chip mem" id="s2">MEM</div><div class="chip cpu" id="s2b">CPU</div><div class="chip disk" id="s2c">DISK</div></div></div>
+        <div class="net">RÉSEAU</div>`,
+      hot: null,
+      status: 'Chaque nœud a sa <b>propre</b> mémoire et son propre disque : aucune ressource partagée, aucun goulot central.',
+      example: '<b>Exemple —</b> Hadoop/HDFS, Teradata, Google BigQuery.'
+    }
+  };
+
+  function render(){
+    const a = ARCH[current];
+    box.innerHTML = a.render();
+    statusEl.innerHTML = a.status;
+    exampleEl.innerHTML = a.example;
+  }
+  tabs.querySelectorAll('button').forEach(btn=>{
+    btn.onclick = ()=>{
+      tabs.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on');
+      current = btn.dataset.a;
+      render();
+    };
+  });
+  document.getElementById('archRun').onclick = ()=>{
+    const a = ARCH[current];
+    if(a.hot){
+      const el = document.getElementById(a.hot);
+      if(el){
+        el.classList.add('hot');
+        statusEl.innerHTML = '⚠ Charge envoyée — la ressource partagée <b>chauffe</b> : c\'est le goulot d\'étranglement.';
+        setTimeout(()=> el.classList.remove('hot'), 1400);
+      }
+    } else {
+      ['s1','s1b','s1c','s2','s2b','s2c'].forEach((id,idx)=>{
+        const el = document.getElementById(id);
+        if(el) setTimeout(()=>{ el.classList.add('hot'); setTimeout(()=>el.classList.remove('hot'),400); }, idx*80);
+      });
+      statusEl.innerHTML = '✅ Charge envoyée — chaque nœud traite sa part <b>indépendamment</b>, sans contention.';
+    }
+  };
+  render();
+})();
+
+/* ===================== SLIDE 9 — Répartition sur N nœuds ===================== */
+(function(){
+  const nodeSlider = document.getElementById('nodeSlider'), sizeSlider = document.getElementById('sizeSlider');
+  const nodeVal = document.getElementById('nodeVal'), sizeVal = document.getElementById('sizeVal');
+  const bars = document.getElementById('repartBars'), statusEl = document.getElementById('repartStatus');
+  function fmt(n){ return n.toLocaleString('fr-FR'); }
+  function render(){
+    const n = parseInt(nodeSlider.value), size = parseInt(sizeSlider.value);
+    nodeVal.textContent = n + ' nœud' + (n>1?'s':'');
+    sizeVal.textContent = fmt(size);
+    const per = Math.round(size/n);
+    bars.innerHTML = '';
+    for(let k=1;k<=n;k++){
+      const wrap = document.createElement('div'); wrap.className='bwrap';
+      wrap.innerHTML = '<div class="bar" style="height:'+(100/n).toFixed(0)+'%;">'+fmt(per)+'</div><div class="blabel">Nœud '+k+'</div>';
+      bars.appendChild(wrap);
+    }
+    statusEl.innerHTML = 'Chaque nœud gère <b>'+fmt(per)+'</b> enregistrements au lieu de <b>'+fmt(size)+'</b> sur un serveur unique — recherches et écritures environ <b>'+n+'×</b> plus rapides.';
+  }
+  nodeSlider.oninput = render; sizeSlider.oninput = render;
+  render();
+})();
+
+/* ===================== SLIDE 10 — Scalabilité Horizontale vs Verticale ===================== */
+(function(){
+  const loadSlider = document.getElementById('loadSlider');
+  const loadVal = document.getElementById('loadVal');
+  const visualArea = document.getElementById('scaleVisual');
+  const scaleDesc = document.getElementById('scaleDesc');
+  const btnVert = document.getElementById('btnScaleVert');
+  const btnHor = document.getElementById('btnScaleHor');
+
+  let mode = 'vert';
+
+  function updateScalability() {
+    if (!loadSlider || !visualArea || !scaleDesc) return;
+    const load = parseInt(loadSlider.value);
+    loadVal.textContent = load + ' % de charge';
+    visualArea.innerHTML = '';
+
+    if (mode === 'vert') {
+      const scaleFactor = load / 100;
+      const server = document.createElement('div');
+      server.style.cssText = `
+        width: ${60 * scaleFactor}px;
+        height: ${80 * scaleFactor}px;
+        background: var(--accent);
+        color: var(--accent-ink);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--mono);
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      `;
+      server.innerHTML = `<span>🖥 SERVEUR</span><span style="font-size:11px;">${scaleFactor * 16} Go RAM</span>`;
+      visualArea.appendChild(server);
+
+      scaleDesc.innerHTML = `<b>Scalabilité Verticale (Scale-UP) :</b> On augmente les capacités matérielles d'une seule machine (CPU, RAM, Disque).<br>
+      ⚠️ <i>Limite :</i> Coût très élevé (matériel propriétaire) et plafond physique du serveur.`;
+
+    } else {
+      const nodeCount = Math.ceil(load / 100);
+      for (let k = 1; k <= nodeCount; k++) {
+        const node = document.createElement('div');
+        node.style.cssText = `
+          width: 70px;
+          height: 70px;
+          background: var(--accent2);
+          color: var(--accent-ink);
+          border-radius: 8px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-family: var(--mono);
+          font-size: 12px;
+          font-weight: bold;
+          transition: all 0.3s ease;
+        `;
+        node.innerHTML = `<span>🖥 Nœud ${k}</span><span style="font-size:10px;">16 Go RAM</span>`;
+        visualArea.appendChild(node);
+      }
+
+      scaleDesc.innerHTML = `<b>Scalabilité Horizontale (Scale-OUT) :</b> On ajoute de nouvelles machines (nœuds) standards au cluster pour se partager le travail.<br>
+      ✅ <i>Avantage :</i> Coût réduit (serveurs ordinaires), aucune limite théorique de puissance.`;
+    }
+  }
+
+  if (loadSlider && btnVert && btnHor) {
+    loadSlider.oninput = updateScalability;
+    
+    btnVert.onclick = () => {
+      mode = 'vert';
+      btnVert.classList.add('on');
+      btnHor.classList.remove('on');
+      updateScalability();
+    };
+    btnHor.onclick = () => {
+      mode = 'hor';
+      btnHor.classList.add('on');
+      btnVert.classList.remove('on');
+      updateScalability();
+    };
+
+    updateScalability();
+  }
+})();
+
+/* ===================== SLIDE 11 — Latence simulée ===================== */
+(function(){
+  const latSlider = document.getElementById('latSlider'), latVal = document.getElementById('latVal');
+  const latFill = document.getElementById('latFill'), statusEl = document.getElementById('latStatus');
+  function render(){
+    const n = parseInt(latSlider.value);
+    latVal.textContent = n + ' nœud' + (n>1?'s':'');
+    const pct = Math.max(6, 100/n);
+    latFill.style.width = pct+'%';
+    statusEl.innerHTML = 'Latence relative estimée : <b>'+pct.toFixed(0)+'%</b> du temps d\'un serveur unique.';
+  }
+  latSlider.oninput = render;
+  render();
+})();
+
+/* ===================== SLIDE 13 — Tolérance aux pannes ===================== */
+(function(){
+  const cont = document.getElementById('failNodes'), statusEl = document.getElementById('failStatus');
+  const N = 5; let states = Array(N).fill(true);
+  function render(){
+    cont.innerHTML='';
+    for(let k=0;k<N;k++){
+      const n = document.createElement('div');
+      n.className = 'node' + (states[k] ? '' : ' down');
+      n.textContent = 'N'+(k+1);
+      n.onclick = ()=>{ states[k]=!states[k]; render(); };
+      cont.appendChild(n);
+    }
+    const alive = states.filter(Boolean).length;
+    if(alive === N) statusEl.textContent = 'Tous les nœuds sont actifs — service pleinement disponible.';
+    else if(alive === 0) statusEl.innerHTML = '❌ Tous les nœuds sont en panne — <b>service totalement indisponible</b>.';
+    else statusEl.innerHTML = '✅ '+alive+'/'+N+' nœuds actifs — le service <b>continue de fonctionner</b> grâce à la redondance (données répliquées sur les nœuds survivants).';
+  }
+  render();
+})();
+
+/* ===================== SLIDE 14 — Réplication maître/esclave ===================== */
+(function(){
+  const syncBtn = document.getElementById('syncBtn'), asyncBtn = document.getElementById('asyncBtn');
+  const writeBtn = document.getElementById('writeBtn');
+  const cont = document.getElementById('replNodes'), statusEl = document.getElementById('replStatus');
+  let mode = 'sync';
+  syncBtn.onclick = ()=>{ mode='sync'; syncBtn.classList.add('on'); asyncBtn.classList.remove('on'); };
+  asyncBtn.onclick = ()=>{ mode='async'; asyncBtn.classList.add('on'); syncBtn.classList.remove('on'); };
+
+  function build(){
+    cont.innerHTML = `
+      <div class="node master" id="master">Maître</div>
+      <span class="arrow">→</span>
+      <div class="node" id="rep1">Réplique 1</div>
+      <div class="node" id="rep2">Réplique 2</div>`;
+  }
+  build();
+  writeBtn.onclick = ()=>{
+    build();
+    writeBtn.disabled = true;
+    const master = document.getElementById('master');
+    master.classList.add('active-pulse');
+    statusEl.innerHTML = '✍ Écriture reçue sur le <b>maître</b>…';
+    const delay = mode === 'sync' ? 250 : 1600;
+    setTimeout(()=>{
+      ['rep1','rep2'].forEach((id,idx)=>{
+        setTimeout(()=>{
+          const el = document.getElementById(id);
+          el.classList.add('active-pulse');
+          el.style.borderColor = 'var(--good)'; el.style.color='var(--good)';
+        }, idx*150);
+      });
+      statusEl.innerHTML = mode === 'sync'
+        ? '✅ Mode <b>synchrone</b> : les répliques sont mises à jour <b>immédiatement</b>, avant confirmation de l\'écriture.'
+        : '⏳ Mode <b>asynchrone</b> : le maître a validé tout de suite, les répliques se mettent à jour <b>après un délai</b> (~1.6s ici) — incohérence temporaire possible.';
+      setTimeout(()=>{ master.classList.remove('active-pulse'); writeBtn.disabled=false; }, 500);
+    }, delay);
+  };
+})();
+
+/* ===================== SLIDE 16 — Sharding calculator ===================== */
+(function(){
+  const shardCountSlider = document.getElementById('shardCountSlider'), shardCountVal = document.getElementById('shardCountVal');
+  const idInput = document.getElementById('userIdInput'), calcBtn = document.getElementById('shardCalcBtn');
+  const line = document.getElementById('shardLine'), statusEl = document.getElementById('shardStatus');
+  const TOTAL = 1000000;
+  function colors(n){
+    const base = ['#4fd6c4','#f2b84b','#6fd18f','#e77070','#8fb2ff','#d38fe7','#ffd27a','#7ad3ff'];
+    return base.slice(0,n);
+  }
+  function drawLine(n, highlight){
+    const cs = colors(n);
+    line.innerHTML='';
+    for(let k=0;k<n;k++){
+      const seg = document.createElement('div'); seg.className='seg';
+      seg.style.background = cs[k];
+      seg.style.opacity = (highlight===k || highlight===null) ? '1' : '.28';
+      seg.textContent = 'Shard '+(k+1);
+      line.appendChild(seg);
+    }
+  }
+  function render(){
+    const n = parseInt(shardCountSlider.value);
+    shardCountVal.textContent = n + ' shards';
+    drawLine(n, null);
+    statusEl.textContent = 'Choisissez un ID puis cliquez sur "Localiser".';
+  }
+  shardCountSlider.oninput = render;
+  calcBtn.onclick = ()=>{
+    const n = parseInt(shardCountSlider.value);
+    let id = parseInt(idInput.value);
+    if(isNaN(id) || id<1) id=1;
+    if(id>TOTAL) id=TOTAL;
+    idInput.value = id;
+    const per = Math.ceil(TOTAL/n);
+    const shardIdx = Math.min(n-1, Math.floor((id-1)/per));
+    const lo = shardIdx*per+1, hi = Math.min(TOTAL, (shardIdx+1)*per);
+    drawLine(n, shardIdx);
+    statusEl.innerHTML = 'Utilisateur ID <b>'+id.toLocaleString('fr-FR')+'</b> → <b>Shard '+(shardIdx+1)+'</b> (plage '+lo.toLocaleString('fr-FR')+' – '+hi.toLocaleString('fr-FR')+').';
+  };
+  render();
+})();
+
+/* ===================== SLIDE 18 — Cluster combiné ===================== */
+(function(){
+  const btn = document.getElementById('genClusterBtn'), view = document.getElementById('clusterView');
+  btn.onclick = ()=>{
+    view.innerHTML='';
+    for(let s=1;s<=3;s++){
+      const col = document.createElement('div');
+      col.style.cssText='display:flex; flex-direction:column; align-items:center; gap:8px;';
+      col.innerHTML = '<div style="font-size:12px; color:var(--accent); font-weight:700;">SHARD '+s+'</div>';
+      const primary = document.createElement('div'); primary.className='node master'; primary.textContent='Primaire';
+      const rep = document.createElement('div'); rep.className='node'; rep.textContent='Réplique';
+      col.appendChild(primary); col.appendChild(rep);
+      view.appendChild(col);
+      setTimeout(()=>{ primary.classList.add('active-pulse'); setTimeout(()=>{ rep.style.borderColor='var(--good)'; rep.style.color='var(--good)'; primary.classList.remove('active-pulse'); }, 400); }, s*200);
+    }
+  };
+})();
+
+/* ===================== SLIDE 20 — Quiz ===================== */
+(function(){
+  const QUIZ = [
+    {q:"Qu'est-ce qui caractérise le mieux une BDD parallèle par rapport à une BDD traditionnelle ?", opts:["Elle utilise un serveur plus puissant","Elle répartit le traitement sur plusieurs unités simultanées","Elle stocke moins de données","Elle n'utilise pas de réseau"], correct:1},
+    {q:"Scalabilité horizontale signifie :", opts:["Ajouter de la RAM à la même machine","Ajouter des machines supplémentaires au cluster","Réduire le nombre de serveurs","Changer de système d'exploitation"], correct:1},
+    {q:"Dans l'architecture Shared Nothing, que partagent les nœuds ?", opts:["La mémoire","Le disque","Rien : chaque nœud a sa propre mémoire et son propre disque","Le réseau uniquement, pas le calcul"], correct:2},
+    {q:"Quel est le principal point faible de l'architecture Mémoire Partagée ?", opts:["Coût réseau élevé","La mémoire devient un goulot d'étranglement","Trop de redondance","Aucune limite connue"], correct:1},
+    {q:"La réplication a pour objectif principal :", opts:["La scalabilité et la performance pure","La disponibilité et la fiabilité","Réduire l'espace de stockage","Simplifier le schéma de données"], correct:1},
+    {q:"En réplication synchrone :", opts:["Les répliques sont mises à jour après un délai","La confirmation attend que toutes les répliques soient à jour","Il n'y a qu'une seule réplique possible","Aucune cohérence n'est garantie"], correct:1},
+    {q:"Le sharding consiste à :", opts:["Dupliquer toutes les données sur chaque nœud","Diviser les données en morceaux stockés sur des nœuds différents","Chiffrer les données avant stockage","Fusionner plusieurs bases en une seule"], correct:1},
+    {q:"Quel inconvénient est spécifique au sharding (pas à la réplication) ?", opts:["Consommation élevée d'espace disque","Requêtes croisant plusieurs shards plus lentes","Synchronisation asynchrone risquée","Coût de bande passante pour les copies"], correct:1}
+  ];
+  const area = document.getElementById('quizArea'), scoreEl = document.getElementById('quizScore');
+  let score = 0, answered = 0;
+  function build(){
+    area.innerHTML=''; score=0; answered=0; scoreEl.textContent = '0 / '+QUIZ.length;
+    QUIZ.forEach((item, qi)=>{
+      const box = document.createElement('div'); box.className='quiz-q';
+      const qt = document.createElement('div'); qt.className='qt'; qt.textContent = (qi+1)+'. '+item.q;
+      box.appendChild(qt);
+      const opts = document.createElement('div'); opts.className='quiz-opts';
+      item.opts.forEach((optText, oi)=>{
+        const opt = document.createElement('div'); opt.className='quiz-opt'; opt.textContent = optText;
+        opt.onclick = ()=>{
+          const siblings = opts.querySelectorAll('.quiz-opt');
+          siblings.forEach(s=>s.classList.add('disabled'));
+          if(oi === item.correct){
+            opt.classList.add('correct'); score++;
+          } else {
+            opt.classList.add('wrong');
+            siblings[item.correct].classList.add('correct');
+          }
+          answered++;
+          scoreEl.textContent = score+' / '+QUIZ.length;
+        };
+        opts.appendChild(opt);
+      });
+      box.appendChild(opts);
+      area.appendChild(box);
+    });
+  }
+  document.getElementById('quizReset').onclick = build;
+  build();
+})();
+</script>
+</body>
+</html>
