@@ -1,116 +1,295 @@
 <!DOCTYPE html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>BDD NoSQL – Chapitre III : MongoDB</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chapitre 2 – BDD NoSQL et MongoDB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f2f5f1;--ink:#14231c;--mut:#4f6158;--g:#1f7a4d;--g2:#dcebe1;--am:#e6a92b;--card:#fff;--line:#c9d8cf;--sh:0 8px 28px rgba(20,35,28,.12);--bad:#b3261e}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1a15;--ink:#e8f0eb;--mut:#a3b5aa;--g:#5fcf94;--g2:#183226;--card:#16261e;--line:#2b4237;--sh:0 8px 28px rgba(0,0,0,.5);--bad:#ff8a80}}
-:root[data-theme=dark]{--bg:#0f1a15;--ink:#e8f0eb;--mut:#a3b5aa;--g:#5fcf94;--g2:#183226;--card:#16261e;--line:#2b4237;--sh:0 8px 28px rgba(0,0,0,.5);--bad:#ff8a80}
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:calc(20px + env(safe-area-inset-top,0px))}
-body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.65 "Source Serif 4",Georgia,serif}
-h1,h2,h3,nav,th{font-family:"Bricolage Grotesque","Segoe UI",Arial,sans-serif}
-.wrap{display:grid;grid-template-columns:250px 1fr;max-width:1300px;margin:auto}
-nav{position:sticky;top:0;height:100vh;padding:28px 20px;overflow:auto;border-right:1px solid var(--line)}
-nav b{display:block;font-size:20px;color:var(--g);margin-bottom:14px}
-nav a{display:block;padding:7px 10px;margin:2px 0;color:var(--mut);text-decoration:none;border-radius:8px;font-size:15px;font-weight:500}
-nav a:hover,nav a.on{background:var(--g2);color:var(--g)}
-main{padding:0 clamp(18px,4vw,56px) 80px;min-width:0}
-.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:36px;align-items:center;padding:56px 0 40px}
-.hero h1{font-size:clamp(34px,5.4vw,60px);line-height:1.02;margin:0 0 16px;font-weight:800;letter-spacing:-.03em}
-.hero p{color:var(--mut);margin:0 0 18px}.hero img{width:min(100%,260px);margin:auto;display:block;border-radius:50%;box-shadow:var(--sh)}
-.pill{display:inline-block;background:var(--g);color:#fff;padding:5px 14px;border-radius:99px;font:600 14px "Bricolage Grotesque",sans-serif;margin:0 6px 6px 0}
-section{padding:46px 0 10px;border-top:2px solid var(--line)}
-section>h2{font-size:clamp(28px,4vw,42px);margin:0 0 6px;letter-spacing:-.02em}
-.lead{color:var(--mut);margin:0 0 26px;max-width:62ch}
-.blk{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start;background:var(--card);border-radius:18px;padding:26px;margin:0 0 26px;box-shadow:var(--sh)}
-.blk.r{direction:rtl}.blk.r>*{direction:ltr}
-.blk h3{margin:0 0 8px;font-size:24px;color:var(--g)}.blk h4{margin:14px 0 2px;font:700 15px "Bricolage Grotesque",sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
-.blk ul{margin:4px 0 8px;padding-left:20px}.blk li{margin:4px 0}
-.key{border-left:5px solid var(--am);background:var(--g2);padding:10px 14px;border-radius:0 10px 10px 0;margin:14px 0;font-size:16px}
-.figs{display:grid;gap:14px}
-figure{margin:0}figure img{width:100%;border-radius:10px;border:1px solid var(--line);cursor:zoom-in;display:block;transition:transform .2s;background:#fff}
-figure img:hover{transform:scale(1.02)}figure.sm img{max-width:120px;margin:auto}
-figcaption{font-size:14px;color:var(--mut);margin-top:6px}
-.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 26px}
-.tl div{background:var(--card);border-top:5px solid var(--g);padding:12px;border-radius:10px;font-size:15px;box-shadow:var(--sh)}
-.tl b{display:block;font:800 20px "Bricolage Grotesque",sans-serif;color:var(--g)}
-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden;box-shadow:var(--sh);font-size:15px;margin:0 0 26px}
-th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-th{background:var(--g);color:#fff}.scroll{overflow-x:auto}
-details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:10px 0}
-summary{cursor:pointer;font-weight:600}details p{margin:8px 0 0;color:var(--g)}
-.demo{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0}
-.demo button{font:600 15px "Bricolage Grotesque",sans-serif;padding:8px 14px;border-radius:8px;border:2px solid var(--g);background:var(--g);color:#fff;cursor:pointer}
-.demo button.gh{background:none;color:var(--g)}
-.lb{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;place-items:center;z-index:9;cursor:zoom-out;padding:20px}
-.lb.open{display:grid}.lb img{max-width:100%;max-height:100%;border-radius:8px}
-:focus-visible{outline:3px solid var(--am);outline-offset:2px}
-footer{padding:30px 0;color:var(--mut);font-size:14px}
-@media(max-width:900px){.wrap{grid-template-columns:1fr}nav{position:static;height:auto;border:0;display:flex;flex-wrap:wrap;gap:4px}nav b{width:100%}.hero,.blk{grid-template-columns:1fr}.blk.r{direction:ltr}.tl{grid-template-columns:1fr 1fr}}
+:root{
+  --bg:#0a1220; --panel:#101c2e; --panel2:#152740; --line:#24384f;
+  --ink:#e9f1fb; --ink-dim:#8aa0bf; --accent:#ffb454; --accent2:#5fd2ff;
+  --good:#6fd18f; --bad:#ff6f65; --accent-ink:#1a1206;
+  --sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --display:'Space Grotesk',var(--sans);
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --radius:7px; box-sizing:border-box;
+}
+:root[data-theme="light"]{
+  --bg:#eef2f6; --panel:#ffffff; --panel2:#e7edf3;
+  --line:#cdd9e4; --ink:#0f1e30; --ink-dim:#4c6178;
+  --accent:#b96e0a; --accent2:#0a83ab; --good:#177a44; --bad:#b8362c; --accent-ink:#fff9f0;
+}
+*{box-sizing:border-box;}
+html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%;}
+body{
+  height:100%; margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans);
+  overflow:hidden; transition:background .2s,color .2s;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  background-image:radial-gradient(var(--line) 1px, transparent 1px);
+  background-size:28px 28px;
+  background-position:-4px -4px;
+}
+:root[data-theme="light"] body{background-image:radial-gradient(var(--line) 1px, transparent 1px);}
+.deck{position:relative; height:100%; width:100%;}
+.slide{
+  position:absolute; inset:0; display:none; flex-direction:column;
+  padding:clamp(24px,5vw,64px) clamp(20px,7vw,100px);
+  padding-top:calc(clamp(24px,5vw,64px) + env(safe-area-inset-top,0px));
+  overflow-y:auto;
+}
+.slide.active{display:flex;}
+.kicker{
+  font-family:var(--mono); font-size:12px; color:var(--ink-dim); font-weight:500;
+  margin-bottom:14px; display:inline-flex; align-items:center; gap:8px;
+}
+.kicker::before{content:''; width:7px; height:7px; background:var(--accent2); border-radius:1px; transform:rotate(45deg); flex:0 0 auto;}
+h1{font-family:var(--display); font-size:clamp(28px,4.2vw,52px); line-height:1.06; margin:0 0 14px; font-weight:700; letter-spacing:-0.015em;}
+h2{font-family:var(--display); font-size:clamp(21px,2.8vw,32px); line-height:1.15; margin:0 0 16px; font-weight:700; letter-spacing:-0.01em;}
+h3{font-family:var(--display); font-size:17px; margin:0 0 8px; font-weight:600;}
+p{font-size:15.5px; line-height:1.6; color:var(--ink-dim); max-width:74ch; margin:0 0 10px;}
+.lead{font-size:18px; color:var(--ink); max-width:68ch;}
+.example{border-left:2px dashed var(--accent); background:var(--panel); padding:11px 15px; border-radius:0 6px 6px 0; margin-top:6px; position:relative;}
+.example b{color:var(--accent); font-weight:600; font-family:var(--mono); font-size:.93em;}
+.grid{display:grid; gap:14px; margin-top:12px;}
+.grid.cols-2{grid-template-columns:1fr 1fr;}
+.grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.grid.cols-5{grid-template-columns:repeat(5,1fr);}
+@media (max-width:800px){.grid.cols-2,.grid.cols-3,.grid.cols-5{grid-template-columns:1fr;}}
+.card{background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--accent2); border-radius:var(--radius); padding:15px 17px;}
+.card .n{color:var(--accent2); font-size:12px; font-weight:600; margin-bottom:6px; font-family:var(--mono); letter-spacing:.02em;}
+table{border-collapse:collapse; width:100%; margin-top:8px; font-size:14px;}
+th,td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top; line-height:1.5;}
+th{background:var(--panel2); color:var(--accent2); font-weight:600; font-size:12px; font-family:var(--mono); letter-spacing:.01em;}
+td{color:var(--ink-dim);}
+tr:nth-child(even) td{background:rgba(127,127,127,.05);}
+.proscons{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:8px;}
+@media (max-width:700px){.proscons{grid-template-columns:1fr;}}
+.proscons .box{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px;}
+.proscons .box.pro{border-left:3px solid var(--good);}
+.proscons .box.con{border-left:3px solid var(--bad);}
+.proscons ul{margin:0; padding-left:18px; font-size:14px; color:var(--ink-dim); line-height:1.6;}
+.proscons li{margin-bottom:6px;}
+.pillrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+.pill{background:var(--panel2); border:1px solid var(--line); border-radius:5px; padding:6px 13px; font-size:13px; color:var(--ink); font-family:var(--mono);}
+.footer{margin-top:auto; display:flex; align-items:center; justify-content:space-between; padding-top:14px; font-size:12px; color:var(--ink-dim); font-family:var(--mono); border-top:1px solid var(--line);}
+.num{position:fixed; top:calc(16px + env(safe-area-inset-top,0px) + 9px); right:100px; font-size:12px; color:var(--ink-dim); z-index:10; font-family:var(--mono);}
+.num::before{content:'// ';}
+.topbtns{position:fixed; top:calc(14px + env(safe-area-inset-top,0px)); right:16px; display:flex; gap:8px; z-index:20;}
+.iconbtn{background:var(--panel2); border:1px solid var(--line); color:var(--ink); width:34px; height:34px; border-radius:6px; cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center;}
+.iconbtn:hover{border-color:var(--accent2); color:var(--accent2);}
+.nav{position:fixed; bottom:calc(18px + env(safe-area-inset-bottom,0px)); right:24px; display:flex; gap:8px; z-index:10;}
+.nav button{background:var(--panel2); border:1px solid var(--line); color:var(--ink); width:38px; height:38px; border-radius:6px; cursor:pointer; font-size:16px;}
+.nav button:hover{border-color:var(--accent2); color:var(--accent2);}
+.progress{position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg,var(--accent2),var(--accent)); z-index:15; transition:width .25s;}
+.menu-overlay{position:fixed; inset:0; background:rgba(4,8,14,.7); display:none; align-items:center; justify-content:center; z-index:30;}
+.menu-overlay.open{display:flex;}
+.menu-panel{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px; width:min(440px,90vw); max-height:80vh; overflow-y:auto;}
+.menu-panel h4{margin:0 0 12px; font-size:12px; color:var(--ink-dim); letter-spacing:.04em; font-family:var(--mono); font-weight:500;}
+.menu-item{display:flex; gap:10px; align-items:center; padding:9px 10px; border-radius:6px; cursor:pointer; font-size:14px; border-left:2px solid transparent;}
+.menu-item:hover{background:var(--panel2); border-left-color:var(--line);}
+.menu-item.current{background:var(--panel2); color:var(--accent2); border-left-color:var(--accent2);}
+.menu-item .mi-n{color:var(--ink-dim); font-size:11px; width:30px; font-family:var(--mono);}
+::-webkit-scrollbar{width:8px;} ::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
 
-.hero{grid-template-columns:1.2fr 1fr}.hero .tl{grid-template-columns:1fr 1fr;margin:0}
-.tl3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 20px}
-.tl3 div{background:var(--card);border-top:5px solid var(--am);padding:14px;border-radius:10px;font-size:16px;box-shadow:var(--sh)}
-.tl3 b{display:block;font:700 19px "Bricolage Grotesque",sans-serif;color:var(--g);margin-bottom:4px}
-pre{background:#14231c;color:#e8f0eb;padding:16px;border-radius:12px;overflow-x:auto;font:14px/1.5 "Courier New",monospace;margin:0;align-self:start}
-code{font:.85em "Courier New",monospace;background:var(--g2);padding:1px 6px;border-radius:5px}
-details code{color:var(--ink)}details p code{color:var(--g)}
-h3.sub{font-size:26px;color:var(--g);margin:24px 0 6px}
-@media(max-width:900px){.tl3{grid-template-columns:1fr}.hero{grid-template-columns:1fr}}
+/* ---- Interactive widgets ---- */
+.demo{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; margin-top:14px; position:relative;}
+.demo::before{content:''; position:absolute; left:0; top:14px; bottom:14px; width:3px; background:var(--accent2); border-radius:0 2px 2px 0;}
+.demo h4{margin:0 0 4px; font-size:12.5px; color:var(--ink); letter-spacing:.02em; font-family:var(--mono); font-weight:600;}
+.demo .hint{font-size:13px; color:var(--ink-dim); margin-bottom:12px;}
+.btn{background:var(--accent); color:var(--accent-ink); border:none; padding:9px 18px; border-radius:6px; font-size:14px; font-weight:600; font-family:var(--sans); cursor:pointer;}
+.btn:hover{filter:brightness(1.08);}
+.btn.ghost{background:transparent; color:var(--accent2); border:1px solid var(--accent2);}
+.btnrow{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px;}
+.switch{display:inline-flex; border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+.switch button{background:var(--panel2); color:var(--ink-dim); border:none; padding:7px 14px; font-size:13px; cursor:pointer; font-family:var(--mono);}
+.switch button.on{background:var(--accent); color:var(--accent-ink); font-weight:700;}
+.slider-row{display:flex; align-items:center; gap:14px; margin-bottom:14px;}
+.slider-row input[type=range]{flex:1; accent-color:var(--accent2);}
+.slider-row .val{min-width:120px; text-align:right; font-weight:600; color:var(--accent2); font-size:13.5px; font-family:var(--mono);}
+.queue{display:flex; flex-direction:column; gap:6px;}
+.qline{display:flex; align-items:center; gap:10px;}
+.qline .lbl{width:74px; font-size:12px; color:var(--ink-dim); font-family:var(--mono);}
+.track{flex:1; height:16px; background:var(--panel2); border-radius:4px; overflow:hidden; position:relative; border:1px solid var(--line);}
+.fill{height:100%; width:0%; background:var(--accent2); border-radius:3px; transition:width .12s linear;}
+.qline .time{width:56px; font-size:12px; color:var(--ink-dim); text-align:right; font-family:var(--mono);}
+.barchart{display:flex; align-items:flex-end; gap:10px; height:150px; margin-top:8px; padding:0 4px;}
+.barchart .bwrap{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%;}
+.barchart .bar{width:100%; background:var(--accent2); border-radius:4px 4px 0 0; display:flex; align-items:flex-start; justify-content:center; color:var(--accent-ink); font-size:11.5px; font-weight:700; font-family:var(--mono); padding-top:5px; transition:height .35s ease;}
+.barchart .blabel{margin-top:6px; font-size:11px; color:var(--ink-dim); font-family:var(--mono);}
+.nodeflow{display:flex; align-items:center; justify-content:center; gap:14px; margin:14px 0; flex-wrap:wrap;}
+.node{width:58px; height:58px; border-radius:50%; background:var(--panel2); border:1.5px solid var(--accent2); display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--accent2); font-weight:600; font-family:var(--mono); cursor:pointer; transition:all .2s; text-align:center; line-height:1.15;}
+.node:hover{border-color:var(--accent); box-shadow:0 0 0 3px rgba(255,180,84,.15);}
+.node.down{background:rgba(255,111,101,.12); border-color:var(--bad); color:var(--bad); opacity:.6; text-decoration:line-through;}
+.node.active-pulse{animation:pulse 1s ease infinite;}
+.node.master{border-color:var(--accent); color:var(--accent); border-width:2px;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,180,84,.5);}70%{box-shadow:0 0 0 12px rgba(255,180,84,0);}100%{box-shadow:0 0 0 0 rgba(255,180,84,0);}}
+.arrow{color:var(--ink-dim); font-size:20px;}
+.status{font-size:13px; margin-top:10px; color:var(--ink); min-height:18px;}
+.status b{color:var(--accent2);}
+.arch-tabs{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;}
+.arch-tabs button{background:var(--panel2); border:1px solid var(--line); color:var(--ink-dim); padding:8px 14px; border-radius:6px; font-size:13px; cursor:pointer; font-family:var(--mono);}
+.arch-tabs button.on{background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:700;}
+.arch-box{border:1px solid var(--line); border-radius:var(--radius); background:var(--panel2); padding:16px; display:flex; flex-direction:column; gap:10px; align-items:center;}
+.arch-box .net{background:var(--panel); color:var(--accent2); font-size:11px; letter-spacing:.04em; padding:6px 10px; border-radius:4px; width:100%; text-align:center; font-family:var(--mono);
+  background-image:repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 12px); background-size:100% 1px; background-repeat:no-repeat; background-position:center;}
+.arch-box .row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
+.chip{border:1px solid var(--line); border-radius:5px; padding:8px 12px; font-size:12px; text-align:center; min-width:52px; transition:all .2s; font-family:var(--mono);}
+.chip.cpu{background:#1c2a3d;}
+.chip.disk{background:#2a2013; border-color:#4a3a1c; color:var(--accent);}
+.chip.mem{background:#132a38; border-color:#1f4a58; color:var(--accent2);}
+:root[data-theme="light"] .chip.cpu{background:#e4ecf7;}
+:root[data-theme="light"] .chip.disk{background:#f6ecd8;}
+:root[data-theme="light"] .chip.mem{background:#dcf3ec;}
+.chip.hot{box-shadow:0 0 0 3px var(--bad); border-color:var(--bad);}
+.unit{display:flex; flex-direction:column; gap:6px; align-items:center; padding:6px; border:1px dashed var(--line); border-radius:6px;}
+.shardline{display:flex; gap:2px; margin:14px 0; border-radius:6px; overflow:hidden; height:34px;}
+.shardline .seg{flex:1; display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:700; color:var(--accent-ink); transition:opacity .2s; font-family:var(--mono);}
+.shardmark{position:relative; height:20px; margin-top:-4px;}
+.shardmark .flag{position:absolute; top:0; transform:translateX(-50%); font-size:16px; transition:left .25s ease;}
+.numinput{background:var(--panel2); border:1px solid var(--line); color:var(--ink); padding:8px 12px; border-radius:6px; font-size:14px; width:160px; font-family:var(--mono);}
+.quiz-q{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin-bottom:12px;}
+.quiz-q .qt{font-size:14.5px; color:var(--ink); margin-bottom:10px; font-weight:600; font-family:var(--display);}
+.quiz-opts{display:flex; flex-direction:column; gap:7px; counter-reset:opt;}
+.quiz-opt{background:var(--panel2); border:1px solid var(--line); border-radius:6px; padding:9px 12px 9px 38px; font-size:13.5px; cursor:pointer; color:var(--ink-dim); position:relative;}
+.quiz-opt::before{counter-increment:opt; content:counter(opt,lower-alpha); position:absolute; left:12px; top:9px; font-family:var(--mono); color:var(--ink-dim); font-size:12px;}
+.quiz-opt:hover{border-color:var(--accent2);}
+.quiz-opt.correct{border-color:var(--good); color:var(--good); background:rgba(111,209,143,.1); font-weight:600;}
+.quiz-opt.correct::before{color:var(--good);}
+.quiz-opt.wrong{border-color:var(--bad); color:var(--bad); background:rgba(255,111,101,.1);}
+.quiz-opt.wrong::before{color:var(--bad);}
+.quiz-opt.disabled{pointer-events:none;}
+.scorebox{position:sticky; top:0; background:var(--panel2); border:1px solid var(--line); border-radius:var(--radius); padding:10px 16px; margin-bottom:14px; font-size:14px; display:flex; justify-content:space-between; align-items:center; font-family:var(--mono);}
+.timeline{display:flex; align-items:center; margin-top:20px; gap:0;}
+.tl-step{flex:1; text-align:center; position:relative;}
+.tl-step .dot2{width:11px; height:11px; background:var(--accent2); margin:0 auto 10px; border:2px solid var(--panel); box-shadow:0 0 0 1px var(--accent2); transform:rotate(45deg);}
+.tl-step .line{position:absolute; top:5px; left:50%; width:100%; height:1px; background-image:repeating-linear-gradient(90deg, var(--line) 0 5px, transparent 5px 10px); z-index:-1;}
+.tl-step:last-child .line{display:none;}
+.tl-step h5{font-size:13px; margin:0 0 4px; color:var(--ink); font-family:var(--mono); font-weight:600;}
+.tl-step p{font-size:12px; margin:0; max-width:none;}
+.mg .tl3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 20px}
+.mg .tl3 div{background:var(--card);border-top:5px solid var(--am);padding:14px;border-radius:10px;font-size:16px;box-shadow:var(--sh)}
+.mg .tl3 b{display:block;font:700 19px "Bricolage Grotesque",sans-serif;color:var(--g);margin-bottom:4px}
+.mg pre{background:#14231c;color:#e8f0eb;padding:16px;border-radius:12px;overflow-x:auto;font:14px/1.5 "Courier New",monospace;margin:0;align-self:start}
+.mg code{font:.85em "Courier New",monospace;background:var(--g2);padding:1px 6px;border-radius:5px}
+.mg details code{color:var(--ink)}
+.mg details p code{color:var(--g)}
+.mg h3.sub{font-size:26px;color:var(--g);margin:24px 0 6px}
+.mg .lab{background:var(--card);border:2px dashed var(--g);border-radius:16px;padding:18px 22px;margin:22px 0}
+.mg .lab h4{margin:14px 0 8px;font:700 17px "Bricolage Grotesque",sans-serif;color:var(--g)}
+.mg .lab h4:first-child{margin-top:0}
+.mg .bt{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0;font-size:16px}
+.mg .lab button{font:600 15px "Bricolage Grotesque",sans-serif;padding:7px 14px;border-radius:8px;border:2px solid var(--g);background:var(--g);color:#fff;cursor:pointer}
+.mg .lab button.gh{background:none;color:var(--g)}
+.mg .lab input[type=text],.mg .lab input:not([type]),.mg .lab select{font:inherit;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.mg .lab pre{margin:8px 0;white-space:pre-wrap;font-size:13px}
+.mg .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mg .q{font-weight:600;margin:6px 0}
+.mg .bar{height:14px;background:var(--g2);border-radius:8px;overflow:hidden}
+.mg .bar i{display:block;height:100%;transition:width .2s}
+.mg .flow{display:flex;flex-wrap:wrap;gap:8px}
+.mg .flow span{flex:1;min-width:110px;text-align:center;padding:12px 6px;border:2px solid var(--line);border-radius:10px;font:600 14px "Bricolage Grotesque",sans-serif;transition:.2s}
+.mg .flow span.on{background:var(--am);border-color:var(--am);color:#14231c;transform:scale(1.05)}
+.mg .fig{background:var(--card);border-radius:18px;padding:18px 20px 12px;margin:0 0 26px;box-shadow:var(--sh)}
+.mg .fig svg{width:100%;height:auto;display:block}
+.mg .fig figcaption{text-align:center;font-size:14px;color:var(--mut);margin-top:8px}
+.mg .fig text{fill:var(--ink);font:600 13px "Bricolage Grotesque","Segoe UI",Arial,sans-serif}
+.mg .fig .t2{font-size:11px;font-weight:500;fill:var(--mut)}
+.mg .fig .tt{font-size:16px;font-weight:800;fill:var(--g)}
+.mg .fig .bx{fill:var(--card);stroke:var(--g);stroke-width:2}
+.mg .fig .b2{fill:var(--g2);stroke:var(--g);stroke-width:1.5}
+.mg .fig .pn{fill:none;stroke:var(--g);stroke-width:2;stroke-dasharray:6 4}
+.mg .fig .am{fill:var(--am);stroke:var(--am)}
+.mg .fig .c1{fill:var(--g)}
+.mg .fig .c2{fill:var(--g2);stroke:var(--g);stroke-width:1}
+.mg .fig .c3{fill:var(--card);stroke:var(--mut);stroke-width:1}
+.mg .fig .ar{stroke:var(--mut);stroke-width:2;fill:none}
+.mg .fig .wt{fill:#fff}
+.mg table.cm td:first-child{font:13px/1.5 "Courier New",monospace;background:#14231c;color:#e8f0eb;white-space:pre-wrap;width:48%;border-bottom:1px solid #2b4237}
+.mg table.cm td:last-child{font-size:15px}
+.mg table.cm th{font-size:14px}
+.mg .use{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:6px 0 10px}
+.mg .use div{background:var(--g2);border-radius:10px;padding:10px 14px;font-size:15px}
+.mg .use b{color:var(--g)}
+.mg .use ul{margin:4px 0 0;padding-left:18px}
+.mg .ex{background:var(--card);border-radius:18px;padding:22px 26px;margin:0 0 26px;box-shadow:var(--sh)}
+.mg .ex h3{margin:0 0 4px;font-size:24px;color:var(--g)}
+.mg .ex .lead{margin-bottom:12px}
+.mg{--g:var(--accent2);--g2:var(--panel2);--card:var(--panel);--mut:var(--ink-dim);--am:var(--accent)}
+.mg h2{margin-bottom:10px}.mg .lead{margin-bottom:14px}
+.mg pre{background:#0b1522;color:#e9f1fb;padding:14px;border-radius:8px;overflow-x:auto;font:12.5px/1.5 var(--mono);margin:8px 0}
+.mg code{font:.88em var(--mono);background:var(--panel2);padding:1px 6px;border-radius:4px;color:var(--accent)}
+.mg table.cm td:first-child code,.mg td code{color:var(--accent)}
+.mg .scroll{overflow-x:auto}
+.mg .key{border-left:2px dashed var(--accent);background:var(--panel);padding:11px 15px;border-radius:0 6px 6px 0;margin:10px 0;font-size:14.5px;color:var(--ink-dim)}
+.mg .key b{color:var(--accent)}
+.mg .ex,.mg .blk{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent2);border-radius:7px;padding:14px 18px;margin:8px 0;box-shadow:none}
+.mg .blk{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.mg .blk h3,.mg .ex h3{color:var(--accent2)}
+.mg ul,.mg ol{color:var(--ink-dim);font-size:14.5px;line-height:1.6;padding-left:20px;margin:4px 0}
+.mg .lab{background:var(--panel);border:1px dashed var(--accent2);border-radius:7px;padding:14px 18px;margin:10px 0}
+.mg .lab h4{font:600 13px var(--mono);color:var(--accent2);margin:12px 0 8px}.mg .lab h4:first-child{margin-top:0}
+.mg .lab button,.mg .bt button{background:var(--accent);color:var(--accent-ink);border:none;padding:7px 14px;border-radius:6px;font:600 13.5px var(--sans);cursor:pointer}
+.mg .lab button.gh{background:transparent;color:var(--accent2);border:1px solid var(--accent2)}
+.mg input,.mg select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font:13.5px var(--mono)}
+.mg .bt{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0;font-size:14px;color:var(--ink)}
+.mg .q{font-weight:600;color:var(--ink);font-size:14.5px;margin:6px 0}
+.mg .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mg .bar{height:14px;background:var(--panel2);border-radius:8px;overflow:hidden}.mg .bar i{display:block;height:100%;transition:width .2s}
+.mg .flow{display:flex;flex-wrap:wrap;gap:8px}.mg .flow span{flex:1;min-width:100px;text-align:center;padding:10px 6px;border:1px solid var(--line);border-radius:6px;font:600 12.5px var(--mono);color:var(--ink-dim)}
+.mg .flow span.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);transform:scale(1.05)}
+.mg table.cm td:first-child{font:12.5px/1.5 var(--mono);background:#0b1522;color:#e9f1fb;white-space:pre-wrap;width:46%}
+.mg table.cm td:last-child{font-size:14px}
+.mg .use{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0}.mg .use div{background:var(--panel2);border-radius:6px;padding:9px 13px;font-size:14px;color:var(--ink-dim)}.mg .use b{color:var(--accent2)}
+.mg .tl3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:8px 0}
+.mg .tl3 div{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:7px;padding:12px 14px;font-size:14.5px;color:var(--ink-dim)}
+.mg .tl3 b{display:block;font:600 16px var(--display);color:var(--accent2);margin-bottom:4px}
+.mg .fig{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:12px;margin:8px 0}
+.mg .fig svg{width:100%;max-height:52vh;height:auto;display:block}
+.mg .fig figcaption{text-align:center;font-size:12.5px;color:var(--ink-dim);margin-top:6px}
+.mg details{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:10px 14px;margin:8px 0;color:var(--ink)}
+.mg summary{cursor:pointer;font-weight:600;font-size:14.5px}.mg details p{margin:8px 0 0;color:var(--accent2)}
+.mg h3.sub{color:var(--accent2);font-size:19px;margin:10px 0 4px}
+.mg .tlh{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.mg .tlh div{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:7px;padding:12px;font-size:14px;color:var(--ink-dim)}
+.mg .tlh b{display:block;font:700 22px var(--display);color:var(--accent2)}
+@media(max-width:800px){.mg .blk,.mg .two,.mg .use,.mg .tl3,.mg .tlh{grid-template-columns:1fr}}
 
-.lab{background:var(--card);border:2px dashed var(--g);border-radius:16px;padding:18px 22px;margin:22px 0}
-.lab h4{margin:14px 0 8px;font:700 17px "Bricolage Grotesque",sans-serif;color:var(--g)}.lab h4:first-child{margin-top:0}
-.bt{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0;font-size:16px}
-.lab button{font:600 15px "Bricolage Grotesque",sans-serif;padding:7px 14px;border-radius:8px;border:2px solid var(--g);background:var(--g);color:#fff;cursor:pointer}
-.lab button.gh{background:none;color:var(--g)}.lab input[type=text],.lab input:not([type]),.lab select{font:inherit;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
-.lab pre{margin:8px 0;white-space:pre-wrap;font-size:13px}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.q{font-weight:600;margin:6px 0}.bar{height:14px;background:var(--g2);border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;transition:width .2s}
-.flow{display:flex;flex-wrap:wrap;gap:8px}.flow span{flex:1;min-width:110px;text-align:center;padding:12px 6px;border:2px solid var(--line);border-radius:10px;font:600 14px "Bricolage Grotesque",sans-serif;transition:.2s}
-.flow span.on{background:var(--am);border-color:var(--am);color:#14231c;transform:scale(1.05)}
-@media(max-width:900px){.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck" id="deck">
 
-.fig{background:var(--card);border-radius:18px;padding:18px 20px 12px;margin:0 0 26px;box-shadow:var(--sh)}
-.fig svg{width:100%;height:auto;display:block}.fig figcaption{text-align:center;font-size:14px;color:var(--mut);margin-top:8px}
-.fig text{fill:var(--ink);font:600 13px "Bricolage Grotesque","Segoe UI",Arial,sans-serif}
-.fig .t2{font-size:11px;font-weight:500;fill:var(--mut)}.fig .tt{font-size:16px;font-weight:800;fill:var(--g)}
-.fig .bx{fill:var(--card);stroke:var(--g);stroke-width:2}.fig .b2{fill:var(--g2);stroke:var(--g);stroke-width:1.5}
-.fig .pn{fill:none;stroke:var(--g);stroke-width:2;stroke-dasharray:6 4}.fig .am{fill:var(--am);stroke:var(--am)}
-.fig .c1{fill:var(--g)}.fig .c2{fill:var(--g2);stroke:var(--g);stroke-width:1}.fig .c3{fill:var(--card);stroke:var(--mut);stroke-width:1}
-.fig .ar{stroke:var(--mut);stroke-width:2;fill:none}.fig .wt{fill:#fff}
+<!-- 1 -->
+<section class="slide mg active"><div class="kicker">Chapitre 2 · bdd-nosql / M2 ASD / 2026-2027   IZOUNTAR Yousra</div>
+<h1>Les BDD NoSQL<br>et MongoDB</h1><p class="lead">Pourquoi le relationnel ne suffit plus, quels sont les quatre grands modèles NoSQL, et comment MongoDB stocke, interroge, valide et indexe les données.</p>
+<div class="tlh"><div><b>2007</b>Neo4j (graphes)</div><div><b>2008</b>Cassandra (colonnes)</div><div><b>2009</b>MongoDB (documents)</div><div><b>2009</b>Redis (clé-valeur)</div></div><div class="footer"><span>Titre</span><span>1 / 38</span></div></section>
 
-table.cm td:first-child{font:13px/1.5 "Courier New",monospace;background:#14231c;color:#e8f0eb;white-space:pre-wrap;width:48%;border-bottom:1px solid #2b4237}
-table.cm td:last-child{font-size:15px}table.cm th{font-size:14px}
-.use{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:6px 0 10px}.use div{background:var(--g2);border-radius:10px;padding:10px 14px;font-size:15px}
-.use b{color:var(--g)}.use ul{margin:4px 0 0;padding-left:18px}.ex{background:var(--card);border-radius:18px;padding:22px 26px;margin:0 0 26px;box-shadow:var(--sh)}
-.ex h3{margin:0 0 4px;font-size:24px;color:var(--g)}.ex .lead{margin-bottom:12px}
-@media(max-width:900px){.use{grid-template-columns:1fr}table.cm td:first-child{width:auto}}
-</style></head><body>
-<div class="wrap">
-<nav aria-label="Sommaire"><b>BDD NoSQL</b>
-<a href="#why">1. Pourquoi NoSQL ?</a><a href="#what">2. Qu’est-ce que NoSQL ?</a><a href="#types">3. Les 4 types de BDD</a><a href="#mongo">4. MongoDB</a><a href="#archi">5. Architecture</a><a href="#crud">6. CRUD et agrégation</a><a href="#valid">7. Validation et index</a><a href="#ops">8. Opérateurs et types BSON</a><a href="#sum">9. Synthèse</a><a href="#quiz">10. Auto-évaluation</a></nav>
-<main>
-<header class="hero"><div><span class="pill">Chapitre II</span><span class="pill">BDD NoSQL et cloud</span>
-<h1>Les BDD NoSQL et MongoDB</h1>
-<p>Pourquoi le relationnel ne suffit plus, quels sont les quatre grands modèles NoSQL, et comment MongoDB stocke, interroge, valide et indexe les données.</p></div>
-<div class="tl"><div><b>2007</b>Neo4j (graphes)</div><div><b>2008</b>Cassandra (colonnes)</div><div><b>2009</b>MongoDB (documents)</div><div><b>2009</b>Redis (clé-valeur)</div></div></header>
+<!-- 2 -->
+<section class="slide mg"><div class="kicker">Plan général</div><h2>Plan du chapitre</h2><div class="grid cols-2" style="grid-template-columns:1fr 1fr 1fr"><div class="card"><div class="n">Partie 1</div><h3>Pourquoi NoSQL ?</h3></div><div class="card"><div class="n">Partie 2</div><h3>Qu’est-ce que NoSQL ?</h3></div><div class="card"><div class="n">Partie 3</div><h3>Les 4 types de BDD NoSQL</h3></div><div class="card"><div class="n">Partie 4</div><h3>MongoDB</h3></div><div class="card"><div class="n">Partie 5</div><h3>Architecture</h3></div><div class="card"><div class="n">Partie 6</div><h3>CRUD et agrégation</h3></div><div class="card"><div class="n">Partie 7</div><h3>Validation et index</h3></div><div class="card"><div class="n">Partie 8</div><h3>Opérateurs et types BSON</h3></div><div class="card"><div class="n">Partie 9</div><h3>Synthèse</h3></div><div class="card"><div class="n">Partie 10</div><h3>Auto-évaluation</h3></div></div><div class="footer"><span>Plan général</span><span>2 / 38</span></div></section>
 
-<section id="why"><h2>1. Pourquoi NoSQL ?</h2><p class="lead">Les bases relationnelles excellent sur les données structurées (transactions financières, gestion d’entreprise). Mais avec le Big Data, les réseaux sociaux et les applications mobiles, les volumes explosent et les données deviennent non structurées (images, vidéos, documents, flux temps réel).</p>
-<div class="tl3"><div><b>Scalabilité verticale</b>Ajouter CPU/RAM à un seul serveur : coûteux et limité.</div><div><b>Rigidité des schémas</b>Un schéma fixe gère mal des données hétérogènes ou changeantes.</div><div><b>Relations et performances</b>Les jointures complexes sur des données massives ralentissent tout.</div></div>
-<div class="key"><b>Réponse NoSQL :</b> scalabilité horizontale (ajout de serveurs), flexibilité pour les données non structurées, performances pour les applications web distribuées, disponibilité et adaptabilité.</div><div class="lab"><h4>🧪 Simulateur : vertical vs horizontal</h4><label>Charge à absorber : <input type="range" id="w1" min="1" max="10" value="3"> <b id="w1v">3×</b></label><div id="w1o"></div></div></section>
+<!-- 3 -->
+<section class="slide mg"><div class="kicker">1. Pourquoi NoSQL ?</div><h2>1. Pourquoi NoSQL ?</h2><p class="lead">Les bases relationnelles excellent sur les données structurées (transactions financières, gestion d’entreprise). Mais avec le Big Data, les réseaux sociaux et les applications mobiles, les volumes explosent et les données deviennent non structurées (images, vidéos, documents, flux temps réel).</p><div class="tl3"><div><b>Scalabilité verticale</b>Ajouter CPU/RAM à un seul serveur : coûteux et limité.</div><div><b>Rigidité des schémas</b>Un schéma fixe gère mal des données hétérogènes ou changeantes.</div><div><b>Relations et performances</b>Les jointures complexes sur des données massives ralentissent tout.</div></div><div class="key"><b>Réponse NoSQL :</b> scalabilité horizontale (ajout de serveurs), flexibilité pour les données non structurées, performances pour les applications web distribuées, disponibilité et adaptabilité.</div><div class="lab"><h4>🧪 Simulateur : vertical vs horizontal</h4><label>Charge à absorber : <input id="w1" max="10" min="1" type="range" value="3"/> <b id="w1v">3×</b></label><div id="w1o"></div></div><div class="footer"><span>1. Pourquoi NoSQL ?</span><span>3 / 38</span></div></section>
 
-<section id="what"><h2>2. Qu’est-ce que NoSQL ?</h2><p class="lead">NoSQL signifie <b>Not Only SQL</b> : il complète le SQL, il ne le remplace pas. Pas de schéma rigide préétabli, donc une structure qui évolue vite : réseaux sociaux, streaming, e-commerce.</p>
-<div class="blk"><div><h3>Flexibilité</h3><p>Pas de schéma prédéfini : structures variées, intégration facile de nouvelles données, applications adaptables aux besoins changeants.</p><h3>Scalabilité horizontale</h3><p>Ajout de serveurs pour répartir les données et augmenter stockage et traitement, essentiel en cas de fort trafic.</p></div>
-<div><h3>Données non structurées</h3><p>Documents (JSON, BSON), clé-valeur, colonnes, graphes : données issues des réseaux sociaux, capteurs IoT, contenus multimédias.</p><h3>Performance et tolérance aux pannes</h3><p>Conçues pour le distribué ; grâce à la réplication, le système continue si un ou plusieurs serveurs tombent, sans perte de données.</p></div></div><div class="lab"><h4>🧪 Flexibilité du schéma : faites évoluer un document</h4><div class="bt"><button data-f="twitter">+ champ « twitter »</button><button data-f="hobbies">+ tableau « hobbies »</button><button data-f="adresse">+ sous-document « adresse »</button><button class="gh" data-f="">↺ Réinitialiser</button></div><div class="two"><div><b>NoSQL (document)</b><pre id="w2n"></pre></div><div><b>SQL (table)</b><pre id="w2s"></pre></div></div></div></section>
+<!-- 4 -->
+<section class="slide mg"><div class="kicker">2. Qu’est-ce que NoSQL ?</div><h2>2. Qu’est-ce que NoSQL ?</h2><p class="lead">NoSQL signifie <b>Not Only SQL</b> : il complète le SQL, il ne le remplace pas. Pas de schéma rigide préétabli, donc une structure qui évolue vite : réseaux sociaux, streaming, e-commerce.</p><div class="blk"><div><h3>Flexibilité</h3><p>Pas de schéma prédéfini : structures variées, intégration facile de nouvelles données, applications adaptables aux besoins changeants.</p><h3>Scalabilité horizontale</h3><p>Ajout de serveurs pour répartir les données et augmenter stockage et traitement, essentiel en cas de fort trafic.</p></div>
+<div><h3>Données non structurées</h3><p>Documents (JSON, BSON), clé-valeur, colonnes, graphes : données issues des réseaux sociaux, capteurs IoT, contenus multimédias.</p><h3>Performance et tolérance aux pannes</h3><p>Conçues pour le distribué ; grâce à la réplication, le système continue si un ou plusieurs serveurs tombent, sans perte de données.</p></div></div><div class="footer"><span>2. Qu’est-ce que NoSQL ?</span><span>4 / 38</span></div></section>
 
-<section id="types"><h2>3. Les 4 types de BDD NoSQL</h2><p class="lead">Chaque modèle répond à un besoin précis.</p>
-<figure class="fig"><svg viewBox="0 0 780 400" role="img" aria-label="Structures de données SQL et NoSQL"><rect class="b2" x="4" y="4" width="772" height="392" rx="16"/><text class="tt" x="390" y="32" text-anchor="middle" style="font-size:22px">SQL vs NoSQL : structures de données</text><rect class="bx" x="20" y="50" width="230" height="334" rx="12"/><text class="tt" x="135" y="76" text-anchor="middle">Base SQL</text><rect class="bx" x="262" y="50" width="498" height="334" rx="12"/><text class="tt" x="511" y="76" text-anchor="middle">Base NoSQL</text><text x="135" y="104" text-anchor="middle">Relationnel</text><rect class="c1" x="66" y="116" width="30" height="20" rx="3"/><rect class="c1" x="100" y="116" width="30" height="20" rx="3"/><rect class="c1" x="134" y="116" width="30" height="20" rx="3"/><rect class="c1" x="168" y="116" width="30" height="20" rx="3"/><rect class="c1" x="66" y="142" width="30" height="20" rx="3"/><rect class="c2" x="100" y="142" width="30" height="20" rx="3"/><rect class="c2" x="134" y="142" width="30" height="20" rx="3"/><rect class="c2" x="168" y="142" width="30" height="20" rx="3"/><rect class="c2" x="66" y="168" width="30" height="20" rx="3"/><rect class="c2" x="100" y="168" width="30" height="20" rx="3"/><rect class="c2" x="134" y="168" width="30" height="20" rx="3"/><rect class="c2" x="168" y="168" width="30" height="20" rx="3"/><rect class="c2" x="66" y="194" width="30" height="20" rx="3"/><rect class="c2" x="100" y="194" width="30" height="20" rx="3"/><rect class="c2" x="134" y="194" width="30" height="20" rx="3"/><rect class="c2" x="168" y="194" width="30" height="20" rx="3"/><text x="135" y="256" text-anchor="middle">Analytique (OLAP)</text><rect class="c1" x="125" y="268" width="20" height="104" rx="3"/><rect class="c2" x="82" y="272" width="30" height="20" rx="3"/><rect class="c2" x="158" y="272" width="30" height="20" rx="3"/><line class="ar" x1="112" y1="282" x2="125" y2="282"/><line class="ar" x1="145" y1="282" x2="158" y2="282"/><rect class="c2" x="82" y="297" width="30" height="20" rx="3"/><rect class="c2" x="158" y="297" width="30" height="20" rx="3"/><line class="ar" x1="112" y1="307" x2="125" y2="307"/><line class="ar" x1="145" y1="307" x2="158" y2="307"/><rect class="c2" x="82" y="322" width="30" height="20" rx="3"/><rect class="c2" x="158" y="322" width="30" height="20" rx="3"/><line class="ar" x1="112" y1="332" x2="125" y2="332"/><line class="ar" x1="145" y1="332" x2="158" y2="332"/><rect class="c2" x="82" y="347" width="30" height="20" rx="3"/><rect class="c2" x="158" y="347" width="30" height="20" rx="3"/><line class="ar" x1="112" y1="357" x2="125" y2="357"/><line class="ar" x1="145" y1="357" x2="158" y2="357"/><text x="345" y="104" text-anchor="middle">Clé-valeur</text><rect class="c1" x="290" y="116" width="24" height="22" rx="4"/><text class="wt" x="302" y="131" text-anchor="middle" style="fill:#fff;font-size:10px">clé</text><rect class="c3" x="316" y="116" width="70" height="22" rx="4"/><text class="t2" x="351" y="131" text-anchor="middle">valeur</text><rect class="c1" x="290" y="146" width="24" height="22" rx="4"/><text class="wt" x="302" y="161" text-anchor="middle" style="fill:#fff;font-size:10px">clé</text><rect class="c3" x="316" y="146" width="70" height="22" rx="4"/><text class="t2" x="351" y="161" text-anchor="middle">valeur</text><rect class="c1" x="290" y="176" width="24" height="22" rx="4"/><text class="wt" x="302" y="191" text-anchor="middle" style="fill:#fff;font-size:10px">clé</text><rect class="c3" x="316" y="176" width="70" height="22" rx="4"/><text class="t2" x="351" y="191" text-anchor="middle">valeur</text><rect class="c1" x="290" y="206" width="24" height="22" rx="4"/><text class="wt" x="302" y="221" text-anchor="middle" style="fill:#fff;font-size:10px">clé</text><rect class="c3" x="316" y="206" width="70" height="22" rx="4"/><text class="t2" x="351" y="221" text-anchor="middle">valeur</text><text x="511" y="104" text-anchor="middle">Familles de colonnes</text><rect class="c3" x="445" y="116" width="30" height="22" rx="3"/><rect class="c3" x="479" y="116" width="30" height="22" rx="3"/><rect class="c1" x="513" y="116" width="30" height="22" rx="3"/><rect class="c3" x="547" y="116" width="30" height="22" rx="3"/><rect class="c1" x="445" y="146" width="30" height="22" rx="3"/><rect class="c3" x="479" y="146" width="30" height="22" rx="3"/><rect class="c3" x="513" y="146" width="30" height="22" rx="3"/><rect class="c1" x="547" y="146" width="30" height="22" rx="3"/><rect class="c3" x="445" y="176" width="30" height="22" rx="3"/><rect class="c2" x="479" y="176" width="30" height="22" rx="3"/><rect class="c1" x="513" y="176" width="30" height="22" rx="3"/><rect class="c3" x="547" y="176" width="30" height="22" rx="3"/><rect class="c1" x="445" y="206" width="30" height="22" rx="3"/><rect class="c3" x="479" y="206" width="30" height="22" rx="3"/><rect class="c2" x="513" y="206" width="30" height="22" rx="3"/><rect class="c3" x="547" y="206" width="30" height="22" rx="3"/><text x="345" y="256" text-anchor="middle">Document</text><rect class="c3" x="320" y="268" width="50" height="20" rx="3"/><line class="ar" x1="345" y1="288" x2="310" y2="312"/><line class="ar" x1="345" y1="288" x2="385" y2="312"/><rect class="c2" x="285" y="312" width="50" height="20" rx="3"/><rect class="c2" x="362" y="312" width="50" height="20" rx="3"/><line class="ar" x1="310" y1="332" x2="296" y2="350"/><line class="ar" x1="310" y1="332" x2="326" y2="350"/><line class="ar" x1="387" y1="332" x2="387" y2="350"/><rect class="c1" x="278" y="350" width="26" height="18" rx="3"/><rect class="c1" x="314" y="350" width="26" height="18" rx="3"/><rect class="c1" x="374" y="350" width="26" height="18" rx="3"/><text x="640" y="256" text-anchor="middle">Graphe</text><line class="ar" x1="600" y1="290" x2="680" y2="285"/><line class="ar" x1="600" y1="290" x2="640" y2="325"/><line class="ar" x1="680" y1="285" x2="640" y2="325"/><line class="ar" x1="640" y1="325" x2="590" y2="355"/><line class="ar" x1="640" y1="325" x2="690" y2="355"/><circle cx="600" cy="290" r="12" class="c2"/><circle cx="680" cy="285" r="12" class="c1"/><circle cx="640" cy="325" r="12" class="c1"/><circle cx="590" cy="355" r="12" class="c2"/><circle cx="690" cy="355" r="12" class="c2"/></svg><figcaption>FIGURE 1 – SQL vs NoSQL : structures de données (relationnel, clé-valeur, colonnes, document, graphe, OLAP)</figcaption></figure>
-<div class="scroll"><table><tr><th>Type</th><th>SGBD</th><th>Principe</th><th>Cas typique</th></tr>
+<!-- 5 -->
+<section class="slide mg"><div class="kicker">2. Qu’est-ce que NoSQL ?</div><h2>2. Qu’est-ce que NoSQL ? (suite)</h2><div class="lab"><h4>🧪 Flexibilité du schéma : faites évoluer un document</h4><div class="bt"><button data-f="twitter">+ champ « twitter »</button><button data-f="hobbies">+ tableau « hobbies »</button><button data-f="adresse">+ sous-document « adresse »</button><button class="gh" data-f="">↺ Réinitialiser</button></div><div class="two"><div><b>NoSQL (document)</b><pre id="w2n"></pre></div><div><b>SQL (table)</b><pre id="w2s"></pre></div></div></div><div class="footer"><span>Qu’est-ce que NoSQL ? (suite)</span><span>5 / 38</span></div></section>
+
+<!-- 6 -->
+<section class="slide mg"><div class="kicker">3. Les 4 types de BDD NoSQL</div><h2>3. Les 4 types de BDD NoSQL</h2><p class="lead">Chaque modèle répond à un besoin précis.</p><figure class="fig"><svg aria-label="Structures de données SQL et NoSQL" role="img" viewbox="0 0 780 400"><rect class="b2" height="392" rx="16" width="772" x="4" y="4"></rect><text class="tt" style="font-size:22px" text-anchor="middle" x="390" y="32">SQL vs NoSQL : structures de données</text><rect class="bx" height="334" rx="12" width="230" x="20" y="50"></rect><text class="tt" text-anchor="middle" x="135" y="76">Base SQL</text><rect class="bx" height="334" rx="12" width="498" x="262" y="50"></rect><text class="tt" text-anchor="middle" x="511" y="76">Base NoSQL</text><text text-anchor="middle" x="135" y="104">Relationnel</text><rect class="c1" height="20" rx="3" width="30" x="66" y="116"></rect><rect class="c1" height="20" rx="3" width="30" x="100" y="116"></rect><rect class="c1" height="20" rx="3" width="30" x="134" y="116"></rect><rect class="c1" height="20" rx="3" width="30" x="168" y="116"></rect><rect class="c1" height="20" rx="3" width="30" x="66" y="142"></rect><rect class="c2" height="20" rx="3" width="30" x="100" y="142"></rect><rect class="c2" height="20" rx="3" width="30" x="134" y="142"></rect><rect class="c2" height="20" rx="3" width="30" x="168" y="142"></rect><rect class="c2" height="20" rx="3" width="30" x="66" y="168"></rect><rect class="c2" height="20" rx="3" width="30" x="100" y="168"></rect><rect class="c2" height="20" rx="3" width="30" x="134" y="168"></rect><rect class="c2" height="20" rx="3" width="30" x="168" y="168"></rect><rect class="c2" height="20" rx="3" width="30" x="66" y="194"></rect><rect class="c2" height="20" rx="3" width="30" x="100" y="194"></rect><rect class="c2" height="20" rx="3" width="30" x="134" y="194"></rect><rect class="c2" height="20" rx="3" width="30" x="168" y="194"></rect><text text-anchor="middle" x="135" y="256">Analytique (OLAP)</text><rect class="c1" height="104" rx="3" width="20" x="125" y="268"></rect><rect class="c2" height="20" rx="3" width="30" x="82" y="272"></rect><rect class="c2" height="20" rx="3" width="30" x="158" y="272"></rect><line class="ar" x1="112" x2="125" y1="282" y2="282"></line><line class="ar" x1="145" x2="158" y1="282" y2="282"></line><rect class="c2" height="20" rx="3" width="30" x="82" y="297"></rect><rect class="c2" height="20" rx="3" width="30" x="158" y="297"></rect><line class="ar" x1="112" x2="125" y1="307" y2="307"></line><line class="ar" x1="145" x2="158" y1="307" y2="307"></line><rect class="c2" height="20" rx="3" width="30" x="82" y="322"></rect><rect class="c2" height="20" rx="3" width="30" x="158" y="322"></rect><line class="ar" x1="112" x2="125" y1="332" y2="332"></line><line class="ar" x1="145" x2="158" y1="332" y2="332"></line><rect class="c2" height="20" rx="3" width="30" x="82" y="347"></rect><rect class="c2" height="20" rx="3" width="30" x="158" y="347"></rect><line class="ar" x1="112" x2="125" y1="357" y2="357"></line><line class="ar" x1="145" x2="158" y1="357" y2="357"></line><text text-anchor="middle" x="345" y="104">Clé-valeur</text><rect class="c1" height="22" rx="4" width="24" x="290" y="116"></rect><text class="wt" style="fill:#fff;font-size:10px" text-anchor="middle" x="302" y="131">clé</text><rect class="c3" height="22" rx="4" width="70" x="316" y="116"></rect><text class="t2" text-anchor="middle" x="351" y="131">valeur</text><rect class="c1" height="22" rx="4" width="24" x="290" y="146"></rect><text class="wt" style="fill:#fff;font-size:10px" text-anchor="middle" x="302" y="161">clé</text><rect class="c3" height="22" rx="4" width="70" x="316" y="146"></rect><text class="t2" text-anchor="middle" x="351" y="161">valeur</text><rect class="c1" height="22" rx="4" width="24" x="290" y="176"></rect><text class="wt" style="fill:#fff;font-size:10px" text-anchor="middle" x="302" y="191">clé</text><rect class="c3" height="22" rx="4" width="70" x="316" y="176"></rect><text class="t2" text-anchor="middle" x="351" y="191">valeur</text><rect class="c1" height="22" rx="4" width="24" x="290" y="206"></rect><text class="wt" style="fill:#fff;font-size:10px" text-anchor="middle" x="302" y="221">clé</text><rect class="c3" height="22" rx="4" width="70" x="316" y="206"></rect><text class="t2" text-anchor="middle" x="351" y="221">valeur</text><text text-anchor="middle" x="511" y="104">Familles de colonnes</text><rect class="c3" height="22" rx="3" width="30" x="445" y="116"></rect><rect class="c3" height="22" rx="3" width="30" x="479" y="116"></rect><rect class="c1" height="22" rx="3" width="30" x="513" y="116"></rect><rect class="c3" height="22" rx="3" width="30" x="547" y="116"></rect><rect class="c1" height="22" rx="3" width="30" x="445" y="146"></rect><rect class="c3" height="22" rx="3" width="30" x="479" y="146"></rect><rect class="c3" height="22" rx="3" width="30" x="513" y="146"></rect><rect class="c1" height="22" rx="3" width="30" x="547" y="146"></rect><rect class="c3" height="22" rx="3" width="30" x="445" y="176"></rect><rect class="c2" height="22" rx="3" width="30" x="479" y="176"></rect><rect class="c1" height="22" rx="3" width="30" x="513" y="176"></rect><rect class="c3" height="22" rx="3" width="30" x="547" y="176"></rect><rect class="c1" height="22" rx="3" width="30" x="445" y="206"></rect><rect class="c3" height="22" rx="3" width="30" x="479" y="206"></rect><rect class="c2" height="22" rx="3" width="30" x="513" y="206"></rect><rect class="c3" height="22" rx="3" width="30" x="547" y="206"></rect><text text-anchor="middle" x="345" y="256">Document</text><rect class="c3" height="20" rx="3" width="50" x="320" y="268"></rect><line class="ar" x1="345" x2="310" y1="288" y2="312"></line><line class="ar" x1="345" x2="385" y1="288" y2="312"></line><rect class="c2" height="20" rx="3" width="50" x="285" y="312"></rect><rect class="c2" height="20" rx="3" width="50" x="362" y="312"></rect><line class="ar" x1="310" x2="296" y1="332" y2="350"></line><line class="ar" x1="310" x2="326" y1="332" y2="350"></line><line class="ar" x1="387" x2="387" y1="332" y2="350"></line><rect class="c1" height="18" rx="3" width="26" x="278" y="350"></rect><rect class="c1" height="18" rx="3" width="26" x="314" y="350"></rect><rect class="c1" height="18" rx="3" width="26" x="374" y="350"></rect><text text-anchor="middle" x="640" y="256">Graphe</text><line class="ar" x1="600" x2="680" y1="290" y2="285"></line><line class="ar" x1="600" x2="640" y1="290" y2="325"></line><line class="ar" x1="680" x2="640" y1="285" y2="325"></line><line class="ar" x1="640" x2="590" y1="325" y2="355"></line><line class="ar" x1="640" x2="690" y1="325" y2="355"></line><circle class="c2" cx="600" cy="290" r="12"></circle><circle class="c1" cx="680" cy="285" r="12"></circle><circle class="c1" cx="640" cy="325" r="12"></circle><circle class="c2" cx="590" cy="355" r="12"></circle><circle class="c2" cx="690" cy="355" r="12"></circle></svg><figcaption>FIGURE 1 – SQL vs NoSQL : structures de données (relationnel, clé-valeur, colonnes, document, graphe, OLAP)</figcaption></figure><div class="scroll"><table><tr><th>Type</th><th>SGBD</th><th>Principe</th><th>Cas typique</th></tr>
 <tr><td><b>Documents</b></td><td>MongoDB (2009)</td><td>Documents JSON/BSON hiérarchiques</td><td>Profils, catalogues, applications web</td></tr>
 <tr><td><b>Clé-valeur</b></td><td>Redis (2009)</td><td>Une clé unique identifie une valeur, en RAM</td><td>Sessions, cache</td></tr>
 <tr><td><b>Colonnes</b></td><td>Cassandra (2008)</td><td>Valeurs d’une même colonne regroupées</td><td>Historiques, gros volumes distribués</td></tr>
-<tr><td><b>Graphes</b></td><td>Neo4j (2007)</td><td>Nœuds, arêtes, propriétés</td><td>Réseaux sociaux, relations complexes</td></tr></table></div>
-<div class="blk"><div><h3>Orientée documents : MongoDB</h3><p>Documents semblables à JSON avec sous-documents et tableaux. Créé en 2009 par 10gen (aujourd’hui MongoDB Inc.) : Dwight Merriman, Eliot Horowitz, Kevin Ryan. Stockage en <b>BSON</b> (Binary JSON).</p></div>
+<tr><td><b>Graphes</b></td><td>Neo4j (2007)</td><td>Nœuds, arêtes, propriétés</td><td>Réseaux sociaux, relations complexes</td></tr></table></div><div class="footer"><span>3. Les 4 types de BDD NoSQL</span><span>6 / 38</span></div></section>
+
+<!-- 7 -->
+<section class="slide mg"><div class="kicker">3. Les 4 types de BDD NoSQL</div><h2>3. Les 4 types de BDD NoSQL (suite)</h2><div class="blk"><div><h3>Orientée documents : MongoDB</h3><p>Documents semblables à JSON avec sous-documents et tableaux. Créé en 2009 par 10gen (aujourd’hui MongoDB Inc.) : Dwight Merriman, Eliot Horowitz, Kevin Ryan. Stockage en <b>BSON</b> (Binary JSON).</p></div>
 <pre>{ "titre": "Le Petit Prince",
   "auteur": { "nom": "Antoine de Saint-Exupéry",
               "date_de_naissance": "1900-06-29" },
@@ -118,59 +297,90 @@ table.cm td:last-child{font-size:15px}table.cm th{font-size:14px}
   "disponible": true,
   "emprunts": [
     { "date_emprunt": "2024-01-15",
-      "emprunteur": "Alice Dupont", "date_retour": null } ] }</pre></div>
-<div class="blk"><div><h3>Clé-valeur : Redis</h3><p><i>REmote DIctionary Server</i>, créé en 2009 par Salvatore Sanfilippo, licence BSD. Les données vivent en mémoire (RAM) avec sauvegarde disque possible. Pas de jointure : la recherche se fait directement par la clé, d’où une vitesse extrême.</p></div>
-<pre>session:1001 → {"name":"Alice","email":"alice@example.com","status":"active"}
-session:1002 → {"name":"Bob","email":"bob@example.com","status":"inactive"}</pre></div>
-<div class="blk"><div><h3>Colonnes : Apache Cassandra</h3><p>Créée en 2008 par Facebook puis open source (Apache License 2.0). Les données sont structurées en familles de colonnes et partitions. Pour obtenir seulement l’historique des connexions, on interroge uniquement cette colonne, sans lire le reste.</p></div>
-<div><h3>Graphes : Neo4j</h3><p>Créé en 2007 par Neo4j, Inc. ; licence Community (GPL) et Enterprise ; requêtes en <b>Cypher</b>. Exemple : Alice est amie avec Bob, Bob est ami avec Charlie, Alice suit Charlie. Les personnes sont des <b>nœuds</b>, « amie » et « suit » des <b>arêtes</b>.</p></div></div><h3 class="sub">Exemples commentés et utilisations des 4 types</h3><div class="ex"><h3>1. Documents : MongoDB</h3><p class="lead">Un livre et ses emprunts regroupés dans un seul document (pas de jointure).</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>{</td><td>Début du document (objet JSON/BSON).</td></tr><tr><td>  &quot;titre&quot;: &quot;Le Petit Prince&quot;,</td><td>Champ simple de type <code>string</code>.</td></tr><tr><td>  &quot;auteur&quot;: { &quot;nom&quot;: &quot;…&quot;, &quot;date_de_naissance&quot;: &quot;1900-06-29&quot; },</td><td><b>Sous-document</b> : l’auteur est imbriqué dans le livre.</td></tr><tr><td>  &quot;genre&quot;: [&quot;Fiction&quot;, &quot;Philosophique&quot;],</td><td><b>Tableau</b> : plusieurs valeurs dans un même champ.</td></tr><tr><td>  &quot;disponible&quot;: true,</td><td>Booléen : le livre est-il disponible ?</td></tr><tr><td>  &quot;emprunts&quot;: [ { &quot;emprunteur&quot;: &quot;Alice Dupont&quot;, &quot;date_retour&quot;: null } ]</td><td>Tableau de sous-documents ; <code>null</code> = pas encore rendu.</td></tr><tr><td>}</td><td>Fin du document.</td></tr><tr><td>db.livres.find({ disponible: true })</td><td>Lit tous les livres dont <code>disponible</code> vaut <code>true</code>.</td></tr><tr><td>db.livres.find({ &quot;auteur.nom&quot;: &quot;Antoine de Saint-Exupéry&quot; })</td><td>La notation pointée « auteur.nom » interroge un champ du sous-document.</td></tr><tr><td>db.livres.updateOne({ titre: &quot;Le Petit Prince&quot; }, { $push: { emprunts: { emprunteur: &quot;Sara&quot;, date_retour: null } } })</td><td>Filtre le livre, puis <code>$push</code> ajoute un nouvel emprunt dans le tableau.</td></tr></table></div><div class="use"><div><b>✔ À utiliser pour</b><ul><li>Profils utilisateurs, catalogues produits</li><li>Articles de blog, CMS, applications web et mobiles</li><li>Données dont la structure varie d’un enregistrement à l’autre</li></ul></div><div><b>✘ À éviter pour</b><ul><li>Transactions financières très liées entre plusieurs tables</li><li>Relations multiples très profondes (préférer un graphe)</li></ul></div></div></div>
-<div class="ex"><h3>2. Clé-valeur : Redis</h3><p class="lead">Accès direct par la clé, tout en mémoire (RAM) : extrêmement rapide.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>SET session:1001 &quot;{\&quot;name\&quot;:\&quot;Alice\&quot;,\&quot;status\&quot;:\&quot;active\&quot;}&quot; EX 1800</td><td>Crée la clé <code>session:1001</code> ; <code>EX 1800</code> la fait expirer après 1800 s (30 min).</td></tr><tr><td>GET session:1001</td><td>Lit la valeur en passant uniquement par la clé : aucune recherche ni jointure.</td></tr><tr><td>TTL session:1001</td><td>Affiche le temps restant avant expiration (en secondes).</td></tr><tr><td>HSET user:1001 name &quot;Alice&quot; email &quot;alice@example.com&quot;</td><td>Stocke un <b>hash</b> (plusieurs champs sous une même clé).</td></tr><tr><td>HGETALL user:1001</td><td>Retourne tous les champs et valeurs du hash.</td></tr><tr><td>INCR visites:accueil</td><td>Incrémente un compteur de façon atomique (idéal pour les compteurs).</td></tr><tr><td>DEL session:1001</td><td>Supprime la clé, par exemple à la déconnexion.</td></tr></table></div><div class="use"><div><b>✔ À utiliser pour</b><ul><li>Sessions utilisateur, authentification</li><li>Cache de pages ou de résultats de requêtes</li><li>Compteurs, classements en temps réel, files de messages</li></ul></div><div><b>✘ À éviter pour</b><ul><li>Requêtes complexes par critères sur la valeur</li><li>Gros volumes qui dépassent la mémoire disponible</li></ul></div></div></div>
-<div class="ex"><h3>3. Colonnes : Apache Cassandra</h3><p class="lead">Écritures massives réparties sur plusieurs serveurs ; requête en CQL, proche du SQL.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>CREATE KEYSPACE app WITH replication = {&#x27;class&#x27;:&#x27;SimpleStrategy&#x27;,&#x27;replication_factor&#x27;:3};</td><td>Crée l’espace de travail (keyspace) avec <b>3 copies</b> de chaque donnée pour la tolérance aux pannes.</td></tr><tr><td>USE app;</td><td>Sélectionne le keyspace.</td></tr><tr><td>CREATE TABLE sessions (user_id int, login_time timestamp, ip text, action text,</td><td>Déclare la table et ses colonnes.</td></tr><tr><td>  PRIMARY KEY (user_id, login_time)</td><td><code>user_id</code> = clé de <b>partition</b> (choisit le serveur) ; <code>login_time</code> = clé de <b>clustering</b> (trie les lignes).</td></tr><tr><td>) WITH CLUSTERING ORDER BY (login_time DESC);</td><td>Les connexions les plus récentes sont lues en premier.</td></tr><tr><td>INSERT INTO sessions (user_id, login_time, ip, action) VALUES (1001, toTimestamp(now()), &#x27;192.168.1.10&#x27;, &#x27;login&#x27;);</td><td>Écrit une ligne ; les écritures sont très rapides.</td></tr><tr><td>SELECT login_time FROM sessions WHERE user_id = 1001;</td><td>Lit <b>uniquement la colonne</b> des heures de connexion d’un utilisateur, sans lire le reste.</td></tr></table></div><div class="use"><div><b>✔ À utiliser pour</b><ul><li>Historiques, journaux (logs), données IoT et capteurs</li><li>Très gros volumes d’écritures en continu</li><li>Applications distribuées toujours disponibles</li></ul></div><div><b>✘ À éviter pour</b><ul><li>Requêtes ad hoc ou jointures</li><li>Petits jeux de données qui changent souvent de structure</li></ul></div></div></div>
-<div class="ex"><h3>4. Graphes : Neo4j (Cypher)</h3><p class="lead">Alice est amie avec Bob, Bob est ami avec Charlie, Alice suit Charlie.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>CREATE (:Personne {nom:&#x27;Alice&#x27;}), (:Personne {nom:&#x27;Bob&#x27;}), (:Personne {nom:&#x27;Charlie&#x27;});</td><td>Crée 3 <b>nœuds</b> de type <code>Personne</code> avec une propriété <code>nom</code>.</td></tr><tr><td>MATCH (a:Personne {nom:&#x27;Alice&#x27;}), (b:Personne {nom:&#x27;Bob&#x27;}) CREATE (a)-[:AMI_DE]-&gt;(b);</td><td>Trouve les deux nœuds puis crée l’<b>arête</b> <code>AMI_DE</code> (la flèche donne le sens).</td></tr><tr><td>MATCH (b:Personne {nom:&#x27;Bob&#x27;}), (c:Personne {nom:&#x27;Charlie&#x27;}) CREATE (b)-[:AMI_DE]-&gt;(c);</td><td>Bob est ami avec Charlie.</td></tr><tr><td>MATCH (a:Personne {nom:&#x27;Alice&#x27;}), (c:Personne {nom:&#x27;Charlie&#x27;}) CREATE (a)-[:SUIT]-&gt;(c);</td><td>Alice suit Charlie : un autre type de relation.</td></tr><tr><td>MATCH (:Personne {nom:&#x27;Bob&#x27;})-[:AMI_DE]-(ami) RETURN ami.nom;</td><td>Qui sont les amis de Bob ? Sans flèche, le sens est ignoré.</td></tr><tr><td>MATCH (p)-[:SUIT]-&gt;(:Personne {nom:&#x27;Charlie&#x27;}) RETURN p.nom;</td><td>Qui suit Charlie ?</td></tr><tr><td>MATCH (:Personne {nom:&#x27;Alice&#x27;})-[*1..3]-(autre) RETURN DISTINCT autre.nom;</td><td>Personnes liées à Alice <b>directement ou indirectement</b> (1 à 3 relations) ; <code>DISTINCT</code> évite les doublons.</td></tr></table></div><div class="use"><div><b>✔ À utiliser pour</b><ul><li>Réseaux sociaux, recommandations d’amis ou de produits</li><li>Détection de fraude, chemins et itinéraires</li><li>Questions du type « qui est lié à qui, et à combien de degrés ? »</li></ul></div><div><b>✘ À éviter pour</b><ul><li>Statistiques et agrégats sur de gros volumes</li><li>Stockage simple de documents ou de journaux</li></ul></div></div></div>
-<div class="lab"><h4>🧪 Quel type de BDD choisir ?</h4><p id="w3q" class="q"></p><div class="bt" id="w3b"><button>Documents</button><button>Clé-valeur</button><button>Colonnes</button><button>Graphes</button></div><p id="w3f"></p><div class="bt"><button class="gh" id="w3n">Scénario suivant ›</button><span id="w3s"></span></div></div></section>
+      "emprunteur": "Alice Dupont", "date_retour": null } ] }</pre></div><div class="footer"><span>Les 4 types de BDD NoSQL (suite)</span><span>7 / 38</span></div></section>
 
-<section id="mongo"><h2>4. MongoDB</h2><p class="lead">MongoDB répond aux limites des bases relationnelles qui dominaient les années 1970-2000 : parfaites pour des structures fixes, mais peu adaptées aux données variées et volumineuses du web moderne.</p>
-<div class="blk"><div><h3>5 caractéristiques</h3><ul><li><b>Documents JSON :</b> informations complexes regroupées en un seul objet</li><li><b>Schéma flexible :</b> structures variées dans une même collection</li><li><b>Scalabilité horizontale :</b> le sharding répartit les données sur plusieurs serveurs</li><li><b>Haute disponibilité :</b> la réplication garde des copies sur plusieurs nœuds</li><li><b>Hautes performances :</b> opérations rapides, utile en temps réel</li></ul></div>
+<!-- 8 -->
+<section class="slide mg"><div class="kicker">3. Les 4 types de BDD NoSQL</div><h2>3. Les 4 types de BDD NoSQL (suite)</h2><div class="blk"><div><h3>Clé-valeur : Redis</h3><p><i>REmote DIctionary Server</i>, créé en 2009 par Salvatore Sanfilippo, licence BSD. Les données vivent en mémoire (RAM) avec sauvegarde disque possible. Pas de jointure : la recherche se fait directement par la clé, d’où une vitesse extrême.</p></div>
+<pre>session:1001 → {"name":"Alice","email":"alice@example.com","status":"active"}
+session:1002 → {"name":"Bob","email":"bob@example.com","status":"inactive"}</pre></div><div class="footer"><span>Les 4 types de BDD NoSQL (suite)</span><span>8 / 38</span></div></section>
+
+<!-- 9 -->
+<section class="slide mg"><div class="kicker">3. Les 4 types de BDD NoSQL</div><h2>3. Les 4 types de BDD NoSQL (suite)</h2><div class="blk"><div><h3>Colonnes : Apache Cassandra</h3><p>Créée en 2008 par Facebook puis open source (Apache License 2.0). Les données sont structurées en familles de colonnes et partitions. Pour obtenir seulement l’historique des connexions, on interroge uniquement cette colonne, sans lire le reste.</p></div>
+<div><h3>Graphes : Neo4j</h3><p>Créé en 2007 par Neo4j, Inc. ; licence Community (GPL) et Enterprise ; requêtes en <b>Cypher</b>. Exemple : Alice est amie avec Bob, Bob est ami avec Charlie, Alice suit Charlie. Les personnes sont des <b>nœuds</b>, « amie » et « suit » des <b>arêtes</b>.</p></div></div><h3 class="sub">Exemples commentés et utilisations des 4 types</h3><div class="footer"><span>Les 4 types de BDD NoSQL (suite)</span><span>9 / 38</span></div></section>
+
+<!-- 10 -->
+<section class="slide mg"><div class="kicker">3. Les 4 types de BDD NoSQL</div><h2>1. Documents : MongoDB</h2><div class="ex"><p class="lead">Un livre et ses emprunts regroupés dans un seul document (pas de jointure).</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>{</td><td>Début du document (objet JSON/BSON).</td></tr><tr><td>  "titre": "Le Petit Prince",</td><td>Champ simple de type <code>string</code>.</td></tr><tr><td>  "auteur": { "nom": "…", "date_de_naissance": "1900-06-29" },</td><td><b>Sous-document</b> : l’auteur est imbriqué dans le livre.</td></tr><tr><td>  "genre": ["Fiction", "Philosophique"],</td><td><b>Tableau</b> : plusieurs valeurs dans un même champ.</td></tr><tr><td>  "disponible": true,</td><td>Booléen : le livre est-il disponible ?</td></tr><tr><td>  "emprunts": [ { "emprunteur": "Alice Dupont", "date_retour": null } ]</td><td>Tableau de sous-documents ; <code>null</code> = pas encore rendu.</td></tr><tr><td>}</td><td>Fin du document.</td></tr><tr><td>db.livres.find({ disponible: true })</td><td>Lit tous les livres dont <code>disponible</code> vaut <code>true</code>.</td></tr><tr><td>db.livres.find({ "auteur.nom": "Antoine de Saint-Exupéry" })</td><td>La notation pointée « auteur.nom » interroge un champ du sous-document.</td></tr><tr><td>db.livres.updateOne({ titre: "Le Petit Prince" }, { $push: { emprunts: { emprunteur: "Sara", date_retour: null } } })</td><td>Filtre le livre, puis <code>$push</code> ajoute un nouvel emprunt dans le tableau.</td></tr></table></div><div class="use"><div><b>✔ À utiliser pour</b><ul><li>Profils utilisateurs, catalogues produits</li><li>Articles de blog, CMS, applications web et mobiles</li><li>Données dont la structure varie d’un enregistrement à l’autre</li></ul></div><div><b>✘ À éviter pour</b><ul><li>Transactions financières très liées entre plusieurs tables</li><li>Relations multiples très profondes (préférer un graphe)</li></ul></div></div></div><div class="footer"><span>1. Documents : MongoDB</span><span>10 / 38</span></div></section>
+
+<!-- 11 -->
+<section class="slide mg"><div class="kicker">3. Les 4 types de BDD NoSQL</div><h2>2. Clé-valeur : Redis</h2><div class="ex"><p class="lead">Accès direct par la clé, tout en mémoire (RAM) : extrêmement rapide.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>SET session:1001 "{\"name\":\"Alice\",\"status\":\"active\"}" EX 1800</td><td>Crée la clé <code>session:1001</code> ; <code>EX 1800</code> la fait expirer après 1800 s (30 min).</td></tr><tr><td>GET session:1001</td><td>Lit la valeur en passant uniquement par la clé : aucune recherche ni jointure.</td></tr><tr><td>TTL session:1001</td><td>Affiche le temps restant avant expiration (en secondes).</td></tr><tr><td>HSET user:1001 name "Alice" email "alice@example.com"</td><td>Stocke un <b>hash</b> (plusieurs champs sous une même clé).</td></tr><tr><td>HGETALL user:1001</td><td>Retourne tous les champs et valeurs du hash.</td></tr><tr><td>INCR visites:accueil</td><td>Incrémente un compteur de façon atomique (idéal pour les compteurs).</td></tr><tr><td>DEL session:1001</td><td>Supprime la clé, par exemple à la déconnexion.</td></tr></table></div><div class="use"><div><b>✔ À utiliser pour</b><ul><li>Sessions utilisateur, authentification</li><li>Cache de pages ou de résultats de requêtes</li><li>Compteurs, classements en temps réel, files de messages</li></ul></div><div><b>✘ À éviter pour</b><ul><li>Requêtes complexes par critères sur la valeur</li><li>Gros volumes qui dépassent la mémoire disponible</li></ul></div></div></div><div class="footer"><span>2. Clé-valeur : Redis</span><span>11 / 38</span></div></section>
+
+<!-- 12 -->
+<section class="slide mg"><div class="kicker">3. Les 4 types de BDD NoSQL</div><h2>3. Colonnes : Apache Cassandra</h2><div class="ex"><p class="lead">Écritures massives réparties sur plusieurs serveurs ; requête en CQL, proche du SQL.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>CREATE KEYSPACE app WITH replication = {'class':'SimpleStrategy','replication_factor':3};</td><td>Crée l’espace de travail (keyspace) avec <b>3 copies</b> de chaque donnée pour la tolérance aux pannes.</td></tr><tr><td>USE app;</td><td>Sélectionne le keyspace.</td></tr><tr><td>CREATE TABLE sessions (user_id int, login_time timestamp, ip text, action text,</td><td>Déclare la table et ses colonnes.</td></tr><tr><td>  PRIMARY KEY (user_id, login_time)</td><td><code>user_id</code> = clé de <b>partition</b> (choisit le serveur) ; <code>login_time</code> = clé de <b>clustering</b> (trie les lignes).</td></tr><tr><td>) WITH CLUSTERING ORDER BY (login_time DESC);</td><td>Les connexions les plus récentes sont lues en premier.</td></tr><tr><td>INSERT INTO sessions (user_id, login_time, ip, action) VALUES (1001, toTimestamp(now()), '192.168.1.10', 'login');</td><td>Écrit une ligne ; les écritures sont très rapides.</td></tr><tr><td>SELECT login_time FROM sessions WHERE user_id = 1001;</td><td>Lit <b>uniquement la colonne</b> des heures de connexion d’un utilisateur, sans lire le reste.</td></tr></table></div><div class="use"><div><b>✔ À utiliser pour</b><ul><li>Historiques, journaux (logs), données IoT et capteurs</li><li>Très gros volumes d’écritures en continu</li><li>Applications distribuées toujours disponibles</li></ul></div><div><b>✘ À éviter pour</b><ul><li>Requêtes ad hoc ou jointures</li><li>Petits jeux de données qui changent souvent de structure</li></ul></div></div></div><div class="footer"><span>3. Colonnes : Apache Cassandra</span><span>12 / 38</span></div></section>
+
+<!-- 13 -->
+<section class="slide mg"><div class="kicker">3. Les 4 types de BDD NoSQL</div><h2>4. Graphes : Neo4j (Cypher)</h2><div class="ex"><p class="lead">Alice est amie avec Bob, Bob est ami avec Charlie, Alice suit Charlie.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>CREATE (:Personne {nom:'Alice'}), (:Personne {nom:'Bob'}), (:Personne {nom:'Charlie'});</td><td>Crée 3 <b>nœuds</b> de type <code>Personne</code> avec une propriété <code>nom</code>.</td></tr><tr><td>MATCH (a:Personne {nom:'Alice'}), (b:Personne {nom:'Bob'}) CREATE (a)-[:AMI_DE]-&gt;(b);</td><td>Trouve les deux nœuds puis crée l’<b>arête</b> <code>AMI_DE</code> (la flèche donne le sens).</td></tr><tr><td>MATCH (b:Personne {nom:'Bob'}), (c:Personne {nom:'Charlie'}) CREATE (b)-[:AMI_DE]-&gt;(c);</td><td>Bob est ami avec Charlie.</td></tr><tr><td>MATCH (a:Personne {nom:'Alice'}), (c:Personne {nom:'Charlie'}) CREATE (a)-[:SUIT]-&gt;(c);</td><td>Alice suit Charlie : un autre type de relation.</td></tr><tr><td>MATCH (:Personne {nom:'Bob'})-[:AMI_DE]-(ami) RETURN ami.nom;</td><td>Qui sont les amis de Bob ? Sans flèche, le sens est ignoré.</td></tr><tr><td>MATCH (p)-[:SUIT]-&gt;(:Personne {nom:'Charlie'}) RETURN p.nom;</td><td>Qui suit Charlie ?</td></tr><tr><td>MATCH (:Personne {nom:'Alice'})-[*1..3]-(autre) RETURN DISTINCT autre.nom;</td><td>Personnes liées à Alice <b>directement ou indirectement</b> (1 à 3 relations) ; <code>DISTINCT</code> évite les doublons.</td></tr></table></div><div class="use"><div><b>✔ À utiliser pour</b><ul><li>Réseaux sociaux, recommandations d’amis ou de produits</li><li>Détection de fraude, chemins et itinéraires</li><li>Questions du type « qui est lié à qui, et à combien de degrés ? »</li></ul></div><div><b>✘ À éviter pour</b><ul><li>Statistiques et agrégats sur de gros volumes</li><li>Stockage simple de documents ou de journaux</li></ul></div></div></div><div class="footer"><span>4. Graphes : Neo4j (Cypher)</span><span>13 / 38</span></div></section>
+
+<!-- 14 -->
+<section class="slide mg"><div class="kicker">3. Les 4 types de BDD NoSQL</div><h2>3. Les 4 types de BDD NoSQL (suite)</h2><div class="lab"><h4>🧪 Quel type de BDD choisir ?</h4><p class="q" id="w3q"></p><div class="bt" id="w3b"><button>Documents</button><button>Clé-valeur</button><button>Colonnes</button><button>Graphes</button></div><p id="w3f"></p><div class="bt"><button class="gh" id="w3n">Scénario suivant ›</button><span id="w3s"></span></div></div><div class="footer"><span>Les 4 types de BDD NoSQL (suite)</span><span>14 / 38</span></div></section>
+
+<!-- 15 -->
+<section class="slide mg"><div class="kicker">4. MongoDB</div><h2>4. MongoDB</h2><p class="lead">MongoDB répond aux limites des bases relationnelles qui dominaient les années 1970-2000 : parfaites pour des structures fixes, mais peu adaptées aux données variées et volumineuses du web moderne.</p><div class="blk"><div><h3>5 caractéristiques</h3><ul><li><b>Documents JSON :</b> informations complexes regroupées en un seul objet</li><li><b>Schéma flexible :</b> structures variées dans une même collection</li><li><b>Scalabilité horizontale :</b> le sharding répartit les données sur plusieurs serveurs</li><li><b>Haute disponibilité :</b> la réplication garde des copies sur plusieurs nœuds</li><li><b>Hautes performances :</b> opérations rapides, utile en temps réel</li></ul></div>
 <div><h3>Collections et documents</h3><ul><li><b>Collection ≈ table</b></li><li><b>Document ≈ ligne</b>, avec sous-documents et tableaux</li><li>Hiérarchie : base → collections → documents</li></ul><pre>database1
  ├ Collection1 : { _id: 12, name: a1, status: 46 }
- └ Collection2 : { _id: 56, s: { t: [12, 5], r: test } }</pre></div></div>
-<figure class="fig"><svg viewBox="0 0 780 290" role="img" aria-label="Hiérarchie MongoDB : base, collections, documents"><rect class="b2" x="6" y="6" width="768" height="278" rx="26" style="fill:var(--am);fill-opacity:.18;stroke:var(--am)"/><text class="tt" x="390" y="32" text-anchor="middle">MongoDB</text><rect class="b2" x="22" y="46" width="540" height="226" rx="18"/><text x="292" y="68" text-anchor="middle">database1</text><rect class="b2" x="574" y="46" width="184" height="226" rx="18"/><text x="666" y="68" text-anchor="middle">database2</text><rect class="bx" x="38" y="80" width="250" height="180" rx="14"/><text x="163" y="102" text-anchor="middle">Collection1</text><rect class="c3" x="50" y="116" width="150" height="60" rx="4"/><text class="t2" x="58" y="134" style="fill:var(--ink)">Document 1</text><text class="t2" x="58" y="150">{ _id: 1, nom: … }</text><rect class="c3" x="72" y="146" width="150" height="60" rx="4"/><text class="t2" x="80" y="164" style="fill:var(--ink)">Document 2</text><text class="t2" x="80" y="180">{ _id: 2, user: … }</text><rect class="c3" x="94" y="176" width="170" height="66" rx="4"/><text class="t2" x="102" y="194" style="fill:var(--ink)">Document 3</text><text class="t2" x="102" y="210">{ _id: 12, name: "a1",</text><text class="t2" x="102" y="228">status: 46 }</text><rect class="bx" x="302" y="80" width="250" height="180" rx="14"/><text x="427" y="102" text-anchor="middle">Collection2</text><rect class="c3" x="316" y="122" width="100" height="56" rx="4"/><text class="t2" x="324" y="140" style="fill:var(--ink)">Document1</text><text class="t2" x="324" y="156">{ _id: 12, t: 26 }</text><rect class="c3" x="424" y="150" width="120" height="84" rx="4"/><text class="t2" x="432" y="168" style="fill:var(--ink)">Document2</text><text class="t2" x="432" y="184">{ _id: 56,</text><text class="t2" x="432" y="204">s: { t: [12, 5],</text><text class="t2" x="432" y="220">r: "test" } }</text><rect class="bx" x="588" y="80" width="156" height="180" rx="14"/><text x="666" y="102" text-anchor="middle">Collection1</text><rect class="c3" x="604" y="134" width="124" height="66" rx="4"/><text class="t2" x="612" y="152" style="fill:var(--ink)">Document1</text><text class="t2" x="612" y="168">{ _id: 5, s: 12 }</text></svg><figcaption>Organisation : MongoDB → bases de données → collections → documents</figcaption></figure>
-<div class="key"><b>Modèle orienté document :</b> au lieu de lignes et colonnes fixes, des documents au format BSON, optimisé pour la lecture/écriture et supportant tableaux et objets imbriqués. Exemple : un profil avec « adresse » (rue, ville, code postal) et « contacts » (liste de téléphones).</div><div class="lab"><h4>🧪 Traducteur SQL → MongoDB (cliquez un terme SQL)</h4><div class="bt" id="w4b"></div><p id="w4o" class="q"></p></div></section>
+ └ Collection2 : { _id: 56, s: { t: [12, 5], r: test } }</pre></div></div><div class="footer"><span>4. MongoDB</span><span>15 / 38</span></div></section>
 
-<section id="archi"><h2>5. Architecture</h2><p class="lead">Architecture client-serveur : le serveur <code>mongod</code> stocke les données et traite les requêtes ; les clients sont des applications, MongoDB Compass ou le MongoDB Shell.</p>
-<div class="blk"><div><h3>Serveur autonome</h3><p>Pour un petit volume ou la phase de développement : une seule instance <code>mongod</code>, ni sharding ni réplication, pas de <code>mongos</code>. Simple à configurer.</p></div><div><h3>Architecture distribuée</h3><p>Pour de grandes quantités de données ou la haute disponibilité : sharding et/ou réplication.</p><ul><li><b>Sharded Cluster :</b> chaque mongod ne contient qu’une partie des données</li><li><b>Replica Set :</b> copies redondantes, continuité en cas de panne</li></ul></div></div>
-<figure class="fig"><svg viewBox="0 0 780 250" role="img" aria-label="Architecture MongoDB serveur autonome"><defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--mut)"/></marker></defs><rect class="pn" x="8" y="8" width="764" height="234" rx="10"/><rect class="b2" x="20" y="90" width="150" height="70" rx="14"/><text x="95" y="122" text-anchor="middle">Client</text><text class="t2" x="95" y="142" text-anchor="middle">(MongoSh / Compass)</text><rect class="bx" x="230" y="26" width="520" height="198" rx="8"/><text class="t2" x="490" y="48" text-anchor="middle">Le serveur MongoDB</text><rect class="am" x="270" y="78" width="200" height="94" rx="14" style="fill:var(--g2);stroke:var(--g);stroke-width:2"/><text x="370" y="118" text-anchor="middle">Une seule instance</text><text x="370" y="138" text-anchor="middle">mongod</text><text class="t2" x="370" y="156" text-anchor="middle">(serveur principal)</text><path d="M600 92v68a40 12 0 0 0 80 0v-68" fill="var(--card)" stroke="var(--g)" stroke-width="2"/><ellipse cx="640" cy="92" rx="40" ry="12" fill="var(--g2)" stroke="var(--g)" stroke-width="2"/><text x="640" y="136" text-anchor="middle">BDD</text><text class="t2" x="640" y="196" text-anchor="middle">Collections et documents</text><line class="ar" x1="172" y1="115" x2="268" y2="115" marker-end="url(#ah2)"/><line class="ar" x1="268" y1="140" x2="172" y2="140" marker-end="url(#ah2)"/><line class="ar" x1="472" y1="115" x2="598" y2="115" marker-end="url(#ah2)"/><line class="ar" x1="598" y1="140" x2="472" y2="140" marker-end="url(#ah2)"/><text class="t2" x="220" y="82" text-anchor="middle">lecture / écriture</text></svg><figcaption>FIGURE 2 – Architecture MongoDB d’un serveur autonome</figcaption></figure>
-<div class="scroll"><table><tr><th>Composant</th><th>Rôle</th></tr>
+<!-- 16 -->
+<section class="slide mg"><div class="kicker">4. MongoDB</div><h2>4. MongoDB (suite)</h2><figure class="fig"><svg aria-label="Hiérarchie MongoDB : base, collections, documents" role="img" viewbox="0 0 780 290"><rect class="b2" height="278" rx="26" style="fill:var(--am);fill-opacity:.18;stroke:var(--am)" width="768" x="6" y="6"></rect><text class="tt" text-anchor="middle" x="390" y="32">MongoDB</text><rect class="b2" height="226" rx="18" width="540" x="22" y="46"></rect><text text-anchor="middle" x="292" y="68">database1</text><rect class="b2" height="226" rx="18" width="184" x="574" y="46"></rect><text text-anchor="middle" x="666" y="68">database2</text><rect class="bx" height="180" rx="14" width="250" x="38" y="80"></rect><text text-anchor="middle" x="163" y="102">Collection1</text><rect class="c3" height="60" rx="4" width="150" x="50" y="116"></rect><text class="t2" style="fill:var(--ink)" x="58" y="134">Document 1</text><text class="t2" x="58" y="150">{ _id: 1, nom: … }</text><rect class="c3" height="60" rx="4" width="150" x="72" y="146"></rect><text class="t2" style="fill:var(--ink)" x="80" y="164">Document 2</text><text class="t2" x="80" y="180">{ _id: 2, user: … }</text><rect class="c3" height="66" rx="4" width="170" x="94" y="176"></rect><text class="t2" style="fill:var(--ink)" x="102" y="194">Document 3</text><text class="t2" x="102" y="210">{ _id: 12, name: "a1",</text><text class="t2" x="102" y="228">status: 46 }</text><rect class="bx" height="180" rx="14" width="250" x="302" y="80"></rect><text text-anchor="middle" x="427" y="102">Collection2</text><rect class="c3" height="56" rx="4" width="100" x="316" y="122"></rect><text class="t2" style="fill:var(--ink)" x="324" y="140">Document1</text><text class="t2" x="324" y="156">{ _id: 12, t: 26 }</text><rect class="c3" height="84" rx="4" width="120" x="424" y="150"></rect><text class="t2" style="fill:var(--ink)" x="432" y="168">Document2</text><text class="t2" x="432" y="184">{ _id: 56,</text><text class="t2" x="432" y="204">s: { t: [12, 5],</text><text class="t2" x="432" y="220">r: "test" } }</text><rect class="bx" height="180" rx="14" width="156" x="588" y="80"></rect><text text-anchor="middle" x="666" y="102">Collection1</text><rect class="c3" height="66" rx="4" width="124" x="604" y="134"></rect><text class="t2" style="fill:var(--ink)" x="612" y="152">Document1</text><text class="t2" x="612" y="168">{ _id: 5, s: 12 }</text></svg><figcaption>Organisation : MongoDB → bases de données → collections → documents</figcaption></figure><div class="key"><b>Modèle orienté document :</b> au lieu de lignes et colonnes fixes, des documents au format BSON, optimisé pour la lecture/écriture et supportant tableaux et objets imbriqués. Exemple : un profil avec « adresse » (rue, ville, code postal) et « contacts » (liste de téléphones).</div><div class="footer"><span>MongoDB (suite)</span><span>16 / 38</span></div></section>
+
+<!-- 17 -->
+<section class="slide mg"><div class="kicker">4. MongoDB</div><h2>4. MongoDB (suite)</h2><div class="lab"><h4>🧪 Traducteur SQL → MongoDB (cliquez un terme SQL)</h4><div class="bt" id="w4b"></div><p class="q" id="w4o"></p></div><div class="footer"><span>MongoDB (suite)</span><span>17 / 38</span></div></section>
+
+<!-- 18 -->
+<section class="slide mg"><div class="kicker">5. Architecture</div><h2>5. Architecture</h2><p class="lead">Architecture client-serveur : le serveur <code>mongod</code> stocke les données et traite les requêtes ; les clients sont des applications, MongoDB Compass ou le MongoDB Shell.</p><div class="blk"><div><h3>Serveur autonome</h3><p>Pour un petit volume ou la phase de développement : une seule instance <code>mongod</code>, ni sharding ni réplication, pas de <code>mongos</code>. Simple à configurer.</p></div><div><h3>Architecture distribuée</h3><p>Pour de grandes quantités de données ou la haute disponibilité : sharding et/ou réplication.</p><ul><li><b>Sharded Cluster :</b> chaque mongod ne contient qu’une partie des données</li><li><b>Replica Set :</b> copies redondantes, continuité en cas de panne</li></ul></div></div><div class="footer"><span>5. Architecture</span><span>18 / 38</span></div></section>
+
+<!-- 19 -->
+<section class="slide mg"><div class="kicker">5. Architecture</div><h2>5. Architecture (suite)</h2><figure class="fig"><svg aria-label="Architecture MongoDB serveur autonome" role="img" viewbox="0 0 780 250"><defs><marker id="ah2" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0L10 5L0 10z" fill="var(--mut)"></path></marker></defs><rect class="pn" height="234" rx="10" width="764" x="8" y="8"></rect><rect class="b2" height="70" rx="14" width="150" x="20" y="90"></rect><text text-anchor="middle" x="95" y="122">Client</text><text class="t2" text-anchor="middle" x="95" y="142">(MongoSh / Compass)</text><rect class="bx" height="198" rx="8" width="520" x="230" y="26"></rect><text class="t2" text-anchor="middle" x="490" y="48">Le serveur MongoDB</text><rect class="am" height="94" rx="14" style="fill:var(--g2);stroke:var(--g);stroke-width:2" width="200" x="270" y="78"></rect><text text-anchor="middle" x="370" y="118">Une seule instance</text><text text-anchor="middle" x="370" y="138">mongod</text><text class="t2" text-anchor="middle" x="370" y="156">(serveur principal)</text><path d="M600 92v68a40 12 0 0 0 80 0v-68" fill="var(--card)" stroke="var(--g)" stroke-width="2"></path><ellipse cx="640" cy="92" fill="var(--g2)" rx="40" ry="12" stroke="var(--g)" stroke-width="2"></ellipse><text text-anchor="middle" x="640" y="136">BDD</text><text class="t2" text-anchor="middle" x="640" y="196">Collections et documents</text><line class="ar" marker-end="url(#ah2)" x1="172" x2="268" y1="115" y2="115"></line><line class="ar" marker-end="url(#ah2)" x1="268" x2="172" y1="140" y2="140"></line><line class="ar" marker-end="url(#ah2)" x1="472" x2="598" y1="115" y2="115"></line><line class="ar" marker-end="url(#ah2)" x1="598" x2="472" y1="140" y2="140"></line><text class="t2" text-anchor="middle" x="220" y="82">lecture / écriture</text></svg><figcaption>FIGURE 2 – Architecture MongoDB d’un serveur autonome</figcaption></figure><div class="scroll"><table><tr><th>Composant</th><th>Rôle</th></tr>
 <tr><td><b>mongod</b></td><td>Stocke les données et traite les requêtes ; peut être un shard</td></tr>
 <tr><td><b>mongos</b></td><td>Routeur : reçoit les requêtes, consulte les Config Servers, les dirige vers le bon shard</td></tr>
 <tr><td><b>Config Servers</b></td><td>Stockent les métadonnées (emplacement des données) ; répliqués pour la stabilité</td></tr>
-<tr><td><b>Shards</b></td><td>Fragments de la base ; chacun peut être un replica set (1 primary + 2 secondary)</td></tr></table></div>
-<figure class="fig"><svg viewBox="0 0 860 500" role="img" aria-label="Architecture MongoDB distribuée avec sharding et replica sets"><defs><marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--mut)"/></marker></defs><rect class="pn" x="6" y="6" width="848" height="488" rx="10"/><circle cx="70" cy="70" r="22" class="c1"/><text class="t2" x="70" y="118" text-anchor="middle" style="fill:var(--ink)">Client</text><text class="wt" x="70" y="76" text-anchor="middle" style="fill:#fff">&lt;/&gt;</text><line class="ar" x1="100" y1="60" x2="395" y2="60" marker-end="url(#ah3)"/><line class="ar" x1="395" y1="82" x2="100" y2="82" marker-end="url(#ah3)"/><text class="t2" x="245" y="52" text-anchor="middle">Requête</text><text class="t2" x="245" y="98" text-anchor="middle">Réponse</text><rect class="bx" x="400" y="40" width="100" height="56" rx="8"/><text x="450" y="74" text-anchor="middle">mongos</text><rect class="b2" x="700" y="18" width="140" height="124" rx="8"/><text class="t2" x="770" y="38" text-anchor="middle" style="fill:var(--ink)">Config Servers</text><rect class="bx" x="716" y="48" width="108" height="26" rx="5"/><text x="770" y="66" text-anchor="middle">mongod</text><rect class="bx" x="716" y="78" width="108" height="26" rx="5"/><text x="770" y="96" text-anchor="middle">mongod</text><rect class="bx" x="716" y="108" width="108" height="26" rx="5"/><text x="770" y="126" text-anchor="middle">mongod</text><line class="ar" x1="502" y1="68" x2="698" y2="68" marker-end="url(#ah3)" marker-start="url(#ah3)"/><rect class="pn" x="20" y="190" width="260" height="270" rx="8" style="stroke-dasharray:3 3"/><text class="t2" x="150" y="208" text-anchor="middle" style="fill:var(--ink)">Shard 1 (replica set RS1)</text><rect class="bx" x="90" y="222" width="120" height="70" rx="8" style="fill:var(--g2)"/><text x="150" y="244" text-anchor="middle">mongod</text><text class="t2" x="150" y="260" text-anchor="middle">(Primary)</text><text class="t2" x="150" y="278" text-anchor="middle">RS1 · DB1 · Col-1</text><rect class="bx" x="32" y="350" width="112" height="80" rx="8"/><text x="88" y="376" text-anchor="middle">mongod</text><text class="t2" x="88" y="392" text-anchor="middle">(Secondary)</text><text class="t2" x="88" y="410" text-anchor="middle">RS1 · DB1 · Col-1</text><line class="ar" x1="150" y1="292" x2="88" y2="350" style="stroke-dasharray:4 3"/><rect class="bx" x="156" y="350" width="112" height="80" rx="8"/><text x="212" y="376" text-anchor="middle">mongod</text><text class="t2" x="212" y="392" text-anchor="middle">(Secondary)</text><text class="t2" x="212" y="410" text-anchor="middle">RS1 · DB1 · Col-1</text><line class="ar" x1="150" y1="292" x2="212" y2="350" style="stroke-dasharray:4 3"/><line class="ar" x1="420" y1="98" x2="150" y2="188" marker-end="url(#ah3)"/><rect class="pn" x="300" y="190" width="260" height="270" rx="8" style="stroke-dasharray:3 3"/><text class="t2" x="430" y="208" text-anchor="middle" style="fill:var(--ink)">Shard 2 (replica set RS2)</text><rect class="bx" x="370" y="222" width="120" height="70" rx="8" style="fill:var(--g2)"/><text x="430" y="244" text-anchor="middle">mongod</text><text class="t2" x="430" y="260" text-anchor="middle">(Primary)</text><text class="t2" x="430" y="278" text-anchor="middle">RS2 · DB1 · Col-1</text><rect class="bx" x="312" y="350" width="112" height="80" rx="8"/><text x="368" y="376" text-anchor="middle">mongod</text><text class="t2" x="368" y="392" text-anchor="middle">(Secondary)</text><text class="t2" x="368" y="410" text-anchor="middle">RS2 · DB1 · Col-1</text><line class="ar" x1="430" y1="292" x2="368" y2="350" style="stroke-dasharray:4 3"/><rect class="bx" x="436" y="350" width="112" height="80" rx="8"/><text x="492" y="376" text-anchor="middle">mongod</text><text class="t2" x="492" y="392" text-anchor="middle">(Secondary)</text><text class="t2" x="492" y="410" text-anchor="middle">RS2 · DB1 · Col-1</text><line class="ar" x1="430" y1="292" x2="492" y2="350" style="stroke-dasharray:4 3"/><line class="ar" x1="450" y1="98" x2="450" y2="188" marker-end="url(#ah3)"/><rect class="pn" x="580" y="190" width="260" height="270" rx="8" style="stroke-dasharray:3 3"/><text class="t2" x="710" y="208" text-anchor="middle" style="fill:var(--ink)">Shard 3 (replica set RS3)</text><rect class="bx" x="650" y="222" width="120" height="70" rx="8" style="fill:var(--g2)"/><text x="710" y="244" text-anchor="middle">mongod</text><text class="t2" x="710" y="260" text-anchor="middle">(Primary)</text><text class="t2" x="710" y="278" text-anchor="middle">RS3 · DB1 · Col-1</text><rect class="bx" x="592" y="350" width="112" height="80" rx="8"/><text x="648" y="376" text-anchor="middle">mongod</text><text class="t2" x="648" y="392" text-anchor="middle">(Secondary)</text><text class="t2" x="648" y="410" text-anchor="middle">RS3 · DB1 · Col-1</text><line class="ar" x1="710" y1="292" x2="648" y2="350" style="stroke-dasharray:4 3"/><rect class="bx" x="716" y="350" width="112" height="80" rx="8"/><text x="772" y="376" text-anchor="middle">mongod</text><text class="t2" x="772" y="392" text-anchor="middle">(Secondary)</text><text class="t2" x="772" y="410" text-anchor="middle">RS3 · DB1 · Col-1</text><line class="ar" x1="710" y1="292" x2="772" y2="350" style="stroke-dasharray:4 3"/><line class="ar" x1="480" y1="98" x2="710" y2="188" marker-end="url(#ah3)"/><text class="t2" x="430" y="480" text-anchor="middle">Architecture MongoDB (sharded cluster + replica sets)</text></svg><figcaption>FIGURE 3 – Architecture MongoDB distribuée : mongos route chaque requête vers le bon shard grâce aux Config Servers</figcaption></figure>
-<div class="key"><b>Flux :</b> client → mongos → Config Servers (où est la donnée ?) → shard ou replica set concerné.</div><div class="lab"><h4>🧪 Parcours d’une requête dans un Sharded Cluster</h4><div class="flow" id="w5f"><span>Client</span><span>mongos</span><span>Config Servers</span><span>Shard (replica set)</span></div><p id="w5t" class="q"></p><div class="bt"><button id="w5n">Envoyer la requête ▶</button><button class="gh" id="w5r">↺</button></div></div></section>
+<tr><td><b>Shards</b></td><td>Fragments de la base ; chacun peut être un replica set (1 primary + 2 secondary)</td></tr></table></div><div class="footer"><span>Architecture (suite)</span><span>19 / 38</span></div></section>
 
-<section id="crud"><h2>6. CRUD et agrégation</h2>
-<div class="scroll"><table><tr><th>Action</th><th>Commandes</th></tr>
+<!-- 20 -->
+<section class="slide mg"><div class="kicker">5. Architecture</div><h2>5. Architecture (suite)</h2><figure class="fig"><svg aria-label="Architecture MongoDB distribuée avec sharding et replica sets" role="img" viewbox="0 0 860 500"><defs><marker id="ah3" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0L10 5L0 10z" fill="var(--mut)"></path></marker></defs><rect class="pn" height="488" rx="10" width="848" x="6" y="6"></rect><circle class="c1" cx="70" cy="70" r="22"></circle><text class="t2" style="fill:var(--ink)" text-anchor="middle" x="70" y="118">Client</text><text class="wt" style="fill:#fff" text-anchor="middle" x="70" y="76">&lt;/&gt;</text><line class="ar" marker-end="url(#ah3)" x1="100" x2="395" y1="60" y2="60"></line><line class="ar" marker-end="url(#ah3)" x1="395" x2="100" y1="82" y2="82"></line><text class="t2" text-anchor="middle" x="245" y="52">Requête</text><text class="t2" text-anchor="middle" x="245" y="98">Réponse</text><rect class="bx" height="56" rx="8" width="100" x="400" y="40"></rect><text text-anchor="middle" x="450" y="74">mongos</text><rect class="b2" height="124" rx="8" width="140" x="700" y="18"></rect><text class="t2" style="fill:var(--ink)" text-anchor="middle" x="770" y="38">Config Servers</text><rect class="bx" height="26" rx="5" width="108" x="716" y="48"></rect><text text-anchor="middle" x="770" y="66">mongod</text><rect class="bx" height="26" rx="5" width="108" x="716" y="78"></rect><text text-anchor="middle" x="770" y="96">mongod</text><rect class="bx" height="26" rx="5" width="108" x="716" y="108"></rect><text text-anchor="middle" x="770" y="126">mongod</text><line class="ar" marker-end="url(#ah3)" marker-start="url(#ah3)" x1="502" x2="698" y1="68" y2="68"></line><rect class="pn" height="270" rx="8" style="stroke-dasharray:3 3" width="260" x="20" y="190"></rect><text class="t2" style="fill:var(--ink)" text-anchor="middle" x="150" y="208">Shard 1 (replica set RS1)</text><rect class="bx" height="70" rx="8" style="fill:var(--g2)" width="120" x="90" y="222"></rect><text text-anchor="middle" x="150" y="244">mongod</text><text class="t2" text-anchor="middle" x="150" y="260">(Primary)</text><text class="t2" text-anchor="middle" x="150" y="278">RS1 · DB1 · Col-1</text><rect class="bx" height="80" rx="8" width="112" x="32" y="350"></rect><text text-anchor="middle" x="88" y="376">mongod</text><text class="t2" text-anchor="middle" x="88" y="392">(Secondary)</text><text class="t2" text-anchor="middle" x="88" y="410">RS1 · DB1 · Col-1</text><line class="ar" style="stroke-dasharray:4 3" x1="150" x2="88" y1="292" y2="350"></line><rect class="bx" height="80" rx="8" width="112" x="156" y="350"></rect><text text-anchor="middle" x="212" y="376">mongod</text><text class="t2" text-anchor="middle" x="212" y="392">(Secondary)</text><text class="t2" text-anchor="middle" x="212" y="410">RS1 · DB1 · Col-1</text><line class="ar" style="stroke-dasharray:4 3" x1="150" x2="212" y1="292" y2="350"></line><line class="ar" marker-end="url(#ah3)" x1="420" x2="150" y1="98" y2="188"></line><rect class="pn" height="270" rx="8" style="stroke-dasharray:3 3" width="260" x="300" y="190"></rect><text class="t2" style="fill:var(--ink)" text-anchor="middle" x="430" y="208">Shard 2 (replica set RS2)</text><rect class="bx" height="70" rx="8" style="fill:var(--g2)" width="120" x="370" y="222"></rect><text text-anchor="middle" x="430" y="244">mongod</text><text class="t2" text-anchor="middle" x="430" y="260">(Primary)</text><text class="t2" text-anchor="middle" x="430" y="278">RS2 · DB1 · Col-1</text><rect class="bx" height="80" rx="8" width="112" x="312" y="350"></rect><text text-anchor="middle" x="368" y="376">mongod</text><text class="t2" text-anchor="middle" x="368" y="392">(Secondary)</text><text class="t2" text-anchor="middle" x="368" y="410">RS2 · DB1 · Col-1</text><line class="ar" style="stroke-dasharray:4 3" x1="430" x2="368" y1="292" y2="350"></line><rect class="bx" height="80" rx="8" width="112" x="436" y="350"></rect><text text-anchor="middle" x="492" y="376">mongod</text><text class="t2" text-anchor="middle" x="492" y="392">(Secondary)</text><text class="t2" text-anchor="middle" x="492" y="410">RS2 · DB1 · Col-1</text><line class="ar" style="stroke-dasharray:4 3" x1="430" x2="492" y1="292" y2="350"></line><line class="ar" marker-end="url(#ah3)" x1="450" x2="450" y1="98" y2="188"></line><rect class="pn" height="270" rx="8" style="stroke-dasharray:3 3" width="260" x="580" y="190"></rect><text class="t2" style="fill:var(--ink)" text-anchor="middle" x="710" y="208">Shard 3 (replica set RS3)</text><rect class="bx" height="70" rx="8" style="fill:var(--g2)" width="120" x="650" y="222"></rect><text text-anchor="middle" x="710" y="244">mongod</text><text class="t2" text-anchor="middle" x="710" y="260">(Primary)</text><text class="t2" text-anchor="middle" x="710" y="278">RS3 · DB1 · Col-1</text><rect class="bx" height="80" rx="8" width="112" x="592" y="350"></rect><text text-anchor="middle" x="648" y="376">mongod</text><text class="t2" text-anchor="middle" x="648" y="392">(Secondary)</text><text class="t2" text-anchor="middle" x="648" y="410">RS3 · DB1 · Col-1</text><line class="ar" style="stroke-dasharray:4 3" x1="710" x2="648" y1="292" y2="350"></line><rect class="bx" height="80" rx="8" width="112" x="716" y="350"></rect><text text-anchor="middle" x="772" y="376">mongod</text><text class="t2" text-anchor="middle" x="772" y="392">(Secondary)</text><text class="t2" text-anchor="middle" x="772" y="410">RS3 · DB1 · Col-1</text><line class="ar" style="stroke-dasharray:4 3" x1="710" x2="772" y1="292" y2="350"></line><line class="ar" marker-end="url(#ah3)" x1="480" x2="710" y1="98" y2="188"></line><text class="t2" text-anchor="middle" x="430" y="480">Architecture MongoDB (sharded cluster + replica sets)</text></svg><figcaption>FIGURE 3 – Architecture MongoDB distribuée : mongos route chaque requête vers le bon shard grâce aux Config Servers</figcaption></figure><div class="key"><b>Flux :</b> client → mongos → Config Servers (où est la donnée ?) → shard ou replica set concerné.</div><div class="footer"><span>Architecture (suite)</span><span>20 / 38</span></div></section>
+
+<!-- 21 -->
+<section class="slide mg"><div class="kicker">5. Architecture</div><h2>5. Architecture (suite)</h2><div class="lab"><h4>🧪 Parcours d’une requête dans un Sharded Cluster</h4><div class="flow" id="w5f"><span>Client</span><span>mongos</span><span>Config Servers</span><span>Shard (replica set)</span></div><p class="q" id="w5t"></p><div class="bt"><button id="w5n">Envoyer la requête ▶</button><button class="gh" id="w5r">↺</button></div></div><div class="footer"><span>Architecture (suite)</span><span>21 / 38</span></div></section>
+
+<!-- 22 -->
+<section class="slide mg"><div class="kicker">6. CRUD et agrégation</div><h2>6. CRUD et agrégation</h2><div class="scroll"><table><tr><th>Action</th><th>Commandes</th></tr>
 <tr><td><b>Base / collection</b></td><td><code>use nomBase</code> ; <code>db.createCollection("nom")</code></td></tr>
 <tr><td><b>Ajouter</b></td><td><code>insertOne()</code>, <code>insertMany()</code></td></tr>
 <tr><td><b>Lire</b></td><td><code>find()</code>, <code>findOne()</code> avec filtres</td></tr>
 <tr><td><b>Modifier</b></td><td><code>updateOne()</code>, <code>updateMany()</code> avec <code>$set</code>, <code>$inc</code>…</td></tr>
-<tr><td><b>Supprimer</b></td><td><code>deleteOne()</code>, <code>deleteMany()</code></td></tr></table></div>
-<div class="blk"><div><h3>Le pipeline d’agrégation</h3><p>Contrairement au CRUD, l’agrégation permet calculs, regroupements et transformations. C’est une chaîne d’étapes : chacune transmet ses résultats à la suivante.</p><ul><li>Filtrer les données pertinentes</li><li>Réorganiser ou transformer</li><li>Calculer des agrégats (moyennes, totaux)</li><li>Produire des sorties structurées</li></ul></div>
+<tr><td><b>Supprimer</b></td><td><code>deleteOne()</code>, <code>deleteMany()</code></td></tr></table></div><div class="blk"><div><h3>Le pipeline d’agrégation</h3><p>Contrairement au CRUD, l’agrégation permet calculs, regroupements et transformations. C’est une chaîne d’étapes : chacune transmet ses résultats à la suivante.</p><ul><li>Filtrer les données pertinentes</li><li>Réorganiser ou transformer</li><li>Calculer des agrégats (moyennes, totaux)</li><li>Produire des sorties structurées</li></ul></div>
 <pre>db.collection.aggregate([
   { étape1 },
   { étape2 }
-])</pre></div>
-<div class="scroll"><table><tr><th>Étape</th><th>Rôle</th><th>Exemple</th></tr>
+])</pre></div><div class="footer"><span>6. CRUD et agrégation</span><span>22 / 38</span></div></section>
+
+<!-- 23 -->
+<section class="slide mg"><div class="kicker">6. CRUD et agrégation</div><h2>Créer et lire</h2><div class="scroll"><table><tr><th>Étape</th><th>Rôle</th><th>Exemple</th></tr>
 <tr><td><b>$match</b></td><td>Filtre (comme find)</td><td><code>{ $match: { moyenne: { $gte: 12 } } }</code></td></tr>
 <tr><td><b>$group</b></td><td>Regroupe et calcule</td><td><code>{ $group: { _id: "$section", moyenneSection: { $avg: "$moyenne" } } }</code></td></tr>
 <tr><td><b>$sort</b></td><td>1 croissant, -1 décroissant</td><td><code>{ $sort: { moyenne: -1 } }</code></td></tr>
-<tr><td><b>$project</b></td><td>Choisit ou transforme les champs</td><td><code>{ $project: { nom: 1, moyenne: 1, _id: 0 } }</code></td></tr></table></div><h3 class="sub">Exemples CRUD commentés (collection « etudiants »)</h3><div class="ex"><h3>Créer et lire</h3><p class="lead">Insertion puis recherche avec filtres et projection.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>use universite</td><td>Sélectionne (ou crée à la première écriture) la base <code>universite</code>.</td></tr><tr><td>db.etudiants.insertOne({ nom: &quot;Amina&quot;, age: 25, section: &quot;A&quot;, moyenne: 14.5 })</td><td>Insère <b>un</b> document ; MongoDB ajoute automatiquement un <code>_id</code> unique.</td></tr><tr><td>db.etudiants.insertMany([{ nom: &quot;Ali&quot;, age: 22, section: &quot;B&quot;, moyenne: 12 }, { nom: &quot;Sara&quot;, age: 23, section: &quot;A&quot;, moyenne: 16 }])</td><td>Insère <b>plusieurs</b> documents d’un coup, passés dans un tableau.</td></tr><tr><td>db.etudiants.find()</td><td>Retourne tous les documents de la collection.</td></tr><tr><td>db.etudiants.find({ section: &quot;A&quot; })</td><td>Filtre : uniquement les étudiants de la section A.</td></tr><tr><td>db.etudiants.find({ moyenne: { $gte: 12 } }, { nom: 1, moyenne: 1, _id: 0 })</td><td>1er argument = filtre (moyenne ≥ 12) ; 2e = projection : on affiche nom et moyenne, on cache <code>_id</code>.</td></tr><tr><td>db.etudiants.find().sort({ moyenne: -1 }).limit(3)</td><td>Trie par moyenne décroissante (-1) et garde les 3 premiers.</td></tr><tr><td>db.etudiants.findOne({ nom: &quot;Ali&quot; })</td><td>Retourne le <b>premier</b> document correspondant (et non un curseur).</td></tr></table></div></div>
-<div class="ex"><h3>Modifier et supprimer</h3><p class="lead">Toujours préciser le filtre, sinon on risque de modifier trop de documents.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>db.etudiants.updateOne({ nom: &quot;Ali&quot; }, { $set: { moyenne: 13 } })</td><td>Modifie le <b>premier</b> étudiant nommé Ali : <code>$set</code> change (ou ajoute) le champ <code>moyenne</code>.</td></tr><tr><td>db.etudiants.updateMany({ section: &quot;A&quot; }, { $inc: { age: 1 } })</td><td>Modifie <b>tous</b> les étudiants de la section A : <code>$inc</code> ajoute 1 à l’âge.</td></tr><tr><td>db.etudiants.updateOne({ nom: &quot;Sara&quot; }, { $unset: { age: &quot;&quot; } })</td><td><code>$unset</code> supprime le champ <code>age</code> du document.</td></tr><tr><td>db.etudiants.deleteOne({ nom: &quot;Ali&quot; })</td><td>Supprime un seul document correspondant.</td></tr><tr><td>db.etudiants.deleteMany({ moyenne: { $lt: 10 } })</td><td>Supprime tous les étudiants dont la moyenne est inférieure à 10.</td></tr></table></div></div>
-<div class="ex"><h3>Agrégation</h3><p class="lead">Chaque étape reçoit le résultat de la précédente.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>db.etudiants.aggregate([</td><td>Ouvre le pipeline : un tableau d’étapes exécutées dans l’ordre.</td></tr><tr><td>  { $match: { moyenne: { $gte: 10 } } },</td><td>Étape 1 : ne garde que les étudiants admis (filtre, comme <code>find</code>).</td></tr><tr><td>  { $group: { _id: &quot;$section&quot;, moyenneSection: { $avg: &quot;$moyenne&quot; }, nb: { $sum: 1 } } },</td><td>Étape 2 : regroupe par section (<code>_id</code>), calcule la moyenne et compte les étudiants (<code>$sum: 1</code>).</td></tr><tr><td>  { $sort: { moyenneSection: -1 } },</td><td>Étape 3 : classe les sections de la meilleure à la moins bonne.</td></tr><tr><td>  { $project: { _id: 0, section: &quot;$_id&quot;, moyenneSection: 1, nb: 1 } }</td><td>Étape 4 : renomme <code>_id</code> en <code>section</code> et cache l’<code>_id</code>.</td></tr><tr><td>])</td><td>Ferme le pipeline.</td></tr></table></div></div>
-<div class="lab"><h4>🧪 Constructeur de pipeline (collection « etudiants »)</h4><div class="scroll"><table id="w6d"></table></div><div class="bt"><label><input type="checkbox" id="w6a" checked> $match moyenne ≥ <b id="w6v">12</b></label><input type="range" id="w6m" min="0" max="20" value="12"><label><input type="checkbox" id="w6g"> $group par section ($avg)</label><label><input type="checkbox" id="w6s"> $sort décroissant</label></div><pre id="w6p"></pre><pre id="w6o"></pre></div></section>
+<tr><td><b>$project</b></td><td>Choisit ou transforme les champs</td><td><code>{ $project: { nom: 1, moyenne: 1, _id: 0 } }</code></td></tr></table></div><h3 class="sub">Exemples CRUD commentés (collection « etudiants »)</h3><div class="ex"><p class="lead">Insertion puis recherche avec filtres et projection.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>use universite</td><td>Sélectionne (ou crée à la première écriture) la base <code>universite</code>.</td></tr><tr><td>db.etudiants.insertOne({ nom: "Amina", age: 25, section: "A", moyenne: 14.5 })</td><td>Insère <b>un</b> document ; MongoDB ajoute automatiquement un <code>_id</code> unique.</td></tr><tr><td>db.etudiants.insertMany([{ nom: "Ali", age: 22, section: "B", moyenne: 12 }, { nom: "Sara", age: 23, section: "A", moyenne: 16 }])</td><td>Insère <b>plusieurs</b> documents d’un coup, passés dans un tableau.</td></tr><tr><td>db.etudiants.find()</td><td>Retourne tous les documents de la collection.</td></tr><tr><td>db.etudiants.find({ section: "A" })</td><td>Filtre : uniquement les étudiants de la section A.</td></tr><tr><td>db.etudiants.find({ moyenne: { $gte: 12 } }, { nom: 1, moyenne: 1, _id: 0 })</td><td>1er argument = filtre (moyenne ≥ 12) ; 2e = projection : on affiche nom et moyenne, on cache <code>_id</code>.</td></tr><tr><td>db.etudiants.find().sort({ moyenne: -1 }).limit(3)</td><td>Trie par moyenne décroissante (-1) et garde les 3 premiers.</td></tr><tr><td>db.etudiants.findOne({ nom: "Ali" })</td><td>Retourne le <b>premier</b> document correspondant (et non un curseur).</td></tr></table></div></div><div class="footer"><span>Créer et lire</span><span>23 / 38</span></div></section>
 
-<section id="valid"><h2>7. Validation et index</h2>
-<div class="blk"><div><h3>Valider avec $jsonSchema</h3><p>Des règles au niveau de la collection garantissent la qualité des données : champs obligatoires, types corrects, plages de valeurs. MongoDB reste flexible, mais les données restent correctes.</p><div class="key">Le mot-clé <code>validator</code> est toujours nécessaire à la création d’une collection avec règles.</div></div>
+<!-- 24 -->
+<section class="slide mg"><div class="kicker">6. CRUD et agrégation</div><h2>Modifier et supprimer</h2><div class="ex"><p class="lead">Toujours préciser le filtre, sinon on risque de modifier trop de documents.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>db.etudiants.updateOne({ nom: "Ali" }, { $set: { moyenne: 13 } })</td><td>Modifie le <b>premier</b> étudiant nommé Ali : <code>$set</code> change (ou ajoute) le champ <code>moyenne</code>.</td></tr><tr><td>db.etudiants.updateMany({ section: "A" }, { $inc: { age: 1 } })</td><td>Modifie <b>tous</b> les étudiants de la section A : <code>$inc</code> ajoute 1 à l’âge.</td></tr><tr><td>db.etudiants.updateOne({ nom: "Sara" }, { $unset: { age: "" } })</td><td><code>$unset</code> supprime le champ <code>age</code> du document.</td></tr><tr><td>db.etudiants.deleteOne({ nom: "Ali" })</td><td>Supprime un seul document correspondant.</td></tr><tr><td>db.etudiants.deleteMany({ moyenne: { $lt: 10 } })</td><td>Supprime tous les étudiants dont la moyenne est inférieure à 10.</td></tr></table></div></div><div class="footer"><span>Modifier et supprimer</span><span>24 / 38</span></div></section>
+
+<!-- 25 -->
+<section class="slide mg"><div class="kicker">6. CRUD et agrégation</div><h2>Agrégation</h2><div class="ex"><p class="lead">Chaque étape reçoit le résultat de la précédente.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>db.etudiants.aggregate([</td><td>Ouvre le pipeline : un tableau d’étapes exécutées dans l’ordre.</td></tr><tr><td>  { $match: { moyenne: { $gte: 10 } } },</td><td>Étape 1 : ne garde que les étudiants admis (filtre, comme <code>find</code>).</td></tr><tr><td>  { $group: { _id: "$section", moyenneSection: { $avg: "$moyenne" }, nb: { $sum: 1 } } },</td><td>Étape 2 : regroupe par section (<code>_id</code>), calcule la moyenne et compte les étudiants (<code>$sum: 1</code>).</td></tr><tr><td>  { $sort: { moyenneSection: -1 } },</td><td>Étape 3 : classe les sections de la meilleure à la moins bonne.</td></tr><tr><td>  { $project: { _id: 0, section: "$_id", moyenneSection: 1, nb: 1 } }</td><td>Étape 4 : renomme <code>_id</code> en <code>section</code> et cache l’<code>_id</code>.</td></tr><tr><td>])</td><td>Ferme le pipeline.</td></tr></table></div></div><div class="footer"><span>Agrégation</span><span>25 / 38</span></div></section>
+
+<!-- 26 -->
+<section class="slide mg"><div class="kicker">6. CRUD et agrégation</div><h2>6. CRUD et agrégation (suite)</h2><div class="lab"><h4>🧪 Constructeur de pipeline (collection « etudiants »)</h4><div class="scroll"><table id="w6d"></table></div><div class="bt"><label><input checked="" id="w6a" type="checkbox"/> $match moyenne ≥ <b id="w6v">12</b></label><input id="w6m" max="20" min="0" type="range" value="12"/><label><input id="w6g" type="checkbox"/> $group par section ($avg)</label><label><input id="w6s" type="checkbox"/> $sort décroissant</label></div><pre id="w6p"></pre><pre id="w6o"></pre></div><div class="footer"><span>CRUD et agrégation (suite)</span><span>26 / 38</span></div></section>
+
+<!-- 27 -->
+<section class="slide mg"><div class="kicker">7. Validation et index</div><h2>7. Validation et index</h2><div class="blk"><div><h3>Valider avec $jsonSchema</h3><p>Des règles au niveau de la collection garantissent la qualité des données : champs obligatoires, types corrects, plages de valeurs. MongoDB reste flexible, mais les données restent correctes.</p><div class="key">Le mot-clé <code>validator</code> est toujours nécessaire à la création d’une collection avec règles.</div></div>
 <pre>db.createCollection("etudiants", {
  validator: { $jsonSchema: {
   bsonType: "object",
@@ -181,60 +391,614 @@ session:1002 → {"name":"Bob","email":"bob@example.com","status":"inactive"}</p
      minimum: 0, maximum: 20 } } } } })
 
 insertOne({ nom: "Amina", moyenne: 15 })  // OK
-insertOne({ nom: "Ali",   moyenne: 25 })  // Erreur</pre></div>
-<h3 class="sub">Validation commentée</h3><div class="ex"><h3>Créer une collection avec $jsonSchema</h3><p class="lead">Les règles s’appliquent à chaque insertion.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>db.createCollection(&quot;etudiants&quot;, {</td><td>Crée la collection <code>etudiants</code> avec des options.</td></tr><tr><td>  validator: { $jsonSchema: {</td><td><code>validator</code> déclare les règles ; <code>$jsonSchema</code> les décrit.</td></tr><tr><td>    bsonType: &quot;object&quot;,</td><td>Chaque document doit être un objet.</td></tr><tr><td>    required: [&quot;nom&quot;, &quot;moyenne&quot;],</td><td>Les champs <code>nom</code> et <code>moyenne</code> sont obligatoires.</td></tr><tr><td>    properties: {</td><td>Début des règles champ par champ.</td></tr><tr><td>      nom: { bsonType: &quot;string&quot; },</td><td><code>nom</code> doit être une chaîne de caractères.</td></tr><tr><td>      moyenne: { bsonType: &quot;double&quot;, minimum: 0, maximum: 20 }</td><td><code>moyenne</code> doit être un décimal compris entre 0 et 20.</td></tr><tr><td>    } } }</td><td>Fermeture des blocs <code>properties</code>, <code>$jsonSchema</code> et <code>validator</code>.</td></tr><tr><td>})</td><td>Fin de <code>createCollection</code>.</td></tr><tr><td>db.etudiants.insertOne({ nom: &quot;Amina&quot;, moyenne: 15 })</td><td>✔ Accepté : respecte toutes les règles.</td></tr><tr><td>db.etudiants.insertOne({ nom: &quot;Ali&quot;, moyenne: 25 })</td><td>✘ Refusé : 25 dépasse le maximum de 20 (erreur de validation).</td></tr><tr><td>db.etudiants.insertOne({ moyenne: 12 })</td><td>✘ Refusé : le champ obligatoire <code>nom</code> est absent.</td></tr></table></div></div>
-<h3 class="sub">Indexation</h3><p class="lead">Un index fonctionne comme un annuaire téléphonique : accès rapide sans parcourir tous les documents. Gestion : <code>createIndex({ champ: 1 })</code>, <code>dropIndex("nom")</code>, <code>getIndexes()</code>.</p>
-<div class="scroll"><table><tr><th>Type</th><th>Usage</th><th>Exemple</th></tr>
+insertOne({ nom: "Ali",   moyenne: 25 })  // Erreur</pre></div><h3 class="sub">Validation commentée</h3><div class="footer"><span>7. Validation et index</span><span>27 / 38</span></div></section>
+
+<!-- 28 -->
+<section class="slide mg"><div class="kicker">7. Validation et index</div><h2>Créer une collection avec $jsonSchema</h2><div class="ex"><p class="lead">Les règles s’appliquent à chaque insertion.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>db.createCollection("etudiants", {</td><td>Crée la collection <code>etudiants</code> avec des options.</td></tr><tr><td>  validator: { $jsonSchema: {</td><td><code>validator</code> déclare les règles ; <code>$jsonSchema</code> les décrit.</td></tr><tr><td>    bsonType: "object",</td><td>Chaque document doit être un objet.</td></tr><tr><td>    required: ["nom", "moyenne"],</td><td>Les champs <code>nom</code> et <code>moyenne</code> sont obligatoires.</td></tr><tr><td>    properties: {</td><td>Début des règles champ par champ.</td></tr><tr><td>      nom: { bsonType: "string" },</td><td><code>nom</code> doit être une chaîne de caractères.</td></tr><tr><td>      moyenne: { bsonType: "double", minimum: 0, maximum: 20 }</td><td><code>moyenne</code> doit être un décimal compris entre 0 et 20.</td></tr><tr><td>    } } }</td><td>Fermeture des blocs <code>properties</code>, <code>$jsonSchema</code> et <code>validator</code>.</td></tr><tr><td>})</td><td>Fin de <code>createCollection</code>.</td></tr><tr><td>db.etudiants.insertOne({ nom: "Amina", moyenne: 15 })</td><td>✔ Accepté : respecte toutes les règles.</td></tr><tr><td>db.etudiants.insertOne({ nom: "Ali", moyenne: 25 })</td><td>✘ Refusé : 25 dépasse le maximum de 20 (erreur de validation).</td></tr><tr><td>db.etudiants.insertOne({ moyenne: 12 })</td><td>✘ Refusé : le champ obligatoire <code>nom</code> est absent.</td></tr></table></div></div><h3 class="sub">Indexation</h3><p class="lead">Un index fonctionne comme un annuaire téléphonique : accès rapide sans parcourir tous les documents. Gestion : <code>createIndex({ champ: 1 })</code>, <code>dropIndex("nom")</code>, <code>getIndexes()</code>.</p><div class="scroll"><table><tr><th>Type</th><th>Usage</th><th>Exemple</th></tr>
 <tr><td><b>Simple</b></td><td>Un seul champ</td><td><code>createIndex({ nom: 1 })</code></td></tr>
 <tr><td><b>Composé</b></td><td>Filtres sur plusieurs champs</td><td><code>createIndex({ section: 1, moyenne: -1 })</code></td></tr>
 <tr><td><b>Unique</b></td><td>Interdit les doublons</td><td><code>createIndex({ numero_inscription: 1 }, { unique: true })</code></td></tr>
-<tr><td><b>Partiel</b></td><td>Indexe une partie des documents</td><td><code>createIndex({ moyenne: 1 }, { partialFilterExpression: { moyenne: { $gt: 10 } } })</code></td></tr></table></div>
-<div class="ex"><h3>Index commentés</h3><p class="lead">Un index évite de parcourir toute la collection.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>db.etudiants.createIndex({ nom: 1 })</td><td><b>Index simple</b> croissant (1) sur <code>nom</code> : recherches rapides par nom.</td></tr><tr><td>db.etudiants.createIndex({ section: 1, moyenne: -1 })</td><td><b>Index composé</b> : section croissante puis moyenne décroissante ; l’ordre des champs compte.</td></tr><tr><td>db.etudiants.createIndex({ numero_inscription: 1 }, { unique: true })</td><td><b>Index unique</b> : deux étudiants ne peuvent pas avoir le même numéro.</td></tr><tr><td>db.etudiants.createIndex({ moyenne: 1 }, { partialFilterExpression: { moyenne: { $gt: 10 } } })</td><td><b>Index partiel</b> : n’indexe que les moyennes > 10, donc plus léger.</td></tr><tr><td>db.etudiants.getIndexes()</td><td>Liste les index existants de la collection.</td></tr><tr><td>db.etudiants.find({ nom: &quot;Amina&quot; }).explain(&quot;executionStats&quot;)</td><td>Montre le plan d’exécution : <code>IXSCAN</code> = index utilisé, <code>COLLSCAN</code> = parcours complet.</td></tr><tr><td>db.etudiants.dropIndex(&quot;nom_1&quot;)</td><td>Supprime l’index nommé <code>nom_1</code> (nom généré automatiquement).</td></tr></table></div></div>
-<div class="key"><b>À retenir :</b> les index accélèrent les lectures mais ralentissent insertions et mises à jour. Évitez les index inutiles et testez avec <code>find({ moyenne: { $gt: 10 } }).explain("executionStats")</code>.</div><div class="lab"><h4>🧪 Testez le validateur $jsonSchema</h4><div class="bt"><label>nom <input id="w7n" value="Amina"></label><label>moyenne <input id="w7m" value="25" size="5"></label><button id="w7b">insertOne()</button></div><pre id="w7o"></pre>
-<h4>🧪 Index : combien de documents lus ?</h4><div class="bt"><label>Taille de la collection <input type="range" id="w7r" min="1000" max="1000000" step="1000" value="100000"> <b id="w7rv"></b></label><label><input type="checkbox" id="w7i"> index unique sur numero_inscription</label></div><p id="w7x" class="q"></p></div></section>
+<tr><td><b>Partiel</b></td><td>Indexe une partie des documents</td><td><code>createIndex({ moyenne: 1 }, { partialFilterExpression: { moyenne: { $gt: 10 } } })</code></td></tr></table></div><div class="footer"><span>Créer une collection avec $jsonSchema</span><span>28 / 38</span></div></section>
 
-<section id="ops"><h2>8. Opérateurs et types BSON</h2>
-<div class="scroll"><table><tr><th>Famille</th><th>Opérateurs</th></tr>
+<!-- 29 -->
+<section class="slide mg"><div class="kicker">7. Validation et index</div><h2>Index commentés</h2><div class="ex"><p class="lead">Un index évite de parcourir toute la collection.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>db.etudiants.createIndex({ nom: 1 })</td><td><b>Index simple</b> croissant (1) sur <code>nom</code> : recherches rapides par nom.</td></tr><tr><td>db.etudiants.createIndex({ section: 1, moyenne: -1 })</td><td><b>Index composé</b> : section croissante puis moyenne décroissante ; l’ordre des champs compte.</td></tr><tr><td>db.etudiants.createIndex({ numero_inscription: 1 }, { unique: true })</td><td><b>Index unique</b> : deux étudiants ne peuvent pas avoir le même numéro.</td></tr><tr><td>db.etudiants.createIndex({ moyenne: 1 }, { partialFilterExpression: { moyenne: { $gt: 10 } } })</td><td><b>Index partiel</b> : n’indexe que les moyennes &gt; 10, donc plus léger.</td></tr><tr><td>db.etudiants.getIndexes()</td><td>Liste les index existants de la collection.</td></tr><tr><td>db.etudiants.find({ nom: "Amina" }).explain("executionStats")</td><td>Montre le plan d’exécution : <code>IXSCAN</code> = index utilisé, <code>COLLSCAN</code> = parcours complet.</td></tr><tr><td>db.etudiants.dropIndex("nom_1")</td><td>Supprime l’index nommé <code>nom_1</code> (nom généré automatiquement).</td></tr></table></div></div><div class="key"><b>À retenir :</b> les index accélèrent les lectures mais ralentissent insertions et mises à jour. Évitez les index inutiles et testez avec <code>find({ moyenne: { $gt: 10 } }).explain("executionStats")</code>.</div><div class="footer"><span>Index commentés</span><span>29 / 38</span></div></section>
+
+<!-- 30 -->
+<section class="slide mg"><div class="kicker">7. Validation et index</div><h2>7. Validation et index (suite)</h2><div class="lab"><h4>🧪 Testez le validateur $jsonSchema</h4><div class="bt"><label>nom <input id="w7n" value="Amina"/></label><label>moyenne <input id="w7m" size="5" value="25"/></label><button id="w7b">insertOne()</button></div><pre id="w7o"></pre>
+<h4>🧪 Index : combien de documents lus ?</h4><div class="bt"><label>Taille de la collection <input id="w7r" max="1000000" min="1000" step="1000" type="range" value="100000"/> <b id="w7rv"></b></label><label><input id="w7i" type="checkbox"/> index unique sur numero_inscription</label></div><p class="q" id="w7x"></p></div><div class="footer"><span>Validation et index (suite)</span><span>30 / 38</span></div></section>
+
+<!-- 31 -->
+<section class="slide mg"><div class="kicker">8. Opérateurs et types BSON</div><h2>8. Opérateurs et types BSON</h2><div class="scroll"><table><tr><th>Famille</th><th>Opérateurs</th></tr>
 <tr><td><b>Comparaison</b></td><td><code>$eq</code> <code>$ne</code> <code>$gt</code> <code>$gte</code> <code>$lt</code> <code>$lte</code> <code>$in</code> <code>$nin</code></td></tr>
 <tr><td><b>Logiques</b></td><td><code>$and</code> <code>$or</code> <code>$not</code> <code>$nor</code> ; ex. <code>{ $or: [{ status: "A" }, { status: "D" }] }</code></td></tr>
 <tr><td><b>Éléments / évaluation</b></td><td><code>$exists</code> <code>$type</code> <code>$regex</code> (ex. <code>"^J"</code>) <code>$expr</code></td></tr>
 <tr><td><b>Agrégation</b></td><td><code>$sum</code> <code>$avg</code> <code>$max</code> <code>$min</code> <code>$push</code> <code>$addToSet</code> (élément unique)</td></tr>
-<tr><td><b>Mise à jour</b></td><td><code>$set</code> <code>$unset</code> <code>$inc</code> <code>$mul</code> <code>$rename</code></td></tr></table></div>
-<div class="scroll"><table><tr><th>Type BSON</th><th>Description</th><th>Type BSON</th><th>Description</th></tr>
+<tr><td><b>Mise à jour</b></td><td><code>$set</code> <code>$unset</code> <code>$inc</code> <code>$mul</code> <code>$rename</code></td></tr></table></div><div class="footer"><span>8. Opérateurs et types BSON</span><span>31 / 38</span></div></section>
+
+<!-- 32 -->
+<section class="slide mg"><div class="kicker">8. Opérateurs et types BSON</div><h2>8. Opérateurs et types BSON (suite)</h2><div class="scroll"><table><tr><th>Type BSON</th><th>Description</th><th>Type BSON</th><th>Description</th></tr>
 <tr><td><b>object</b></td><td>Document complexe</td><td><b>double</b></td><td>Décimal (une moyenne)</td></tr>
 <tr><td><b>string</b></td><td>Chaîne de caractères</td><td><b>bool</b></td><td>true ou false</td></tr>
 <tr><td><b>int</b></td><td>Entier 32 bits</td><td><b>array</b></td><td>Liste de valeurs</td></tr>
 <tr><td><b>long</b></td><td>Entier 64 bits</td><td><b>date</b></td><td>Dates</td></tr>
-<tr><td><b>objectId</b></td><td>Identifiant unique généré par MongoDB</td><td><b>null</b></td><td>Valeur nulle autorisée</td></tr></table></div><div class="lab"><h4>🧪 Filtrez avec les opérateurs de comparaison</h4><div class="scroll"><table id="w8d"></table></div><div class="bt"><label>{ age: { <select id="w8o"><option>$eq</option><option>$ne</option><option>$gt</option><option>$gte</option><option>$lt</option><option>$lte</option></select>: <input id="w8v" value="22" size="4"> } }</label></div><pre id="w8q"></pre><div id="w8r" class="q"></div>
-<h4>🧪 Entraînement : quel type BSON ?</h4><p class="q">Valeur : <code id="w9v"></code></p><div class="bt" id="w9b"></div><p id="w9f"></p><button class="gh" id="w9n">Valeur suivante ›</button></div></section>
+<tr><td><b>objectId</b></td><td>Identifiant unique généré par MongoDB</td><td><b>null</b></td><td>Valeur nulle autorisée</td></tr></table></div><div class="lab"><h4>🧪 Filtrez avec les opérateurs de comparaison</h4><div class="scroll"><table id="w8d"></table></div><div class="bt"><label>{ age: { <select id="w8o"><option>$eq</option><option>$ne</option><option>$gt</option><option>$gte</option><option>$lt</option><option>$lte</option></select>: <input id="w8v" size="4" value="22"/> } }</label></div><pre id="w8q"></pre><div class="q" id="w8r"></div>
+<h4>🧪 Entraînement : quel type BSON ?</h4><p class="q">Valeur : <code id="w9v"></code></p><div class="bt" id="w9b"></div><p id="w9f"></p><button class="gh" id="w9n">Valeur suivante ›</button></div><div class="footer"><span>Opérateurs et types BSON (suite)</span><span>32 / 38</span></div></section>
 
-<section id="sum"><h2>9. Synthèse</h2>
-<div class="scroll"><table><tr><th>Notion</th><th>Problème résolu</th><th>Solution</th></tr>
+<!-- 33 -->
+<section class="slide mg"><div class="kicker">9. Synthèse</div><h2>9. Synthèse</h2><div class="scroll"><table><tr><th>Notion</th><th>Problème résolu</th><th>Solution</th></tr>
 <tr><td><b>NoSQL</b></td><td>Volumes, schémas rigides</td><td>Scalabilité horizontale, flexibilité</td></tr>
 <tr><td><b>Sharding</b></td><td>Trop de données pour un serveur</td><td>Répartition en shards via mongos</td></tr>
 <tr><td><b>Réplication</b></td><td>Panne de serveur</td><td>Replica set (copies redondantes)</td></tr>
 <tr><td><b>$jsonSchema</b></td><td>Données incorrectes</td><td>Validation à l’insertion</td></tr>
-<tr><td><b>Index</b></td><td>Requêtes lentes</td><td>Index simple, composé, unique, partiel</td></tr></table></div></section>
+<tr><td><b>Index</b></td><td>Requêtes lentes</td><td>Index simple, composé, unique, partiel</td></tr></table></div><div class="footer"><span>9. Synthèse</span><span>33 / 38</span></div></section>
 
-<section id="quiz"><h2>10. Auto-évaluation</h2><p class="lead">Répondez dans votre tête, puis cliquez pour vérifier.</p>
-<details><summary>Que signifie NoSQL ?</summary><p>Not Only SQL : il complète le SQL, il ne le remplace pas.</p></details>
-<details><summary>Quelle est la limite de la scalabilité verticale ?</summary><p>Ajouter CPU/RAM à un seul serveur est coûteux et limité ; NoSQL préfère la scalabilité horizontale (ajout de serveurs).</p></details>
-<details><summary>Citez les 4 types de BDD NoSQL avec un SGBD pour chacun.</summary><p>Documents (MongoDB), clé-valeur (Redis), colonnes (Cassandra), graphes (Neo4j).</p></details>
-<details><summary>Pourquoi Redis est-il extrêmement rapide ?</summary><p>Accès direct par la clé, sans jointure, et données stockées en mémoire (RAM).</p></details>
-<details><summary>Dans un graphe, que sont les nœuds et les arêtes ?</summary><p>Les nœuds sont les entités (Alice, Bob) ; les arêtes sont les relations (« amie », « suit »).</p></details>
-<details><summary>Sous quelle forme MongoDB stocke-t-il les documents JSON ?</summary><p>En BSON (Binary JSON), rapide en lecture et en écriture.</p></details>
-<details><summary>À quoi correspondent collection et document en SQL ?</summary><p>Collection ≈ table ; document ≈ ligne.</p></details>
-<details><summary>Quelle architecture choisir pour une petite application en développement ?</summary><p>Un serveur autonome : une seule instance mongod, sans sharding ni réplication.</p></details>
-<details><summary>Quels rôles jouent mongos et les Config Servers ?</summary><p>Mongos est le routeur ; il consulte les Config Servers (métadonnées sur l’emplacement des données) pour diriger la requête vers le bon shard.</p></details>
-<details><summary>Quelle différence entre sharding et réplication ?</summary><p>Le sharding répartit les données entre plusieurs serveurs (scalabilité) ; la réplication en conserve des copies (haute disponibilité).</p></details>
-<details><summary>Quelle étape du pipeline calcule la moyenne par section ?</summary><p><code>$group</code> avec <code>_id: "$section"</code> et <code>$avg</code>.</p></details>
-<details><summary>Que donne <code>insertOne({ nom: "Ali", moyenne: 25 })</code> avec le validateur des moyennes ?</summary><p>Une erreur : <code>$jsonSchema</code> impose une moyenne entre 0 et 20.</p></details>
-<details><summary>Quel index garantit un numéro d’inscription unique ?</summary><p>L’index unique : <code>{ unique: true }</code>.</p></details>
-<details><summary>Quel est le prix à payer d’un index, et comment le tester ?</summary><p>Insertions et mises à jour plus lentes ; on teste son impact avec <code>explain()</code>.</p></details>
-<details><summary>Quel type BSON pour une moyenne décimale ?</summary><p><code>double</code> (int = 32 bits, long = 64 bits).</p></details></section>
-<footer>Cours BDD NoSQL et cloud, Chapitre III. Mise en forme alignée sur le chapitre 2 du cours d’IHM.</footer>
-</main></div>
+<!-- 34 -->
+<section class="slide mg"><div class="kicker">10. Auto-évaluation</div><h2>10. Auto-évaluation</h2><p class="lead">Répondez dans votre tête, puis cliquez pour vérifier.</p><div class="footer"><span>10. Auto-évaluation</span><span>34 / 38</span></div></section>
+
+<!-- 35 -->
+<section class="slide mg"><div class="kicker">10. Auto-évaluation</div><h2>10. Auto-évaluation (suite)</h2><details><summary>Que signifie NoSQL ?</summary><p>Not Only SQL : il complète le SQL, il ne le remplace pas.</p></details><details><summary>Quelle est la limite de la scalabilité verticale ?</summary><p>Ajouter CPU/RAM à un seul serveur est coûteux et limité ; NoSQL préfère la scalabilité horizontale (ajout de serveurs).</p></details><details><summary>Citez les 4 types de BDD NoSQL avec un SGBD pour chacun.</summary><p>Documents (MongoDB), clé-valeur (Redis), colonnes (Cassandra), graphes (Neo4j).</p></details><details><summary>Pourquoi Redis est-il extrêmement rapide ?</summary><p>Accès direct par la clé, sans jointure, et données stockées en mémoire (RAM).</p></details><details><summary>Dans un graphe, que sont les nœuds et les arêtes ?</summary><p>Les nœuds sont les entités (Alice, Bob) ; les arêtes sont les relations (« amie », « suit »).</p></details><div class="footer"><span>Auto-évaluation (suite)</span><span>35 / 38</span></div></section>
+
+<!-- 36 -->
+<section class="slide mg"><div class="kicker">10. Auto-évaluation</div><h2>10. Auto-évaluation (suite)</h2><details><summary>Sous quelle forme MongoDB stocke-t-il les documents JSON ?</summary><p>En BSON (Binary JSON), rapide en lecture et en écriture.</p></details><details><summary>À quoi correspondent collection et document en SQL ?</summary><p>Collection ≈ table ; document ≈ ligne.</p></details><details><summary>Quelle architecture choisir pour une petite application en développement ?</summary><p>Un serveur autonome : une seule instance mongod, sans sharding ni réplication.</p></details><details><summary>Quels rôles jouent mongos et les Config Servers ?</summary><p>Mongos est le routeur ; il consulte les Config Servers (métadonnées sur l’emplacement des données) pour diriger la requête vers le bon shard.</p></details><details><summary>Quelle différence entre sharding et réplication ?</summary><p>Le sharding répartit les données entre plusieurs serveurs (scalabilité) ; la réplication en conserve des copies (haute disponibilité).</p></details><div class="footer"><span>Auto-évaluation (suite)</span><span>36 / 38</span></div></section>
+
+<!-- 37 -->
+<section class="slide mg"><div class="kicker">10. Auto-évaluation</div><h2>10. Auto-évaluation (suite)</h2><details><summary>Quelle étape du pipeline calcule la moyenne par section ?</summary><p><code>$group</code> avec <code>_id: "$section"</code> et <code>$avg</code>.</p></details><details><summary>Que donne <code>insertOne({ nom: "Ali", moyenne: 25 })</code> avec le validateur des moyennes ?</summary><p>Une erreur : <code>$jsonSchema</code> impose une moyenne entre 0 et 20.</p></details><details><summary>Quel index garantit un numéro d’inscription unique ?</summary><p>L’index unique : <code>{ unique: true }</code>.</p></details><details><summary>Quel est le prix à payer d’un index, et comment le tester ?</summary><p>Insertions et mises à jour plus lentes ; on teste son impact avec <code>explain()</code>.</p></details><details><summary>Quel type BSON pour une moyenne décimale ?</summary><p><code>double</code> (int = 32 bits, long = 64 bits).</p></details><div class="footer"><span>Auto-évaluation (suite)</span><span>37 / 38</span></div></section>
+
+<!-- 38 -->
+<section class="slide mg"><div class="kicker">Fin</div><h2>Ce qu'il faut retenir</h2><div class="grid cols-2"><div class="card"><h3>NoSQL</h3><p style="margin:0">Not Only SQL : scalabilité horizontale, schéma flexible, quatre modèles (documents, clé-valeur, colonnes, graphes).</p></div><div class="card"><h3>MongoDB</h3><p style="margin:0">Documents BSON, sharding et réplication, CRUD et agrégation, validation $jsonSchema et index.</p></div></div><div class="footer"><span>Conclusion</span><span>38 / 38</span></div></section>
+
+</div>
+
+<div class="num" id="num">1 / 38</div>
+<div class="topbtns">
+  <button class="iconbtn" id="themeToggle" title="Mode clair / sombre">☀</button>
+  <button class="iconbtn" id="menuToggle" title="Aller à une section">☰</button>
+</div>
+<div class="nav">
+  <button id="prev" aria-label="Précédent">‹</button>
+  <button id="next" aria-label="Suivant">›</button>
+</div>
+
+<div class="menu-overlay" id="menuOverlay">
+  <div class="menu-panel">
+    <h4>NAVIGATION</h4>
+    <div id="menuList"></div>
+  </div>
+</div>
+
 <script>
+/* ===================== NAVIGATION ===================== */
+const slides = document.querySelectorAll('.slide');
+const titles = ["Titre", "Plan général", "1. Pourquoi NoSQL ?", "2. Qu’est-ce que NoSQL ?", "Qu’est-ce que NoSQL ? (suite)", "3. Les 4 types de BDD NoSQL", "Les 4 types de BDD NoSQL (suite)", "Les 4 types de BDD NoSQL (suite)", "Les 4 types de BDD NoSQL (suite)", "1. Documents : MongoDB", "2. Clé-valeur : Redis", "3. Colonnes : Apache Cassandra", "4. Graphes : Neo4j (Cypher)", "Les 4 types de BDD NoSQL (suite)", "4. MongoDB", "MongoDB (suite)", "MongoDB (suite)", "5. Architecture", "Architecture (suite)", "Architecture (suite)", "Architecture (suite)", "6. CRUD et agrégation", "Créer et lire", "Modifier et supprimer", "Agrégation", "CRUD et agrégation (suite)", "7. Validation et index", "Créer une collection avec $jsonSchema", "Index commentés", "Validation et index (suite)", "8. Opérateurs et types BSON", "Opérateurs et types BSON (suite)", "9. Synthèse", "10. Auto-évaluation", "Auto-évaluation (suite)", "Auto-évaluation (suite)", "Auto-évaluation (suite)", "Conclusion"];
+let i = 0;
+function show(n){
+  slides[i].classList.remove('active');
+  i = (n + slides.length) % slides.length;
+  slides[i].classList.add('active');
+  document.getElementById('num').textContent = (i+1) + ' / ' + slides.length;
+  document.getElementById('progress').style.width = (((i+1)/slides.length)*100) + '%';
+  renderMenu();
+}
+document.getElementById('next').onclick = () => show(i+1);
+document.getElementById('prev').onclick = () => show(i-1);
+window.addEventListener('keydown', (e) => {
+  if(document.getElementById('menuOverlay').classList.contains('open')) return;
+  const tag = document.activeElement.tagName;
+  if(tag === 'INPUT') return;
+  if(e.key === 'ArrowRight' || e.key === ' ') show(i+1);
+  if(e.key === 'ArrowLeft') show(i-1);
+  if(e.key === 'Escape') closeMenu();
+});
+let touchX = null;
+window.addEventListener('touchstart', e => touchX = e.touches[0].clientX);
+window.addEventListener('touchend', e => {
+  if(touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if(dx < -40) show(i+1);
+  if(dx > 40) show(i-1);
+  touchX = null;
+});
+const themeBtn = document.getElementById('themeToggle');
+let light = false;
+themeBtn.onclick = () => {
+  light = !light;
+  document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
+  themeBtn.textContent = light ? '☾' : '☀';
+};
+const menuOverlay = document.getElementById('menuOverlay');
+const menuList = document.getElementById('menuList');
+function renderMenu(){
+  menuList.innerHTML = '';
+  titles.forEach((t, idx) => {
+    const item = document.createElement('div');
+    item.className = 'menu-item' + (idx === i ? ' current' : '');
+    item.innerHTML = '<span class="mi-n">' + (idx+1) + '</span><span>' + t + '</span>';
+    item.onclick = () => { show(idx); closeMenu(); };
+    menuList.appendChild(item);
+  });
+}
+function closeMenu(){ menuOverlay.classList.remove('open'); }
+document.getElementById('menuToggle').onclick = () => { renderMenu(); menuOverlay.classList.add('open'); };
+menuOverlay.addEventListener('click', (e) => { if(e.target === menuOverlay) closeMenu(); });
+renderMenu();
+document.getElementById('progress').style.width = (100/slides.length) + '%';
+
+/* ===================== SLIDE 3 — Séquentiel vs parallèle ===================== */
+(function(){
+  const seqBtn = document.getElementById('seqBtn'), parBtn = document.getElementById('parBtn');
+  const runBtn = document.getElementById('runSeqPar');
+  const statusEl = document.getElementById('seqParStatus');
+  const queueEl = document.getElementById('seqParQueue');
+  let mode = 'seq';
+  const REQS = ['Requête A','Requête B','Requête C','Requête D'];
+  const DUR = 900; // ms per request unit
+
+  function build(){
+    queueEl.innerHTML = '';
+    REQS.forEach((r,idx)=>{
+      const line = document.createElement('div'); line.className='qline';
+      line.innerHTML = '<span class="lbl">'+r+'</span><div class="track"><div class="fill" id="f'+idx+'"></div></div><span class="time" id="t'+idx+'">0.0s</span>';
+      queueEl.appendChild(line);
+    });
+  }
+  build();
+  seqBtn.onclick = ()=>{ mode='seq'; seqBtn.classList.add('on'); parBtn.classList.remove('on'); build(); statusEl.textContent='Mode : serveur unique.'; };
+  parBtn.onclick = ()=>{ mode='par'; parBtn.classList.add('on'); seqBtn.classList.remove('on'); build(); statusEl.textContent='Mode : 4 nœuds en parallèle.'; };
+
+  runBtn.onclick = () => {
+    build();
+    runBtn.disabled = true;
+    const start = performance.now();
+    if(mode === 'par'){
+      statusEl.innerHTML = 'Traitement en cours <b>en parallèle</b>…';
+      REQS.forEach((r,idx)=> animateOne(idx, 0, DUR, start));
+      setTimeout(()=>{ statusEl.innerHTML = 'Terminé en <b>~'+(DUR/1000).toFixed(1)+'s</b> — tous les nœuds ont fini ensemble.'; runBtn.disabled=false; }, DUR+150);
+    } else {
+      statusEl.innerHTML = 'Traitement en cours <b>séquentiel</b>…';
+      REQS.forEach((r,idx)=> animateOne(idx, idx*DUR, DUR, start));
+      const total = REQS.length*DUR;
+      setTimeout(()=>{ statusEl.innerHTML = 'Terminé en <b>~'+(total/1000).toFixed(1)+'s</b> — 4× plus long que le mode parallèle.'; runBtn.disabled=false; }, total+150);
+    }
+  };
+  function animateOne(idx, delay, dur, start){
+    setTimeout(()=>{
+      const fill = document.getElementById('f'+idx), timeEl = document.getElementById('t'+idx);
+      const t0 = performance.now();
+      function step(now){
+        const p = Math.min(1, (now-t0)/dur);
+        fill.style.width = (p*100)+'%';
+        timeEl.textContent = (((now-start))/1000).toFixed(1)+'s';
+        if(p<1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }, delay);
+  }
+})();
+
+/* ===================== SLIDE 6 — Cinq objectifs (carte interactive) ===================== */
+(function(){
+  const objectifs = [
+    {
+      titre: "1. Performance",
+      desc: "Accélérer l'exécution des requêtes grâce à la division et au traitement simultané des tâches (parallélisme intra/inter-requête).",
+      exemple: "Indexation et recherche parmi des milliards de documents en une fraction de seconde."
+    },
+    {
+      titre: "2. Disponibilité",
+      desc: "Garantir un accès continu et sans interruption au service 24h/24 et 7j/7, même lors des pics de charge.",
+      exemple: "Système bancaire en ligne accessible mondialement sans arrêt de service."
+    },
+    {
+      titre: "3. Fiabilité",
+      desc: "Assurer la tolérance aux pannes par la redondance et la réplication des données sur plusieurs nœuds.",
+      exemple: "Si un serveur physique s'éteint brusquement, un autre prend le relais sans perte de données."
+    },
+    {
+      titre: "4. Accès distribué",
+      desc: "Permettre à des utilisateurs ou applications situés sur différents sites d'accéder aux données de manière transparente.",
+      exemple: "Des équipes distantes à Alger, Paris et Dubaï travaillent en simultané sur la même base."
+    },
+    {
+      titre: "5. Maîtrise des coûts",
+      desc: "Préférer un ensemble de serveurs standards bon marché (commodity hardware) plutôt qu'une seule machine surdimensionnée très coûteuse.",
+      exemple: "Un cluster cloud à la demande coûte nettement moins cher qu'un mainframe propriétaire."
+    }
+  ];
+
+  const grid = document.getElementById('objGrid');
+  if (grid) {
+    grid.innerHTML = '';
+    objectifs.forEach(obj => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.cursor = 'pointer';
+      card.style.minHeight = '140px';
+      
+      card.innerHTML = `
+        <div class="n">${obj.titre}</div>
+        <p style="margin:0 0 8px; font-size:13.5px; color:var(--ink);">${obj.desc}</p>
+        <div class="example" style="display:none; margin-top:8px;"><b>Exemple :</b> ${obj.exemple}</div>
+        <span style="font-size:11px; color:var(--accent2); font-family:var(--mono);">👉 Cliquez pour afficher/masquer l'exemple</span>
+      `;
+
+      card.onclick = () => {
+        const ex = card.querySelector('.example');
+        const isHidden = ex.style.display === 'none';
+        ex.style.display = isHidden ? 'block' : 'none';
+      };
+
+      grid.appendChild(card);
+    });
+  }
+})();
+
+/* ===================== SLIDE 7 — Architecture explorer ===================== */
+(function(){
+  const box = document.getElementById('archBox');
+  const tabs = document.getElementById('archTabs');
+  const statusEl = document.getElementById('archStatus');
+  const exampleEl = document.getElementById('archExample');
+  let current = 'mem';
+
+  const ARCH = {
+    mem: {
+      render: ()=>`
+        <div class="row"><div class="chip cpu" id="c1">CPU</div><div class="chip cpu" id="c2">CPU</div><div class="chip cpu" id="c3">CPU</div><div class="chip cpu" id="c4">CPU</div></div>
+        <div class="net">RÉSEAU D'INTERCONNEXION</div>
+        <div class="row"><div class="chip disk">DISK</div><div class="chip disk">DISK</div><div class="chip mem" id="shared">MÉMOIRE PARTAGÉE</div></div>`,
+      hot: 'shared',
+      status: 'Toutes les CPU accèdent à la <b>même mémoire</b> : rapide, mais elle sature vite sous forte charge.',
+      example: '<b>Exemple —</b> SAP HANA in-memory, PostgreSQL avec parallélisme intra-requête sur une machine multi-cœurs.'
+    },
+    disk: {
+      render: ()=>`
+        <div class="row"><div class="unit"><div class="chip mem">MEM</div><div class="chip cpu">CPU</div></div><div class="unit"><div class="chip mem">MEM</div><div class="chip cpu">CPU</div></div></div>
+        <div class="net">RÉSEAU</div>
+        <div class="row"><div class="chip disk" id="shared">DISK PARTAGÉ</div></div>`,
+      hot: 'shared',
+      status: 'Chaque nœud a sa mémoire propre, mais tous écrivent sur le <b>même disque</b> : contention possible en écriture.',
+      example: '<b>Exemple —</b> Oracle RAC : plusieurs serveurs de calcul partagent un unique système de stockage (baie SAN).'
+    },
+    none: {
+      render: ()=>`
+        <div class="row"><div class="unit"><div class="chip mem" id="s1">MEM</div><div class="chip cpu" id="s1b">CPU</div><div class="chip disk" id="s1c">DISK</div></div><div class="unit"><div class="chip mem" id="s2">MEM</div><div class="chip cpu" id="s2b">CPU</div><div class="chip disk" id="s2c">DISK</div></div></div>
+        <div class="net">RÉSEAU</div>`,
+      hot: null,
+      status: 'Chaque nœud a sa <b>propre</b> mémoire et son propre disque : aucune ressource partagée, aucun goulot central.',
+      example: '<b>Exemple —</b> Hadoop/HDFS, Teradata, Google BigQuery.'
+    }
+  };
+
+  function render(){
+    const a = ARCH[current];
+    box.innerHTML = a.render();
+    statusEl.innerHTML = a.status;
+    exampleEl.innerHTML = a.example;
+  }
+  tabs.querySelectorAll('button').forEach(btn=>{
+    btn.onclick = ()=>{
+      tabs.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on');
+      current = btn.dataset.a;
+      render();
+    };
+  });
+  document.getElementById('archRun').onclick = ()=>{
+    const a = ARCH[current];
+    if(a.hot){
+      const el = document.getElementById(a.hot);
+      if(el){
+        el.classList.add('hot');
+        statusEl.innerHTML = '⚠ Charge envoyée — la ressource partagée <b>chauffe</b> : c\'est le goulot d\'étranglement.';
+        setTimeout(()=> el.classList.remove('hot'), 1400);
+      }
+    } else {
+      ['s1','s1b','s1c','s2','s2b','s2c'].forEach((id,idx)=>{
+        const el = document.getElementById(id);
+        if(el) setTimeout(()=>{ el.classList.add('hot'); setTimeout(()=>el.classList.remove('hot'),400); }, idx*80);
+      });
+      statusEl.innerHTML = '✅ Charge envoyée — chaque nœud traite sa part <b>indépendamment</b>, sans contention.';
+    }
+  };
+  render();
+})();
+
+/* ===================== SLIDE 9 — Répartition sur N nœuds ===================== */
+(function(){
+  const nodeSlider = document.getElementById('nodeSlider'), sizeSlider = document.getElementById('sizeSlider');
+  const nodeVal = document.getElementById('nodeVal'), sizeVal = document.getElementById('sizeVal');
+  const bars = document.getElementById('repartBars'), statusEl = document.getElementById('repartStatus');
+  function fmt(n){ return n.toLocaleString('fr-FR'); }
+  function render(){
+    const n = parseInt(nodeSlider.value), size = parseInt(sizeSlider.value);
+    nodeVal.textContent = n + ' nœud' + (n>1?'s':'');
+    sizeVal.textContent = fmt(size);
+    const per = Math.round(size/n);
+    bars.innerHTML = '';
+    for(let k=1;k<=n;k++){
+      const wrap = document.createElement('div'); wrap.className='bwrap';
+      wrap.innerHTML = '<div class="bar" style="height:'+(100/n).toFixed(0)+'%;">'+fmt(per)+'</div><div class="blabel">Nœud '+k+'</div>';
+      bars.appendChild(wrap);
+    }
+    statusEl.innerHTML = 'Chaque nœud gère <b>'+fmt(per)+'</b> enregistrements au lieu de <b>'+fmt(size)+'</b> sur un serveur unique — recherches et écritures environ <b>'+n+'×</b> plus rapides.';
+  }
+  nodeSlider.oninput = render; sizeSlider.oninput = render;
+  render();
+})();
+
+/* ===================== SLIDE 10 — Scalabilité Horizontale vs Verticale ===================== */
+(function(){
+  const loadSlider = document.getElementById('loadSlider');
+  const loadVal = document.getElementById('loadVal');
+  const visualArea = document.getElementById('scaleVisual');
+  const scaleDesc = document.getElementById('scaleDesc');
+  const btnVert = document.getElementById('btnScaleVert');
+  const btnHor = document.getElementById('btnScaleHor');
+
+  let mode = 'vert';
+
+  function updateScalability() {
+    if (!loadSlider || !visualArea || !scaleDesc) return;
+    const load = parseInt(loadSlider.value);
+    loadVal.textContent = load + ' % de charge';
+    visualArea.innerHTML = '';
+
+    if (mode === 'vert') {
+      const scaleFactor = load / 100;
+      const server = document.createElement('div');
+      server.style.cssText = `
+        width: ${60 * scaleFactor}px;
+        height: ${80 * scaleFactor}px;
+        background: var(--accent);
+        color: var(--accent-ink);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--mono);
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      `;
+      server.innerHTML = `<span>🖥 SERVEUR</span><span style="font-size:11px;">${scaleFactor * 16} Go RAM</span>`;
+      visualArea.appendChild(server);
+
+      scaleDesc.innerHTML = `<b>Scalabilité Verticale (Scale-UP) :</b> On augmente les capacités matérielles d'une seule machine (CPU, RAM, Disque).<br>
+      ⚠️ <i>Limite :</i> Coût très élevé (matériel propriétaire) et plafond physique du serveur.`;
+
+    } else {
+      const nodeCount = Math.ceil(load / 100);
+      for (let k = 1; k <= nodeCount; k++) {
+        const node = document.createElement('div');
+        node.style.cssText = `
+          width: 70px;
+          height: 70px;
+          background: var(--accent2);
+          color: var(--accent-ink);
+          border-radius: 8px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-family: var(--mono);
+          font-size: 12px;
+          font-weight: bold;
+          transition: all 0.3s ease;
+        `;
+        node.innerHTML = `<span>🖥 Nœud ${k}</span><span style="font-size:10px;">16 Go RAM</span>`;
+        visualArea.appendChild(node);
+      }
+
+      scaleDesc.innerHTML = `<b>Scalabilité Horizontale (Scale-OUT) :</b> On ajoute de nouvelles machines (nœuds) standards au cluster pour se partager le travail.<br>
+      ✅ <i>Avantage :</i> Coût réduit (serveurs ordinaires), aucune limite théorique de puissance.`;
+    }
+  }
+
+  if (loadSlider && btnVert && btnHor) {
+    loadSlider.oninput = updateScalability;
+    
+    btnVert.onclick = () => {
+      mode = 'vert';
+      btnVert.classList.add('on');
+      btnHor.classList.remove('on');
+      updateScalability();
+    };
+    btnHor.onclick = () => {
+      mode = 'hor';
+      btnHor.classList.add('on');
+      btnVert.classList.remove('on');
+      updateScalability();
+    };
+
+    updateScalability();
+  }
+})();
+
+/* ===================== SLIDE 11 — Latence simulée ===================== */
+(function(){
+  const latSlider = document.getElementById('latSlider'), latVal = document.getElementById('latVal');
+  const latFill = document.getElementById('latFill'), statusEl = document.getElementById('latStatus');
+  function render(){
+    const n = parseInt(latSlider.value);
+    latVal.textContent = n + ' nœud' + (n>1?'s':'');
+    const pct = Math.max(6, 100/n);
+    latFill.style.width = pct+'%';
+    statusEl.innerHTML = 'Latence relative estimée : <b>'+pct.toFixed(0)+'%</b> du temps d\'un serveur unique.';
+  }
+  latSlider.oninput = render;
+  render();
+})();
+
+/* ===================== SLIDE 13 — Tolérance aux pannes ===================== */
+(function(){
+  const cont = document.getElementById('failNodes'), statusEl = document.getElementById('failStatus');
+  const N = 5; let states = Array(N).fill(true);
+  function render(){
+    cont.innerHTML='';
+    for(let k=0;k<N;k++){
+      const n = document.createElement('div');
+      n.className = 'node' + (states[k] ? '' : ' down');
+      n.textContent = 'N'+(k+1);
+      n.onclick = ()=>{ states[k]=!states[k]; render(); };
+      cont.appendChild(n);
+    }
+    const alive = states.filter(Boolean).length;
+    if(alive === N) statusEl.textContent = 'Tous les nœuds sont actifs — service pleinement disponible.';
+    else if(alive === 0) statusEl.innerHTML = '❌ Tous les nœuds sont en panne — <b>service totalement indisponible</b>.';
+    else statusEl.innerHTML = '✅ '+alive+'/'+N+' nœuds actifs — le service <b>continue de fonctionner</b> grâce à la redondance (données répliquées sur les nœuds survivants).';
+  }
+  render();
+})();
+
+/* ===================== SLIDE 14 — Réplication maître/esclave ===================== */
+(function(){
+  const syncBtn = document.getElementById('syncBtn'), asyncBtn = document.getElementById('asyncBtn');
+  const writeBtn = document.getElementById('writeBtn');
+  const cont = document.getElementById('replNodes'), statusEl = document.getElementById('replStatus');
+  let mode = 'sync';
+  syncBtn.onclick = ()=>{ mode='sync'; syncBtn.classList.add('on'); asyncBtn.classList.remove('on'); };
+  asyncBtn.onclick = ()=>{ mode='async'; asyncBtn.classList.add('on'); syncBtn.classList.remove('on'); };
+
+  function build(){
+    cont.innerHTML = `
+      <div class="node master" id="master">Maître</div>
+      <span class="arrow">→</span>
+      <div class="node" id="rep1">Réplique 1</div>
+      <div class="node" id="rep2">Réplique 2</div>`;
+  }
+  build();
+  writeBtn.onclick = ()=>{
+    build();
+    writeBtn.disabled = true;
+    const master = document.getElementById('master');
+    master.classList.add('active-pulse');
+    statusEl.innerHTML = '✍ Écriture reçue sur le <b>maître</b>…';
+    const delay = mode === 'sync' ? 250 : 1600;
+    setTimeout(()=>{
+      ['rep1','rep2'].forEach((id,idx)=>{
+        setTimeout(()=>{
+          const el = document.getElementById(id);
+          el.classList.add('active-pulse');
+          el.style.borderColor = 'var(--good)'; el.style.color='var(--good)';
+        }, idx*150);
+      });
+      statusEl.innerHTML = mode === 'sync'
+        ? '✅ Mode <b>synchrone</b> : les répliques sont mises à jour <b>immédiatement</b>, avant confirmation de l\'écriture.'
+        : '⏳ Mode <b>asynchrone</b> : le maître a validé tout de suite, les répliques se mettent à jour <b>après un délai</b> (~1.6s ici) — incohérence temporaire possible.';
+      setTimeout(()=>{ master.classList.remove('active-pulse'); writeBtn.disabled=false; }, 500);
+    }, delay);
+  };
+})();
+
+/* ===================== SLIDE 16 — Sharding calculator ===================== */
+(function(){
+  const shardCountSlider = document.getElementById('shardCountSlider'), shardCountVal = document.getElementById('shardCountVal');
+  const idInput = document.getElementById('userIdInput'), calcBtn = document.getElementById('shardCalcBtn');
+  const line = document.getElementById('shardLine'), statusEl = document.getElementById('shardStatus');
+  const TOTAL = 1000000;
+  function colors(n){
+    const base = ['#4fd6c4','#f2b84b','#6fd18f','#e77070','#8fb2ff','#d38fe7','#ffd27a','#7ad3ff'];
+    return base.slice(0,n);
+  }
+  function drawLine(n, highlight){
+    const cs = colors(n);
+    line.innerHTML='';
+    for(let k=0;k<n;k++){
+      const seg = document.createElement('div'); seg.className='seg';
+      seg.style.background = cs[k];
+      seg.style.opacity = (highlight===k || highlight===null) ? '1' : '.28';
+      seg.textContent = 'Shard '+(k+1);
+      line.appendChild(seg);
+    }
+  }
+  function render(){
+    const n = parseInt(shardCountSlider.value);
+    shardCountVal.textContent = n + ' shards';
+    drawLine(n, null);
+    statusEl.textContent = 'Choisissez un ID puis cliquez sur "Localiser".';
+  }
+  shardCountSlider.oninput = render;
+  calcBtn.onclick = ()=>{
+    const n = parseInt(shardCountSlider.value);
+    let id = parseInt(idInput.value);
+    if(isNaN(id) || id<1) id=1;
+    if(id>TOTAL) id=TOTAL;
+    idInput.value = id;
+    const per = Math.ceil(TOTAL/n);
+    const shardIdx = Math.min(n-1, Math.floor((id-1)/per));
+    const lo = shardIdx*per+1, hi = Math.min(TOTAL, (shardIdx+1)*per);
+    drawLine(n, shardIdx);
+    statusEl.innerHTML = 'Utilisateur ID <b>'+id.toLocaleString('fr-FR')+'</b> → <b>Shard '+(shardIdx+1)+'</b> (plage '+lo.toLocaleString('fr-FR')+' – '+hi.toLocaleString('fr-FR')+').';
+  };
+  render();
+})();
+
+/* ===================== SLIDE 18 — Cluster combiné ===================== */
+(function(){
+  const btn = document.getElementById('genClusterBtn'), view = document.getElementById('clusterView');
+  btn.onclick = ()=>{
+    view.innerHTML='';
+    for(let s=1;s<=3;s++){
+      const col = document.createElement('div');
+      col.style.cssText='display:flex; flex-direction:column; align-items:center; gap:8px;';
+      col.innerHTML = '<div style="font-size:12px; color:var(--accent); font-weight:700;">SHARD '+s+'</div>';
+      const primary = document.createElement('div'); primary.className='node master'; primary.textContent='Primaire';
+      const rep = document.createElement('div'); rep.className='node'; rep.textContent='Réplique';
+      col.appendChild(primary); col.appendChild(rep);
+      view.appendChild(col);
+      setTimeout(()=>{ primary.classList.add('active-pulse'); setTimeout(()=>{ rep.style.borderColor='var(--good)'; rep.style.color='var(--good)'; primary.classList.remove('active-pulse'); }, 400); }, s*200);
+    }
+  };
+})();
+
+/* ===================== SLIDE 20 — Quiz ===================== */
+(function(){
+  const QUIZ = [
+    {q:"Qu'est-ce qui caractérise le mieux une BDD parallèle par rapport à une BDD traditionnelle ?", opts:["Elle utilise un serveur plus puissant","Elle répartit le traitement sur plusieurs unités simultanées","Elle stocke moins de données","Elle n'utilise pas de réseau"], correct:1},
+    {q:"Scalabilité horizontale signifie :", opts:["Ajouter de la RAM à la même machine","Ajouter des machines supplémentaires au cluster","Réduire le nombre de serveurs","Changer de système d'exploitation"], correct:1},
+    {q:"Dans l'architecture Shared Nothing, que partagent les nœuds ?", opts:["La mémoire","Le disque","Rien : chaque nœud a sa propre mémoire et son propre disque","Le réseau uniquement, pas le calcul"], correct:2},
+    {q:"Quel est le principal point faible de l'architecture Mémoire Partagée ?", opts:["Coût réseau élevé","La mémoire devient un goulot d'étranglement","Trop de redondance","Aucune limite connue"], correct:1},
+    {q:"La réplication a pour objectif principal :", opts:["La scalabilité et la performance pure","La disponibilité et la fiabilité","Réduire l'espace de stockage","Simplifier le schéma de données"], correct:1},
+    {q:"En réplication synchrone :", opts:["Les répliques sont mises à jour après un délai","La confirmation attend que toutes les répliques soient à jour","Il n'y a qu'une seule réplique possible","Aucune cohérence n'est garantie"], correct:1},
+    {q:"Le sharding consiste à :", opts:["Dupliquer toutes les données sur chaque nœud","Diviser les données en morceaux stockés sur des nœuds différents","Chiffrer les données avant stockage","Fusionner plusieurs bases en une seule"], correct:1},
+    {q:"Quel inconvénient est spécifique au sharding (pas à la réplication) ?", opts:["Consommation élevée d'espace disque","Requêtes croisant plusieurs shards plus lentes","Synchronisation asynchrone risquée","Coût de bande passante pour les copies"], correct:1}
+  ];
+  const area = document.getElementById('quizArea'), scoreEl = document.getElementById('quizScore');
+  let score = 0, answered = 0;
+  function build(){
+    area.innerHTML=''; score=0; answered=0; scoreEl.textContent = '0 / '+QUIZ.length;
+    QUIZ.forEach((item, qi)=>{
+      const box = document.createElement('div'); box.className='quiz-q';
+      const qt = document.createElement('div'); qt.className='qt'; qt.textContent = (qi+1)+'. '+item.q;
+      box.appendChild(qt);
+      const opts = document.createElement('div'); opts.className='quiz-opts';
+      item.opts.forEach((optText, oi)=>{
+        const opt = document.createElement('div'); opt.className='quiz-opt'; opt.textContent = optText;
+        opt.onclick = ()=>{
+          const siblings = opts.querySelectorAll('.quiz-opt');
+          siblings.forEach(s=>s.classList.add('disabled'));
+          if(oi === item.correct){
+            opt.classList.add('correct'); score++;
+          } else {
+            opt.classList.add('wrong');
+            siblings[item.correct].classList.add('correct');
+          }
+          answered++;
+          scoreEl.textContent = score+' / '+QUIZ.length;
+        };
+        opts.appendChild(opt);
+      });
+      box.appendChild(opts);
+      area.appendChild(box);
+    });
+  }
+  document.getElementById('quizReset').onclick = build;
+  build();
+})();
+</script>
+<script>(function(){
+
 const $=i=>document.getElementById(i);
 // 1
 function w1(){const l=+$('w1').value;$('w1v').textContent=l+'×';const ok=l<=4;$('w1o').innerHTML=`<div class="bar"><i style="width:${Math.min(l*10,100)}%;background:${ok?'var(--g)':'var(--bad)'}"></i></div><p>Vertical : un seul gros serveur, capacité max 4×, coût ≈ ${l*l} u. ${ok?'✅':'❌ <b>saturé</b>'}</p><p>Horizontal : <b>${l} serveur${l>1?'s':''}</b> de base, coût ≈ ${l} u. ✅ la charge est répartie.</p>`}
@@ -278,7 +1042,7 @@ $('w9b').innerHTML=['object','string','int','long','double','bool','array','date
 function w9(){$('w9v').textContent=V[i9][0];$('w9f').textContent=''}
 $('w9b').onclick=e=>{if(e.target.tagName=='BUTTON')$('w9f').textContent=e.target.textContent==V[i9][1]?'✅ Correct !':'❌ Réessayez.'};$('w9n').onclick=()=>{i9=(i9+1)%V.length;w9()};w9();
 
-const links=[...document.querySelectorAll('nav a')];
-document.querySelectorAll('section').forEach(s=>new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.hash==='#'+s.id))}),{rootMargin:'-30% 0px -60% 0px'}).observe(s));
-</script></body></html>
 
+})();</script>
+</body>
+</html>
