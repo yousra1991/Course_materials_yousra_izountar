@@ -1,1 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Human-Computer Interaction: Lecture 1</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{--bg:#f2f5f1;--ink:#14231c;--mut:#4f6158;--g:#1f7a4d;--g2:#dcebe1;--am:#e6a92b;--card:#fff;--line:#c9d8cf;--sh:0 8px 28px rgba(20,35,28,.12)}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1a15;--ink:#e8f0eb;--mut:#a3b5aa;--g:#5fcf94;--g2:#183226;--card:#16261e;--line:#2b4237;--sh:0 8px 28px rgba(0,0,0,.5)}}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.65 "Source Serif 4",Georgia,serif}
+h1,h2,h3,nav,th{font-family:"Bricolage Grotesque","Segoe UI",Arial,sans-serif}
+.wrap{display:grid;grid-template-columns:250px 1fr;max-width:1300px;margin:auto}
+nav{position:sticky;top:0;height:100vh;padding:28px 20px;overflow:auto;border-right:1px solid var(--line)}
+nav b{display:block;font-size:20px;color:var(--g);margin-bottom:14px}
+nav a{display:block;padding:7px 10px;margin:2px 0;color:var(--mut);text-decoration:none;border-radius:8px;font-size:15px;font-weight:500}
+nav a:hover,nav a.on{background:var(--g2);color:var(--g)}
+main{padding:0 clamp(18px,4vw,56px) 80px;min-width:0}
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:36px;align-items:center;padding:56px 0 40px}
+.hero h1{font-size:clamp(38px,6vw,68px);line-height:1;margin:0 0 16px;font-weight:800;letter-spacing:-.03em}
+.hero p{color:var(--mut);margin:0 0 18px}
+.pill{display:inline-block;background:var(--g);color:#fff;padding:5px 14px;border-radius:99px;font:600 14px "Bricolage Grotesque",sans-serif;margin:0 6px 6px 0}
+section{padding:46px 0 10px;border-top:2px solid var(--line)}
+section>h2{font-size:clamp(28px,4vw,42px);margin:0 0 6px;letter-spacing:-.02em}
+.lead{color:var(--mut);margin:0 0 26px;max-width:62ch}
+.blk{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start;background:var(--card);border-radius:18px;padding:26px;margin:0 0 26px;box-shadow:var(--sh)}
+.blk.r{direction:rtl}.blk.r>*{direction:ltr}
+.blk h3{margin:0 0 8px;font-size:24px;color:var(--g)}
+.blk ul{margin:8px 0;padding-left:20px}.blk li{margin:5px 0}
+.key{border-left:5px solid var(--am);background:var(--g2);padding:10px 14px;border-radius:0 10px 10px 0;margin:14px 0;font-size:16px}
+figure{margin:0}figure img{width:100%;border-radius:10px;border:1px solid var(--line);cursor:zoom-in;display:block;transition:transform .2s}
+figure img:hover{transform:scale(1.02)}
+figcaption{font-size:14px;color:var(--mut);margin-top:6px}
+.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 26px}
+.tl div{background:var(--card);border-top:5px solid var(--g);padding:12px;border-radius:10px;font-size:15px;box-shadow:var(--sh)}
+.tl b{display:block;font:800 22px "Bricolage Grotesque",sans-serif;color:var(--g)}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden;box-shadow:var(--sh);font-size:15px;margin:0 0 26px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--g);color:#fff}
+.scroll{overflow-x:auto}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:10px 0}
+summary{cursor:pointer;font-weight:600}
+details p{margin:8px 0 0;color:var(--g)}
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;place-items:center;z-index:9;cursor:zoom-out;padding:20px}
+.lb.open{display:grid}.lb img{max-width:100%;max-height:100%;border-radius:8px}
+:focus-visible{outline:3px solid var(--am);outline-offset:2px}
+footer{padding:30px 0;color:var(--mut);font-size:14px}
+.gal{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.gal.big{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}.gal.small{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+.gal div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:6px;text-align:center}
+.gal img{height:110px;object-fit:contain;background:#fff;border:0}.gal.big img{height:auto;max-height:260px}.gal.small img{height:90px}
+.gal span{display:block;font-size:13px;line-height:1.3;color:var(--mut);margin-top:4px}
+.blk figure.full{grid-column:1/-1}
+.tl.six{grid-template-columns:repeat(3,1fr)}.tl .here{border-top-color:var(--am)}
+.blk.one{grid-template-columns:1fr}
+.side{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px}.side h3{font-size:19px}.side p{margin:6px 0}
+.stack{display:flex;flex-direction:column;gap:6px}.stack div{background:var(--g2);border-radius:8px;padding:8px 12px;text-align:center;font:600 15px "Bricolage Grotesque",sans-serif}.stack .hl{background:var(--g);color:#fff}
+h3.sub{font-size:22px;color:var(--g);margin:26px 0 12px}
+.ecs{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));margin-top:12px}
+.ec{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:15px;line-height:1.4}
+.ec .em{font-size:26px;display:block}.ec small{display:block;color:var(--mut);font-size:13.5px;margin-top:4px}
+.ecs.wide{margin-bottom:20px}
+.exq{padding:12px 0;border-top:1px solid var(--line)}.exq .q{margin:0;font-weight:600}.exq .qn{display:inline-block;min-width:24px;height:24px;border-radius:99px;background:var(--g);color:#fff;text-align:center;font:700 14px/24px "Bricolage Grotesque",sans-serif;margin-right:8px}
+.cks{display:grid;gap:6px}.ck{display:flex;gap:10px;align-items:flex-start;cursor:pointer}.ck input{margin-top:7px;accent-color:var(--g)}.ck:has(input:checked) span{opacity:.55;text-decoration:line-through}
+@media(max-width:900px){.tl.six{grid-template-columns:1fr 1fr}}
+
+@media(max-width:900px){.wrap{grid-template-columns:1fr}nav{position:static;height:auto;border:0;display:flex;flex-wrap:wrap;gap:4px}nav b{width:100%}.hero,.blk{grid-template-columns:1fr}.blk.r{direction:ltr}.tl{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav aria-label="Contents"><b>HCI: Lecture 1</b>
+<a href="#roadmap">Roadmap</a><a href="#intro">1. Introduction</a><a href="#ergo">2. Ergonomics &amp; design</a><a href="#history">3. History</a><a href="#output">4. Output devices</a><a href="#input">5. Input devices</a><a href="#multi">6. Multimodality</a><a href="#xr">7. Extended realities</a><a href="#tangible">8. Tangible interfaces</a><a href="#plasticity">9. Mobile &amp; plasticity</a><a href="#beyond">10. Beyond the desktop</a><a href="#exercises">11. Exercises</a><a href="#quiz">12. Self-assessment quiz</a></nav>
+<main>
+<header class="hero">
+<div><span class="pill">LifIHM</span><span class="pill">Human-Computer Interaction</span>
+<h1>Introduction to HCI</h1>
+<p>Lecture 1 · Izountar Yousra, Faculty of Computer Science, Université Alger 1 · 2026/2027.<br>From punched cards to virtual reality headsets: how humans talk to machines, and why the interface decides everything.</p>
+<div class="key"><b>Learning goals:</b> trace the evolution of interfaces, classify input and output devices, tell VR, AR, MR and XR apart, and understand the challenges of mobile computing.</div></div>
+<figure class="gal big"><div><img src="01_01.png" alt="Humorous cartoon: old PC and laptop"><span>Humorous cartoon: old PC and laptop</span></div></figure>
+</header>
+
+<section id="roadmap"><h2>Course roadmap</h2><p class="lead">Scenario: you have been hired to fix StudyHub, a learning platform everyone hates. Each part of the course answers one question about fixing it.</p><div class="tl six"><div class="here"><b>1 · Intro &amp; History</b>Why did it end up this way? Start with the history of interaction. <i>You are here.</i></div><div class=""><b>2 · Ergonomics theories</b>Why is it exhausting to use? Cognitive, perceptual, motor and visual-design theories.</div><div class=""><b>3 · HCI design</b>How do you design something better? Follow a real design method.</div><div class=""><b>4 · Mockups</b>How do you make the idea real? Sketches become clickable mockups.</div><div class=""><b>5 · Bastien &amp; Scapin</b>Is the design any good? Judge it with a rigorous criteria grid.</div><div class=""><b>6 · User testing</b>Will it survive real users? Questionnaires, eye-tracking, observation, A/B tests.</div></div></section><section id="intro"><h2>1. Introduction to HCI</h2><p class="lead">One acronym, two meanings, and a field that sits between people and machines.</p><div class="blk"><div><h3>One acronym, two meanings</h3><ul><li><b>Interfaces</b>: the hardware and software devices that let a human user interact with an interactive digital system (an ATM touchscreen and its software).</li><li><b>Interactions</b>: the reciprocal actions between both: <i>commands</i> from human to machine (tapping "pay"), <i>feedback</i> from machine to human (the terminal beeps and shows "Approved").</li></ul><p>Also used for human-machine communication, human-machine dialogue and human-robot interaction.</p><div class="key">Interfaces are the support for interactions.</div></div><div class="side"><h3>A bit of etymology</h3><p><b>Interface</b>: <i>inter</i> (between) + <i>facies</i> (appearance).</p><p><b>Interaction</b>: <i>inter</i> (between) + <i>actio</i> (capacity to act).</p></div></div><div class="blk r"><div><h3>Between hardware and human</h3><ul><li><b>Hardware</b>: computers, tablets, smartphones.</li><li><b>Operating system</b>: Windows, Linux, macOS.</li><li><b>Software</b>: downloaded programs ("thick clients": desktop and mobile apps) or used through a browser and websites.</li><li><b>Users</b>: HCI is the layer where the person meets all of the above.</li></ul></div><div class="side stack"><div>Humans / users</div><div class="hl">HCI</div><div>Software</div><div>Operating system</div><div>Hardware</div></div></div><div class="blk one"><div><h3>Consequences of good HCI (Meinadier)</h3><ul><li><b>Ease of learning</b>: you start at once, without a manual.</li><li><b>Ease, efficiency and safety</b>: an undo button protects from mistakes.</li><li><b>Pleasure of use</b> and <b>acceptability</b>: people use the software instead of finding workarounds.</li><li><b>User satisfaction</b> and satisfactory <b>productivity</b> of the person-machine pair.</li><li><b>Profitability</b> for the company: fewer support calls, higher completion rates.</li></ul></div></div><div class="blk"><div><h3>Bad HCI: individual level</h3><ul><li><b>Confusion</b>: where do I upload my assignment?</li><li><b>Frustration</b>: clicking submit again because nothing confirms it worked.</li><li><b>Panic</b>: submit and abort buttons that look identical in a timed exam.</li><li><b>Stress</b>: a red countdown and a laggy page.</li><li><b>Boredom</b>: identical unskippable intro videos in every chapter.</li></ul></div><div><h3>Bad HCI: company and society</h3><ul><li><b>Rejection, serious errors</b>: staff go back to paper ledgers or miskey a decimal.</li><li><b>Under-use</b> and lower performance: manual searches instead of the new tool.</li><li><b>Regression to execution-only tasks</b>: expertise erodes until nobody can act when the tool fails.</li><li><b>Costs</b>: task changes, system rewrites, emergency patches after rollout.</li></ul></div></div><div class="scroll"><table><tr><th></th><th>Technocentered 🏭</th><th>Anthropocentered 🧑</th></tr><tr><td><b>Centered on</b></td><td>The machine and its capabilities</td><td>The human and their needs</td></tr><tr><td><b>Who adapts</b></td><td>The user adapts to the machine</td><td>The machine adapts to the user</td></tr><tr><td><b>Point of view</b></td><td>The designer</td><td>The user</td></tr></table></div><div class="key"><i>Anthropocentered</i>: Greek <i>ánthropos</i> (human) + <i>kéntron</i> (center).</div></section><section id="ergo"><h2>2. Ergonomics and design</h2><p class="lead">Adapting the interface, and telling ergonomics, visual design, UI and UX apart.</p><div class="scroll"><table><tr><th>Adapt to…</th><th>What it means</th><th>Example</th></tr><tr><td><b>The user</b></td><td>Physical differences, knowledge and experience (domain, computing), socio-cultural traits</td><td>Larger touch targets and screen-reader support; "05/10" is 5 May in the US but 5 October in France; an Arabic UI must mirror its whole layout (RTL)</td></tr><tr><td><b>The context</b></td><td>General public, leisure, industry, critical systems</td><td>A museum kiosk needs zero learning; a nuclear control panel prevents accidental commands</td></tr><tr><td><b>The task</b></td><td>Occasional to daily use, risky or time-constrained work</td><td>A tax site used once a year must re-explain itself; ambulance dispatch must work in bright sun</td></tr><tr><td><b>Technical constraints</b></td><td>Platform, memory and bandwidth, screen and sensors, legacy code</td><td>Ctrl vs Cmd shortcuts; a rural app that works on slow 2G; a watch app on a 1-inch screen</td></tr></table></div><div class="blk"><div><h3>What is ergonomics?</h3><ul><li><b>Of objects and workstations</b>: fit them to the person (an adjustable chair against back pain).</li><li><b>Software ergonomics, corrective</b>: improve existing software, cut errors and learning time.</li><li><b>Design-oriented</b>: build usability in from the first wireframe.</li><li><b>Prospective</b>: imagine new ergonomic interfaces (voice-only smart homes).</li></ul><div class="key">Point of view: the <b>user</b>, not the designer, the developer or the client.</div></div><div class="side"><h3>Etymology</h3><p><b>Ergonomics</b>: Greek <i>érgon</i> (work) + <i>nómos</i> (law).</p></div></div><h3 class="sub">A multidisciplinary field</h3><div class="ecs wide"><div class="ec"><span class="em">🖥️</span><b>Computer science</b><small>OS layer that renders windows and handles input events</small></div><div class="ec"><span class="em">🧩</span><b>Software engineering</b><small>Architecture that adds features without breaking the UI</small></div><div class="ec"><span class="em">👩‍💻</span><b>Programming</b><small>Code that makes the "Submit" button respond</small></div><div class="ec"><span class="em">🤖</span><b>Artificial intelligence</b><small>Chatbots that understand natural-language questions</small></div><div class="ec"><span class="em">🗣️</span><b>Image and speech processing</b><small>Voice-to-text, face unlock</small></div><div class="ec"><span class="em">🧠</span><b>Cognitive psychology</b><small>Memory limits: long lists must be categorised</small></div><div class="ec"><span class="em">🎓</span><b>Education sciences</b><small>Gradual onboarding instead of a feature dump</small></div><div class="ec"><span class="em">🗨️</span><b>Sociology, linguistics</b><small>Localising into Arabic means flipping to RTL</small></div><div class="ec"><span class="em">🎨</span><b>Graphic and visual design</b><small>Colour, type and contrast that read clearly</small></div></div><div class="key">A successful interface is a collaboration between code, psychology, culture and visual design. HCI is not just "UI programming".</div><div class="scroll"><table><tr><th></th><th>HCI / software ergonomics ⚙️</th><th>Visual design 🎨</th></tr><tr><td><b>Choices</b></td><td>Functional</td><td>Aesthetic and symbolic</td></tr><tr><td><b>Goal</b></td><td>Efficiency, comfort, adaptation to users</td><td>A good (brand) image: type, palette, icons, layout, animation</td></tr><tr><td><b>Nature</b></td><td>Objective and constant (aside from scientific advances)</td><td>Subjective and dependent on trends</td></tr></table></div><div class="scroll"><table><tr><th></th><th>UI design</th><th>UX design</th></tr><tr><td><b>Stands for</b></td><td>User Interface</td><td>User eXperience</td></tr><tr><td><b>Covers</b></td><td>What the user sees and touches: colours, buttons, type, layout</td><td>The whole lived experience: easy, logical, comfortable?</td></tr><tr><td><b>Components</b></td><td>User interface, visual design</td><td>Functionalities, information architecture, usability, interaction design, content strategy, and UI nested inside</td></tr></table></div><div class="key">UI is one piece inside UX: the visible layer the user touches.</div><h3 class="sub">Micro case studies: four websites on two axes</h3><div class="scroll"><table><tr><th>Website</th><th>Ergonomics</th><th>Design</th><th>Why</th></tr><tr><td>📖 Wikipedia</td><td>High</td><td>Low</td><td>Plain, dense, highly functional</td></tr><tr><td>🪑 Gone's (furniture)</td><td>High</td><td>High</td><td>Clean, modern e-commerce: the ideal quadrant</td></tr><tr><td>🍕 Pizza site</td><td>Low</td><td>Low</td><td>Colourful, cluttered, clashing colours</td></tr><tr><td>📷 Photo blog</td><td>Low</td><td>High</td><td>Elegant typography, but pop-ups hurt usability</td></tr></table></div><h3 class="sub">Common misconceptions about software ergonomics</h3><details><summary>"It's easy, it's fast"</summary><p>False. It is difficult, long and costly.</p></details><details><summary>"It's just a cosmetic operation on the screen"</summary><p>False. It requires deep work and must start early in the project.</p></details><details><summary>"It's only a matter of taste, common sense, intuition"</summary><p>False. There are rules to follow, grounded in scientific sources.</p></details><details><summary>"There is a miracle method"</summary><p>False. No turnkey solution exists: only theoretical and experimental reference points, trade-offs and compromises.</p></details></section><section id="history"><h2>3. History: from the origins to the future</h2>
+<p class="lead">Every decade invented a new way of talking to the computer.</p>
+<div class="tl"><div><b>1945-70</b>Cards, indicator lights, printers, then screens and keyboards</div><div><b>1963</b>Graphic display, light pen, first mouse</div><div><b>1980</b>Mass-market applications, direct manipulation</div><div><b>1990+</b>Graphical interfaces and WYSIWYG</div></div>
+<div class="blk"><div><h3>1945-1970: the beginnings</h3><ul><li><b>Limited input/output</b>: card punches and readers, dashboards of indicator lights, printers.</li><li><b>Then</b>: screens, keyboards and <b>command languages</b>.</li></ul><div class="key">Talking to the machine meant learning its language.</div></div><figure class="gal mid"><div><img src="02_01.png" alt="Card punch and punched cards"><span>Card punch and punched cards</span></div><div><img src="02_02.png" alt="Early computer with indicator-light panels"><span>Early computer with indicator-light panels</span></div><div><img src="02_03.png" alt="Early console"><span>Early console</span></div><div><img src="02_04.png" alt="Operator at an early terminal"><span>Operator at an early terminal</span></div><div><img src="02_05.png" alt="Modern command prompt"><span>Modern command prompt</span></div></figure></div>
+<div class="blk r"><div><h3>The 1970s: "modern" computers</h3><ul><li>1963: <b>graphic display and light pen</b>.</li><li>1963: the first <b>"mouse"</b>.</li><li>1980: mass-market applications built on <b>direct manipulation</b>, still our reference today.</li></ul><p>Milestones: Xerox 8010 Star (1981), Apple Lisa (1982), Macintosh (1984), Windows 3.0 (1990).</p></div><figure class="gal mid"><div><img src="03_01.png" alt="First mouse (1963)"><span>First mouse (1963)</span></div><div><img src="03_02.png" alt="Light pen and graphic display (1963)"><span>Light pen and graphic display (1963)</span></div><div><img src="03_03.png" alt="Xerox 8010 Star (1981)"><span>Xerox 8010 Star (1981)</span></div><div><img src="03_04.png" alt="Apple Lisa (1982)"><span>Apple Lisa (1982)</span></div><div><img src="03_05.png" alt="Macintosh (1984)"><span>Macintosh (1984)</span></div><div><img src="03_06.png" alt="Windows 3.0 (1990)"><span>Windows 3.0 (1990)</span></div></figure></div>
+<div class="blk"><div><h3>Evolution of interfaces</h3><ul><li>Systems that are more <b>user-friendly</b>, easy to understand and use.</li><li><b>Graphical interfaces</b> and direct manipulation: the user acts "directly" on objects shown on screen.</li><li><b>WYSIWYG</b>: <i>What You See Is What You Get</i>.</li></ul><div class="key">In a web editor, the HTML code (left) versus the rendered page (right) shows the difference between command languages and WYSIWYG.</div></div><figure class="gal big"><div><img src="04_01.png" alt="3D graphical desktop"><span>3D graphical desktop</span></div><div><img src="04_02.png" alt="HTML source code editing"><span>HTML source code editing</span></div><div><img src="04_03.png" alt="WYSIWYG editing"><span>WYSIWYG editing</span></div></figure></div>
+</section>
+
+<section id="output"><h2>4. Output devices</h2>
+<p class="lead">Everything through which the machine addresses our senses.</p>
+<div class="blk"><div><h3>Overview</h3><ul><li><b>Screens</b>, from classic to miniature.</li><li><b>3D printers</b>: the output becomes a physical object.</li><li><b>Force feedback and haptic feedback</b>: joystick, wristband, vibrations on a smartphone.</li><li><b>Sound</b>: speech synthesis, spatialised 3D sound (front: future, behind: past), holophonic and binaural 3D sound.</li></ul></div><figure class="gal small full"><div><img src="05_01.png" alt="Large touch screen"><span>Large touch screen</span></div><div><img src="05_02.png" alt="Miniature screen"><span>Miniature screen</span></div><div><img src="05_03.png" alt="3D printer"><span>3D printer</span></div><div><img src="05_04.png" alt="3D-printed lattice"><span>3D-printed lattice</span></div><div><img src="05_05.png" alt="3D-printed building"><span>3D-printed building</span></div><div><img src="05_06.png" alt="Printing head at work"><span>Printing head at work</span></div><div><img src="05_07.png" alt="Haptic hand device"><span>Haptic hand device</span></div><div><img src="05_08.png" alt="Force-feedback joystick"><span>Force-feedback joystick</span></div><div><img src="05_09.png" alt="Haptic wristband"><span>Haptic wristband</span></div><div><img src="05_10.png" alt="Smartphone haptic keyboard"><span>Smartphone haptic keyboard</span></div><div><img src="05_11.png" alt="Sound waveform"><span>Sound waveform</span></div><div><img src="05_12.png" alt="Voice assistant character"><span>Voice assistant character</span></div><div><img src="05_13.png" alt="Wearable spatial-sound device"><span>Wearable spatial-sound device</span></div><div><img src="05_14.png" alt="Holophonic loudspeaker array"><span>Holophonic loudspeaker array</span></div><div><img src="05_15.png" alt="Binaural microphones"><span>Binaural microphones</span></div></figure></div>
+<div class="blk r"><div><h3>2D information visualisation</h3><ul><li><b>File representation</b>: treemaps and radial graphs to see how a disk is used.</li><li><b>Fish-eye: focus + context</b>: enlarge the area of interest without losing the rest (metro map, alphabetical list).</li></ul></div><figure class="gal mid"><div><img src="06_01.png" alt="File-usage treemap"><span>File-usage treemap</span></div><div><img src="06_02.png" alt="Sunburst diagram"><span>Sunburst diagram</span></div><div><img src="06_03.png" alt="Radial tree"><span>Radial tree</span></div><div><img src="06_04.png" alt="Fish-eye metro map"><span>Fish-eye metro map</span></div><div><img src="06_05.png" alt="Fish-eye list"><span>Fish-eye list</span></div></figure></div>
+<div class="blk"><div><h3>2.5D information visualisation</h3><ul><li>Between 2D and 3D.</li><li><b>Richer</b> than 2D.</li><li><b>Less demanding</b> in computing power than 3D.</li></ul><p>Examples: temperature surface, perspective graph, temporal representation of files.</p></div><figure class="gal big"><div><img src="07_01.png" alt="Temperature surface (2.5D)"><span>Temperature surface (2.5D)</span></div><div><img src="07_02.png" alt="Network graph in perspective"><span>Network graph in perspective</span></div><div><img src="07_03.png" alt="Temporal file view"><span>Temporal file view</span></div></figure></div>
+<div class="blk r"><div><h3>3D information visualisation</h3><ul><li>Anaglyphs (red-cyan glasses), active shutter glasses, 3D screens.</li><li>Immersive headsets and CAVE-type immersive rooms.</li></ul><div class="key">Depth is always obtained by sending a different image to each eye.</div></div><figure class="gal mid"><div><img src="08_01.png" alt="Anaglyph leopard"><span>Anaglyph leopard</span></div><div><img src="08_02.png" alt="Stereo pair image"><span>Stereo pair image</span></div><div><img src="08_03.png" alt="Red-cyan anaglyph glasses"><span>Red-cyan anaglyph glasses</span></div><div><img src="08_04.png" alt="Active shutter glasses"><span>Active shutter glasses</span></div><div><img src="08_05.png" alt="3D television"><span>3D television</span></div><div><img src="08_06.png" alt="VR headset user"><span>VR headset user</span></div><div><img src="08_07.png" alt="Immersive dome room"><span>Immersive dome room</span></div></figure></div>
+</section>
+
+<section id="input"><h2>5. Input devices</h2>
+<p class="lead">Everything through which humans address the machine.</p>
+<div class="blk"><div><h3>Keyboards, pointing, sound</h3><ul><li><b>Keyboards</b>: azerty/qwerty, "ergonomic" layouts (Dvorak, bépo).</li><li><b>Pointing</b>: mouse, trackball, joystick, touchpad, touch input.</li><li><b>Sound</b>: speech recognition, sound and music recognition.</li></ul></div><figure class="gal small full"><div><img src="09_01.png" alt="Typewriter"><span>Typewriter</span></div><div><img src="09_02.png" alt="Standard keyboard"><span>Standard keyboard</span></div><div><img src="09_03.png" alt="Ergonomic keyboard"><span>Ergonomic keyboard</span></div><div><img src="09_04.png" alt="Ergonomic keyboard cartoon"><span>Ergonomic keyboard cartoon</span></div><div><img src="09_05.png" alt="Mouse"><span>Mouse</span></div><div><img src="09_06.png" alt="Trackball"><span>Trackball</span></div><div><img src="09_07.png" alt="Wii remote"><span>Wii remote</span></div><div><img src="09_08.png" alt="Joystick"><span>Joystick</span></div><div><img src="09_09.png" alt="Touchpad"><span>Touchpad</span></div><div><img src="09_10.png" alt="Kinect sensor"><span>Kinect sensor</span></div><div><img src="09_11.png" alt="Touchscreen phone"><span>Touchscreen phone</span></div><div><img src="09_12.png" alt="Voice recognition prompt"><span>Voice recognition prompt</span></div><div><img src="09_13.png" alt="Audio signal"><span>Audio signal</span></div><div><img src="09_14.png" alt="Music recognition app"><span>Music recognition app</span></div></figure></div>
+<div class="blk r"><div><h3>2D visual input</h3><ul><li><b>2D barcodes</b> (QR codes): text, web, mail, wifi, business card.</li><li><b>Touchscreen</b>, fingerprint reader, light pen.</li><li><b>Recognition</b> of drawn strokes (music scores) and handwriting.</li></ul></div><figure class="gal small full"><div><img src="10_01.png" alt="Scanning a QR code"><span>Scanning a QR code</span></div><div><img src="10_02.png" alt="Child scanning a code"><span>Child scanning a code</span></div><div><img src="10_03.png" alt="Ticket machine touchscreen"><span>Ticket machine touchscreen</span></div><div><img src="10_04.png" alt="Tablet"><span>Tablet</span></div><div><img src="10_05.png" alt="Touch table"><span>Touch table</span></div><div><img src="10_06.png" alt="Fingerprint reader"><span>Fingerprint reader</span></div><div><img src="10_07.png" alt="Light pen"><span>Light pen</span></div><div><img src="10_08.png" alt="Music stroke recognition"><span>Music stroke recognition</span></div><div><img src="10_09.png" alt="Handwriting recognition"><span>Handwriting recognition</span></div><div><img src="10_10.png" alt="QR code zebra cartoon"><span>QR code zebra cartoon</span></div><div><img src="10_11.png" alt="Building-block interface"><span>Building-block interface</span></div><div><img src="10_12.png" alt="Coloured block interface"><span>Coloured block interface</span></div></figure></div>
+<div class="blk"><div><h3>3D input</h3><ul><li><b>Position, direction and speed sensors</b>: glove, headset, motion capture, Wiimote, Kinect.</li><li><b>Face and iris recognition</b> for authentication.</li></ul></div><figure class="gal small full"><div><img src="11_01.png" alt="Data glove"><span>Data glove</span></div><div><img src="11_02.png" alt="Head-tracking headset"><span>Head-tracking headset</span></div><div><img src="11_03.png" alt="Hand tracking over a laptop"><span>Hand tracking over a laptop</span></div><div><img src="11_04.png" alt="Motion-capture suit"><span>Motion-capture suit</span></div><div><img src="11_05.png" alt="Wii remote and nunchuk"><span>Wii remote and nunchuk</span></div><div><img src="11_06.png" alt="Kinect body tracking"><span>Kinect body tracking</span></div><div><img src="11_07.png" alt="Mid-air haptic device"><span>Mid-air haptic device</span></div><div><img src="11_08.png" alt="Face recognition"><span>Face recognition</span></div><div><img src="11_09.png" alt="Face login on a laptop"><span>Face login on a laptop</span></div><div><img src="11_10.png" alt="Face unlock on a phone"><span>Face unlock on a phone</span></div></figure></div>
+<div class="blk r"><div><h3>Other inputs: sensors</h3><ul><li>Temperature, humidity, air composition, light.</li><li>Orientation, proximity, movement, altitude, acceleration, magnetic field.</li><li>Heart rate, sound level, atmospheric pressure, smells.</li><li><b>Location (GPS)</b>.</li></ul></div><figure class="gal big"><div><img src="12_01.png" alt="Environment sensors"><span>Environment sensors</span></div><div><img src="12_02.png" alt="Motion and orientation sensors"><span>Motion and orientation sensors</span></div><div><img src="12_03.png" alt="Body and air sensors"><span>Body and air sensors</span></div></figure></div>
+</section>
+
+<section id="multi"><h2>6. Multimodal and multisensory interaction</h2>
+<div class="blk"><div><h3>Two notions not to be confused</h3><ul><li><b>Multimodal</b>: a combination of <i>input means</i>. Close modalities (two-handed interaction) or different ones (voice + gesture: "Put that… here").</li><li><b>Multisensory</b>: involves several <i>senses</i> (sight, hearing, touch, taste, smell) through effects (wind, water, light, vibrations, body movement) produced by effectors (fan, vaporiser, lamp, haptic vest, moving seat).</li></ul><div class="key">Multimodal = several ways to act. Multisensory = several ways to perceive.</div></div><figure class="gal big"><div><img src="13_01.png" alt="Two-handed tablet interaction"><span>Two-handed tablet interaction</span></div><div><img src="13_02.png" alt="Voice + gesture: "Put that... here""><span>Voice + gesture: "Put that... here"</span></div><div><img src="13_03.png" alt="4D cinema seats"><span>4D cinema seats</span></div></figure></div>
+</section>
+
+<section id="xr"><h2>7. Virtual, augmented, mixed and extended reality</h2>
+
+<div class="blk"><div><h3>Virtual reality (VR)</h3><ul><li>Immersion in a 360° 3D world in real time, the user is represented by an avatar.</li><li>3D interactions: gestures, movements, voice commands.</li></ul></div><figure class="gal mid"><div><img src="14_01.png" alt="Avatar in a virtual world"><span>Avatar in a virtual world</span></div><div><img src="14_02.png" alt="VR headset and controllers"><span>VR headset and controllers</span></div><div><img src="14_03.png" alt="Driving simulator"><span>Driving simulator</span></div><div><img src="14_04.png" alt="Immersive molecule visualisation"><span>Immersive molecule visualisation</span></div><div><img src="14_05.png" alt="VR therapy session"><span>VR therapy session</span></div><div><img src="14_06.png" alt="VR headsets and cardboard"><span>VR headsets and cardboard</span></div></figure></div>
+<div class="blk r"><div><h3>Augmented reality (AR)</h3><ul><li>The user is not cut off from reality.</li><li>Examples: Pokémon GO, furniture preview, overlays on a football pitch.</li></ul><div class="key">Beware of information <b>overload</b>!</div></div><figure class="gal small full"><div><img src="15_01.png" alt="AR overlays on a football pitch"><span>AR overlays on a football pitch</span></div><div><img src="15_02.png" alt="AR on a smartphone"><span>AR on a smartphone</span></div><div><img src="15_03.png" alt="Pokémon GO"><span>Pokémon GO</span></div><div><img src="15_04.png" alt="AR furniture preview"><span>AR furniture preview</span></div><div><img src="15_05.png" alt="Smart glasses"><span>Smart glasses</span></div><div><img src="15_06.png" alt="Projection onto the body"><span>Projection onto the body</span></div><div><img src="15_07.png" alt="Swimming race overlay"><span>Swimming race overlay</span></div><div><img src="15_08.png" alt="AR maintenance guide"><span>AR maintenance guide</span></div><div><img src="15_09.png" alt="AR driving overlay"><span>AR driving overlay</span></div></figure></div>
+<div class="blk"><div><h3>Diminished reality</h3><ul><li>An element is removed from a "real" image, in real time.</li><li>(Anti-)commercial use: erasing advertisements.</li></ul></div><figure class="gal big"><div><img src="16_01.png" alt="Original scene with a can"><span>Original scene with a can</span></div><div><img src="16_02.png" alt="Same scene with the can removed"><span>Same scene with the can removed</span></div></figure></div>
+<div class="blk r"><div><h3>Mixed reality (MR)</h3><ul><li>A real-time overlay (<i>output</i>) that you can interact with (<i>input</i>).</li><li>Mostly professional uses: maintenance, training, design.</li></ul></div><figure class="gal big"><div><img src="17_01.png" alt="Mixed reality with holographic glasses"><span>Mixed reality with holographic glasses</span></div></figure></div>
+<div class="blk"><div><h3>Extended reality (XR)</h3><ul><li>All immersive technologies combining real and virtual: VR, AR, MR.</li><li>The <b>virtuality continuum</b> runs from reality to virtual reality, through augmented reality and augmented virtuality.</li></ul>
+</div></div>
+<div class="scroll"><table><tr><th></th><th>Virtual (VR)</th><th>Augmented (AR)</th><th>Diminished</th><th>Mixed (MR)</th></tr>
+<tr><td><b>Principle</b></td><td>Simulated 360° 3D environment, avatar</td><td>Virtual image overlaid on the real world</td><td>Removal of an element from a "real" image</td><td>Real and virtual combined, with interaction</td></tr>
+<tr><td><b>Real / virtual</b></td><td>100% virtual, real world hidden</td><td>Perception centred on the real</td><td>Virtual modifies the image of the real</td><td>Close link between both</td></tr>
+<tr><td><b>Interactions</b></td><td>With the virtual, in 3D</td><td>Weak</td><td>None</td><td>With the virtual and the real</td></tr>
+<tr><td><b>Equipment</b></td><td>VR headset, smartphone + cardboard</td><td>Screen, glasses, projection onto the real</td><td>Screen</td><td>Specific</td></tr>
+<tr><td><b>Uses</b></td><td>Games, education, medical, research</td><td>Leisure, professional, medical, safety</td><td>Removing advertisements</td><td>Mostly professional</td></tr></table></div>
+</section>
+
+<section id="tangible"><h2>8. Tangible interfaces</h2>
+<div class="blk r"><div><h3>Real objects + digital objects</h3><ul><li>Hybrid devices: you act <b>directly on objects</b>.</li><li>Simpler and more intuitive interaction.</li></ul><p>Examples: wearable projector, display projected on the arm, physical music notes, interactive table with cubes, a circuit drawn and manipulated by hand.</p></div><figure class="gal mid"><div><img src="19_01.png" alt="Wearable camera and projector"><span>Wearable camera and projector</span></div><div><img src="19_02.png" alt="Interface projected on the arm"><span>Interface projected on the arm</span></div><div><img src="19_03.png" alt="Physical music notes"><span>Physical music notes</span></div><div><img src="19_04.png" alt="Circuit manipulated by hand"><span>Circuit manipulated by hand</span></div><div><img src="19_05.png" alt="Interactive table with objects"><span>Interactive table with objects</span></div></figure></div>
+</section>
+
+<section id="plasticity">
+  <h2>9. Mobile computing and interface plasticity</h2>
+  <p class="lead">Mobile devices are small, powerful and connected, and used anywhere. The compatibility problem (platform, bandwidth, memory, screen size) is solved by the plasticity of interfaces.</p>
+
+  <!-- Interactive Slide Card matching the .blk structure -->
+  <div class="blk">
+    <div>
+      <h3>Plasticity: Adaptation with Usability Preservation</h3>
+      <ul>
+        <li>
+          <b>Definition</b>: The capacity of a user interface to adapt to hardware context (screen size, device type) and environment, <b>while preserving usability</b>.
+        </li>
+        <li>
+          <b>Multi-Device Support</b>: Seamlessly scales and restructures layouts across smartphones, tablets, desktop workstations, and high-resolution wall displays.
+        </li>
+        <li>
+          <b>Context Awareness</b>: Dynamically adjusts interaction targets, font sizes, and navigational elements depending on screen orientation or input capabilities (touch vs. mouse).
+        </li>
+      </ul>
+      <div class="key">
+        Plasticity = Adaptation to context while preserving usability.
+      </div>
+    </div>
+
+    <!-- Interactive Demonstration Canvas/Viewport -->
+    <div class="plasticity-demo-wrapper">
+      <div class="plasticity-controls">
+        <label><b>Simulate Viewport:</b></label>
+        <div class="pill-group">
+          <button class="plastic-btn active" onclick="setDeviceView('mobile', this)">📱 Mobile</button>
+          <button class="plastic-btn" onclick="setDeviceView('tablet', this)">📱 Tablet</button>
+          <button class="plastic-btn" onclick="setDeviceView('desktop', this)">💻 Desktop</button>
+        </div>
+      </div>
+
+      <!-- Simulated Dynamic Interface Frame -->
+      <div id="simulated-device" class="device-frame mobile">
+        <div class="device-topbar">
+          <span class="device-title">Adaptive App</span>
+          <div id="device-menu-icon" class="menu-icon">☰</div>
+        </div>
+        <div id="device-nav-links" class="device-nav hidden">
+          <span>Home</span>
+          <span>Analytics</span>
+          <span>Settings</span>
+        </div>
+        <div class="device-content">
+          <div class="content-box card-a">Widget A</div>
+          <div class="content-box card-b">Widget B</div>
+          <div class="content-box card-c">Widget C</div>
+        </div>
+      </div>
+      <figcaption id="viewport-caption">Mobile View (Compact stacked layout & hidden drawer menu)</figcaption>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Styling integrated with your existing CSS Variables */
+  .plasticity-demo-wrapper {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .plasticity-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .plasticity-controls label {
+    font-size: 14px;
+    color: var(--mut);
+  }
+
+  .pill-group {
+    display: flex;
+    gap: 6px;
+  }
+
+  .plastic-btn {
+    background: var(--card);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 6px 12px;
+    border-radius: 99px;
+    font: 600 13px "Bricolage Grotesque", sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .plastic-btn.active, .plastic-btn:hover {
+    background: var(--g);
+    color: #fff;
+    border-color: var(--g);
+  }
+
+  /* Device Preview Container */
+  .device-frame {
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: var(--sh);
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-sizing: border-box;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  /* Responsive state classes controlled by JS */
+  .device-frame.mobile {
+    max-width: 220px;
+  }
+
+  .device-frame.tablet {
+    max-width: 340px;
+  }
+
+  .device-frame.desktop {
+    max-width: 480px;
+  }
+
+  .device-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+  }
+
+  .device-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--g);
+  }
+
+  .menu-icon {
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--mut);
+  }
+
+  .device-nav {
+    display: flex;
+    gap: 10px;
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .device-nav.hidden {
+    display: none;
+  }
+
+  .device-content {
+    display: grid;
+    gap: 8px;
+    transition: all 0.3s ease;
+  }
+
+  /* Grid variations based on device width */
+  .device-frame.mobile .device-content {
+    grid-template-columns: 1fr;
+  }
+
+  .device-frame.tablet .device-content {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .device-frame.desktop .device-content {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .content-box {
+    background: var(--g2);
+    color: var(--g);
+    border: 1px solid var(--line);
+    padding: 14px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  #viewport-caption {
+    font-size: 13px;
+    color: var(--mut);
+    text-align: center;
+  }
+</style>
+
+<script>
+  function setDeviceView(mode, btn) {
+    const frame = document.getElementById('simulated-device');
+    const menuIcon = document.getElementById('device-menu-icon');
+    const navLinks = document.getElementById('device-nav-links');
+    const caption = document.getElementById('viewport-caption');
+
+    // Update button active states
+    document.querySelectorAll('.plastic-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Remove old state classes
+    frame.classList.remove('mobile', 'tablet', 'desktop');
+    frame.classList.add(mode);
+
+    // Apply layout transformations based on plasticity principles
+    if (mode === 'mobile') {
+      menuIcon.style.display = 'block';
+      navLinks.classList.add('hidden');
+      caption.innerText = "Mobile View: Stacked single-column, hamburger menu collapsed.";
+    } else if (mode === 'tablet') {
+      menuIcon.style.display = 'none';
+      navLinks.classList.remove('hidden');
+      caption.innerText = "Tablet View: 2-column grid layout with expanded navigation.";
+    } else if (mode === 'desktop') {
+      menuIcon.style.display = 'none';
+      navLinks.classList.remove('hidden');
+      caption.innerText = "Desktop View: Multi-column wide grid utilizing max screen real estate.";
+    }
+  }
+</script>
+
+<section id="beyond"><h2>10. Beyond the desktop</h2><p class="lead">Computing leaves the screen and spreads into objects, clothes and places.</p><div class="blk one"><div><h3>Smart objects, web of things</h3><div class="key">Computing embedded in everyday objects, shrinking the distance between "computing" and "non-computing" objects.</div><div class="ecs"><div class="ec"><span class="em">💡</span><b>Connected lamp / robot</b><small>e.g. Philips Hue bulbs that dim automatically at sunset.</small></div><div class="ec"><span class="em">📺</span><b>Smart TV</b><small>e.g. a TV that streams apps and responds to voice commands.</small></div><div class="ec"><span class="em">🧺</span><b>Connected washing machine</b><small>e.g. getting a phone notification when the laundry cycle finishes.</small></div><div class="ec"><span class="em">🍳</span><b>Connected cooking robot</b><small>e.g. a Thermomix-style device you control from an app.</small></div><div class="ec"><span class="em">🌡️</span><b>Connected thermostat / blinds</b><small>e.g. a Nest thermostat that learns your schedule and adjusts itself.</small></div><div class="ec"><span class="em">🪴</span><b>Connected plant sensor</b><small>e.g. a sensor that alerts you when your plant needs water.</small></div><div class="ec"><span class="em">🍴</span><b>Smart fork</b><small>e.g. a fork that tracks eating speed to encourage slower meals.</small></div><div class="ec"><span class="em">🗑️</span><b>Smart trash bin</b><small>e.g. a bin that opens its lid automatically as your hand approaches.</small></div><div class="ec"><span class="em">👶</span><b>Connected baby monitor / cradle</b><small>e.g. a cradle that senses crying and rocks itself to soothe the baby.</small></div><div class="ec"><span class="em">💊</span><b>Connected pill bottle</b><small>e.g. a bottle that reminds patients to take their medication on time.</small></div><div class="ec"><span class="em">🔊</span><b>Smart speaker</b><small>e.g. an Amazon Echo or Google Home answering questions by voice.</small></div><div class="ec"><span class="em">💡</span><b>Connected light bulbs</b><small>e.g. changing your room's color from your phone without touching a switch.</small></div></div></div></div><div class="blk one"><div><h3>Wearable computing</h3><div class="key">Embedded computing in clothing and accessories.</div><div class="ecs"><div class="ec"><span class="em">🦺</span><b>Early wearable-computer vest prototype</b><small>e.g. 1980s research vests carrying a full computer to be worn on the body.</small></div><div class="ec"><span class="em">🧤</span><b>Data glove</b><small>e.g. a glove tracking finger bends to control a virtual hand.</small></div><div class="ec"><span class="em">🕶️</span><b>Smart glasses</b><small>e.g. glasses that overlay turn-by-turn directions on what you see.</small></div><div class="ec"><span class="em">⌚</span><b>Smartwatch</b><small>e.g. an Apple Watch showing notifications and tracking your heart rate.</small></div><div class="ec"><span class="em">📿</span><b>Fitness wristband</b><small>e.g. a Fitbit counting steps and sleep quality.</small></div><div class="ec"><span class="em">🎾</span><b>Connected tennis racket / mouthguard</b><small>e.g. a racket that analyzes your swing technique after each shot.</small></div><div class="ec"><span class="em">🎒</span><b>Illuminated backpack turn-signal</b><small>e.g. LED arrows on a cyclist's backpack that light up to signal turns.</small></div><div class="ec"><span class="em">👟</span><b>Connected running shoe</b><small>e.g. a shoe that tracks stride length and syncs it to a running app.</small></div><div class="ec"><span class="em">🧦</span><b>Connected sock / ankle sensor</b><small>e.g. a smart sock that monitors an infant's oxygen level and heart rate.</small></div></div></div></div><div class="blk"><div><h3>Pervasive and ubiquitous environments</h3><ul><li><b>Pervasive</b> (diffuse computing): communicating objects recognise and locate each other and interact (data transfer, synchronisation) without user action, at any moment.</li><li><b>Ubiquitous</b> = pervasive + mobile.</li></ul></div><div><h3>Groupware ("collecticiel")</h3><ul><li><b>Together, same place</b>: interactive whiteboard, multi-touch table.</li><li><b>Remotely</b>: shared editors with communication tools, e.g. collaborative AR with remote annotation over a shared document.</li></ul></div></div><div class="key">Back to reality… screen, keyboard, mouse. 🖥️⌨️🖱️</div></section><section id="exercises"><h2>11. Review exercises</h2><p class="lead">Self-check covering the whole lecture. Open each answer after you have tried.</p><div class="blk one"><div><h3>Exercise 1 — Key Vocabulary</h3><p class="lead">Read each definition and try to recall the right term before revealing it</p><div class="exq"><p class="q"><span class="qn">1</span>The set of hardware &amp; software devices allowing a user to interact with a digital system.</p><details><summary>Show answer</summary><p><b>Interface.</b> From Latin <i>inter</i> (between) + <i>facies</i> (appearance).</p></details></div><div class="exq"><p class="q"><span class="qn">2</span>The set of reciprocal actions (commands + feedback) between a human and a machine.</p><details><summary>Show answer</summary><p><b>Interaction.</b> From Latin <i>inter</i> (between) + <i>actio</i> (capacity to act). Interfaces are the support for interactions.</p></details></div><div class="exq"><p class="q"><span class="qn">3</span>An approach where the machine adapts to the user's needs, not the other way round.</p><details><summary>Show answer</summary><p><b>Anthropocentered approach</b> (from Greek <i>ánthropos</i>, human + <i>kéntron</i>, center) — opposite of the <b>technocentered</b> approach.</p></details></div><div class="exq"><p class="q"><span class="qn">4</span>The scientific field studying how to adapt work / tools to human physiological &amp; psychological characteristics.</p><details><summary>Show answer</summary><p><b>Ergonomics.</b> From Greek <i>érgon</i> (work) + <i>nómos</i> (law). Software ergonomics can be corrective, design-oriented, or prospective.</p></details></div><div class="exq"><p class="q"><span class="qn">5</span>The discipline focused purely on usability, layout and interaction of the interface (not the overall lived experience).</p><details><summary>Show answer</summary><p><b>UI design</b> (User Interface design) — as opposed to <b>UX design</b>, which covers the whole quality of the user's experience with the system.</p></details></div><div class="exq"><p class="q"><span class="qn">6</span>What You See Is What You Get.</p><details><summary>Show answer</summary><p><b>WYSIWYG</b> — what appears on screen matches exactly what you get once printed; a core idea of direct manipulation / graphical interfaces.</p></details></div></div></div><div class="blk one"><div><h3>Exercise 2 — True or False?</h3><p class="lead">Decide, then reveal the correct answer</p><div class="exq"><p class="q"><span class="qn">1</span>"Software ergonomics is easy and fast to apply."</p><details><summary>Show answer</summary><p><b>False.</b> It is difficult, long and costly — it is a misconception, not a shortcut.</p></details></div><div class="exq"><p class="q"><span class="qn">2</span>A badly designed interface can lead to confusion, frustration, panic, stress and boredom for the individual user.</p><details><summary>Show answer</summary><p><b>True.</b> These are the individual-level consequences described by Meinadier.</p></details></div><div class="exq"><p class="q"><span class="qn">3</span>There exists a single "miracle method" that guarantees a good HCI if you follow it step by step.</p><details><summary>Show answer</summary><p><b>False.</b> No turnkey solution exists — only theoretical &amp; experimental reference points, trade-offs and compromises.</p></details></div><div class="exq"><p class="q"><span class="qn">4</span>Good HCI design only matters for the end user — companies see no financial impact either way.</p><details><summary>Show answer</summary><p><b>False.</b> Bad HCI causes rejection, errors, under-use and costly rewrites; good HCI increases productivity and profitability for the company.</p></details></div><div class="exq"><p class="q"><span class="qn">5</span>Visual (graphic) design and software ergonomics pursue the exact same goals.</p><details><summary>Show answer</summary><p><b>False.</b> Ergonomics targets efficiency/comfort and is objective &amp; fairly constant; visual design targets aesthetics/branding and is subjective &amp; trend-dependent.</p></details></div><div class="exq"><p class="q"><span class="qn">6</span>Augmented Reality still lets the user perceive the real world, unlike Virtual Reality.</p><details><summary>Show answer</summary><p><b>True.</b> AR overlays virtual content onto reality; VR fully occludes the real world in a 100% virtual, immersive scene.</p></details></div></div></div><div class="blk one"><div><h3>Exercise 3 — Classify the Approach</h3><p class="lead">For each scenario: technocentered 🏭 or anthropocentered 🧑?</p><div class="exq"><p class="q"><span class="qn">1</span>A banking app forces every customer to learn a complex menu tree because "that's how the core banking system is structured internally."</p><details><summary>Show answer</summary><p><b>Technocentered.</b> The user must adapt to the machine's internal logic — the designer's point of view dominates.</p></details></div><div class="exq"><p class="q"><span class="qn">2</span>A medical records system is redesigned after watching nurses work, so that its screens follow their actual ward routine.</p><details><summary>Show answer</summary><p><b>Anthropocentered.</b> The system is shaped around real user needs and tasks — the user's point of view drives the design.</p></details></div><div class="exq"><p class="q"><span class="qn">3</span>A settings screen exposes every low-level parameter of the operating system "because it's all technically possible."</p><details><summary>Show answer</summary><p><b>Technocentered.</b> Centered on the machine's capabilities rather than what the human actually needs to control.</p></details></div><div class="exq"><p class="q"><span class="qn">4</span>An e-commerce checkout is shortened from 6 steps to 2 after user testing shows shoppers abandoning their carts.</p><details><summary>Show answer</summary><p><b>Anthropocentered.</b> The machine (the checkout flow) is adapted to reduce friction for the human, based on observed behaviour.</p></details></div></div></div><div class="blk one"><div><h3>Exercise 4 — Input or Output?</h3><p class="lead">For each device, is it mainly an input or an output device?</p><div class="exq"><p class="q"><span class="qn">1</span>Data glove tracking hand position and gestures</p><details><summary>Show answer</summary><p><b>Input</b> (3D input device — position/direction sensor).</p></details></div><div class="exq"><p class="q"><span class="qn">2</span>Force-feedback joystick that vibrates when you hit an obstacle</p><details><summary>Show answer</summary><p><b>Both!</b> It's an input device (you steer with it) AND an output device (haptic force feedback) — a good example of bidirectional interaction.</p></details></div><div class="exq"><p class="q"><span class="qn">3</span>3D printer producing a physical prototype</p><details><summary>Show answer</summary><p><b>Output</b> device (rapid prototyping / fabrication).</p></details></div><div class="exq"><p class="q"><span class="qn">4</span>QR code scanned by a smartphone camera</p><details><summary>Show answer</summary><p><b>Input</b> — a 2D visual input device.</p></details></div><div class="exq"><p class="q"><span class="qn">5</span>Spatialized 3D / binaural sound in a game</p><details><summary>Show answer</summary><p><b>Output</b> device (sound output for information / immersion).</p></details></div><div class="exq"><p class="q"><span class="qn">6</span>Fingerprint reader unlocking a phone</p><details><summary>Show answer</summary><p><b>Input</b> — a 2D visual / biometric input device.</p></details></div></div></div><div class="blk one"><div><h3>Exercise 5 — Which Reality Is It?</h3><p class="lead">VR · AR · MR · Diminished Reality · Tangible Interface</p><div class="exq"><p class="q"><span class="qn">1</span>A headset removes an unwanted advertisement from a livestreamed video feed in real time.</p><details><summary>Show answer</summary><p><b>Diminished Reality.</b> An element is removed from the real image; there is no interaction with it.</p></details></div><div class="exq"><p class="q"><span class="qn">2</span>A surgeon wears smart glasses that overlay a patient's vitals on top of what they see, and can grab/move that virtual panel with their hand.</p><details><summary>Show answer</summary><p><b>Mixed Reality.</b> There is a tight link between real and virtual, with interaction possible on BOTH sides.</p></details></div><div class="exq"><p class="q"><span class="qn">3</span>A fully 360° headset places the user's avatar inside a simulated city, cutting them off entirely from the physical room.</p><details><summary>Show answer</summary><p><b>Virtual Reality.</b> 100% virtual; the real world is occluded.</p></details></div><div class="exq"><p class="q"><span class="qn">4</span>A phone app shows furniture "placed" in your living room through the camera view, but you can't touch or move it directly.</p><details><summary>Show answer</summary><p><b>Augmented Reality.</b> A virtual image is superimposed on reality, with limited interaction with the virtual layer.</p></details></div><div class="exq"><p class="q"><span class="qn">5</span>Connected physical tokens on a table trigger digital content on a projector when moved by hand.</p><details><summary>Show answer</summary><p><b>Tangible Interface.</b> A hybrid device combining real objects with digital ones for simpler, more intuitive interaction.</p></details></div></div></div><div class="blk one"><div><h3>Exercise 6 — Ergonomics vs. Design</h3><p class="lead">Place each website on the quadrant and justify your answer</p><div class="exq"><p class="q"><span class="qn">1</span>📖 Wikipedia — plain, dense, highly functional, minimal visual design.</p><details><summary>Show answer</summary><p>High ergonomics / low design: extremely usable and functional, but visually austere.</p></details></div><div class="exq"><p class="q"><span class="qn">2</span>🪑 Furniture brand "Gone's" — clean, modern e-commerce site.</p><details><summary>Show answer</summary><p>High ergonomics / high design: strong on both usability and aesthetics — the ideal quadrant.</p></details></div><div class="exq"><p class="q"><span class="qn">3</span>🍕 Pizza vendor website — colorful, cluttered, clashing colors.</p><details><summary>Show answer</summary><p>Low ergonomics / low design: busy and hard to use, without a coherent visual identity either.</p></details></div><div class="exq"><p class="q"><span class="qn">4</span>📷 Photo blog — elegant "designer" typography, cluttered pop-ups.</p><details><summary>Show answer</summary><p>Low ergonomics / high design: visually appealing, but usability suffers from intrusive pop-ups.</p></details></div></div></div><div class="blk one"><div><h3>Exercise 7 — Put History in Order</h3><p class="lead">From earliest (1) to most recent (6)</p><div class="exq"><p class="q">A. Punch cards &amp; control panels · B. First computer mouse (1963) · C. Macintosh (1984) ·
+    D. Smartphones &amp; touch input · E. Virtual / Augmented Reality headsets · F. Smart objects / Web of Things</p><details><summary>Show the correct order</summary><p>
+    <b>1. A</b> — Punch cards, control panels (1945-1970)<br>
+    <b>2. B</b> — First "mouse" (1963), alongside the graphic screen &amp; light pen<br>
+    <b>3. C</b> — Macintosh (1984), consumer GUI &amp; direct manipulation<br>
+    <b>4. D</b> — Mobile / nomadic computing, touchscreens, smartphones<br>
+    <b>5. E</b> — VR / AR / MR — immersive realities<br>
+    <b>6. F</b> — Smart objects, Web of Things, pervasive &amp; ubiquitous computing</p></details></div></div></div><div class="blk one"><div><h3>Exam-prep checklist</h3><p class="lead">Can you explain each of these in your own words?</p><div class="cks"><label class="ck"><input type="checkbox"> <span>The two meanings of <b>HCI</b>, and the difference between an interface and an interaction</span></label><label class="ck"><input type="checkbox"> <span>Why HCI sits between <b>humans</b>, <b>software</b>, the <b>OS</b> and <b>hardware</b></span></label><label class="ck"><input type="checkbox"> <span>The individual &amp; global consequences of good vs. bad HCI</span></label><label class="ck"><input type="checkbox"> <span>Technocentered vs. anthropocentered approaches (with an example of your own)</span></label><label class="ck"><input type="checkbox"> <span>The three types of software ergonomics: corrective, design-oriented, prospective</span></label><label class="ck"><input type="checkbox"> <span>UI design vs. UX design, and the four common misconceptions about ergonomics</span></label><label class="ck"><input type="checkbox"> <span>Major milestones in HCI history, from punch cards to smart objects</span></label><label class="ck"><input type="checkbox"> <span>The difference between VR, AR, MR, diminished reality and tangible interfaces</span></label><label class="ck"><input type="checkbox"> <span>Examples of input, output, 2D/2.5D/3D visualization, and multimodal/multisensory devices</span></label></div><div class="key">If you can explain all of these out loud, you are ready for the next lecture on Design.</div></div></div></section>
+<section id="quiz">
+  <h2>12. Self-assessment quiz</h2>
+  <p class="lead">Answer the questions below to test your knowledge based directly on the course material.</p>
+
+  <div class="quiz-container">
+    <div class="quiz-header">
+      <span id="quiz-progress">Question 1 of 9</span>
+      <span id="quiz-score-badge">Score: 0</span>
+    </div>
+
+    <div id="question-card" class="quiz-card">
+      <h3 id="quiz-question-text">Question text goes here</h3>
+      <div id="quiz-options" class="quiz-options"></div>
+      <div id="quiz-feedback" class="quiz-feedback" hidden></div>
+    </div>
+
+    <div class="quiz-actions">
+      <button id="quiz-next-btn" class="quiz-btn" onclick="nextQuestion()" disabled>Next Question</button>
+      <button id="quiz-restart-btn" class="quiz-btn secondary" onclick="restartQuiz()" hidden>Restart Quiz</button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .quiz-container {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 26px;
+    box-shadow: var(--sh);
+    margin: 20px 0;
+  }
+
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 700;
+    color: var(--mut);
+    margin-bottom: 20px;
+    font-size: 15px;
+  }
+
+  #quiz-score-badge {
+    background: var(--g2);
+    color: var(--g);
+    padding: 4px 12px;
+    border-radius: 99px;
+  }
+
+  .quiz-card h3 {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .quiz-opt-btn {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .quiz-opt-btn:hover:not(:disabled) {
+    border-color: var(--g);
+    background: var(--g2);
+    color: var(--g);
+  }
+
+  .quiz-opt-btn.correct {
+    background: #d1e7dd !important;
+    border-color: #0f5132 !important;
+    color: #0f5132 !important;
+    font-weight: 600;
+  }
+
+  .quiz-opt-btn.incorrect {
+    background: #f8d7da !important;
+    border-color: #842029 !important;
+    color: #842029 !important;
+  }
+
+  @media(prefers-color-scheme: dark) {
+    .quiz-opt-btn.correct {
+      background: #0f3823 !important;
+      border-color: #5fcf94 !important;
+      color: #5fcf94 !important;
+    }
+    .quiz-opt-btn.incorrect {
+      background: #441318 !important;
+      border-color: #ea868f !important;
+      color: #ea868f !important;
+    }
+  }
+
+  .quiz-feedback {
+    margin-top: 18px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .quiz-feedback.correct {
+    background: var(--g2);
+    color: var(--g);
+    border-left: 4px solid var(--g);
+  }
+
+  .quiz-feedback.incorrect {
+    background: #f8d7da;
+    color: #842029;
+    border-left: 4px solid #842029;
+  }
+
+  @media(prefers-color-scheme: dark) {
+    .quiz-feedback.incorrect {
+      background: #441318;
+      color: #ea868f;
+      border-left-color: #ea868f;
+    }
+  }
+
+  .quiz-actions {
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+  }
+
+  .quiz-btn {
+    background: var(--g);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .quiz-btn.secondary {
+    background: var(--mut);
+  }
+
+  .quiz-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .quiz-btn:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+</style>
+
+<script>
+  // Strictly derived from the course material questions & content
+  const quizData = [
+    {
+      question: "Which interface popularised direct manipulation for the general public?",
+      options: [
+        "Card punches and dashboards of indicator lights",
+        "Command languages and early consoles",
+        "The graphical interfaces of the 1980s (Xerox Star, Lisa, Macintosh)",
+        "3D cinema seats and haptic wristbands"
+      ],
+      answer: 2
+    },
+    {
+      question: "What does WYSIWYG mean?",
+      options: [
+        "What You See Is What You Get: editing directly reflects the final result",
+        "With Your System Input Words Yield Graphs",
+        "Web Yield System Interface Within Your Graphic",
+        "Way You See Interactive Words In Your Graphics"
+      ],
+      answer: 0
+    },
+    {
+      question: "What is the benefit of fish-eye views?",
+      options: [
+        "They completely remove real-world elements in real time",
+        "They show a detailed focus while keeping the global context",
+        "They simulate binaural spatialised sound",
+        "They replace graphical interfaces with command languages"
+      ],
+      answer: 1
+    },
+    {
+      question: "Multimodal or multisensory: which one concerns the senses?",
+      options: [
+        "Multimodal (it combines several ways to act)",
+        "Multisensory (multimodal combines input means)",
+        "Both concern senses identically",
+        "Neither, both only concern output screens"
+      ],
+      answer: 1
+    },
+    {
+      question: "What is the difference between VR and AR?",
+      options: [
+        "VR: virtual image overlaid on the real; AR: 100% virtual world",
+        "VR: removes elements from a real image; AR: requires 3D printers",
+        "VR: 100% virtual world, real world hidden. AR: virtual content overlaid on the real, the user stays connected to reality",
+        "VR: weak interaction; AR: 100% virtual world"
+      ],
+      answer: 2
+    },
+    {
+      question: "In a technocentered approach, who adapts to whom?",
+      options: ["The machine adapts to the user", "The user adapts to the machine", "Designer and user adapt to each other", "Neither, the interface is fixed by law"],
+      answer: 1
+    },
+    {
+      question: "How do UI and UX design relate?",
+      options: ["They are the same discipline", "UI covers the whole lived experience, UX only the visuals", "UI is the visible layer inside UX, which covers the whole experience with the system", "UX only concerns marketing"],
+      answer: 2
+    },
+    {
+      question: "What is a ubiquitous environment?",
+      options: ["A pervasive environment that is also mobile", "A fully virtual 360° world", "A room with 3D cinema seats", "A shared editor used remotely"],
+      answer: 0
+    },
+    {
+      question: "What is interface plasticity?",
+      options: [
+        "The physical flexibility of 3D-printed lattices",
+        "The ability of an interface to adapt to screen size and device context",
+        "The capability of a device to generate wind and water effects",
+        "The use of red-cyan anaglyph glasses"
+      ],
+      answer: 1
+    }
+  ];
+
+  let currentQIndex = 0;
+  let currentScore = 0;
+
+  function loadQuestion() {
+    const q = quizData[currentQIndex];
+    document.getElementById('quiz-progress').innerText = `Question ${currentQIndex + 1} of ${quizData.length}`;
+    document.getElementById('quiz-question-text').innerText = q.question;
+    
+    const optionsContainer = document.getElementById('quiz-options');
+    optionsContainer.innerHTML = '';
+
+    const feedbackEl = document.getElementById('quiz-feedback');
+    feedbackEl.hidden = true;
+    feedbackEl.className = 'quiz-feedback';
+
+    document.getElementById('quiz-next-btn').disabled = true;
+
+    q.options.forEach((optText, index) => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-opt-btn';
+      btn.innerText = optText;
+      btn.onclick = () => selectOption(index);
+      optionsContainer.appendChild(btn);
+    });
+  }
+
+  function selectOption(selectedIdx) {
+    const q = quizData[currentQIndex];
+    const optionBtns = document.querySelectorAll('.quiz-opt-btn');
+    const feedbackEl = document.getElementById('quiz-feedback');
+
+    optionBtns.forEach(btn => btn.disabled = true);
+
+    if (selectedIdx === q.answer) {
+      optionBtns[selectedIdx].classList.add('correct');
+      feedbackEl.innerText = "Correct!";
+      feedbackEl.classList.add('correct');
+      currentScore++;
+      document.getElementById('quiz-score-badge').innerText = `Score: ${currentScore}`;
+    } else {
+      optionBtns[selectedIdx].classList.add('incorrect');
+      optionBtns[q.answer].classList.add('correct');
+      feedbackEl.innerText = `Incorrect. The correct answer is: "${q.options[q.answer]}"`;
+      feedbackEl.classList.add('incorrect');
+    }
+
+    feedbackEl.hidden = false;
+    document.getElementById('quiz-next-btn').disabled = false;
+  }
+
+  function nextQuestion() {
+    currentQIndex++;
+    if (currentQIndex < quizData.length) {
+      loadQuestion();
+    } else {
+      showFinalResults();
+    }
+  }
+
+  function showFinalResults() {
+    document.getElementById('quiz-progress').innerText = "Quiz Completed!";
+    document.getElementById('quiz-question-text').innerText = `You scored ${currentScore} out of ${quizData.length}!`;
+    document.getElementById('quiz-options').innerHTML = '';
+    document.getElementById('quiz-feedback').hidden = true;
+    
+    document.getElementById('quiz-next-btn').hidden = true;
+    document.getElementById('quiz-restart-btn').hidden = false;
+  }
+
+  function restartQuiz() {
+    currentQIndex = 0;
+    currentScore = 0;
+    document.getElementById('quiz-score-badge').innerText = `Score: 0`;
+    document.getElementById('quiz-next-btn').hidden = false;
+    document.getElementById('quiz-restart-btn').hidden = true;
+    loadQuestion();
+  }
+
+  document.addEventListener('DOMContentLoaded', loadQuestion);
+  
+  const DRIVE_FOLDER_ID = "1rLyPRAENgguD9dUM38t7E3DHVBOVhWa3";
+
+  // Fonction exécutée au chargement de la page
+  document.addEventListener("DOMContentLoaded", () => {
+    // Sélectionne toutes les images de la page
+    const images = document.querySelectorAll("img");
+
+    images.forEach(img => {
+      const currentSrc = img.getAttribute("src");
+      
+      // Si l'image pointe vers le dossier local ""
+      if (currentSrc && currentSrc.startsWith("")) {
+        // Extraction du nom de fichier (ex: 01_01.png -> 01_01)
+        const fileName = currentSrc.replace("", "").split(".")[0];
+        
+        // Redirection vers le flux direct Google Drive
+        img.src = `https://lh3.googleusercontent.com/d/${DRIVE_FOLDER_ID}`;
+      }
+    });
+  });
+</script>
+<footer>HCI course material, Lecture 1. Photos extracted from the course slides.</footer>
+</main></div>
+<div class="lb" id="lb" role="dialog" aria-label="Enlarged image"><img alt=""></div>
+<script>
+const lb=document.getElementById('lb'),li=lb.querySelector('img');
+document.querySelectorAll('figure img').forEach(i=>i.addEventListener('click',()=>{li.src=i.src;li.alt=i.alt;lb.classList.add('open')}));
+lb.onclick=()=>lb.classList.remove('open');addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('open')});
+const links=[...document.querySelectorAll('nav a')];
+document.querySelectorAll('section').forEach(s=>new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.hash==='#'+s.id))}),{rootMargin:'-30% 0px -60% 0px'}).observe(s));
+</script>
+</body></html>
 
