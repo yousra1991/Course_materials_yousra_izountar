@@ -406,11 +406,15 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:.9rem;border-top:1px sol
 .cover-in .meta b{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.2rem,3vw,1.6rem)}
 
 
+/* a slightly darker coral for small text on coral-soft backgrounds (the shared token gives 4.47:1; 4.5:1 is needed) */
+:root{--coral-ink:#A62E1B}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--coral-ink:#FF8A74}}
+:root[data-theme="dark"]{--coral-ink:#FF8A74}
 /* =====================================================================
    Chapter 2 additions (same tokens, same components as lecture 3)
    ===================================================================== */
 .fam{display:inline-block;border-radius:999px;padding:1px 10px;font-size:.78rem;font-weight:700;border:1px solid currentColor;vertical-align:middle;margin-left:8px;letter-spacing:0}
-.fam.cog{color:var(--blue)}.fam.perc{color:var(--teal)}.fam.mot{color:var(--amber)}.fam.vis{color:var(--coral)}
+.fam.cog{color:var(--blue)}.fam.perc{color:var(--teal)}.fam.mot{color:var(--amber)}.fam.vis{color:var(--coral-ink)}
 .tag{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 10px;border-radius:999px;background:var(--blue-soft);color:var(--blue)}
 code.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:1px 8px;font-size:.92em}
 .kcards{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin:16px 0}
@@ -423,7 +427,7 @@ code.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;backgrou
 .hl{padding:2px 8px;border-radius:6px;font-weight:700}
 .hl.a{background:var(--amber-soft);color:var(--amber)}.hl.b{background:var(--blue-soft);color:var(--blue)}
 .hl.g{background:var(--green-soft);color:var(--green)}.hl.t{background:var(--teal-soft);color:var(--teal)}
-.hl.c{background:var(--coral-soft);color:var(--coral)}
+.hl.c{background:var(--coral-soft);color:var(--coral-ink)}
 .five{display:grid;gap:10px;margin:14px 0}
 .five>div{display:grid;grid-template-columns:minmax(96px,120px) 1fr;gap:14px;align-items:baseline;border:1.5px solid var(--line);border-left:6px solid var(--blue);border-radius:12px;background:var(--surface);padding:10px 14px}
 .five b{font-family:'Bricolage Grotesque',sans-serif;color:var(--blue);font-size:1.05rem}
@@ -452,7 +456,7 @@ code.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;backgrou
 .vcard{border:1px solid var(--line);border-top:5px solid var(--line);border-radius:14px;background:var(--surface);padding:12px 14px;min-width:0}
 .vcard.bad{border-top-color:var(--coral-fill)}.vcard.good{border-top-color:var(--green-fill)}
 .vtag{display:block;font-weight:800;font-size:.85rem;margin-bottom:8px}
-.vcard.bad .vtag{color:var(--coral)}.vcard.good .vtag{color:var(--green)}
+.vcard.bad .vtag{color:var(--coral-ink)}.vcard.good .vtag{color:var(--green)}
 .cap{font-size:.9rem;color:var(--muted);margin:8px 0 0}
 .cap b{color:var(--ink)}
 .seg.wrap2{display:flex;max-width:100%}
@@ -556,7 +560,7 @@ code.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;backgrou
 .hk-card.bad{border-top-color:var(--coral-fill)}.hk-card.good{border-top-color:var(--green-fill)}
 .hk-card.wide{grid-column:1/-1}
 .hk-tag{display:block;font-weight:800;font-size:.85rem;margin-bottom:10px}
-.hk-card.bad .hk-tag{color:var(--coral)}.hk-card.good .hk-tag{color:var(--green)}
+.hk-card.bad .hk-tag{color:var(--coral-ink)}.hk-card.good .hk-tag{color:var(--green)}
 .hk-q{font-weight:700;display:block;margin-bottom:8px}
 .hk-opts{display:flex;flex-direction:column;gap:6px}
 .hk-opts label,.hk-set label{display:flex;gap:8px;align-items:center;cursor:pointer}
@@ -582,7 +586,7 @@ html.waiting,html.waiting *{cursor:wait!important}
 .toast.ok{background:var(--green-soft);border-color:var(--green-fill);color:var(--green)}
 .toast.in{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
 .toast.wn{background:var(--amber-soft);border-color:var(--amber-fill);color:var(--amber)}
-.toast.er{background:var(--coral-soft);border-color:var(--coral-fill);color:var(--coral)}
+.toast.er{background:var(--coral-soft);border-color:var(--coral-fill);color:var(--coral-ink)}
 .toast .t{flex:1}
 .toast button{border:0;background:none;cursor:pointer;opacity:.75;font-size:1.05rem;color:inherit;padding:2px 6px}
 .toast button:hover{opacity:1}
@@ -677,7 +681,7 @@ html.waiting,html.waiting *{cursor:wait!important}
 .np .ln{height:5px;background:var(--line);border-radius:3px;margin:5px 8px}
 .np .ln.s{width:60%}
 .np .fold{position:relative;height:0;border-top:2px dashed var(--coral-fill);margin:8px 0 0}
-.np .fold span{position:absolute;right:6px;top:-9px;background:var(--surface);color:var(--coral);font-size:.62rem;font-weight:800;padding:0 4px;text-transform:uppercase;letter-spacing:.06em}
+.np .fold span{position:absolute;right:6px;top:-9px;background:var(--surface);color:var(--coral-ink);font-size:.62rem;font-weight:800;padding:0 4px;text-transform:uppercase;letter-spacing:.06em}
 .np .low{padding:8px 0 6px;transition:max-height .45s,opacity .45s;max-height:200px;overflow:hidden}
 .np .low .hl2{font-weight:800;font-size:.8rem;padding:0 8px 2px}
 .np.folded .low{max-height:0;opacity:0;padding:0}
@@ -703,11 +707,11 @@ html.waiting,html.waiting *{cursor:wait!important}
 .wf-ft{top:376px;height:30px;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
 .wf-dim{position:absolute;left:0;right:0;bottom:0;background:repeating-linear-gradient(135deg,rgba(14,29,42,.18) 0 6px,rgba(14,29,42,.30) 6px 12px);pointer-events:none}
 .wf-line{position:absolute;left:0;right:0;height:0;border-top:3px dashed var(--coral-fill);pointer-events:none}
-.wf-line span{position:absolute;right:6px;top:-22px;background:var(--coral-fill);color:#fff;border-radius:6px;padding:1px 8px;font-size:.7rem;font-weight:800}
+.wf-line span{position:absolute;right:6px;top:-22px;background:#B8341F;color:#fff;border-radius:6px;padding:1px 8px;font-size:.7rem;font-weight:800}
 .wf-st{list-style:none;padding:0;margin:10px 0;display:grid;gap:6px}
 .wf-st li{display:flex;gap:10px;align-items:center;margin:0;padding:6px 10px;border-radius:8px;background:var(--surface2);border:1px solid var(--line);font-size:.92rem}
 .wf-st li i{font-style:normal;font-weight:800;width:1.4em;text-align:center}
-.wf-st li.ok i{color:var(--green)}.wf-st li.mid i{color:var(--amber)}.wf-st li.no i{color:var(--coral)}
+.wf-st li.ok i{color:var(--green)}.wf-st li.mid i{color:var(--amber)}.wf-st li.no i{color:var(--coral-ink)}
 .wf-st li em{margin-left:auto;font-style:normal;font-size:.8rem;color:var(--muted)}
 
 
@@ -754,6 +758,154 @@ html.waiting,html.waiting *{cursor:wait!important}
 .ft-ban .bx{margin:0 auto 6px;background:var(--blue);border-radius:6px}
 .ft-speed{display:flex;align-items:center;gap:10px;font-weight:800;font-size:.85rem}
 .ft-speed i{flex:1;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--green-fill),var(--coral-fill))}
+
+
+/* ---- module 5: visual design theories ---- */
+/* sample "screens" keep their own fixed colours in light and dark mode: they show what users see */
+.ty-ctl{display:flex;gap:6px 12px;align-items:center;flex-wrap:wrap;margin:6px 0}
+.ty-ctl>span{font-size:.88rem;font-weight:700;color:var(--muted);flex:0 0 8.6em}
+.ty-ctl .chiprow{margin:0}
+@media(max-width:560px){.ty-ctl>span{flex-basis:100%}}
+.ty-card{background:#fff;color:#14202b;border:1px solid #c5d0d8;border-radius:14px;padding:16px 18px;margin:12px 0;overflow-wrap:anywhere}
+.ty-h{margin:0 0 6px;font-weight:800;font-size:1.3rem;line-height:1.2}
+.ty-p{margin:0 0 12px;font-size:1rem;line-height:1.55}
+.ty-btn{border:0;border-radius:8px;background:#0b4f72;color:#fff;font:inherit;font-weight:700;padding:8px 16px;cursor:default}
+.ty-link{background:none;border:0;padding:0;margin:0;font:inherit;color:#0b4f72;text-decoration:underline;cursor:pointer}
+.f-sans{font-family:'Atkinson Hyperlegible',Arial,Helvetica,sans-serif}
+.f-serif{font-family:Georgia,'Times New Roman',serif}
+.f-deco{font-family:'Brush Script MT','Segoe Script','Lucida Handwriting',cursive}
+.ty-card .s-b{font-weight:800}.ty-card .s-i{font-style:italic}.ty-card .s-u{text-decoration:underline}.ty-card .s-c{text-transform:uppercase}
+.sz-rand .ty-h{font-size:.85rem}.sz-rand .ty-p{font-size:1.5rem;line-height:1.25}.sz-rand .ty-btn{font-size:1.6rem;padding:2px 8px}
+.ty-res{display:block}.ty-res ul{margin:4px 0 0;padding-left:1.2em;font-weight:400}
+
+/* colour wheel */
+.rw-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));align-items:start}
+.rw-left,.rw-right{min-width:0}
+.rw-svg{display:block;width:100%;max-width:260px;margin:4px auto 0;overflow:visible}
+.rw-w{cursor:pointer;stroke:var(--surface);stroke-width:1.5}
+.rw-w:hover{stroke:var(--ink);stroke-width:2.5}
+.rw-w:focus{outline:none}
+.rw-w:focus-visible{stroke:var(--ink);stroke-width:4}
+.rw-mk{pointer-events:none}
+.rw-mk circle,.rw-mk rect{fill:#fff;stroke:#111;stroke-width:1.6}
+.rw-mk text{font:800 9px 'Atkinson Hyperlegible',Arial,sans-serif;fill:#111;text-anchor:middle;dominant-baseline:central}
+.rw-neu{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0 0}
+.rw-neu button{width:38px;height:38px;border-radius:10px;border:2px solid var(--line);padding:0;cursor:pointer}
+.rw-neu button[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:2px}
+.rw-stage{border:1px solid var(--line);border-radius:14px;overflow:hidden;line-height:0}
+.rw-stage svg{display:block;width:100%;height:auto}
+
+/* contrast checker */
+.cc-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));align-items:stretch;margin:10px 0}
+.cc-in{display:grid;gap:10px;align-content:start}
+.cc-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cc-row label{font-weight:700;font-size:.92rem;flex:1 1 7.5em}
+.cc-row input[type=color]{width:44px;height:36px;border:1.5px solid var(--line);border-radius:8px;padding:2px;background:var(--surface);cursor:pointer}
+.cc-hex{width:7.4em;border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--surface);font-family:ui-monospace,Menlo,Consolas,monospace;text-transform:uppercase}
+.cc-hex[aria-invalid="true"]{border-color:var(--coral-fill);background:var(--coral-soft)}
+.cc-sample{border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+.cc-l{font-size:1.5rem;font-weight:800;line-height:1.15;margin-bottom:6px;font-family:'Bricolage Grotesque',sans-serif}
+.cc-sample p{margin:0 0 10px}
+.cc-ic{display:flex;gap:8px;align-items:center;font-size:.75rem}
+.cc-badges{list-style:none;padding:0;margin:8px 0;display:grid;gap:6px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.cc-badges li{border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--surface);font-size:.9rem;margin:0}
+.cc-badges li.ok{border-color:var(--green-fill);background:var(--green-soft)}
+.cc-badges li.no{border-color:var(--coral-fill);background:var(--coral-soft)}
+.cc-badges small{color:var(--muted)}
+
+/* how many colours */
+.nc-page{background:#fff;color:#14202b;border:1px solid #c5d0d8;border-radius:14px;overflow:hidden;font-size:.9rem;margin:8px 0}
+.nc-hd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px}
+.nc-nav{display:flex;gap:6px;flex-wrap:wrap}
+.nc-nav i{font-style:normal;border-radius:999px;padding:2px 10px;font-weight:700;font-size:.82rem}
+.nc-ban{padding:8px 14px;font-weight:700}
+.nc-cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));padding:12px 14px}
+.nc-card{border:1px solid #c5d0d8;border-radius:10px;overflow:hidden;background:#fff}
+.nc-ct{padding:6px 10px;font-weight:800}
+.nc-card p{margin:8px 10px}
+.nc-btn{display:inline-block;margin:0 10px 10px;border-radius:8px;padding:4px 14px;font-weight:700}
+.nc-foot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 14px 14px}
+.nc-bd{border-radius:999px;padding:2px 12px;font-weight:700;font-size:.82rem}
+.nc-lk{text-decoration:underline;font-weight:700}
+
+/* text over a gradient or a picture */
+.oi-stage{border-radius:14px;min-height:170px;padding:22px;display:flex;align-items:center;border:1px solid var(--line);margin:8px 0}
+.oi-text{color:#fff;max-width:36ch}
+.oi-text .t1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.7rem;line-height:1.1;margin-bottom:6px}
+.oi-text .t2{font-size:1rem}
+.oi-text.pn{background:#0B1F33;border-radius:10px;padding:14px 16px}
+
+/* meaning of colours */
+.mn-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));margin:6px 0 12px}
+.mn-sw{border:2px solid var(--line);border-radius:12px;min-height:60px;font-weight:800;cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;font-size:1rem;padding:8px 4px}
+.mn-sw[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:2px}
+.mn-detail{border:1px solid var(--line);border-radius:12px;background:var(--surface2);padding:12px 16px}
+.mn-detail p{margin:.4em 0}
+.mn-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.mn-top>b{font-family:'Bricolage Grotesque',sans-serif;font-size:1.25rem}
+.mn-chip{border-radius:999px;padding:5px 16px;font-weight:700;border:1px solid rgba(0,0,0,.25)}
+.cd-list{display:grid;gap:8px;margin:10px 0}
+.cd-item{border-left:8px solid;border-radius:6px 12px 12px 6px;padding:10px 14px;font-weight:700;color:#1f2933}
+.cu-card{border:1px solid var(--line);border-radius:12px;background:var(--surface2);padding:10px 16px;margin:8px 0}
+.cu-card ul{margin:6px 0 0}
+.cu-h{margin:18px 0 6px;font-size:1rem;font-family:'Bricolage Grotesque',sans-serif}
+.cu-tick{background:#fff;color:#14202b;border:1px solid #c5d0d8;border-radius:12px;padding:4px 14px;max-width:420px;margin:8px 0}
+.cu-row{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;padding:8px 0;border-bottom:1px solid #e3e9ee}
+.cu-row:last-child{border-bottom:0}
+.cu-chg{font-weight:800;min-width:6.5em;text-align:right}
+
+/* relevance: a student's week */
+.rl-list{display:grid;gap:6px;margin:10px 0}
+.rl-ev{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.rl-when{flex:0 0 7em;font-size:.92rem}
+.rl-pill{border-radius:8px;padding:5px 14px;font-weight:700;flex:1 1 200px;max-width:340px}
+.rl-leg{display:flex;gap:8px 16px;flex-wrap:wrap;align-items:center;border:1px dashed var(--muted);border-radius:12px;padding:8px 14px;margin:8px 0}
+.rl-leg[hidden]{display:none}
+.rl-key{display:inline-flex;gap:6px;align-items:center}
+.rl-key i{width:18px;height:18px;border-radius:4px;display:inline-block;border:1px solid rgba(0,0,0,.3)}
+
+/* portability */
+.cv-stage{background:#fff;color:#14202b;border:1px solid #c5d0d8;border-radius:14px;padding:14px;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));margin:10px 0}
+.cv-card{border:1px solid #d5dde3;border-radius:10px;padding:10px 12px;min-width:0}
+.cv-t{font-weight:800;margin-bottom:8px;font-family:'Bricolage Grotesque',sans-serif}
+.cv-sv{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.cv-sv li{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0}
+.cv-dot{width:16px;height:16px;border-radius:50%;flex:none}
+.cv-st{font-size:.85rem;font-weight:700}
+.cv-bars{display:flex;gap:14px;align-items:flex-end;height:96px;margin:18px 0 26px}
+.cv-g{display:flex;gap:3px;align-items:flex-end;position:relative;flex:1;justify-content:center}
+.cv-g>span{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font-size:.75rem}
+.cv-b{width:22px;position:relative;border-radius:3px 3px 0 0}
+.cv-b small{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:.7rem;font-weight:700}
+.hat{background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.8) 0 3px,transparent 3px 7px)}
+.cv-lg{display:flex;gap:12px;flex-wrap:wrap;font-size:.82rem}
+.cv-lg .sq{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px}
+.cv-field{display:flex;justify-content:space-between;gap:8px;border:2.5px solid;border-radius:8px;padding:8px 10px;font-size:.9rem}
+.cv-err{margin-top:6px;font-weight:700;font-size:.85rem;min-height:1.2em}
+.ev-wrap{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));margin:10px 0;transition:filter .3s}
+@media (prefers-reduced-motion:reduce){.ev-wrap{transition:none}}
+.ev-card{background:#fff;border:1px solid #d5dde3;border-radius:12px;padding:12px 14px;min-width:0}
+.ev-lab{font-size:.75rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.ev-t{font-weight:800;font-size:1.1rem;font-family:'Bricolage Grotesque',sans-serif}
+.ev-card p{margin:.3em 0}
+.ev-tags{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.tg{border-radius:999px;padding:2px 12px;font-size:.82rem;font-weight:700}
+.ev-low{color:#9AA0A6}.ev-low .ev-lab{color:#B0B5BA}.ev-low .ev-t{color:#A7ADB3}
+.ev-low .tg.a{background:#DDF3E3;color:#8BC49A}.ev-low .tg.b{background:#FFF3D1;color:#E3BD58}
+.ev-high{color:#1f2933}.ev-high .ev-lab{color:#334155}
+.ev-high .tg.a{background:#14532D;color:#fff}.ev-high .tg.b{background:#7A4B00;color:#fff}
+
+
+/* ---- modules 6-8 ---- */
+.cc-in .btn{justify-self:start}
+.scroll table.sum{min-width:600px}
+.sum td a{color:var(--blue);text-decoration:none}
+.sum td a:hover{text-decoration:underline}
+.sum .fam{margin-left:0}
+.sum tbody tr[hidden]{display:none}
+.qz-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:6px 0 10px}
+/* the deck "Next" button: white text on the light dark-mode blue is only 2:1; use the badge text colour (white in light mode, as before) */
+#deckbar .btn.primary{color:var(--badge-fg)}
 </style>
 </head>
 <body>
@@ -1098,28 +1250,173 @@ html.waiting,html.waiting *{cursor:wait!important}
 <section class="module" id="m5" aria-labelledby="m5h">
 <div class="slide" data-mod="m5" data-title="Module 5: Visual design theories">
 <div class="mh"><span class="dia"><b>5</b></span><h2 id="m5h">Visual design theories</h2></div>
-<p class="note blue"><b>Still being built.</b> This part will be in the final file.</p>
+<p class="lead">Typography and colors: readability, meaning, relevance, portability.</p>
+<div class="mods">
+<a href="#m5-text"><b>Text display</b><small>Principles of typography.</small></a>
+<a href="#m5-read"><b>Readability of colors</b><small>A high contrast between information and background.</small></a>
+<a href="#m5-meaning"><b>Meaning of colors</b><small>Usual codes, local and cultural specificities.</small></a>
+<a href="#m5-rel"><b>Relevance of colors</b><small>A good match between colour and concept.</small></a>
+<a href="#m5-port"><b>Portability of colors</b><small>Available everywhere, always, for everyone.</small></a>
+</div>
+<p class="muted small">Each colour topic has live examples: contrast checker, number of colours, text on pictures, usual codes, culture, a student's week, colour-blind simulator.</p>
+</div>
+
+<div class="slide" id="m5-text" data-mod="m5" data-title="Text display">
+<h3 style="margin-top:.4em">Text display <span class="fam vis">Visual design</span></h3>
+<div class="lists three">
+<div class="pr"><h5>Principles of typography</h5><ul>
+<li><b>Sans-serif</b> fonts are more readable on screen: Arial, Calibri, Helvetica, Geneva, Aptos&hellip;</li>
+<li>Styles slow down reading and are less readable: <b>bold</b>, <i>italics</i>, <u>underlined</u> (+ confusion with links), CAPITALS (+ feeling of shouting).</li>
+<li>Ban <b>COMBINATIONS</b> (bold + underlined).</li></ul></div>
+<div class="bad"><h5>Risks</h5><ul><li>Loss of readability; slowing down reading.</li></ul></div>
+<div class="good"><h5>Solutions</h5><ul><li>Use styles sparingly, to highlight certain elements.</li></ul></div>
+</div>
+<figure class="panel ifig" data-img="images/typo.jpg" data-alt="Bad versus good typography">
+<div class="ifig-live" id="w-typo"></div>
+<button type="button" class="ifig-photo" hidden aria-label="Enlarge the course photo: bad versus good typography"><span class="ifig-hint">Tap to enlarge</span></button>
+<figcaption>Clear font hierarchy, balanced button text, consistent scaling.</figcaption>
+</figure>
+</div>
+
+<div class="slide" id="m5-read" data-mod="m5" data-title="Readability of colors">
+<h3 style="margin-top:.4em">Readability of colors <span class="fam vis">Visual design</span></h3>
+<div class="lists three">
+<div class="pr"><h5>Principle</h5><ul><li>The eye needs a <b>high contrast</b> between information and background.</li><li>Too many colors disturb the gaze.</li></ul></div>
+<div class="bad"><h5>Risks</h5><ul><li>Reduced legibility; difficulty identifying text and icons.</li></ul></div>
+<div class="good"><h5>Solutions</h5><ul>
+<li>Dark characters on a light background, preferably black on white; except in low-light environments (night, specific tasks).</li>
+<li>Avoid some colour combinations and colors that are too vivid.</li>
+<li>Limit the number of colors (7 maximum, excluding icons).</li>
+<li>Avoid colour gradients; be careful with text over an image.</li></ul></div>
+</div>
+<figure class="panel ifig" data-img="images/col1.jpg" data-alt="Colour wheel and effective versus not effective contrast">
+<div class="ifig-live" id="w-wheel"></div>
+<button type="button" class="ifig-photo" hidden aria-label="Enlarge the course photo: colour wheel and contrast"><span class="ifig-hint">Tap to enlarge</span></button>
+<figcaption>Light and dark colours; a pink circle is effective on a light background, a green triangle on pink is not.</figcaption>
+</figure>
+<div class="donebar"><a class="btn small primary" href="#m5-read-ex">Examples: contrast checker, number of colours, text on pictures &rarr;</a></div>
+</div>
+
+<div class="slide" id="m5-read-ex" data-mod="m5" data-title="Readability of colors: examples">
+<h3 style="margin-top:.4em">Readability of colors: examples <span class="tag">Examples</span></h3>
+<p class="prose">Three situations from real interfaces. Try each one, then compare with the solutions of the previous slide.</p>
+<div class="panel" id="w-contrast"></div>
+<div class="panel" id="w-ncolors"></div>
+<div class="panel" id="w-overimg"></div>
+</div>
+
+<div class="slide" id="m5-meaning" data-mod="m5" data-title="Meaning of colors">
+<h3 style="margin-top:.4em">Meaning of colors <span class="fam vis">Visual design</span></h3>
+<div class="lists three">
+<div class="pr"><h5>Principle</h5><ul><li>Colors have a usual meaning, a symbolism.</li><li>Example: red = stop / green = go.</li><li>Counter-example: in China, red = joy; on stage, green = superstition.</li></ul></div>
+<div class="bad"><h5>Risks</h5><ul><li>Misunderstanding of the interface or the colour code.</li></ul></div>
+<div class="good"><h5>Solutions</h5><ul>
+<li>Follow usual codes: green = validation, success; red = warning, stop, failure; neutral colors = nothing special.</li>
+<li>Use neutral colors when there is no specific need (default = black).</li>
+<li>Pay attention to local and cultural specificities.</li></ul></div>
+</div>
+<figure class="panel ifig" data-img="images/col2.jpg" data-alt="Colour meanings: red, orange, yellow, blue, black, white, purple, green">
+<div class="ifig-live" id="w-meaning"></div>
+<button type="button" class="ifig-photo" hidden aria-label="Enlarge the course photo: colour meanings"><span class="ifig-hint">Tap to enlarge</span></button>
+<figcaption>Typical associations: red power/danger, blue trust, green outdoors/health&hellip;</figcaption>
+</figure>
+<div class="donebar"><a class="btn small primary" href="#m5-meaning-ex">Examples: usual codes and culture &rarr;</a></div>
+</div>
+
+<div class="slide" id="m5-meaning-ex" data-mod="m5" data-title="Meaning of colors: examples">
+<h3 style="margin-top:.4em">Meaning of colors: examples <span class="tag">Examples</span></h3>
+<p class="prose">First follow the usual codes, then check that they also hold for your users.</p>
+<div class="panel" id="w-codes"></div>
+<div class="panel" id="w-culture"></div>
+</div>
+
+<div class="slide" id="m5-rel" data-mod="m5" data-title="Relevance of colors">
+<h3 style="margin-top:.4em">Relevance of colors <span class="fam vis">Visual design</span></h3>
+<p class="prose">Use colors to convey something in a relevant way; ensure a good <b>match between colour and concept</b>.</p>
+<div class="lists">
+<div class="bad"><h5>Risks</h5><ul><li>Objects with the same colour are wrongly associated.</li><li>Similar concepts are not associated.</li></ul></div>
+<div class="good"><h5>Solutions</h5><ul><li>Same type of information &rArr; same colour.</li><li>Different types &rArr; contrasting colors.</li><li>Similar types &rArr; slightly contrasting colors.</li><li>Combine / make information explicit.</li></ul></div>
+</div>
+<div class="panel" id="w-agenda"></div>
+</div>
+
+<div class="slide" id="m5-port" data-mod="m5" data-title="Portability of colors">
+<h3 style="margin-top:.4em">Portability of colors <span class="fam vis">Visual design</span></h3>
+<p class="prose">Information carried by colour must remain available <b>everywhere, always, for everyone</b>.</p>
+<div class="lists">
+<div class="bad"><h5>Risks</h5><ul><li>Poor rendering (distinction, contrast, number of colors) outdoors or at night; on projectors or smartphones; for colour-blind users (about 10% of men, 0.5% of women).</li></ul></div>
+<div class="good"><h5>Solutions: interface testing tools</h5><ul>
+<li>Simulators: Colblindor (online), Let's Get Color Blind (Chrome), Colorsimulations (Windows), Chromatic Vision Simulator (mobile).</li>
+<li>Contrast tests: Contrast Checker, etc.</li></ul></div>
+</div>
+<div class="note blue prose"><p>Try it yourself on the next slide: a colour-blind simulator and a &ldquo;where will it be used?&rdquo; test, built into this page.</p></div>
+<div class="donebar"><a class="btn small primary" href="#m5-port-ex">Examples: colour-blind simulator &rarr;</a></div>
+</div>
+
+<div class="slide" id="m5-port-ex" data-mod="m5" data-title="Portability of colors: examples">
+<h3 style="margin-top:.4em">Portability of colors: examples <span class="tag">Examples</span></h3>
+<p class="prose">The same screen, seen by different users and in different places.</p>
+<div class="panel" id="w-cvd"></div>
+<div class="panel" id="w-env"></div>
+<div class="donebar"><button class="btn done" type="button" data-done="m5" aria-pressed="false">Mark module 5 complete</button><a class="btn small" href="#m6">Next: summary of the theories</a></div>
 </div>
 </section>
 
 <section class="module" id="m6" aria-labelledby="m6h">
 <div class="slide" data-mod="m6" data-title="Module 6: Summary of the theories">
 <div class="mh"><span class="dia"><b>6</b></span><h2 id="m6h">Summary of the theories</h2></div>
-<p class="note blue"><b>Still being built.</b> This part will be in the final file.</p>
+<p class="lead">All the theories in one table. Filter by family, or click a theory to go back to its slide.</p>
+<div id="w-sum-chips"></div>
+<div class="scroll"><table class="sum" id="sum-table">
+<caption class="sr">Summary of the theories: family, risk and key solution</caption>
+<thead><tr><th scope="col">Theory</th><th scope="col">Family</th><th scope="col">Risk</th><th scope="col">Key solution</th></tr></thead>
+<tbody>
+<tr data-f="cog"><td><a href="#m1-why"><b>Memory</b></a></td><td><span class="fam cog">Cognitive</span></td><td>Forgetting</td><td>Repetition, coherence, affect</td></tr>
+<tr data-f="cog"><td><a href="#m2-miller"><b>Miller (7 &plusmn; 2)</b></a></td><td><span class="fam cog">Cognitive</span></td><td>User forgets, searches</td><td>&le; 7 items, link by color/format/location</td></tr>
+<tr data-f="cog"><td><a href="#m2-hick"><b>Hick</b></a></td><td><span class="fam cog">Cognitive</span></td><td>Mistakes, lost time</td><td>Fewer choices, clear messages</td></tr>
+<tr data-f="cog"><td><a href="#m2-two"><b>2 seconds</b></a></td><td><span class="fam cog">Cognitive</span></td><td>Repeated action, bugs</td><td>Cursor, feedback, progress</td></tr>
+<tr data-f="cog"><td><a href="#m2-three"><b>3 clicks</b></a></td><td><span class="fam cog">Cognitive</span></td><td>Abandonment</td><td>Quick access to key actions</td></tr>
+<tr data-f="perc"><td><a href="#m3-gestalt"><b>Gestalt (proximity, similarity)</b></a></td><td><span class="fam perc">Perceptual</span></td><td>Wrong associations</td><td>Group, separate, mark differences</td></tr>
+<tr data-f="perc"><td><a href="#m3-scan"><b>Scan patterns, fold</b></a></td><td><span class="fam perc">Perceptual</span></td><td>Missed key content</td><td>Z/F layouts, content above the fold</td></tr>
+<tr data-f="mot"><td><a href="#m4-aff"><b>Affordance</b></a></td><td><span class="fam mot">Motor</span></td><td>Hesitation, wrong usage</td><td>Clear clickable cues</td></tr>
+<tr data-f="mot"><td><a href="#m4-fitts"><b>Fitts</b></a></td><td><span class="fam mot">Motor</span></td><td>Lost time, missed clicks</td><td>Large, near targets; contextual menus</td></tr>
+<tr data-f="vis"><td><a href="#m5-text"><b>Text, colors</b></a></td><td><span class="fam vis">Visual design</span></td><td>Loss of legibility, misreading</td><td>Sans-serif, contrast, &le; 7 colors, tested</td></tr>
+</tbody></table></div>
+<p class="muted small" id="sum-count" aria-live="polite"></p>
+<div class="donebar"><button class="btn done" type="button" data-done="m6" aria-pressed="false">Mark module 6 complete</button><a class="btn small" href="#m7">Next: self-assessment</a></div>
 </div>
 </section>
 
 <section class="module" id="m7" aria-labelledby="m7h">
 <div class="slide" data-mod="m7" data-title="Module 7: Self-assessment">
 <div class="mh"><span class="dia"><b>7</b></span><h2 id="m7h">Self-assessment</h2></div>
-<p class="note blue"><b>Still being built.</b> This part will be in the final file.</p>
+<p class="lead">Answer in your head, then click to check.</p>
+<div class="qz-bar"><button type="button" class="btn small" id="qz-all">Show all answers</button><span class="muted small" id="qz-count" aria-live="polite"></span></div>
+<div id="qz">
+<details class="acc"><summary>What are the three components of usability?</summary><div class="in"><p>Effectiveness, efficiency and satisfaction.</p></div></details>
+<details class="acc"><summary>Who performs an ergonomic audit, and does it replace usability testing?</summary><div class="in"><p>An ergonomics expert (ideally with a domain expert), and no: it does not replace usability testing.</p></div></details>
+<details class="acc"><summary>How many items can working memory hold?</summary><div class="in"><p>7 &plusmn; 2 (Miller).</p></div></details>
+<details class="acc"><summary>What does Hick's law say?</summary><div class="in"><p>Decision time depends on the number and complexity of options.</p></div></details>
+<details class="acc"><summary>Which indicator suits a long action?</summary><div class="in"><p>A progress indicator (waiting cursor/feedback for short ones; response under 2 seconds).</p></div></details>
+<details class="acc"><summary>Which Gestalt law justifies grouping a menu by category?</summary><div class="in"><p>Proximity; similarity for shared appearance.</p></div></details>
+<details class="acc"><summary>Which scan pattern is typical of first exploration, and which of search engines?</summary><div class="in"><p>Z-pattern for first exploration; F-pattern for search engines.</p></div></details>
+<details class="acc"><summary>What does Fitts' law imply for a button?</summary><div class="in"><p>Larger and closer targets are reached faster.</p></div></details>
+<details class="acc"><summary>Name three colour guidelines for interfaces.</summary><div class="in"><p>High contrast (dark on light); at most 7 colors; follow usual codes and test for colour blindness.</p></div></details>
+</div>
+<div class="donebar"><button class="btn done" type="button" data-done="m7" aria-pressed="false">Mark module 7 complete</button><a class="btn small" href="#m8">Next: references</a></div>
 </div>
 </section>
 
 <section class="module" id="m8" aria-labelledby="m8h">
 <div class="slide" data-mod="m8" data-title="Module 8: References">
 <div class="mh"><span class="dia"><b>8</b></span><h2 id="m8h">References</h2></div>
-<p class="note blue"><b>Still being built.</b> This part will be in the final file.</p>
+<ul class="refs">
+<li class="ext"><b>1</b><span>Donald A. Norman, <i>The Design of Everyday Things</i>, Revised and Expanded Edition, Basic Books, 2013.</span></li>
+<li class="ext"><b>2</b><span>Jenny Preece, Yvonne Rogers, Helen Sharp, <i>Interaction Design: Beyond Human-Computer Interaction</i>, 4th Ed., Wiley, 2015.</span></li>
+<li class="ext"><b>3</b><span>Alan Dix, Janet Finlay, Gregory Abowd, Russell Beale, <i>Human-Computer Interaction</i>, 3rd Ed., Pearson, 2004.</span></li>
+<li class="ext"><b>4</b><span>Jakob Nielsen, <i>Usability Engineering</i>, Academic Press, 1994.</span></li>
+<li class="ext"><b>5</b><span>Ben Shneiderman, Catherine Plaisant, Maxine Cohen, Steven Jacobs, Niklas Elmqvist, Nicholas Diakopoulos, <i>Designing the User Interface</i>, 6th Ed., Pearson, 2016.</span></li>
+</ul>
 </div>
 </section>
 
@@ -1127,6 +1424,7 @@ html.waiting,html.waiting *{cursor:wait!important}
 <section class="endwrap"><div class="slide" data-mod="" data-title="Credits">
 <footer><div class="wrap">
   <p>HCI course material, University of Algiers 1. Illustrations taken from the course slides. Keep designing for everyone: inclusive, ethical and user-centered design matters.</p>
+  <p class="small">Based on <i>Human Computer Interaction, Lecture 02: General Ergonomics Theories</i>, Yousra Izountar Bouziane, Faculty of Sciences, Department of Computer Science, 29/09/2026. Fitts' law diagram source: NN/g (nngroup.com).</p>
 </div></footer>
 </div></section>
 
@@ -1163,16 +1461,24 @@ html.waiting,html.waiting *{cursor:wait!important}
 <button type="button" class="ditem" data-go="23"><i>24</i><span>Fitts' Law</span></button>
 <p class="dmod">Module 5: Visual design theories</p>
 <button type="button" class="ditem" data-go="24"><i>25</i><span>Module 5: Visual design theories</span></button>
+<button type="button" class="ditem" data-go="25"><i>26</i><span>Text display</span></button>
+<button type="button" class="ditem" data-go="26"><i>27</i><span>Readability of colors</span></button>
+<button type="button" class="ditem" data-go="27"><i>28</i><span>Readability of colors: examples</span></button>
+<button type="button" class="ditem" data-go="28"><i>29</i><span>Meaning of colors</span></button>
+<button type="button" class="ditem" data-go="29"><i>30</i><span>Meaning of colors: examples</span></button>
+<button type="button" class="ditem" data-go="30"><i>31</i><span>Relevance of colors</span></button>
+<button type="button" class="ditem" data-go="31"><i>32</i><span>Portability of colors</span></button>
+<button type="button" class="ditem" data-go="32"><i>33</i><span>Portability of colors: examples</span></button>
 <p class="dmod">Module 6: Summary of the theories</p>
-<button type="button" class="ditem" data-go="25"><i>26</i><span>Module 6: Summary of the theories</span></button>
+<button type="button" class="ditem" data-go="33"><i>34</i><span>Module 6: Summary of the theories</span></button>
 <p class="dmod">Module 7: Self-assessment</p>
-<button type="button" class="ditem" data-go="26"><i>27</i><span>Module 7: Self-assessment</span></button>
+<button type="button" class="ditem" data-go="34"><i>35</i><span>Module 7: Self-assessment</span></button>
 <p class="dmod">Module 8: References</p>
-<button type="button" class="ditem" data-go="27"><i>28</i><span>Module 8: References</span></button>
+<button type="button" class="ditem" data-go="35"><i>36</i><span>Module 8: References</span></button>
 <p class="dmod">Credits</p>
-<button type="button" class="ditem" data-go="28"><i>29</i><span>Credits</span></button>
+<button type="button" class="ditem" data-go="36"><i>37</i><span>Credits</span></button>
 </div></div>
-<nav id="deckbar" aria-label="Slides"><div class="in"><button type="button" class="btn small" id="dPrev" aria-label="Previous slide">&#8249;<span class="lbl"> Previous</span></button><button type="button" class="btn small" id="dMenuBtn" aria-haspopup="dialog" aria-label="All slides"><span id="dNum">1 / 29</span><span class="lbl">&nbsp; All slides</span></button><button type="button" class="btn small primary" id="dNext" aria-label="Next slide"><span class="lbl">Next </span>&#8250;</button></div></nav>
+<nav id="deckbar" aria-label="Slides"><div class="in"><button type="button" class="btn small" id="dPrev" aria-label="Previous slide">&#8249;<span class="lbl"> Previous</span></button><button type="button" class="btn small" id="dMenuBtn" aria-haspopup="dialog" aria-label="All slides"><span id="dNum">1 / 37</span><span class="lbl">&nbsp; All slides</span></button><button type="button" class="btn small primary" id="dNext" aria-label="Next slide"><span class="lbl">Next </span>&#8250;</button></div></nav>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
     <!-- approximate colour-vision-deficiency simulations (Machado et al. 2009, full severity) -->
@@ -1219,6 +1525,11 @@ const hex2rgb=h=>{h=String(h).replace('#','');if(h.length===3)h=h.split('').map(
 const lum=h=>{const [r,g,b]=hex2rgb(h).map(v=>{v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4)});return 0.2126*r+0.7152*g+0.0722*b};
 const ratio=(a,b)=>{const x=lum(a),y=lum(b);return (Math.max(x,y)+0.05)/(Math.min(x,y)+0.05)};
 const r1=v=>(Math.round(v*10)/10).toFixed(1);
+const rf=v=>(Math.floor(v*10)/10).toFixed(1); /* floor, so 4.49 is never shown as 4.5 */
+const ink=bg=>ratio('#FFFFFF',bg)>=ratio('#111111',bg)?'#FFFFFF':'#111111';
+const mix=(a,b,t)=>{const A=hex2rgb(a),B=hex2rgb(b);return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('')};
+const validHex=h=>/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.test(String(h).trim());
+const normHex=h=>{h=String(h).trim().replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');return '#'+h.toUpperCase()};
 
 /* ---------- progress ---------- */
 const NDONE=7;
@@ -1240,6 +1551,15 @@ function seg(host,items,cur,on){
   host.addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(!b)return;
     $$('button',host).forEach(x=>x.setAttribute('aria-pressed',x===b));on(b.dataset.v)});
 }
+
+/* toggle chips that wrap on small screens: chips(host, [[value,label],...], current, onChange, ariaLabel) */
+function chips(host,items,cur,on,label){
+  host.classList.add('chiprow'); host.setAttribute('role','group'); if(label)host.setAttribute('aria-label',label);
+  host.innerHTML=items.map(([v,l])=>`<button type="button" data-v="${esc(v)}" aria-pressed="${v===cur}">${l}</button>`).join('');
+  host.addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(!b)return;
+    $$('button',host).forEach(x=>x.setAttribute('aria-pressed',x===b));on(b.dataset.v)});
+}
+const setChip=(host,v)=>$$('button',host).forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===v));
 
 /* ---------- course photos: tap to enlarge (zoom + pan), hover loupe ---------- */
 const LB={el:$('#lbx'),img:$('#lbxImg'),cap:$('#lbxCap'),st:$('.lbx-stage',$('#lbx')),pct:$('#lbxPct'),s:1,x:0,y:0,opener:null,pts:new Map(),d0:0,s0:1};
@@ -1265,14 +1585,19 @@ $('#lbxClose').addEventListener('click',lbClose);
 $('#lbxIn').addEventListener('click',()=>lbZoom(1.4,0,0));
 $('#lbxOut').addEventListener('click',()=>lbZoom(1/1.4,0,0));
 $('#lbxReset').addEventListener('click',()=>{LB.s=1;LB.x=0;LB.y=0;lbApply()});
-LB.el.addEventListener('click',e=>{if(e.target===LB.el||e.target===LB.st)lbClose()});
+/* a click on the dark backdrop closes; the click that ends a drag, or lands on the picture, does not */
+LB.el.addEventListener('click',e=>{
+  if(LB.moved){LB.moved=false;return}
+  if(!LB.onImg&&(e.target===LB.el||e.target===LB.st))lbClose();
+});
 LB.st.addEventListener('wheel',e=>{e.preventDefault();const [cx,cy]=stageXY(e);lbZoom(Math.exp(-e.deltaY*(e.ctrlKey?0.01:0.0016)),cx,cy)},{passive:false});
 LB.st.addEventListener('dblclick',e=>{const [cx,cy]=stageXY(e);if(LB.s>1.05){LB.s=1;LB.x=0;LB.y=0;lbApply()}else lbZoom(2.5,cx,cy)});
-LB.st.addEventListener('pointerdown',e=>{LB.st.setPointerCapture(e.pointerId);LB.pts.set(e.pointerId,[e.clientX,e.clientY]);LB.st.classList.add('drag');
+LB.st.addEventListener('pointerdown',e=>{LB.onImg=(e.target===LB.img);LB.moved=false;LB.sx=e.clientX;LB.sy=e.clientY;LB.st.setPointerCapture(e.pointerId);LB.pts.set(e.pointerId,[e.clientX,e.clientY]);LB.st.classList.add('drag');
   if(LB.pts.size===2){const [a,b]=[...LB.pts.values()];LB.d0=Math.hypot(a[0]-b[0],a[1]-b[1]);LB.s0=LB.s}});
 LB.st.addEventListener('pointermove',e=>{
   if(!LB.pts.has(e.pointerId))return;
   const p=LB.pts.get(e.pointerId);
+  if(Math.hypot(e.clientX-LB.sx,e.clientY-LB.sy)>5)LB.moved=true;
   if(LB.pts.size===1){LB.x+=e.clientX-p[0];LB.y+=e.clientY-p[1];lbClamp();lbApply()}
   LB.pts.set(e.pointerId,[e.clientX,e.clientY]);
   if(LB.pts.size===2){const [a,b]=[...LB.pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);
@@ -1704,7 +2029,7 @@ function show(k){
   $('#sc-nodes',host).innerHTML=c.nodes.map(n=>`<span style="position:absolute;left:${n[0]/6}%;top:${n[1]/3.2}%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:var(--coral-fill);color:#fff;border:2px solid var(--surface);font-weight:800;font-size:.8rem;display:grid;place-items:center">${n[2]}</span>`).join('');
   $('#sc-rule',host).innerHTML=c.rule;
 }
-seg($('#sc-seg',host),[['z','&#9889; Z-Pattern (Landing / Exploration)'],['f','&#128196; F-Pattern (Text / Search Engine)']],'z',show);
+chips($('#sc-seg',host),[['z','&#9889; Z-Pattern (Landing / Exploration)'],['f','&#128196; F-Pattern (Text / Search Engine)']],'z',show,'Scan pattern');
 show('z');
 })();
 
@@ -1846,6 +2171,488 @@ function draw(){
   $('#ft-bars',host).innerHTML=rows.map(r=>{const t=T(r[1],r[2]);return `<div class="ft-bar"><span>${r[4]}</span><div class="tr"><div class="fl" style="width:${Math.min(100,t/max*100)}%"></div></div><b>${t.toFixed(2)} s</b></div>`}).join('');
 }
 D.addEventListener('input',draw);W.addEventListener('input',draw);draw();
+})();
+
+
+/* ===================== MODULE 5: visual design theories ===================== */
+/* ---- text display: typography lab (live version of the typography photo) ---- */
+(function(){
+const host=$('#w-typo'); if(!host.id)return;
+host.innerHTML=`<div class="ifig-title"><b>Typography lab</b><span class="small muted">Change the text, watch the readability</span></div>
+<div class="ty-ctl"><span>Try</span><div id="ty-pre"></div></div>
+<div class="ty-ctl"><span>Font</span><div id="ty-font"></div></div>
+<div class="ty-ctl"><span>Styles</span><div id="ty-sty"></div></div>
+<div class="ty-ctl"><span>Apply styles to</span><div id="ty-scope"></div></div>
+<div class="ty-ctl"><span>Sizes</span><div id="ty-size"></div></div>
+<div class="ty-card f-sans sz-ok" id="ty-card">
+ <div class="ty-h">Lab session confirmed</div>
+ <p class="ty-p">Your group is registered. Bring your student card to <span class="ty-key">room 12, Sunday at 9:00</span> and read the <button type="button" class="ty-link">lab rules</button> before you come.</p>
+ <button type="button" class="ty-btn">Confirm attendance</button>
+</div>
+<div class="result ty-res" id="ty-res" aria-live="polite"></div>`;
+const card=$('#ty-card',host), p=$('.ty-p',card), key=$('.ty-key',card), res=$('#ty-res',host);
+const S={font:'sans',st:{b:false,i:false,u:false,c:false},scope:'key',size:'ok'};
+const STY=[['b','<b>Bold</b>'],['i','<i>Italic</i>'],['u','<u>Underlined</u>'],['c','CAPITALS']];
+function render(){
+  card.className='ty-card f-'+S.font+' sz-'+S.size;
+  const on=S.scope==='all'?p:key, off=S.scope==='all'?key:p;
+  off.className=off===p?'ty-p':'ty-key';
+  on.className=(on===p?'ty-p':'ty-key')+' '+Object.keys(S.st).filter(k=>S.st[k]).map(k=>'s-'+k).join(' ');
+  const n=Object.values(S.st).filter(Boolean).length, all=S.scope==='all', iss=[];
+  if(S.font==='deco')iss.push([2,'A decorative font is hard to read on screen.']);
+  if(S.font==='serif')iss.push([1,'Serif letters are less readable on screen than sans-serif ones (Arial, Calibri, Helvetica, Geneva, Aptos&hellip;).']);
+  if(S.st.b&&all)iss.push([1,'Bold on a whole paragraph: nothing stands out any more and reading slows down.']);
+  if(S.st.i)iss.push([all?2:1,all?'Italics on a whole paragraph slow down reading.':'Italics slow down reading: keep them for a very short phrase.']);
+  if(S.st.u)iss.push([all?2:1,'Underlined text looks like a link: users may try to click it.']);
+  if(S.st.c)iss.push([all?2:1,all?'A paragraph in CAPITALS feels like shouting and is slower to read.':'CAPITALS feel like shouting: one or two words at most.']);
+  if(n>=2)iss.push([2,'Combination of styles (for example bold + underlined): banned.']);
+  if(S.size==='rand')iss.push([2,'Inconsistent sizes: no clear hierarchy, the eye does not know where to start.']);
+  const lvl=iss.reduce((m,x)=>Math.max(m,x[0]),0);
+  res.className='result ty-res'+(lvl===2?' bad':lvl===1?' warn':'');
+  let head,body;
+  if(lvl===0){
+    head='&#10003; Easy to read';
+    body=n===0?'<li>Plain sans-serif text is the baseline. To highlight one element, add <b>one</b> style to the key phrase.</li>'
+             :'<li>One style, used sparingly, on one key phrase: this is the recommended practice.</li>';
+  }else{
+    head=lvl===2?'&#10007; Hard to read':'! Slower to read';
+    body=iss.map(x=>'<li>'+x[1]+'</li>').join('');
+  }
+  res.innerHTML='<div><b>'+head+'</b><ul>'+body+'</ul></div>';
+}
+const PRE={good:{font:'sans',st:{b:true,i:false,u:false,c:false},scope:'key',size:'ok'},
+           plain:{font:'sans',st:{b:false,i:false,u:false,c:false},scope:'key',size:'ok'},
+           bad:{font:'deco',st:{b:true,i:true,u:true,c:true},scope:'all',size:'rand'}};
+function sync(){
+  setChip($('#ty-font',host),S.font);setChip($('#ty-scope',host),S.scope);setChip($('#ty-size',host),S.size);
+  $$('#ty-sty button',host).forEach(b=>b.setAttribute('aria-pressed',!!S.st[b.dataset.v]));
+}
+chips($('#ty-pre',host),[['good','Good practice'],['plain','Plain text'],['bad','Everything at once']],'',v=>{
+  const x=PRE[v]; S.font=x.font;S.st={...x.st};S.scope=x.scope;S.size=x.size;sync();render();
+},'Examples');
+const dirty=()=>setChip($('#ty-pre',host),'');
+chips($('#ty-font',host),[['sans','Sans-serif'],['serif','Serif'],['deco','Decorative']],S.font,v=>{S.font=v;dirty();render()},'Font');
+$('#ty-sty',host).classList.add('chiprow');
+$('#ty-sty',host).setAttribute('role','group');$('#ty-sty',host).setAttribute('aria-label','Text styles');
+$('#ty-sty',host).innerHTML=STY.map(([k,l])=>`<button type="button" data-v="${k}" aria-pressed="false">${l}</button>`).join('');
+$('#ty-sty',host).addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(!b)return;
+  S.st[b.dataset.v]=!S.st[b.dataset.v];b.setAttribute('aria-pressed',S.st[b.dataset.v]);
+  dirty();render()});
+chips($('#ty-scope',host),[['key','Key phrase only'],['all','Whole paragraph']],S.scope,v=>{S.scope=v;dirty();render()},'Apply styles to');
+chips($('#ty-size',host),[['ok','Consistent'],['rand','Random']],S.size,v=>{S.size=v;dirty();render()},'Sizes');
+$('.ty-link',card).addEventListener('click',e=>e.preventDefault());
+render();
+})();
+
+
+/* ---- readability of colours: colour wheel (live version of the colour photo) ---- */
+(function(){
+const host=$('#w-wheel'); if(!host.id)return;
+const HUES=[0,30,60,90,120,150,180,210,240,270,300,330];
+const HN=['Red','Orange','Yellow','Lime','Green','Spring green','Cyan','Azure','Blue','Violet','Magenta','Pink'];
+const RINGS=[['light',80,85],['medium',52,72],['dark',30,75]];   /* outer ring to inner ring: name, lightness %, saturation % */
+const NEU=[['White','#FFFFFF'],['Light grey','#E5E7EB'],['Dark grey','#374151'],['Black','#111111']];
+function hsl(h,s,l){s/=100;l/=100;const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));
+  return '#'+[f(0),f(8),f(4)].map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('').toUpperCase()}
+const CX=110,CY=110,RAD=[[106,74],[74,48],[48,22]];
+const pt=(r,deg)=>{const a=(deg-90)*Math.PI/180;return [CX+r*Math.cos(a),CY+r*Math.sin(a)]};
+const f2=v=>v.toFixed(2);
+const W=[]; let paths='';
+RINGS.forEach(([rn,l,s],ri)=>HUES.forEach((h,hi)=>{
+  const [ro,rin]=RAD[ri], a0=h-15, a1=h+15, hex=hsl(h,s,l);
+  const A=pt(ro,a0),B=pt(ro,a1),C=pt(rin,a1),D=pt(rin,a0), M=pt((ro+rin)/2,h), i=W.length;
+  W.push({ri,hi,hex,x:M[0],y:M[1],label:HN[hi]+', '+rn});
+  paths+=`<path class="rw-w" data-i="${i}" fill="${hex}" role="button" tabindex="-1" aria-label="${HN[hi]}, ${rn}" d="M${f2(A[0])} ${f2(A[1])} A${ro} ${ro} 0 0 1 ${f2(B[0])} ${f2(B[1])} L${f2(C[0])} ${f2(C[1])} A${rin} ${rin} 0 0 0 ${f2(D[0])} ${f2(D[1])}Z"/>`;
+}));
+const wc=(ri,hi)=>W.find(w=>w.ri===ri&&w.hi===hi).hex;     /* wheel colour by ring and hue */
+const PRE=[
+ ['Pink circle on a light background',{shape:wc(1,11),bg:'#FFFFFF',kind:'circle'}],
+ ['Green triangle on pink',{shape:wc(1,4),bg:wc(0,11),kind:'triangle'}],
+ ['Yellow square on white',{shape:wc(1,2),bg:'#FFFFFF',kind:'square'}],
+ ['Dark blue circle on black',{shape:wc(2,8),bg:'#111111',kind:'circle'}]];
+host.innerHTML=`<div class="ifig-title"><b>Colour wheel: light and dark</b><span class="small muted">Choose a shape colour and a background colour</span></div>
+<div class="rw-grid">
+ <div class="rw-left">
+  <div id="rw-tgt"></div>
+  <svg class="rw-svg" id="rw-svg" viewBox="0 0 220 220" role="group" aria-label="Colour wheel: 12 hues in a light, a medium and a dark ring">${paths}
+   <g class="rw-mk" id="rw-ms"><circle r="8"/><text>S</text></g><g class="rw-mk" id="rw-mb"><rect x="-8" y="-8" width="16" height="16" rx="4"/><text>B</text></g></svg>
+  <div class="rw-neu" id="rw-neu" role="group" aria-label="Neutral colours">${NEU.map(([n,h])=>`<button type="button" data-h="${h}" style="background:${h}" aria-label="${n}" title="${n}"></button>`).join('')}</div>
+ </div>
+ <div class="rw-right">
+  <div class="rw-stage" id="rw-stage"><svg viewBox="0 0 260 150" role="img" id="rw-prev" aria-label="Preview">
+   <rect id="rw-bg" width="260" height="150"/><circle id="rw-c" cx="130" cy="75" r="46"/><polygon id="rw-t" points="130,24 182,114 78,114"/><rect id="rw-s" x="86" y="30" width="88" height="88" rx="6"/></svg></div>
+  <div class="result" id="rw-res" aria-live="polite"></div>
+  <div id="rw-kind"></div>
+  <label class="chk2"><input type="checkbox" id="rw-gray"> Show in greyscale</label>
+ </div>
+</div>
+<div class="ty-ctl"><span>Examples</span><div id="rw-pre"></div></div>`;
+const S={shape:PRE[0][1].shape,bg:PRE[0][1].bg,kind:'circle',target:'shape'};
+const svg=$('#rw-svg',host), res=$('#rw-res',host);
+const wedges=$$('.rw-w',svg);
+let focusI=W.findIndex(w=>w.hex===S.shape);
+function mark(id,hex,dx){const g=$(id,host),i=W.findIndex(w=>w.hex===hex);
+  if(i<0){g.style.display='none';return i}
+  g.style.display='';g.setAttribute('transform','translate('+f2(W[i].x+dx)+' '+f2(W[i].y)+')');return i}
+function update(){
+  $('#rw-bg',host).setAttribute('fill',S.bg);
+  ['c','t','s'].forEach(k=>{const e=$('#rw-'+k,host);e.setAttribute('fill',S.shape);e.style.display=({c:'circle',t:'triangle',s:'square'})[k]===S.kind?'':'none'});
+  const iS=W.findIndex(w=>w.hex===S.shape), iB=W.findIndex(w=>w.hex===S.bg), both=iS>=0&&iS===iB;
+  mark('#rw-ms',S.shape,both?-6:0); mark('#rw-mb',S.bg,both?6:0);
+  const cur=S.target==='shape'?iS:iB; if(cur>=0)focusI=cur;
+  wedges.forEach((w,i)=>w.setAttribute('tabindex',i===focusI?'0':'-1'));
+  $$('#rw-neu button',host).forEach(b=>b.setAttribute('aria-pressed',b.dataset.h===(S.target==='shape'?S.shape:S.bg)));
+  const r=ratio(S.shape,S.bg), ok=r>=3;
+  res.className='result'+(ok?'':' bad');
+  res.innerHTML='<span class="big">'+rf(r)+' : 1</span><span>'+(ok
+    ?'<b>&#10003; Effective</b>: the shape is easy to identify (at least 3 : 1 for shapes and icons).'
+    :'<b>&#10007; Not effective</b>: below 3 : 1. A different hue is not enough, the two colours need a different <b>lightness</b>.')+'</span>';
+  $('#rw-prev',host).setAttribute('aria-label','Preview: a '+S.kind+' on a background. Contrast '+rf(r)+' to 1, '+(ok?'effective':'not effective'));
+}
+function pick(hex){S[S.target]=hex;setChip($('#rw-pre',host),'');update()}
+chips($('#rw-tgt',host),[['shape','Set the shape colour'],['bg','Set the background']],S.target,v=>{S.target=v;update()},'Which colour the wheel sets');
+chips($('#rw-kind',host),[['circle','Circle'],['triangle','Triangle'],['square','Square']],S.kind,v=>{S.kind=v;setChip($('#rw-pre',host),'');update()},'Shape');
+chips($('#rw-pre',host),PRE.map(([n],i)=>[String(i),n]),'0',v=>{Object.assign(S,PRE[+v][1]);setChip($('#rw-kind',host),S.kind);update()},'Examples');
+svg.addEventListener('click',e=>{const w=e.target.closest('.rw-w');if(w){focusI=+w.dataset.i;pick(W[focusI].hex)}});
+svg.addEventListener('keydown',e=>{
+  const w=e.target.closest('.rw-w'); if(!w)return; const i=+w.dataset.i, c=W[i]; let n=-1;
+  if(e.key==='Enter'||e.key===' '){e.preventDefault();focusI=i;pick(c.hex);return}
+  if(e.key==='ArrowRight')n=c.ri*12+(c.hi+1)%12; else if(e.key==='ArrowLeft')n=c.ri*12+(c.hi+11)%12;
+  else if(e.key==='ArrowUp'&&c.ri>0)n=(c.ri-1)*12+c.hi; else if(e.key==='ArrowDown'&&c.ri<2)n=(c.ri+1)*12+c.hi;
+  if(n>=0){e.preventDefault();focusI=n;wedges.forEach((x,k)=>x.setAttribute('tabindex',k===n?'0':'-1'));wedges[n].focus()}
+});
+$('#rw-neu',host).addEventListener('click',e=>{const b=e.target.closest('button[data-h]');if(b)pick(b.dataset.h)});
+$('#rw-gray',host).addEventListener('change',e=>{$('#rw-prev',host).style.filter=e.target.checked?'url(#cvd-gray)':''});
+update();
+})();
+
+/* ---- examples: contrast checker ---- */
+(function(){
+const host=$('#w-contrast'); if(!host.id)return;
+const PRE=[
+ ['Black on white','#000000','#FFFFFF','The classic: dark characters on a light background, preferably black on white.'],
+ ['Dark grey on white','#444444','#FFFFFF','Dark grey on white is still comfortable, a little softer than pure black.'],
+ ['Light grey on white','#AAAAAA','#FFFFFF','Fashionable in some designs, but too faint: the eye struggles to read it.'],
+ ['Yellow on white','#E6C200','#FFFFFF','A vivid, light colour on white. A light colour needs a dark partner.'],
+ ['White on blue','#FFFFFF','#0B4F72','Light characters on a dark colour work well too, when the ratio is high.'],
+ ['Red on green','#D32F2F','#2E7D32','Two different hues with almost the same lightness: almost no contrast, and nothing at all for red-green colour-blind users.'],
+ ['Pastel on pastel','#F4A6C0','#A8E6CF','Two soft colours: pleasant to look at, but not readable.'],
+ ['Light on dark (night)','#E6EDF3','#0F172A','The exception: in low-light environments (night, specific tasks) light characters on a dark background are fine, as long as the contrast stays high.']];
+const T=[['Normal text (AA)',4.5],['Large text (AA)',3],['Normal text (AAA)',7],['Icons and shapes',3]];
+host.innerHTML=`<div class="ph"><h4>1 &middot; Contrast checker: text on a background</h4><span class="small muted">Pick colours or try an example</span></div>
+<div id="cc-pre"></div>
+<div class="cc-grid">
+ <div class="cc-in">
+  <div class="cc-row"><label for="cc-fg">Text colour</label><input type="color" id="cc-fg"><input type="text" id="cc-fgh" class="cc-hex" maxlength="7" autocomplete="off" spellcheck="false" aria-label="Text colour as a hex code"></div>
+  <div class="cc-row"><label for="cc-bg">Background</label><input type="color" id="cc-bg"><input type="text" id="cc-bgh" class="cc-hex" maxlength="7" autocomplete="off" spellcheck="false" aria-label="Background colour as a hex code"></div>
+  <button type="button" class="btn small" id="cc-swap">Swap the two colours</button>
+ </div>
+ <div class="cc-sample" id="cc-sample">
+  <div class="cc-l">Registration closes Friday</div>
+  <p>The eye needs a high contrast between information and background.</p>
+  <div class="cc-ic"><svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Icon and small text (12 px)</span></div>
+ </div>
+</div>
+<div class="result" id="cc-res" aria-live="polite"></div>
+<ul class="cc-badges" id="cc-badges"></ul>
+<p class="cap" id="cc-note"></p>`;
+const S={fg:PRE[0][1],bg:PRE[0][2]}, note=$('#cc-note',host);
+const FG=$('#cc-fg',host),BG=$('#cc-bg',host),FH=$('#cc-fgh',host),BH=$('#cc-bgh',host);
+function update(msg){
+  FG.value=S.fg.toLowerCase();BG.value=S.bg.toLowerCase();FH.value=S.fg;BH.value=S.bg;
+  FH.removeAttribute('aria-invalid');BH.removeAttribute('aria-invalid');
+  const sm=$('#cc-sample',host); sm.style.background=S.bg; sm.style.color=S.fg;
+  const r=ratio(S.fg,S.bg);
+  const verdict=r>=7?'Excellent for any text':r>=4.5?'Good for all text':r>=3?'Only for large text and icons':'Not readable';
+  const res=$('#cc-res',host); res.className='result'+(r>=4.5?'':r>=3?' warn':' bad');
+  res.innerHTML='<span class="big">'+rf(r)+' : 1</span><span><b>'+(r>=4.5?'&#10003; ':r>=3?'! ':'&#10007; ')+verdict+'</b></span>';
+  $('#cc-badges',host).innerHTML=T.map(([n,m])=>`<li class="${r>=m?'ok':'no'}"><b>${r>=m?'&#10003; Pass':'&#10007; Fail'}</b> ${n} <small>(needs ${m} : 1)</small></li>`).join('');
+  note.textContent=msg!==undefined?msg:(r>=7?'Plenty of contrast.':r>=4.5?'Enough contrast for normal text.':r>=3?'Too faint for body text: keep these colours for headings and icons only.':'Too little contrast: change the lightness of one of the two colours.');
+}
+chips($('#cc-pre',host),PRE.map(([n],i)=>[String(i),n]),'0',v=>{const p=PRE[+v];S.fg=p[1];S.bg=p[2];update(p[3])},'Examples');
+const free=()=>setChip($('#cc-pre',host),'');
+function fromPicker(k,el){S[k]=el.value.toUpperCase();free();update()}
+FG.addEventListener('input',()=>fromPicker('fg',FG));BG.addEventListener('input',()=>fromPicker('bg',BG));
+function fromText(k,el){
+  if(validHex(el.value)){S[k]=normHex(el.value);free();const a=FH.value,b=BH.value;update();FH.value=a;BH.value=b}
+  else el.setAttribute('aria-invalid','true');
+}
+FH.addEventListener('input',()=>fromText('fg',FH));BH.addEventListener('input',()=>fromText('bg',BH));
+FH.addEventListener('change',()=>{if(validHex(FH.value))FH.value=S.fg});BH.addEventListener('change',()=>{if(validHex(BH.value))BH.value=S.bg});
+$('#cc-swap',host).addEventListener('click',()=>{[S.fg,S.bg]=[S.bg,S.fg];free();update()});
+update(PRE[0][3]);
+})();
+
+/* ---- examples: how many colours? ---- */
+(function(){
+const host=$('#w-ncolors'); if(!host.id)return;
+const PAL=['#0B4F72','#C2410C','#15803D','#7E22CE','#BE123C','#0F766E','#A16207','#4338CA','#B91C1C','#0E7490','#4D7C0F','#9D174D'];
+host.innerHTML=`<div class="ph"><h4>2 &middot; How many colours?</h4><span class="small muted">Move the slider</span></div>
+<label class="fld"><span>Number of colours in the page <b id="nc-v"></b></span><input type="range" id="nc-r" min="1" max="12" value="3"></label>
+<div class="nc-page" id="nc-page" role="img" aria-label="Sample web page: the number of colours it uses follows the slider">
+ <div class="nc-hd" data-s="0"><b>Course portal</b><span class="nc-nav"><i data-s="1">Home</i><i data-s="2">Labs</i><i data-s="3">Grades</i></span></div>
+ <div class="nc-ban" data-s="4">New: the lab schedule is online</div>
+ <div class="nc-cards">
+  <div class="nc-card"><div class="nc-ct" data-s="5">Lectures</div><p>All slides and videos.</p><span class="nc-btn" data-s="7">Open</span></div>
+  <div class="nc-card"><div class="nc-ct" data-s="6">Tutorials</div><p>Exercises and solutions.</p><span class="nc-btn" data-s="8">Open</span></div>
+ </div>
+ <div class="nc-foot"><span class="nc-bd" data-s="9">New</span><span class="nc-bd" data-s="10">Due Friday</span><span class="nc-lk" data-s="11">Help and contact</span></div>
+</div>
+<div class="result" id="nc-res" aria-live="polite"></div>`;
+const R=$('#nc-r',host);
+function update(){
+  const n=+R.value;
+  $('#nc-v',host).textContent=n;
+  $$('[data-s]',host).forEach(el=>{const c=PAL[(+el.dataset.s)%n];
+    if(el.classList.contains('nc-lk')){el.style.color=c;el.style.background='transparent'}
+    else{el.style.background=c;el.style.color=ink(c)}});
+  const res=$('#nc-res',host);
+  if(n<=7){res.className='result';res.innerHTML='<span><b>&#10003; '+n+' colour'+(n>1?'s':'')+'</b>: within the limit (7 maximum, excluding icons). The page stays calm and its structure is clear.</span>'}
+  else{res.className='result bad';res.innerHTML='<span><b>&#10007; '+n+' colours</b>: too many. The gaze jumps from one colour to the next and nothing leads the eye (limit: 7, excluding icons).</span>'}
+}
+R.addEventListener('input',update);update();
+})();
+
+/* ---- examples: text over a gradient or a picture ---- */
+(function(){
+const host=$('#w-overimg'); if(!host.id)return;
+const LIGHT='#F3D9B1',DARK='#35506B',PANEL='#0B1F33',SHADE=.65;
+const PIC='repeating-conic-gradient('+LIGHT+' 0% 25%,'+DARK+' 0% 50%) 0 0/44px 44px';
+const STOPS=[[0,'#FDE68A'],[.55,'#38BDF8'],[1,'#1E3A8A']];
+const O={
+ grad:{bg:'linear-gradient(90deg,'+STOPS.map(s=>s[1]+' '+s[0]*100+'%').join(',')+')',
+       worst:()=>{let m=99;for(let i=0;i<=40;i++){const t=i/40;let k=0;while(k<STOPS.length-2&&t>STOPS[k+1][0])k++;
+         const a=STOPS[k],b=STOPS[k+1];m=Math.min(m,ratio('#FFFFFF',mix(a[1],b[1],(t-a[0])/(b[0]-a[0]))))}return m}},
+ busy:{bg:PIC,worst:()=>Math.min(ratio('#FFFFFF',LIGHT),ratio('#FFFFFF',DARK))},
+ over:{bg:'linear-gradient(rgba(0,0,0,'+SHADE+'),rgba(0,0,0,'+SHADE+')),'+PIC,
+       worst:()=>Math.min(ratio('#FFFFFF',mix(LIGHT,'#000000',SHADE)),ratio('#FFFFFF',mix(DARK,'#000000',SHADE)))},
+ panel:{bg:PIC,panel:true,worst:()=>ratio('#FFFFFF',PANEL)}};
+host.innerHTML=`<div class="ph"><h4>3 &middot; Text over a gradient or a picture</h4><span class="small muted">Pick a background for the white text</span></div>
+<div id="oi-seg"></div>
+<div class="oi-stage" id="oi-stage"><div class="oi-text" id="oi-text"><div class="t1">Registration closes Friday</div><div class="t2">Bring your student card to the secretariat before noon.</div></div></div>
+<div class="result" id="oi-res" aria-live="polite"></div>`;
+function show(k){
+  const o=O[k], st=$('#oi-stage',host), tx=$('#oi-text',host);
+  st.style.background=o.bg; tx.className='oi-text'+(o.panel?' pn':'');
+  const r=o.worst(), ok=r>=4.5, res=$('#oi-res',host);
+  res.className='result'+(ok?'':' bad');
+  res.innerHTML='<span class="big">'+rf(r)+' : 1</span><span>'+(ok
+    ?'<b>&#10003; Passes</b> at the worst point under the text (4.5 : 1 needed for normal text).'
+    :'<b>&#10007; Fails</b> at the worst point under the text (4.5 : 1 needed). Part of the text is hard to read.')
+    +(k==='grad'||k==='busy'?' Fix it with a dark overlay or a solid panel behind the text, or keep text off the picture.':'')+'</span>';
+}
+chips($('#oi-seg',host),[['grad','Gradient'],['busy','Busy picture'],['over','Dark overlay (fix)'],['panel','Solid panel (fix)']],'grad',show,'Background');
+show('grad');
+})();
+
+
+/* ---- meaning of colours: typical associations (live version of the colour-meaning photo) ---- */
+(function(){
+const host=$('#w-meaning'); if(!host.id)return;
+const C=[
+ {n:'Red',hex:'#D32F2F',a:'Power, passion, danger, urgency',u:'Errors, alerts, stop and delete actions',ex:'Delete account'},
+ {n:'Orange',hex:'#E65100',a:'Energy, enthusiasm, warmth',u:'Attention without alarm; calls to action',ex:'Try it free'},
+ {n:'Yellow',hex:'#F9C80E',a:'Optimism, attention, caution',u:'Warnings and highlights (needs dark text)',ex:'Heads up'},
+ {n:'Blue',hex:'#1565C0',a:'Trust, calm, reliability',u:'Links, information, primary actions',ex:'Sign in'},
+ {n:'Black',hex:'#111111',a:'Elegance, authority, sophistication',u:'Default text; premium brands',ex:'Read more'},
+ {n:'White',hex:'#FFFFFF',a:'Purity, cleanliness, simplicity',u:'Empty space and backgrounds',ex:'Clean layout'},
+ {n:'Purple',hex:'#7B1FA2',a:'Creativity, luxury, imagination',u:'Premium or creative products',ex:'Go premium'},
+ {n:'Green',hex:'#2E7D32',a:'Nature, outdoors, health, growth, success',u:'Success, validation, &ldquo;go&rdquo;',ex:'Payment accepted'}];
+host.innerHTML=`<div class="ifig-title"><b>What do colours say?</b><span class="small muted">Tap a colour</span></div>
+<div class="mn-grid" id="mn-grid" role="group" aria-label="Colours">${C.map((c,i)=>`<button type="button" class="mn-sw" data-i="${i}" aria-pressed="${i===0}" style="background:${c.hex};color:${ink(c.hex)}">${c.n}</button>`).join('')}</div>
+<div class="mn-detail" id="mn-detail" aria-live="polite"></div>`;
+function show(i){
+  const c=C[i];
+  $$('#mn-grid button',host).forEach(b=>b.setAttribute('aria-pressed',+b.dataset.i===i));
+  $('#mn-detail',host).innerHTML=`<div class="mn-top"><span class="mn-chip" style="background:${c.hex};color:${ink(c.hex)}">${c.ex}</span><b>${c.n}</b></div>
+   <p><b>Typical associations:</b> ${c.a}.</p><p><b>In an interface:</b> ${c.u}.</p>
+   <p class="small muted">These are usual meanings, not laws: they change with culture (see the examples).</p>`;
+}
+$('#mn-grid',host).addEventListener('click',e=>{const b=e.target.closest('button[data-i]');if(b)show(+b.dataset.i)});
+show(0);
+})();
+
+/* ---- examples: usual colour codes ---- */
+(function(){
+const host=$('#w-codes'); if(!host.id)return;
+const COL={green:['#2E7D32','#E3F3E6'],amber:['#B7791F','#FDF1D6'],red:['#C62828','#FBE4E2'],blue:['#1565C0','#E1EDF9'],grey:['#5F6B76','#EEF1F3'],purple:['#7B1FA2','#F1E3F6']};
+const MSG=[['Payment accepted','green','red'],['Your session expires in 2 minutes','amber','blue'],['Card number is invalid','red','green'],['A new version is available','blue','amber'],['3 items in your basket','grey','purple']];
+host.innerHTML=`<div class="ph"><h4>1 &middot; Usual codes in an interface</h4><span class="small muted">Same messages, two colour codes</span></div>
+<div id="cd-seg"></div>
+<div class="cd-list" id="cd-list"></div>
+<div class="result" id="cd-res" aria-live="polite"></div>`;
+function show(k){
+  $('#cd-list',host).innerHTML=MSG.map(m=>{const c=COL[m[k==='usual'?1:2]];return `<div class="cd-item" style="border-left-color:${c[0]};background:${c[1]}">${m[0]}</div>`}).join('');
+  const r=$('#cd-res',host);
+  if(k==='usual'){r.className='result';r.innerHTML='<span><b>&#10003; Usual codes.</b> Green = validation, success; red = warning, stop, failure; neutral colours = nothing special. You grasp the state of each message before reading it.</span>'}
+  else{r.className='result bad';r.innerHTML='<span><b>&#10007; Codes mixed up.</b> Read the green message, then the red one: the colour says one thing and the words another. Users trust the colour first, so they misread the interface.</span>'}
+}
+chips($('#cd-seg',host),[['usual','Usual codes'],['mixed','Codes mixed up']],'usual',show,'Colour code');
+show('usual');
+})();
+
+/* ---- examples: culture ---- */
+(function(){
+const host=$('#w-culture'); if(!host.id)return;
+const L={
+ west:{t:'Most Western apps',items:[['Red','stop, danger, error, loss'],['Green','go, validation, success, gain'],['White','clean, neutral, simple (and weddings)']]},
+ asia:{t:'China and East Asia',items:[['Red','joy, luck, celebration (weddings, New Year gifts)'],['Red and green','on the stock charts of several East Asian markets (for example mainland China, Japan, Taiwan), red means a price rise and green a fall: the opposite of most Western apps'],['White','also linked with mourning in several East Asian traditions']]},
+ stage:{t:'On stage',items:[['Green','superstition in the theatre world']]}};
+host.innerHTML=`<div class="ph"><h4>2 &middot; The same colour, a different meaning</h4><span class="small muted">Choose a context</span></div>
+<div id="cu-seg"></div>
+<div class="cu-card" id="cu-card" aria-live="polite"></div>
+<h5 class="cu-h">Same data, two conventions</h5>
+<div id="cu-conv"></div>
+<div class="cu-tick" id="cu-tick"></div>
+<p class="cap" id="cu-cap"></p>`;
+function lens(k){
+  const x=L[k];
+  $('#cu-card',host).innerHTML='<b>'+x.t+'</b><ul>'+x.items.map(i=>'<li><b>'+i[0]+':</b> '+i[1]+'.</li>').join('')+'</ul>';
+}
+function tick(k){
+  const up=k==='west'?'#1B7F3B':'#C62828', dn=k==='west'?'#C62828':'#1B7F3B';
+  const row=(n,p,v,a)=>{const c=v>0?up:dn;return `<div class="cu-row"><b>${n}</b><span>${p}</span><span class="cu-chg" style="color:${c}">${v>0?'&#9650;':'&#9660;'} ${v>0?'+':'&minus;'}${Math.abs(v).toFixed(1)}%</span></div>`};
+  $('#cu-tick',host).innerHTML=row('ACME','48.20',2.4)+row('BETA','12.75',-1.8)+row('GAMMA','103.10',0.6);
+  $('#cu-cap',host).innerHTML=k==='west'
+    ?'Western convention: green &#9650; = price up, red &#9660; = price down.'
+    :'East Asian convention: red &#9650; = price up, green &#9660; = price down. A user used to the other convention reads your green &#9650; as a loss. Arrows and signs (+ / &minus;) keep the meaning clear whatever the colours.';
+}
+chips($('#cu-seg',host),[['west','Most Western apps'],['asia','China and East Asia'],['stage','On stage']],'west',lens,'Context');
+chips($('#cu-conv',host),[['west','Western convention'],['asia','East Asian convention']],'west',tick,'Stock chart convention');
+lens('west');tick('west');
+})();
+
+
+/* ---- relevance of colours: a student's week ---- */
+(function(){
+const host=$('#w-agenda'); if(!host.id)return;
+const TY={L:['Lecture','&#127891;'],B:['Lab','&#128187;'],T:['Tutorial','&#9999;&#65039;'],E:['Exam','&#128221;']};
+const EV=[['Mon','8:30','HCI','L'],['Mon','10:15','HCI','B'],['Tue','9:00','Algorithms','T'],['Wed','8:30','Networks','L'],
+          ['Wed','10:15','Networks','B'],['Thu','9:00','Databases','T'],['Fri','9:00','HCI','E'],['Fri','13:00','Algorithms','E']];
+const BLUE='#1D4ED8',PURP='#7E22CE',GREEN='#15803D',ORNG='#C2410C',RED='#B91C1C',TEAL='#0F766E',TEAL2='#5EEAD4';
+const RANDOM=[BLUE,PURP,GREEN,GREEN,ORNG,RED,BLUE,PURP];                       /* one colour per event, with no logic */
+const BYTYPE={L:BLUE,B:TEAL,T:TEAL2,E:RED};                                    /* same type = same colour; Lab / Tutorial = two teals */
+host.innerHTML=`<div class="ph"><h4>Example: a student's week</h4><span class="small muted">Compare the two colour choices</span></div>
+<div id="rl-seg"></div>
+<label class="chk2"><input type="checkbox" id="rl-exp"> Make it explicit (labels and legend)</label>
+<div class="rl-list" id="rl-list"></div>
+<div class="rl-leg" id="rl-leg" hidden></div>
+<div class="result" id="rl-res" aria-live="polite"></div>`;
+let mode='random';
+const exp=$('#rl-exp',host);
+function draw(){
+  const E=exp.checked;
+  $('#rl-list',host).innerHTML=EV.map((e,i)=>{
+    const c=mode==='random'?RANDOM[i]:BYTYPE[e[3]], t=TY[e[3]];
+    return `<div class="rl-ev"><span class="rl-when"><b>${e[0]}</b> ${e[1]}</span><span class="rl-pill" style="background:${c};color:${ink(c)}">${E?t[1]+' '+t[0]+' &middot; ':''}${e[2]}</span></div>`}).join('');
+  const lg=$('#rl-leg',host); lg.hidden=!E;
+  lg.innerHTML=E?'<b>Legend</b>'+Object.keys(TY).map(k=>{const c=mode==='random'?null:BYTYPE[k];
+    return mode==='random'?`<span class="rl-key">${TY[k][1]} ${TY[k][0]}</span>`
+                          :`<span class="rl-key"><i style="background:${c}"></i>${TY[k][1]} ${TY[k][0]}</span>`}).join(''):'';
+  const r=$('#rl-res',host);
+  if(mode==='random'){
+    r.className='result bad';
+    r.innerHTML='<span><b>&#10007; Colours without logic.</b> A Lecture and a Tutorial share green, an Exam and a Lecture share blue: different types look related. Both Labs (and both Tutorials) have different colours: similar events look unrelated.'
+      +(E?' Labels help, but the colours still mislead.':' And a legend would not help: there is nothing to learn.')+'</span>';
+  }else{
+    r.className='result';
+    r.innerHTML='<span><b>&#10003; Relevant colours.</b> Same type &rArr; same colour. Different types &rArr; contrasting colours (blue, teal, red). Similar types (Lab and Tutorial) &rArr; slightly contrasting colours (two teals).'
+      +(E?' Labels and a legend make the information explicit: the meaning no longer depends on colour alone.':' Add labels and a legend to make the information explicit.')+'</span>';
+  }
+}
+chips($('#rl-seg',host),[['random','Random colours'],['relevant','Relevant colours']],'random',v=>{mode=v;draw()},'Colour choice');
+exp.addEventListener('change',draw);
+draw();
+})();
+
+
+/* ---- portability of colours: colour-vision simulator ---- */
+(function(){
+const host=$('#w-cvd'); if(!host.id)return;
+const OK='#2E9E44',BAD='#D8352A',WARN='#F2B531',INFO='#1E6BD6';
+const MODES={
+ normal:['Normal vision','','Normal colour vision: green, amber, red and blue are easy to tell apart.'],
+ prot:['Protanopia (no red)','url(#cvd-prot)','Protanopia (no red cones): red turns dark and close to the greens and ambers.'],
+ deut:['Deuteranopia (no green)','url(#cvd-deut)','Deuteranopia (no green cones): red, green and amber collapse into similar yellow-brown tones.'],
+ trit:['Tritanopia (no blue)','url(#cvd-trit)','Tritanopia (no blue cones): blue and green are confused, and yellow looks pinkish.'],
+ gray:['Greyscale','url(#cvd-gray)','Greyscale (also a test for printing and poor screens): the hue disappears, only the lightness remains.']};
+const SV=[['Server A','OK',OK,'&#10003;','ok'],['Server B','Failed',BAD,'&#10007;','failed'],['Server C','Slow',WARN,'!','slow'],['Server D','Maintenance',INFO,'i','maintenance']];
+const BARS=[['Mon',34,6],['Tue',28,12],['Wed',40,3]];
+host.innerHTML=`<div class="ph"><h4>1 &middot; The same screen, seen by colour-blind users</h4><span class="small muted">Approximate simulation</span></div>
+<div id="cv-vis"></div>
+<label class="chk2"><input type="checkbox" id="cv-fix"> Fix it: colour + icon + text</label>
+<div class="cv-stage" id="cv-stage">
+ <div class="cv-card"><div class="cv-t">Server status</div><ul class="cv-sv" id="cv-sv"></ul></div>
+ <div class="cv-card"><div class="cv-t">Tests this week</div><div class="cv-bars" id="cv-bars"></div><div class="cv-lg" id="cv-lg"></div></div>
+ <div class="cv-card"><div class="cv-t">Payment</div><div class="cv-field" id="cv-field"><span>Card number</span><span>4539 &bull;&bull;&bull;&bull; 12</span></div><div class="cv-err" id="cv-err"></div></div>
+</div>
+<p class="cap" id="cv-cap" aria-live="polite"></p>
+<p class="cap">The simulation is approximate (Machado et al., 2009, full severity). Figures vary by source and population; one often-quoted estimate is about 8% of men and 0.5% of women with a colour-vision deficiency.</p>`;
+let mode='normal';
+function draw(){
+  const fix=$('#cv-fix',host).checked;
+  $('#cv-sv',host).innerHTML=SV.map(s=>`<li><i class="cv-dot" style="background-color:${s[2]}"></i><b>${s[0]}</b>${fix?`<span class="cv-st"><span aria-hidden="true">${s[3]}</span> ${s[1]}</span>`:''}</li>`).join('');
+  $('#cv-bars',host).innerHTML=BARS.map(b=>`<div class="cv-g"><div class="cv-b" style="height:${b[1]*2}px;background-color:${OK}">${fix?'<small>'+b[1]+'</small>':''}</div><div class="cv-b ${fix?'hat':''}" style="height:${b[2]*2}px;background-color:${BAD}">${fix?'<small>'+b[2]+'</small>':''}</div><span>${b[0]}</span></div>`).join('');
+  $('#cv-lg',host).innerHTML=fix
+    ?`<span><i class="sq" style="background-color:${OK}"></i>&#10003; Passed (solid)</span><span><i class="sq hat" style="background-color:${BAD}"></i>&#10007; Failed (striped)</span>`
+    :`<span><i class="sq" style="background-color:${OK}"></i>Passed</span><span><i class="sq" style="background-color:${BAD}"></i>Failed</span>`;
+  $('#cv-field',host).style.borderColor=BAD;
+  $('#cv-err',host).innerHTML=fix?'<span aria-hidden="true">&#10007;</span> Card number is invalid: check the 16 digits.':'';
+  $('#cv-stage',host).style.filter=MODES[mode][1];
+  $('#cv-cap',host).textContent=MODES[mode][2]+(fix?' With icons, text and patterns, nothing depends on colour alone.':(mode==='normal'?'':' Can you still tell which server failed, and which bars are the failures?'));
+}
+chips($('#cv-vis',host),Object.keys(MODES).map(k=>[k,MODES[k][0]]),'normal',v=>{mode=v;draw()},'Type of vision');
+$('#cv-fix',host).addEventListener('change',draw);
+draw();
+})();
+
+/* ---- portability of colours: where will it be used? ---- */
+(function(){
+const host=$('#w-env'); if(!host.id)return;
+const ENV={
+ normal:['Normal screen','','A well-lit screen: both designs look fine.'],
+ sun:['Bright sunlight','brightness(1.2) contrast(.5) saturate(.7)','Outdoors the screen reflects the sun: contrast and colours wash out.'],
+ night:['Night, low light','brightness(.5) contrast(.9)','In the dark, pale colours sink into the background.'],
+ proj:['Projector','contrast(.6) brightness(1.1) saturate(.6)','On a classroom projector the lightest and the most saturated colours lose their edge.']};
+host.innerHTML=`<div class="ph"><h4>2 &middot; Where will it be used?</h4><span class="small muted">Approximate effect</span></div>
+<div id="ev-seg"></div>
+<div class="ev-wrap" id="ev-wrap">
+ <div class="ev-card ev-low"><div class="ev-lab">Fragile: low contrast, colour only</div>
+  <div class="ev-t">Open day, 14 Nov</div><p>Meet the teachers and test the labs.</p>
+  <div class="ev-tags"><span class="tg a">Available</span><span class="tg b">Few seats</span></div><small>Room 12, 9:00</small></div>
+ <div class="ev-card ev-high"><div class="ev-lab">Robust: contrast, icons and text</div>
+  <div class="ev-t">Open day, 14 Nov</div><p>Meet the teachers and test the labs.</p>
+  <div class="ev-tags"><span class="tg a">&#10003; Available</span><span class="tg b">! Few seats</span></div><small>Room 12, 9:00</small></div>
+</div>
+<p class="cap" id="ev-cap" aria-live="polite"></p>`;
+function show(k){
+  $('#ev-wrap',host).style.filter=ENV[k][1];
+  $('#ev-cap',host).textContent=ENV[k][2]+(k==='normal'?'':' The fragile design is the first to fail.');
+}
+chips($('#ev-seg',host),Object.keys(ENV).map(k=>[k,ENV[k][0]]),'normal',show,'Environment');
+show('normal');
+})();
+
+
+/* ===================== MODULES 6-7: summary filter, self-assessment ===================== */
+(function(){
+const host=$('#w-sum-chips'); if(!host.id)return;
+const rows=$$('#sum-table tbody tr'), count=$('#sum-count');
+function show(f){
+  let n=0;
+  rows.forEach(r=>{const on=f==='all'||r.dataset.f===f;r.hidden=!on;if(on)n++});
+  count.textContent='Showing '+n+' of '+rows.length+' theories.';
+}
+chips(host,[['all','All'],['cog','Cognitive'],['perc','Perceptual'],['mot','Motor'],['vis','Visual design']],'all',show,'Filter by family');
+show('all');
+})();
+(function(){
+const box=$('#qz'); if(!box.id)return;
+const items=$$('details.acc',box), btn=$('#qz-all'), cnt=$('#qz-count');
+function upd(){const o=items.filter(d=>d.open).length;cnt.textContent=o+' of '+items.length+' answers shown';btn.textContent=o===items.length?'Hide all answers':'Show all answers'}
+items.forEach(d=>d.addEventListener('toggle',upd));
+btn.addEventListener('click',()=>{const all=items.every(d=>d.open);items.forEach(d=>{d.open=!all});upd()});
+upd();
 })();
 
 })();
