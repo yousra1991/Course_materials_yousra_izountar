@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>NoSQL – MongoDB Lab 3 · Quiz answers (instructor)</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"><style>
+:root{--bg:#f2f5f1;--ink:#14231c;--mut:#4f6158;--g:#1f7a4d;--g2:#dcebe1;--am:#e6a92b;--card:#fff;--line:#c9d8cf;--sh:0 8px 28px rgba(20,35,28,.12);--bad:#b3261e}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1a15;--ink:#e8f0eb;--mut:#a3b5aa;--g:#5fcf94;--g2:#183226;--card:#16261e;--line:#2b4237;--sh:0 8px 28px rgba(0,0,0,.5);--bad:#ff8a80}}
+:root[data-theme=dark]{--bg:#0f1a15;--ink:#e8f0eb;--mut:#a3b5aa;--g:#5fcf94;--g2:#183226;--card:#16261e;--line:#2b4237;--sh:0 8px 28px rgba(0,0,0,.5);--bad:#ff8a80}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:calc(20px + env(safe-area-inset-top,0px))}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.65 "Source Serif 4",Georgia,serif}
+h1,h2,h3,nav,th{font-family:"Bricolage Grotesque","Segoe UI",Arial,sans-serif}
+.wrap{display:grid;grid-template-columns:250px 1fr;max-width:1300px;margin:auto}
+nav{position:sticky;top:0;height:100vh;padding:28px 20px;overflow:auto;border-right:1px solid var(--line)}
+nav b{display:block;font-size:20px;color:var(--g);margin-bottom:14px}
+nav a{display:block;padding:7px 10px;margin:2px 0;color:var(--mut);text-decoration:none;border-radius:8px;font-size:15px;font-weight:500}
+nav a:hover,nav a.on{background:var(--g2);color:var(--g)}
+main{padding:0 clamp(18px,4vw,56px) 80px;min-width:0}
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:36px;align-items:center;padding:56px 0 40px}
+.hero h1{font-size:clamp(34px,5.4vw,60px);line-height:1.02;margin:0 0 16px;font-weight:800;letter-spacing:-.03em}
+.hero p{color:var(--mut);margin:0 0 18px}.hero img{width:min(100%,260px);margin:auto;display:block;border-radius:50%;box-shadow:var(--sh)}
+.pill{display:inline-block;background:var(--g);color:#fff;padding:5px 14px;border-radius:99px;font:600 14px "Bricolage Grotesque",sans-serif;margin:0 6px 6px 0}
+section{padding:46px 0 10px;border-top:2px solid var(--line)}
+section>h2{font-size:clamp(28px,4vw,42px);margin:0 0 6px;letter-spacing:-.02em}
+.lead{color:var(--mut);margin:0 0 26px;max-width:62ch}
+.blk{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start;background:var(--card);border-radius:18px;padding:26px;margin:0 0 26px;box-shadow:var(--sh)}
+.blk.r{direction:rtl}.blk.r>*{direction:ltr}
+.blk h3{margin:0 0 8px;font-size:24px;color:var(--g)}.blk h4{margin:14px 0 2px;font:700 15px "Bricolage Grotesque",sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+.blk ul{margin:4px 0 8px;padding-left:20px}.blk li{margin:4px 0}
+.key{border-left:5px solid var(--am);background:var(--g2);padding:10px 14px;border-radius:0 10px 10px 0;margin:14px 0;font-size:16px}
+.figs{display:grid;gap:14px}
+figure{margin:0}figure img{width:100%;border-radius:10px;border:1px solid var(--line);cursor:zoom-in;display:block;transition:transform .2s;background:#fff}
+figure img:hover{transform:scale(1.02)}figure.sm img{max-width:120px;margin:auto}
+figcaption{font-size:14px;color:var(--mut);margin-top:6px}
+.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 26px}
+.tl div{background:var(--card);border-top:5px solid var(--g);padding:12px;border-radius:10px;font-size:15px;box-shadow:var(--sh)}
+.tl b{display:block;font:800 20px "Bricolage Grotesque",sans-serif;color:var(--g)}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden;box-shadow:var(--sh);font-size:15px;margin:0 0 26px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--g);color:#fff}.scroll{overflow-x:auto}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:10px 0}
+summary{cursor:pointer;font-weight:600}details p{margin:8px 0 0;color:var(--g)}
+.demo{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0}
+.demo button{font:600 15px "Bricolage Grotesque",sans-serif;padding:8px 14px;border-radius:8px;border:2px solid var(--g);background:var(--g);color:#fff;cursor:pointer}
+.demo button.gh{background:none;color:var(--g)}
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;place-items:center;z-index:9;cursor:zoom-out;padding:20px}
+.lb.open{display:grid}.lb img{max-width:100%;max-height:100%;border-radius:8px}
+:focus-visible{outline:3px solid var(--am);outline-offset:2px}
+footer{padding:30px 0;color:var(--mut);font-size:14px}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}nav{position:static;height:auto;border:0;display:flex;flex-wrap:wrap;gap:4px}nav b{width:100%}.hero,.blk{grid-template-columns:1fr}.blk.r{direction:ltr}.tl{grid-template-columns:1fr 1fr}}
+
+.hero{grid-template-columns:1.2fr 1fr}.hero .tl{grid-template-columns:1fr 1fr;margin:0}
+.tl3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 20px}
+.tl3 div{background:var(--card);border-top:5px solid var(--am);padding:14px;border-radius:10px;font-size:16px;box-shadow:var(--sh)}
+.tl3 b{display:block;font:700 19px "Bricolage Grotesque",sans-serif;color:var(--g);margin-bottom:4px}
+pre{background:#14231c;color:#e8f0eb;padding:16px;border-radius:12px;overflow-x:auto;font:14px/1.5 "Courier New",monospace;margin:0;align-self:start}
+code{font:.85em "Courier New",monospace;background:var(--g2);padding:1px 6px;border-radius:5px}
+details code{color:var(--ink)}details p code{color:var(--g)}
+h3.sub{font-size:26px;color:var(--g);margin:24px 0 6px}
+@media(max-width:900px){.tl3{grid-template-columns:1fr}.hero{grid-template-columns:1fr}}
+
+.lab{background:var(--card);border:2px dashed var(--g);border-radius:16px;padding:18px 22px;margin:22px 0}
+.lab h4{margin:14px 0 8px;font:700 17px "Bricolage Grotesque",sans-serif;color:var(--g)}.lab h4:first-child{margin-top:0}
+.bt{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0;font-size:16px}
+.lab button{font:600 15px "Bricolage Grotesque",sans-serif;padding:7px 14px;border-radius:8px;border:2px solid var(--g);background:var(--g);color:#fff;cursor:pointer}
+.lab button.gh{background:none;color:var(--g)}.lab input[type=text],.lab input:not([type]),.lab select{font:inherit;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.lab pre{margin:8px 0;white-space:pre-wrap;font-size:13px}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{font-weight:600;margin:6px 0}.bar{height:14px;background:var(--g2);border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;transition:width .2s}
+.flow{display:flex;flex-wrap:wrap;gap:8px}.flow span{flex:1;min-width:110px;text-align:center;padding:12px 6px;border:2px solid var(--line);border-radius:10px;font:600 14px "Bricolage Grotesque",sans-serif;transition:.2s}
+.flow span.on{background:var(--am);border-color:var(--am);color:#14231c;transform:scale(1.05)}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+.gp{margin-top:16px;padding:10px;border-radius:10px;background:var(--g2);color:var(--g);font:700 15px "Bricolage Grotesque",sans-serif;text-align:center}
+details.qs{padding:14px 18px}details.qs .en{color:var(--ink);margin:10px 0 6px}details.qs details{margin:10px 0 0;background:var(--bg)}
+details.qs pre{margin:10px 0 0;white-space:pre-wrap;font-size:13px}.dn{display:block;font:600 15px "Bricolage Grotesque",sans-serif;color:var(--g);margin:6px 0}.lab,.bar{margin-top:6px}
+.bar{height:14px;background:var(--g2);border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--g);transition:width .3s}
+.net{margin-top:10px;text-align:center;font:600 13px "Bricolage Grotesque",sans-serif;color:var(--mut)}.ok{color:var(--g);font-weight:700}.ko{color:var(--bad);font-weight:700}.bd{font:600 13px "Bricolage Grotesque",sans-serif;margin-left:8px}
+.act{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 4px}.act button{font:600 15px "Bricolage Grotesque",sans-serif;padding:8px 14px;border-radius:8px;border:2px solid var(--g);background:none;color:var(--g);cursor:pointer}.act button.on{background:var(--g);color:#fff}.act button[data-a=aide]{border-color:var(--bad);color:var(--bad)}.act button[data-a=aide].on{background:var(--bad);color:#fff}
+pre.c{white-space:pre;margin:10px 0}section .bar{margin:0 0 14px}
+.shots{display:flex;flex-wrap:wrap;gap:16px;margin:12px 0}.shots figure{margin:0}.shots img{max-width:100%;border:1px solid var(--line);border-radius:8px;cursor:zoom-in;background:#fff}
+.key ul{margin:6px 0 0;padding-left:20px}.cap{margin:14px 0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.drop{border:2px dashed var(--g);border-radius:12px;padding:16px;text-align:center;color:var(--mut);margin:8px 0}.drop:focus{outline:3px solid var(--am);background:var(--g2)}.fl{color:var(--g);text-decoration:underline;cursor:pointer}
+.pv{max-width:280px;border-radius:8px;border:1px solid var(--line);margin-top:6px}.btnl{display:inline-block;background:var(--g);color:#fff;padding:12px 22px;border-radius:10px;font:700 17px "Bricolage Grotesque",sans-serif;text-decoration:none}
+.tm{display:inline-block;font:600 13px "Bricolage Grotesque",sans-serif;background:var(--g2);color:var(--g);padding:2px 10px;border-radius:99px;margin-left:8px;vertical-align:middle;white-space:nowrap}
+section>h2 .tm{font-size:15px}
+.plan td.mt{white-space:nowrap}.plan tr.tot td{font-weight:800;background:var(--g2);color:var(--g)}.plan a{color:inherit}
+
+.cds{margin:6px 0;font:600 14px "Bricolage Grotesque",sans-serif}
+.src{width:100%;min-height:180px;font:13px/1.45 "Courier New",monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px;resize:vertical;white-space:pre;tab-size:4}
+.cap button.sendc,#bnot{font:600 15px "Bricolage Grotesque",sans-serif;padding:7px 14px;border-radius:8px;border:2px solid var(--g);background:var(--g);color:#fff;cursor:pointer}#bnot{background:none;color:var(--g);margin-top:10px;width:100%;font-size:13px}
+.fb{margin:10px 0}.fbi{padding:8px 12px;border-radius:8px;margin:6px 0;font-size:15px;border-left:5px solid var(--am);background:var(--g2)}.fbi.valide{border-color:var(--g)}.fbi.rejete{border-color:var(--bad)}
+.rep{font-size:15px;border-color:var(--g)}.rep h5{margin:10px 0 2px;font:700 14px "Bricolage Grotesque",sans-serif}.rep ul{margin:4px 0;padding-left:20px}.rep p{margin:4px 0;color:var(--ink)}.rep .ok{color:var(--g)}.rep .ko{color:var(--bad)}
+#toasts{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:20;display:grid;gap:8px;max-width:min(360px,92vw)}.toast{background:var(--g);color:#fff;padding:12px 16px;border-radius:10px;box-shadow:var(--sh);font:600 15px "Bricolage Grotesque",sans-serif;cursor:pointer}.toast.ko{background:var(--bad)}
+
+.brand{display:grid;grid-template-columns:150px 1fr;gap:24px;align-items:center;padding:28px 0 0}
+.brand .logo{width:150px;height:150px;object-fit:contain}
+.brand h2{margin:0;font-size:clamp(20px,2.6vw,28px);color:var(--g);letter-spacing:-.01em}.brand .bs{margin:2px 0 10px;color:var(--mut);font-size:16px}
+.brand dl{display:grid;grid-template-columns:max-content 1fr;gap:3px 14px;margin:0;font-size:15px}.brand dt{font:700 13px "Bricolage Grotesque",sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);padding-top:2px}.brand dd{margin:0}
+.labs,.nl{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0}.nl{margin:0 0 14px}
+.labs a,.nl a{display:inline-block;padding:7px 16px;border:2px solid var(--g);border-radius:99px;color:var(--g);text-decoration:none;font:700 15px "Bricolage Grotesque",sans-serif}
+.labs a.cur,.nl a.cur{background:var(--g);color:#fff}.nl a{padding:4px 10px;font-size:13px;margin:0}
+#nextlab a{font:700 17px "Bricolage Grotesque",sans-serif;color:var(--g)}
+@media(max-width:900px){.brand{grid-template-columns:1fr;justify-items:center;text-align:center}.brand dl{text-align:left}}
+@media print{nav,.act,.cap,.labs{display:none}}
+
+.brand{display:grid;grid-template-columns:150px 1fr;gap:24px;align-items:center;padding:28px 0 0}
+.brand .logo{width:150px;height:150px;object-fit:contain}
+.brand h2{margin:0;font-size:clamp(20px,2.6vw,28px);color:var(--g);letter-spacing:-.01em}.brand .bs{margin:2px 0 10px;color:var(--mut);font-size:16px}
+.brand dl{display:grid;grid-template-columns:max-content 1fr;gap:3px 14px;margin:0;font-size:15px}.brand dt{font:700 13px "Bricolage Grotesque",sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);padding-top:2px}.brand dd{margin:0}
+.labs,.nl{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0}.nl{margin:0 0 14px}
+.labs a,.nl a{display:inline-block;padding:7px 16px;border:2px solid var(--g);border-radius:99px;color:var(--g);text-decoration:none;font:700 15px "Bricolage Grotesque",sans-serif}
+.labs a.cur,.nl a.cur{background:var(--g);color:#fff}.nl a{padding:4px 10px;font-size:13px}
+.cp{float:right;font:600 13px "Bricolage Grotesque",sans-serif;padding:4px 10px;border-radius:6px;border:2px solid var(--g);background:none;color:var(--g);cursor:pointer;margin:6px 0 0 8px}
+.nx{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:30px 0}.nx a{font:700 17px "Bricolage Grotesque",sans-serif;color:var(--g)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:26px 0}.card{display:block;background:var(--card);border-top:5px solid var(--g);border-radius:12px;padding:18px;box-shadow:var(--sh);color:inherit;text-decoration:none}.card b{display:block;font:800 22px "Bricolage Grotesque",sans-serif;color:var(--g)}.card small{color:var(--mut)}
+@media(max-width:900px){.brand{grid-template-columns:1fr;justify-items:center;text-align:center}.brand dl{text-align:left}.cards{grid-template-columns:1fr}}
+@media print{nav,.act,.labs,.cp{display:none}}
+
+.qc{background:var(--card);border-radius:16px;padding:20px 24px;margin:0 0 20px;box-shadow:var(--sh)}
+.qc h3{margin:0 0 8px;font-size:20px;color:var(--g)}.qc pre{margin:10px 0;white-space:pre-wrap}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:8px 12px;margin:6px 0;border:2px solid var(--line);border-radius:10px;cursor:pointer}
+.opt:hover{border-color:var(--g)}.opt input{margin-top:6px}.opt code{background:none;padding:0;font-size:.95em}
+.opt.sel{border-color:var(--g);background:var(--g2)}.opt.good{border-color:var(--g);background:var(--g2)}.opt.bad{opacity:.75}
+.tb{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line);font:600 15px "Bricolage Grotesque",sans-serif}
+.tb button,.go{font:600 15px "Bricolage Grotesque",sans-serif;padding:7px 14px;border-radius:8px;border:2px solid var(--g);background:var(--g);color:#fff;cursor:pointer}
+.tb button.gh{background:none;color:var(--g)}.tb input{font:inherit;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
+#tm{font-size:20px;color:var(--g)}#tm.low{color:var(--bad)}.key{margin:14px 0}
+.sum{width:auto}.sum td,.sum th{text-align:center}
+</style></head><body><main style="max-width:900px;margin:auto;padding:0 20px 70px">
+<div class="brand"><img class="logo" src="logo.png" alt="Université d'Alger 1 logo" onerror="this.style.display='none'"><div class="bi"><h2>Université d'Alger 1 – Benyoucef Benkhedda</h2><p class="bs">Faculty of Sciences · Computer Science Department</p><dl><dt>Module</dt><dd>NoSQL &amp; Cloud Databases</dd><dt>Level</dt><dd>Master 2 – ASD</dd><dt>Instructor</dt><dd>Dr. Izountar Yousra</dd><dt>Academic year</dt><dd>2026 / 2027</dd><dt>Document</dt><dd>Lab 3 – Quiz answers (instructor)</dd></dl></div></div>
+<h1 style="font-size:clamp(28px,4.4vw,46px);margin:26px 0 8px">Lab 3 · Quiz answers</h1>
+<div class="key"><b>Answer key:</b> <b>1</b>-B · <b>2</b>-C · <b>3</b>-A · <b>4</b>-C · <b>5</b>-A · <b>6</b>-B · <b>7</b>-A · <b>8</b>-C · <b>9</b>-B · <b>10</b>-C</div>
+<p style="color:var(--mut)">Instructor copy: do not share this page with students before the quiz. Same data as the quiz: <a href="lab3-qcm-c6e61690.html">open the quiz</a>.</p>
+<div class="qc"><h3>Question 1 — answer B</h3><p>How many documents does this query return?</p><pre>db.students.find({ average: { $gte: 15 } })</pre><div class="opt bad"><span><b>A.</b> <code>2</code></span></div><div class="opt good"><span><b>B.</b> <code>3</code> &nbsp;✔</span></div><div class="opt bad"><span><b>C.</b> <code>4</code></span></div><div class="opt bad"><span><b>D.</b> <code>5</code></span></div><div class="key"><b>Explanation:</b> Yasmine (16.2), Lina (17.1) and Sarah (15.4): 3 documents. Amine has 14.5, so he is not included ($gte: greater than or equal).</div></div><div class="qc"><h3>Question 2 — answer C</h3><p>Which query returns the students living in Oran <b>or</b> Annaba?</p><div class="opt bad"><span><b>A.</b> <code>db.students.find({ city: &quot;Oran&quot;, city: &quot;Annaba&quot; })</code></span></div><div class="opt bad"><span><b>B.</b> <code>db.students.find({ $and: [ { city: &quot;Oran&quot; }, { city: &quot;Annaba&quot; } ] })</code></span></div><div class="opt good"><span><b>C.</b> <code>db.students.find({ city: { $in: [&quot;Oran&quot;, &quot;Annaba&quot;] } })</code> &nbsp;✔</span></div><div class="opt bad"><span><b>D.</b> <code>db.students.find({ city: { $and: [&quot;Oran&quot;, &quot;Annaba&quot;] } })</code></span></div><div class="key"><b>Explanation:</b> <code>$in</code> accepts any of the listed values. A: the key <code>city</code> is written twice, the second one replaces the first, so only Annaba is searched. B: nobody lives in both cities, the result is empty. D: <code>$and</code> is not a field operator, MongoDB reports an error.</div></div><div class="qc"><h3>Question 3 — answer A</h3><p>What does this query display?</p><pre>db.students.find(
+  { speciality: &quot;ASD&quot;, average: { $lt: 15 } },
+  { name: 1, _id: 0 }
+)</pre><div class="opt good"><span><b>A.</b> <code>Amine and Nadia</code> &nbsp;✔</span></div><div class="opt bad"><span><b>B.</b> <code>Amine, Yasmine and Nadia</code></span></div><div class="opt bad"><span><b>C.</b> <code>Nadia only</code></span></div><div class="opt bad"><span><b>D.</b> <code>Karim, Samir and Walid</code></span></div><div class="key"><b>Explanation:</b> Two fields in the same filter mean AND. The ASD students are Amine (14.5), Yasmine (16.2), Lina (17.1), Nadia (13.0) and Sarah (15.4); only Amine and Nadia are below 15. The projection keeps the name and hides the _id. Karim, Samir and Walid are SIC students.</div></div><div class="qc"><h3>Question 4 — answer C</h3><p>Which students does this query return?</p><pre>db.students.find({
+  $or: [ { average: { $lt: 10 } }, { average: { $gt: 17 } } ]
+})</pre><div class="opt bad"><span><b>A.</b> <code>Lina only</code></span></div><div class="opt bad"><span><b>B.</b> <code>Samir and Walid</code></span></div><div class="opt good"><span><b>C.</b> <code>Lina, Samir and Walid</code> &nbsp;✔</span></div><div class="opt bad"><span><b>D.</b> <code>Lina, Samir, Walid and Karim</code></span></div><div class="key"><b>Explanation:</b> Samir has 9.5, Walid 8.7 (both below 10) and Lina 17.1 (above 17). Karim has 11.8: he matches neither condition.</div></div><div class="qc"><h3>Question 5 — answer A</h3><p>Which students does this query return?</p><pre>db.students.find({ modules: { $all: [&quot;NoSQL&quot;, &quot;ML&quot;] } })</pre><div class="opt good"><span><b>A.</b> <code>Yasmine, Lina and Sarah</code> &nbsp;✔</span></div><div class="opt bad"><span><b>B.</b> <code>Amine, Yasmine, Lina, Samir and Sarah</code></span></div><div class="opt bad"><span><b>C.</b> <code>Yasmine and Lina</code></span></div><div class="opt bad"><span><b>D.</b> <code>Lina only</code></span></div><div class="key"><b>Explanation:</b> <code>$all</code> requires every listed value in the array: Yasmine [NoSQL, ML, BI], Lina [NoSQL, ML] and Sarah [NoSQL, ML, BI]. Option B lists all the students who follow NoSQL, whether or not they follow ML.</div></div><div class="qc"><h3>Question 6 — answer B</h3><p>What does this query return?</p><pre>db.students.countDocuments({ scholarship: { $exists: true } })</pre><div class="opt bad"><span><b>A.</b> <code>3</code></span></div><div class="opt good"><span><b>B.</b> <code>4</code> &nbsp;✔</span></div><div class="opt bad"><span><b>C.</b> <code>5</code></span></div><div class="opt bad"><span><b>D.</b> <code>8</code></span></div><div class="key"><b>Explanation:</b> <code>$exists: true</code> tests the presence of the field, not its value. Amine, Lina and Sarah have <code>true</code> and Nadia has <code>false</code>: the field exists for these 4 students.</div></div><div class="qc"><h3>Question 7 — answer A</h3><p>Which students does this query return?</p><pre>db.students.find({ modules: { $in: [&quot;NoSQL&quot;], $nin: [&quot;ML&quot;] } })</pre><div class="opt good"><span><b>A.</b> <code>Amine and Samir</code> &nbsp;✔</span></div><div class="opt bad"><span><b>B.</b> <code>Amine, Yasmine, Lina, Samir and Sarah</code></span></div><div class="opt bad"><span><b>C.</b> <code>Yasmine, Lina and Sarah</code></span></div><div class="opt bad"><span><b>D.</b> <code>Amine only</code></span></div><div class="key"><b>Explanation:</b> The students who follow NoSQL are Amine, Yasmine, Lina, Samir and Sarah; among them, Yasmine, Lina and Sarah also follow ML and are excluded by <code>$nin</code>. Remaining: Amine [NoSQL, BI] and Samir [Web, NoSQL].</div></div><div class="qc"><h3>Question 8 — answer C</h3><p>A student wants the students aged 23 to 25 inclusive and writes this query. How many documents does it really return?</p><pre>db.students.countDocuments({
+  age: { $gte: 23 },
+  age: { $lte: 25 }
+})</pre><div class="opt bad"><span><b>A.</b> <code>4</code></span></div><div class="opt bad"><span><b>B.</b> <code>5</code></span></div><div class="opt good"><span><b>C.</b> <code>7</code> &nbsp;✔</span></div><div class="opt bad"><span><b>D.</b> <code>8</code></span></div><div class="key"><b>Explanation:</b> The key <code>age</code> appears twice: the second condition replaces the first, so the query is only <code>age &lt;= 25</code>. Everybody except Walid (26) matches: 7 documents. The right query is <code>{ age: { $gte: 23, $lte: 25 } }</code>, which returns 4.</div></div><div class="qc"><h3>Question 9 — answer B</h3><p>The 8 students are untouched. What is <code>matchedCount</code> of this command?</p><pre>db.students.updateMany(
+  { average: { $gte: 12, $lt: 14 } },
+  { $set: { mention: &quot;Fair&quot; } }
+)</pre><div class="opt bad"><span><b>A.</b> <code>0</code></span></div><div class="opt good"><span><b>B.</b> <code>1</code> &nbsp;✔</span></div><div class="opt bad"><span><b>C.</b> <code>2</code></span></div><div class="opt bad"><span><b>D.</b> <code>3</code></span></div><div class="key"><b>Explanation:</b> Only Nadia (13.0) has an average from 12 (included) to 14 (excluded). Karim has 11.8, which is below 12.</div></div><div class="qc"><h3>Question 10 — answer C</h3><p>Each student with an average of 12 or more now has a <code>mention</code> field (Very Good, Good or Fair). What is <code>deletedCount</code>?</p><pre>db.students.deleteMany({ mention: { $exists: false } })</pre><div class="opt bad"><span><b>A.</b> <code>1</code></span></div><div class="opt bad"><span><b>B.</b> <code>2</code></span></div><div class="opt good"><span><b>C.</b> <code>3</code> &nbsp;✔</span></div><div class="opt bad"><span><b>D.</b> <code>5</code></span></div><div class="key"><b>Explanation:</b> The students below 12 have no mention: Karim (11.8), Samir (9.5) and Walid (8.7), i.e. 3 documents. The 5 others (Lina, Yasmine, Sarah, Amine, Nadia) have one.</div></div></main></body></html>
