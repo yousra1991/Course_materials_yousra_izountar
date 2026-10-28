@@ -505,17 +505,14 @@ IA    ← Sara, Yacine, Lina      → 3</pre><p><code>_id: "$modules"</code> : u
 
 <!-- 43 -->
 <section class="slide mg"><div class="kicker">8. Validation et index</div><h2>8. Validation et index</h2><div class="blk"><div><h3>Valider avec $jsonSchema</h3><p>Des règles au niveau de la collection garantissent la qualité des données : champs obligatoires, types corrects, plages de valeurs. MongoDB reste flexible, mais les données restent correctes.</p><div class="key">Le mot-clé <code>validator</code> est toujours nécessaire à la création d’une collection avec règles.</div></div>
-<pre>db.createCollection("etudiants", {
- validator: { $jsonSchema: {
-  bsonType: "object",
-  required: ["nom", "moyenne"],
-  properties: {
-   nom: { bsonType: "string" },
-   moyenne: { bsonType: "double",
-     minimum: 0, maximum: 20 } } } } })
-
-insertOne({ nom: "Amina", moyenne: 15 })  // OK
-insertOne({ nom: "Ali",   moyenne: 25 })  // Erreur</pre></div><h3 class="sub">Validation commentée</h3><div class="footer"><span>8. Validation et index</span><span>43 / 56</span></div></section>
+<pre>db.createCollection("etudiants", {        // crée la collection avec des options
+ validator: { $jsonSchema: {              // validator = « contrôle à l'entrée » ; $jsonSchema = les règles
+  bsonType: "object",                     // chaque document doit être un objet { … }
+  required: ["nom", "moyenne"],           // ces 2 champs sont obligatoires
+  properties: {                           // règles champ par champ :
+   nom: { bsonType: "string" },           //   nom doit être du texte
+   moyenne: { bsonType: "double",         //   moyenne doit être un nombre décimal
+     minimum: 0, maximum: 20 } } } } })   //   compris entre 0 et 20</pre></div><h3 class="sub">Validation commentée</h3><div class="footer"><span>8. Validation et index</span><span>43 / 56</span></div></section>
 
 <!-- 44 -->
 <section class="slide mg"><div class="kicker">8. Validation et index</div><h2>Créer une collection avec $jsonSchema</h2><div class="ex"><p class="lead">Les règles s’appliquent à chaque insertion.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>db.createCollection("etudiants", {</td><td>Crée la collection <code>etudiants</code> avec des options.</td></tr><tr><td>  validator: { $jsonSchema: {</td><td><code>validator</code> déclare les règles ; <code>$jsonSchema</code> les décrit.</td></tr><tr><td>    bsonType: "object",</td><td>Chaque document doit être un objet.</td></tr><tr><td>    required: ["nom", "moyenne"],</td><td>Les champs <code>nom</code> et <code>moyenne</code> sont obligatoires.</td></tr><tr><td>    properties: {</td><td>Début des règles champ par champ.</td></tr><tr><td>      nom: { bsonType: "string" },</td><td><code>nom</code> doit être une chaîne de caractères.</td></tr><tr><td>      moyenne: { bsonType: "double", minimum: 0, maximum: 20 }</td><td><code>moyenne</code> doit être un décimal compris entre 0 et 20.</td></tr><tr><td>    } } }</td><td>Fermeture des blocs <code>properties</code>, <code>$jsonSchema</code> et <code>validator</code>.</td></tr><tr><td>})</td><td>Fin de <code>createCollection</code>.</td></tr><tr><td>db.etudiants.insertOne({ nom: "Amina", moyenne: 15 })</td><td>✔ Accepté : respecte toutes les règles.</td></tr><tr><td>db.etudiants.insertOne({ nom: "Ali", moyenne: 25 })</td><td>✘ Refusé : 25 dépasse le maximum de 20 (erreur de validation).</td></tr><tr><td>db.etudiants.insertOne({ moyenne: 12 })</td><td>✘ Refusé : le champ obligatoire <code>nom</code> est absent.</td></tr></table></div></div><h3 class="sub">Indexation</h3><p class="lead">Un index fonctionne comme un annuaire téléphonique : accès rapide sans parcourir tous les documents. Gestion : <code>createIndex({ champ: 1 })</code>, <code>dropIndex("nom")</code>, <code>getIndexes()</code>.</p><div class="scroll"><table><tr><th>Type</th><th>Usage</th><th>Exemple</th></tr>
