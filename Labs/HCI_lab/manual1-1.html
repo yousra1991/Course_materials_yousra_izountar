@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>HCI – Interactive manual · Lab 1.1</title>
+<style>
+:root{--bg:#f2f5f1;--ink:#14231c;--mut:#4f6158;--g:#1f7a4d;--g2:#dcebe1;--am:#e6a92b;--card:#fff;--line:#c9d8cf;--sh:0 8px 28px rgba(20,35,28,.12);--bad:#b3261e}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1a15;--ink:#e8f0eb;--mut:#a3b5aa;--g:#5fcf94;--g2:#183226;--card:#16261e;--line:#2b4237;--sh:0 8px 28px rgba(0,0,0,.5);--bad:#ff8a80}}
+:root[data-theme=dark]{--bg:#0f1a15;--ink:#e8f0eb;--mut:#a3b5aa;--g:#5fcf94;--g2:#183226;--card:#16261e;--line:#2b4237;--sh:0 8px 28px rgba(0,0,0,.5);--bad:#ff8a80}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:calc(20px + env(safe-area-inset-top,0px))}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.65 "Source Serif 4",Georgia,serif}
+h1,h2,h3,nav,th{font-family:"Bricolage Grotesque","Segoe UI",Arial,sans-serif}
+.wrap{display:grid;grid-template-columns:250px 1fr;max-width:1300px;margin:auto}
+nav{position:sticky;top:0;height:100vh;padding:28px 20px;overflow:auto;border-right:1px solid var(--line)}
+nav b{display:block;font-size:20px;color:var(--g);margin-bottom:14px}
+nav a{display:block;padding:7px 10px;margin:2px 0;color:var(--mut);text-decoration:none;border-radius:8px;font-size:15px;font-weight:500}
+nav a:hover,nav a.on{background:var(--g2);color:var(--g)}
+main{padding:0 clamp(18px,4vw,56px) 80px;min-width:0}
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:36px;align-items:center;padding:56px 0 40px}
+.hero h1{font-size:clamp(34px,5.4vw,60px);line-height:1.02;margin:0 0 16px;font-weight:800;letter-spacing:-.03em}
+.hero p{color:var(--mut);margin:0 0 18px}.hero img{width:min(100%,260px);margin:auto;display:block;border-radius:50%;box-shadow:var(--sh)}
+.pill{display:inline-block;background:var(--g);color:#fff;padding:5px 14px;border-radius:99px;font:600 14px "Bricolage Grotesque",sans-serif;margin:0 6px 6px 0}
+section{padding:46px 0 10px;border-top:2px solid var(--line)}
+section>h2{font-size:clamp(28px,4vw,42px);margin:0 0 6px;letter-spacing:-.02em}
+.lead{color:var(--mut);margin:0 0 26px;max-width:62ch}
+.blk{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start;background:var(--card);border-radius:18px;padding:26px;margin:0 0 26px;box-shadow:var(--sh)}
+.blk.r{direction:rtl}.blk.r>*{direction:ltr}
+.blk h3{margin:0 0 8px;font-size:24px;color:var(--g)}.blk h4{margin:14px 0 2px;font:700 15px "Bricolage Grotesque",sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+.blk ul{margin:4px 0 8px;padding-left:20px}.blk li{margin:4px 0}
+.key{border-left:5px solid var(--am);background:var(--g2);padding:10px 14px;border-radius:0 10px 10px 0;margin:14px 0;font-size:16px}
+.figs{display:grid;gap:14px}
+figure{margin:0}figure img{width:100%;border-radius:10px;border:1px solid var(--line);cursor:zoom-in;display:block;transition:transform .2s;background:#fff}
+figure img:hover{transform:scale(1.02)}figure.sm img{max-width:120px;margin:auto}
+figcaption{font-size:14px;color:var(--mut);margin-top:6px}
+.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 26px}
+.tl div{background:var(--card);border-top:5px solid var(--g);padding:12px;border-radius:10px;font-size:15px;box-shadow:var(--sh)}
+.tl b{display:block;font:800 20px "Bricolage Grotesque",sans-serif;color:var(--g)}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden;box-shadow:var(--sh);font-size:15px;margin:0 0 26px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--g);color:#fff}.scroll{overflow-x:auto}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:10px 0}
+summary{cursor:pointer;font-weight:600}details p{margin:8px 0 0;color:var(--g)}
+.demo{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0}
+.demo button{font:600 15px "Bricolage Grotesque",sans-serif;padding:8px 14px;border-radius:8px;border:2px solid var(--g);background:var(--g);color:#fff;cursor:pointer}
+.demo button.gh{background:none;color:var(--g)}
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;place-items:center;z-index:9;cursor:zoom-out;padding:20px}
+.lb.open{display:grid}.lb img{max-width:100%;max-height:100%;border-radius:8px}
+:focus-visible{outline:3px solid var(--am);outline-offset:2px}
+footer{padding:30px 0;color:var(--mut);font-size:14px}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}nav{position:static;height:auto;border:0;display:flex;flex-wrap:wrap;gap:4px}nav b{width:100%}.hero,.blk{grid-template-columns:1fr}.blk.r{direction:ltr}.tl{grid-template-columns:1fr 1fr}}
+
+.hero{grid-template-columns:1.2fr 1fr}.hero .tl{grid-template-columns:1fr 1fr;margin:0}
+.tl3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 20px}
+.tl3 div{background:var(--card);border-top:5px solid var(--am);padding:14px;border-radius:10px;font-size:16px;box-shadow:var(--sh)}
+.tl3 b{display:block;font:700 19px "Bricolage Grotesque",sans-serif;color:var(--g);margin-bottom:4px}
+pre{background:#14231c;color:#e8f0eb;padding:16px;border-radius:12px;overflow-x:auto;font:14px/1.5 "Courier New",monospace;margin:0;align-self:start}
+code{font:.85em "Courier New",monospace;background:var(--g2);padding:1px 6px;border-radius:5px}
+details code{color:var(--ink)}details p code{color:var(--g)}
+h3.sub{font-size:26px;color:var(--g);margin:24px 0 6px}
+@media(max-width:900px){.tl3{grid-template-columns:1fr}.hero{grid-template-columns:1fr}}
+
+.lab{background:var(--card);border:2px dashed var(--g);border-radius:16px;padding:18px 22px;margin:22px 0}
+.lab h4{margin:14px 0 8px;font:700 17px "Bricolage Grotesque",sans-serif;color:var(--g)}.lab h4:first-child{margin-top:0}
+.bt{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0;font-size:16px}
+.lab button{font:600 15px "Bricolage Grotesque",sans-serif;padding:7px 14px;border-radius:8px;border:2px solid var(--g);background:var(--g);color:#fff;cursor:pointer}
+.lab button.gh{background:none;color:var(--g)}.lab input[type=text],.lab input:not([type]),.lab select{font:inherit;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.lab pre{margin:8px 0;white-space:pre-wrap;font-size:13px}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{font-weight:600;margin:6px 0}.bar{height:14px;background:var(--g2);border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;transition:width .2s}
+.flow{display:flex;flex-wrap:wrap;gap:8px}.flow span{flex:1;min-width:110px;text-align:center;padding:12px 6px;border:2px solid var(--line);border-radius:10px;font:600 14px "Bricolage Grotesque",sans-serif;transition:.2s}
+.flow span.on{background:var(--am);border-color:var(--am);color:#14231c;transform:scale(1.05)}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+.gp{margin-top:16px;padding:10px;border-radius:10px;background:var(--g2);color:var(--g);font:700 15px "Bricolage Grotesque",sans-serif;text-align:center}
+details.qs{padding:14px 18px}details.qs .en{color:var(--ink);margin:10px 0 6px}details.qs details{margin:10px 0 0;background:var(--bg)}
+details.qs pre{margin:10px 0 0;white-space:pre-wrap;font-size:13px}.dn{display:block;font:600 15px "Bricolage Grotesque",sans-serif;color:var(--g);margin:6px 0}.lab,.bar{margin-top:6px}
+.bar{height:14px;background:var(--g2);border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--g);transition:width .3s}
+.net{margin-top:10px;text-align:center;font:600 13px "Bricolage Grotesque",sans-serif;color:var(--mut)}.ok{color:var(--g);font-weight:700}.ko{color:var(--bad);font-weight:700}.bd{font:600 13px "Bricolage Grotesque",sans-serif;margin-left:8px}
+.act{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 4px}.act button{font:600 15px "Bricolage Grotesque",sans-serif;padding:8px 14px;border-radius:8px;border:2px solid var(--g);background:none;color:var(--g);cursor:pointer}.act button.on{background:var(--g);color:#fff}.act button[data-a=aide]{border-color:var(--bad);color:var(--bad)}.act button[data-a=aide].on{background:var(--bad);color:#fff}
+pre.c{white-space:pre;margin:10px 0}section .bar{margin:0 0 14px}
+.shots{display:flex;flex-wrap:wrap;gap:16px;margin:12px 0}.shots figure{margin:0}.shots img{max-width:100%;border:1px solid var(--line);border-radius:8px;cursor:zoom-in;background:#fff}
+.key ul{margin:6px 0 0;padding-left:20px}.cap{margin:14px 0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.drop{border:2px dashed var(--g);border-radius:12px;padding:16px;text-align:center;color:var(--mut);margin:8px 0}.drop:focus{outline:3px solid var(--am);background:var(--g2)}.fl{color:var(--g);text-decoration:underline;cursor:pointer}
+.pv{max-width:280px;border-radius:8px;border:1px solid var(--line);margin-top:6px}.btnl{display:inline-block;background:var(--g);color:#fff;padding:12px 22px;border-radius:10px;font:700 17px "Bricolage Grotesque",sans-serif;text-decoration:none}
+.tm{display:inline-block;font:600 13px "Bricolage Grotesque",sans-serif;background:var(--g2);color:var(--g);padding:2px 10px;border-radius:99px;margin-left:8px;vertical-align:middle;white-space:nowrap}
+section>h2 .tm{font-size:15px}
+.plan td.mt{white-space:nowrap}.plan tr.tot td{font-weight:800;background:var(--g2);color:var(--g)}.plan a{color:inherit}
+
+.cds{margin:6px 0;font:600 14px "Bricolage Grotesque",sans-serif}
+.src{width:100%;min-height:180px;font:13px/1.45 "Courier New",monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px;resize:vertical;white-space:pre;tab-size:4}
+.cap button.sendc,#bnot{font:600 15px "Bricolage Grotesque",sans-serif;padding:7px 14px;border-radius:8px;border:2px solid var(--g);background:var(--g);color:#fff;cursor:pointer}#bnot{background:none;color:var(--g);margin-top:10px;width:100%;font-size:13px}
+.fb{margin:10px 0}.fbi{padding:8px 12px;border-radius:8px;margin:6px 0;font-size:15px;border-left:5px solid var(--am);background:var(--g2)}.fbi.valide{border-color:var(--g)}.fbi.rejete{border-color:var(--bad)}
+.rep{font-size:15px;border-color:var(--g)}.rep h5{margin:10px 0 2px;font:700 14px "Bricolage Grotesque",sans-serif}.rep ul{margin:4px 0;padding-left:20px}.rep p{margin:4px 0;color:var(--ink)}.rep .ok{color:var(--g)}.rep .ko{color:var(--bad)}
+#toasts{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:20;display:grid;gap:8px;max-width:min(360px,92vw)}.toast{background:var(--g);color:#fff;padding:12px 16px;border-radius:10px;box-shadow:var(--sh);font:600 15px "Bricolage Grotesque",sans-serif;cursor:pointer}.toast.ko{background:var(--bad)}
+
+.brand{display:grid;grid-template-columns:150px 1fr;gap:24px;align-items:center;padding:28px 0 0}
+.brand .logo{width:150px;height:150px;object-fit:contain}
+.brand h2{margin:0;font-size:clamp(20px,2.6vw,28px);color:var(--g);letter-spacing:-.01em}.brand .bs{margin:2px 0 10px;color:var(--mut);font-size:16px}
+.brand dl{display:grid;grid-template-columns:max-content 1fr;gap:3px 14px;margin:0;font-size:15px}.brand dt{font:700 13px "Bricolage Grotesque",sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);padding-top:2px}.brand dd{margin:0}
+.labs,.nl{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0}.nl{margin:0 0 14px}
+.labs a,.nl a{display:inline-block;padding:7px 16px;border:2px solid var(--g);border-radius:99px;color:var(--g);text-decoration:none;font:700 15px "Bricolage Grotesque",sans-serif}
+.labs a.cur,.nl a.cur{background:var(--g);color:#fff}.nl a{padding:4px 10px;font-size:13px;margin:0}
+#nextlab a{font:700 17px "Bricolage Grotesque",sans-serif;color:var(--g)}
+@media(max-width:900px){.brand{grid-template-columns:1fr;justify-items:center;text-align:center}.brand dl{text-align:left}}
+@media print{nav,.act,.cap,.labs{display:none}}
+
+.brand{display:grid;grid-template-columns:150px 1fr;gap:24px;align-items:center;padding:28px 0 0}
+.brand .logo{width:150px;height:150px;object-fit:contain}
+.brand h2{margin:0;font-size:clamp(20px,2.6vw,28px);color:var(--g);letter-spacing:-.01em}.brand .bs{margin:2px 0 10px;color:var(--mut);font-size:16px}
+.brand dl{display:grid;grid-template-columns:max-content 1fr;gap:3px 14px;margin:0;font-size:15px}.brand dt{font:700 13px "Bricolage Grotesque",sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);padding-top:2px}.brand dd{margin:0}
+.labs,.nl{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0}.nl{margin:0 0 14px}
+.labs a,.nl a{display:inline-block;padding:7px 16px;border:2px solid var(--g);border-radius:99px;color:var(--g);text-decoration:none;font:700 15px "Bricolage Grotesque",sans-serif}
+.labs a.cur,.nl a.cur{background:var(--g);color:#fff}.nl a{padding:4px 10px;font-size:13px}
+.cp{float:right;font:600 13px "Bricolage Grotesque",sans-serif;padding:4px 10px;border-radius:6px;border:2px solid var(--g);background:none;color:var(--g);cursor:pointer;margin:6px 0 0 8px}
+.nx{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:30px 0}.nx a{font:700 17px "Bricolage Grotesque",sans-serif;color:var(--g)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:26px 0}.card{display:block;background:var(--card);border-top:5px solid var(--g);border-radius:12px;padding:18px;box-shadow:var(--sh);color:inherit;text-decoration:none}.card b{display:block;font:800 22px "Bricolage Grotesque",sans-serif;color:var(--g)}.card small{color:var(--mut)}
+@media(max-width:900px){.brand{grid-template-columns:1fr;justify-items:center;text-align:center}.brand dl{text-align:left}.cards{grid-template-columns:1fr}}
+@media print{nav,.act,.labs,.cp{display:none}}
+
+.lang{display:flex;gap:6px;margin:0 0 12px}.lang.top{justify-content:flex-end;padding-top:16px;margin:0}
+.lang button{font:700 13px "Bricolage Grotesque",sans-serif;padding:4px 12px;border-radius:99px;border:2px solid var(--g);background:none;color:var(--g);cursor:pointer}.lang button.on{background:var(--g);color:#fff}
+
+.mw{max-width:1180px;margin:0 auto;padding:16px}
+.stp{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0}.stp button{border:1.5px solid #1f7a4f;background:transparent;color:inherit;border-radius:999px;padding:5px 13px;font:600 13px inherit;cursor:pointer}
+.stp button.on{background:#1f7a4f;color:#fff}.stp button:disabled{opacity:.4;cursor:not-allowed}
+.expl{border-left:4px solid #e6a92b;padding:10px 16px;margin:8px 0 14px;background:rgba(230,169,43,.1);border-radius:6px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+@media(max-width:860px){.split{grid-template-columns:1fr}}
+.pn{border:1px solid #c9d6cf;border-radius:10px;overflow:hidden;background:#fff}
+.pn>h3{margin:0;padding:8px 14px;font:700 13px/1.4 sans-serif;background:#1f7a4f;color:#fff;display:flex;justify-content:space-between}
+.pn>h3 span{opacity:.85;font-weight:500}
+.ui{padding:18px;background:#e9efec;min-height:300px;display:flex;align-items:flex-start;justify-content:center;overflow:auto}
+.codep{background:#14231c;color:#e6efe9;padding:12px 0;overflow:auto;max-height:560px;font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;counter-reset:ln}
+.codep .ln{white-space:pre;padding:0 14px 0 8px;counter-increment:ln;min-width:max-content}
+.codep .ln::before{content:counter(ln);display:inline-block;width:2.4em;margin-right:10px;text-align:right;color:#6d8579}
+.codep .ln.nw{background:rgba(230,169,43,.22);box-shadow:inset 3px 0 #e6a92b}
+.codep i{font-style:normal}.codep i::before{content:attr(data-t)}.codep i.u::before{content:none}
+.codep i.k{color:#7fd3a8}.codep i.s{color:#f2c46d}.codep i.c{color:#8aa397}.codep i.m{color:#9ec8ff}
+.unlocked .codep{-webkit-user-select:text;user-select:text}
+.lockn{font-size:13px;margin:8px 0;padding:8px 12px;border-radius:8px;background:rgba(31,122,79,.1)}
+.unlocked .lockn{background:rgba(230,169,43,.18)}
+.fin{margin-top:16px;border:2px solid #1f7a4f;border-radius:10px;padding:14px 18px}
+.fin button,.fin a.go{background:#1f7a4f;color:#fff;border:0;border-radius:8px;padding:9px 16px;font:700 14px inherit;cursor:pointer;text-decoration:none;display:inline-block;margin:4px 6px 0 0}
+.nav2{display:flex;gap:8px;margin-top:12px}.nav2 button{border:1.5px solid #1f7a4f;background:#fff;color:#1f7a4f;border-radius:8px;padding:8px 18px;font:700 14px inherit;cursor:pointer}.nav2 button.p{background:#1f7a4f;color:#fff}.nav2 button:disabled{opacity:.4;cursor:not-allowed}
+@media print{.codep,.pn{display:none}body:after{content:"Printing is disabled for this manual.";font-size:20px}}
+/* mock swing */
+.scr{width:100%;max-width:330px;height:190px;border:3px solid #455;border-radius:8px;background:#9fb9c9;position:relative;overflow:hidden}
+.scrw{position:absolute;transition:all .5s}.scrw.tl{left:6px;top:6px}.scrw.c{left:50%;top:50%;transform:translate(-50%,-50%)}
+.scrl{position:absolute;bottom:3px;right:8px;font:600 10px sans-serif;color:#234}
+.swin{border:2px solid #333;background:#f0f0f0;border-radius:6px;font:13px sans-serif;color:#111;position:relative;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.swt{background:#0078d7;color:#fff;padding:4px 8px;font:700 12px sans-serif;display:flex;justify-content:space-between}
+.swb{padding:10px}
+.sl{font:13px sans-serif;color:#111}.stf{border:1px solid #888;background:#fff;padding:3px 4px;font:13px sans-serif;box-sizing:border-box;color:#111}
+.sbtn{border:1px solid #888;background:linear-gradient(#fafafa,#ddd);border-radius:4px;padding:5px 12px;font:13px sans-serif;cursor:pointer;color:#111}.sbtn:disabled{opacity:.5}
+.sbtn.def{border:2px solid #0078d7;font-weight:700}.sbtn.big{width:100%;padding:12px}
+.scb{display:inline-block;border:1px solid #888;background:#fff;padding:3px 8px;min-width:80px}
+.src,.sck{display:inline-flex;gap:5px;align-items:center;margin:2px 8px 2px 0;cursor:pointer}
+.src i{width:12px;height:12px;border:1px solid #666;border-radius:50%;background:#fff;display:inline-block}.src.on i{background:radial-gradient(#0078d7 45%,#fff 50%)}
+.sck i{width:12px;height:12px;border:1px solid #666;background:#fff;display:inline-block;font:9px/12px sans-serif;color:transparent;text-align:center}.sck.on i{color:#0078d7;font-weight:700}
+.ssp{display:inline-flex;border:1px solid #888;background:#fff;padding:2px 6px;gap:8px}.ssp b{font-size:9px}
+.ssl{display:inline-block;width:90px;height:14px;position:relative;vertical-align:middle}.ssl u{position:absolute;left:0;right:0;top:6px;height:3px;background:#999}.ssl i{position:absolute;top:1px;width:10px;height:12px;background:#0078d7;border-radius:2px}
+.sta{border:1px solid #888;background:#fff;padding:4px;color:#777;font-size:12px}
+.sgrid{display:grid;align-items:center}.scol{display:flex;flex-direction:column;gap:4px}
+.stabs{display:flex;gap:2px;border-bottom:1px solid #999}.tab{padding:4px 10px;border:1px solid #999;border-bottom:0;background:#ddd;border-radius:4px 4px 0 0;cursor:pointer;font-size:12px}.tab.on{background:#fff;font-weight:700}
+.panes{background:#fff;border:1px solid #999;border-top:0;padding:10px;min-height:90px}
+.smb{display:flex;gap:2px;background:#e8e8e8;border-bottom:1px solid #aaa;margin:-10px -10px 8px;padding:2px 4px;font-size:12px}.smb span{padding:2px 8px}
+.sbs{display:flex;justify-content:center;gap:8px;margin-top:10px}.sbs.right{justify-content:flex-end}
+.stb{border-collapse:collapse;width:100%;font-size:12px}.stb th,.stb td{border:1px solid #bbb;padding:3px 6px;text-align:left}.stb th{background:#eee}
+.sfs{border:1px solid #999;border-radius:4px;margin:0 0 8px;padding:8px}.sfs legend{font-size:12px;padding:0 4px}
+.sbl{display:grid;grid-template-columns:auto 1fr;grid-template-areas:"n n" "w c";gap:6px;min-width:260px}.sbl .n{grid-area:n}.sbl .w{grid-area:w}.sbl .c{grid-area:c}
+.dlg{position:absolute;inset:0;background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;border-radius:4px}.dlg[hidden]{display:none}
+.dlg div{background:#f0f0f0;border:2px solid #333;border-radius:6px;padding:12px 16px;max-width:80%;text-align:center;font-size:13px}.dlg button{margin:8px 3px 0}
+.spg{height:12px;border:1px solid #888;background:#fff;margin-bottom:8px;overflow:hidden;border-radius:3px}.spg[hidden]{display:none}.spg i{display:block;height:100%;width:30%;background:#0078d7;animation:sl 1s linear infinite}@keyframes sl{from{margin-left:-30%}to{margin-left:100%}}
+.hintui{font-size:12px;margin:6px 0 0;color:#555}
+</style></head><body>
+<div class="mw">
+<div class="brand"><img class="logo" src="logo.png" alt="Université d'Alger 1 logo" onerror="this.style.display='none'"><div class="bi"><h2>Université d'Alger 1 – Benyoucef Benkhedda</h2><p class="bs">Faculty of Sciences · Computer Science Department</p><dl><dt>Module</dt><dd>Human-Computer Interaction (HCI)</dd><dt>Level</dt><dd>L3 – Semester 5 (ISIL, SI)</dd><dt>Instructor</dt><dd>Dr. Izountar Yousra</dd><dt>Academic year</dt><dd>2026 / 2027</dd><dt>Document</dt><dd>Interactive manual · Lab 1.1</dd><dt>Linked lab</dt><dd><a href="lab1-1.html">Lab 1.1</a> · <a href="../../index.html">Home</a></dd></dl></div></div>
+<header class="hero"><div><span class="pill">Manual</span><span class="pill">Lab 1.1</span><h1>Interactive manual · Lab 1.1</h1><p>Follow a <b>different</b> example (a tea-timer window) built step by step. On the left you see what happens on the interface, on the right the code that produces it. Then you do your own exercise in the lab.</p></div></header>
+<section><h2>Objectives</h2><div class="key"><b>By the end of this manual you will be able to:</b><ul><li>See how a <code>JFrame</code> is created, sized, centred and closed.</li><li>See how <code>JLabel</code>, <code>JTextField</code> and <code>JButton</code> are added to a window.</li><li>Understand why a layout manager is needed before adding several components.</li></ul></div>
+<div class="lockn" id="lockn">🔒 <b>The code on the right cannot be selected or copied</b> until you reach the exercise at the end. Read it, understand it, then <b>write your own code</b> in the lab: the example here is <b>not</b> your exercise.</div></section>
+<section><div class="stp" id="stp"></div>
+<h2 id="st"></h2><div class="expl" id="sx"></div>
+<div class="split"><div class="pn"><h3>What happens on the interface <span>screen</span></h3><div class="ui" id="ui"></div></div>
+<div class="pn"><h3>The code <span>TeaTimer.java</span></h3><div class="codep" id="code" oncontextmenu="return !document.body.classList.contains('unl')?false:true"></div></div></div>
+<div class="hintui" id="hint"></div>
+<div class="nav2"><button id="prev">← Previous</button><button class="p" id="next">Next →</button></div>
+<div class="fin" id="fin" hidden><h3>Your turn: the exercise</h3><p>You have seen the whole example. The code of this manual is now <b>unlocked</b> (you can select it if you need to re-read it), but your exercise is different: open the lab and build it <b>yourself</b>.</p><button id="unl">🔓 Unlock the code</button><a class="go" href="lab1-1.html">Go to Lab 1.1 →</a></div>
+</section>
+<footer>Human-Computer Interaction · Université d'Alger 1</footer></div>
+<script id="data" type="application/json">{"steps": [{"t": "1 · An empty window", "x": "A window is a class that <b>extends <code>JFrame<\/code><\/b>. In the constructor you give it a title and a size. <code>main<\/code> creates the window and makes it visible with <code>setVisible(true)<\/code>. Look at the left: the window exists, but it sits in the <b>corner<\/b> of the screen, and closing it would not stop the program.", "c": "import javax.swing.*;\n\npublic class TeaTimer extends JFrame {\n    public TeaTimer() {\n        setTitle(\"Tea Timer\");\n        setSize(320, 160);\n    }\n\n    public static void main(String[] args) {\n        new TeaTimer().setVisible(true);\n    }\n}\n", "u": "<div class=\"scr\"><div class=\"scrw tl\"><div class=\"swin\" style=\"width:150px;max-width:100%;\"><div class=\"swt\">Tea Timer<span>– ▢ ✕<\/span><\/div><div class=\"swb\"><\/div><div class=\"dlg\" hidden><\/div><\/div><\/div><div class=\"scrl\">your screen<\/div><\/div>"}, {"t": "2 · Centre it and stop the program on close", "x": "<code>setLocationRelativeTo(null)<\/code> centres the window on the screen. <code>setDefaultCloseOperation(EXIT_ON_CLOSE)<\/code> ends the program when you click the ✕. The two new lines are highlighted on the right.", "c": "import javax.swing.*;\n\npublic class TeaTimer extends JFrame {\n    public TeaTimer() {\n        setTitle(\"Tea Timer\");\n        setSize(320, 160);\n        setLocationRelativeTo(null);\n        setDefaultCloseOperation(EXIT_ON_CLOSE);\n    }\n\n    public static void main(String[] args) {\n        new TeaTimer().setVisible(true);\n    }\n}\n", "u": "<div class=\"scr\"><div class=\"scrw c\"><div class=\"swin\" style=\"width:150px;max-width:100%;\"><div class=\"swt\">Tea Timer<span>– ▢ ✕<\/span><\/div><div class=\"swb\"><\/div><div class=\"dlg\" hidden><\/div><\/div><\/div><div class=\"scrl\">your screen<\/div><\/div>"}, {"t": "3 · Add a label", "x": "Components are placed by a <b>layout manager<\/b>. <code>FlowLayout<\/code> places them one after the other, centred, line by line. A <code>JLabel<\/code> shows a fixed text. Do not forget the <code>import java.awt.*;<\/code> for <code>FlowLayout<\/code>.", "c": "import javax.swing.*;\nimport java.awt.*;\n\npublic class TeaTimer extends JFrame {\n    public TeaTimer() {\n        setTitle(\"Tea Timer\");\n        setSize(320, 160);\n        setLocationRelativeTo(null);\n        setDefaultCloseOperation(EXIT_ON_CLOSE);\n\n        setLayout(new FlowLayout());\n        add(new JLabel(\"Minutes:\"));\n    }\n\n    public static void main(String[] args) {\n        new TeaTimer().setVisible(true);\n    }\n}\n", "u": "<div class=\"swin\" style=\"width:320px;max-width:100%;height:120px\"><div class=\"swt\">Tea Timer<span>– ▢ ✕<\/span><\/div><div class=\"swb\"><span class=\"sl\" style=\"\">Minutes:<\/span><\/div><div class=\"dlg\" hidden><\/div><\/div>"}, {"t": "4 · Add a text field and a button", "x": "<code>new JTextField(5)<\/code> is a field about 5 characters wide, <code>new JButton(\"Start\")<\/code> a push button. Each <code>add(...)<\/code> puts the component after the previous one. <b>Without <code>setLayout<\/code><\/b>, the default layout of a <code>JFrame<\/code> is <code>BorderLayout<\/code>: every component would go to the centre and <b>only the last one would be visible<\/b>. Try typing in the field.", "c": "import javax.swing.*;\nimport java.awt.*;\n\npublic class TeaTimer extends JFrame {\n    public TeaTimer() {\n        setTitle(\"Tea Timer\");\n        setSize(320, 160);\n        setLocationRelativeTo(null);\n        setDefaultCloseOperation(EXIT_ON_CLOSE);\n\n        setLayout(new FlowLayout());\n        add(new JLabel(\"Minutes:\"));\n        add(new JTextField(5));\n        add(new JButton(\"Start\"));\n    }\n\n    public static void main(String[] args) {\n        new TeaTimer().setVisible(true);\n    }\n}\n", "u": "<div class=\"swin\" style=\"width:320px;max-width:100%;height:120px\"><div class=\"swt\">Tea Timer<span>– ▢ ✕<\/span><\/div><div class=\"swb\"><span class=\"sl\" style=\"\">Minutes:<\/span> <input class=\"stf\" style=\"width:60px\" value=\"\" data-f=\"\" placeholder=\"\"> <button class=\"sbtn \" data-act=\"\" data-msg=\"\" style=\"\">Start<\/button><\/div><div class=\"dlg\" hidden><\/div><\/div>"}]}</script>
+<script>
+const D=JSON.parse(document.getElementById('data').textContent),$=id=>document.getElementById(id),KEY='hcimanual-1.1';
+let cur=0,reach=0,unl=false;try{reach=+localStorage.getItem(KEY+'r')||0;unl=localStorage.getItem(KEY+'u')==='1'}catch(e){}
+const KW=/\b(import|public|class|extends|static|void|new|int|double|String|if|else|for|try|catch|return|this|true|false|null|private)\b/;
+const esc=t=>t.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+function span(c,t){return '<i class="'+c+'" data-t="'+esc(t)+'"></i>'}
+function lineHTML(l){let out='',i=0;const re=/(\/\/.*$)|("(?:[^"\\]|\\.)*")|(\b(?:import|public|class|extends|static|void|new|int|double|String|if|else|for|try|catch|return|this|true|false|null|private)\b)|(\b[A-Z][A-Za-z]*\b)/g;let m;
+ while((m=re.exec(l))){if(m.index>i)out+=span('p',l.slice(i,m.index));out+=span(m[1]?'c':m[2]?'s':m[3]?'k':'m',m[0]);i=m.index+m[0].length}
+ if(i<l.length)out+=span('p',l.slice(i));return out||span('p',' ')}
+function render(){const ci=Math.min(cur,D.steps.length-1),s=D.steps[ci],prev=ci?D.steps[ci-1].c.split('\n').map(x=>x.trim()):[];
+ $('st').textContent=s.t;$('sx').innerHTML=s.x;$('ui').innerHTML=s.u;
+ $('hint').textContent=s.hint?'Try it: click and type in the window on the left, it reacts like the real program.':'';
+ $('code').innerHTML=s.c.replace(/\n$/,'').split('\n').map(l=>'<div class="ln'+(ci&&l.trim()&&!prev.includes(l.trim())?' nw':'')+'">'+lineHTML(l)+'</div>').join('');
+ if(unl)unlock(true);
+ $('stp').innerHTML=D.steps.map((x,i)=>'<button data-i="'+i+'"'+(i>reach?' disabled':'')+(i===cur?' class="on"':'')+'>'+(i+1)+'</button>').join('')+'<button data-i="end"'+(reach<D.steps.length-1?' disabled':'')+(cur===D.steps.length?' class="on"':'')+'>Exercise</button>';
+ $('prev').disabled=cur===0;$('next').disabled=cur>=D.steps.length;$('next').textContent=cur===D.steps.length-1?'Finish →':'Next →';
+ $('fin').hidden=cur<D.steps.length}
+function unlock(q){document.body.classList.add('unl');document.body.parentElement.classList.add('unlocked');document.querySelectorAll('#code i').forEach(e=>{e.textContent=e.dataset.t;e.classList.add('u')});$('lockn').innerHTML='🔓 The code is unlocked.';$('unl').hidden=true;if(!q){try{localStorage.setItem(KEY+'u','1')}catch(e){}unl=true}}
+function go(i){cur=i;if(i<D.steps.length)reach=Math.max(reach,i);else reach=Math.max(reach,D.steps.length-1);try{localStorage.setItem(KEY+'r',reach)}catch(e){}render();window.scrollTo({top:$('stp').offsetTop-10,behavior:'smooth'})}
+$('next').onclick=()=>go(cur+1);$('prev').onclick=()=>go(cur-1);
+$('stp').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;go(b.dataset.i==='end'?D.steps.length:+b.dataset.i)};
+$('unl').onclick=()=>{unlock(false);if($('code').children.length)render()};
+['copy','cut','dragstart','selectstart'].forEach(ev=>document.addEventListener(ev,e=>{if(!document.body.classList.contains('unl')&&e.target.closest&&e.target.closest('#code')){e.preventDefault()}}));
+/* mock interface behaviour */
+function dlg(w,msg,btns){const d=w.querySelector('.dlg');d.hidden=false;d.innerHTML='<div>'+msg+'<br>'+(btns||'<button class="sbtn" data-close="1">OK</button>')+'</div>'}
+document.addEventListener('click',ev=>{const t=ev.target,ui=t.closest('#ui');if(!ui)return;const w=ui.querySelector('.swin');
+ if(t.closest('[data-close]')){w.querySelector('.dlg').hidden=true;if(t.dataset.close==='yes'){w.style.opacity=.25;dlg(w,'The window is closed (dispose). The program goes on.')}return}
+ const tab=t.closest('.tab');if(tab){ui.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===tab));ui.querySelectorAll('.pane').forEach(p=>p.hidden=p.dataset.pane!==tab.dataset.tab);return}
+ const r=t.closest('.src');if(r){r.parentElement.querySelectorAll('.src').forEach(x=>x.classList.remove('on'));r.classList.add('on');return}
+ const c=t.closest('.sck');if(c){c.classList.toggle('on');return}
+ const b=t.closest('[data-act]');if(!b)return;const a=b.dataset.act,out=ui.querySelector('.out'),f=n=>ui.querySelector('[data-f="'+n+'"]');
+ if(a==='dice')out.textContent=1+Math.floor(Math.random()*6);
+ else if(a==='double'){const v=parseFloat(f('in').value.replace(',','.'));isNaN(v)?dlg(w,'Please type a number.'):out.textContent=v*2}
+ else if(a==='dlg')dlg(w,b.dataset.msg);
+ else if(a==='place'){const n=f('cust').value.trim()||'(no name)';ui.querySelector('.rows').insertAdjacentHTML('beforeend','<tr><td>'+esc(n).replace(/&quot;/g,'"')+'</td><td>Medium</td><td>1</td></tr>');dlg(w,'Order placed. See the History tab.')}
+ else if(a==='sub4'){f('em').value.trim()?dlg(w,'(valid email: nothing else happens at this step)'):(dlg(w,'Please enter your email address.'),f('em').focus())}
+ else if(a==='can4')dlg(w,'Discard your subscription?','<button class="sbtn" data-close="yes">Yes</button><button class="sbtn" data-close="no">No</button>');
+ else if(a==='sub5'){if(!f('em').value.trim()){dlg(w,'Please enter your email address.');return}b.disabled=true;const p=w.querySelector('.spg');p.hidden=false;setTimeout(()=>{p.hidden=true;b.disabled=false;dlg(w,'Subscribed!')},3000)}
+});
+render();
+</script></body></html>
