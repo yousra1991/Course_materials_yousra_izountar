@@ -218,11 +218,15 @@ function span(c,t){return '<i class="'+c+'" data-t="'+esc(t)+'"></i>'}
 function lineHTML(l){let out='',i=0;const re=/(\/\/.*$)|("(?:[^"\\]|\\.)*")|(\b(?:import|public|class|extends|static|void|new|int|double|String|if|else|for|try|catch|return|this|true|false|null|private)\b)|(\b[A-Z][A-Za-z]*\b)/g;let m;
  while((m=re.exec(l))){if(m.index>i)out+=span('p',l.slice(i,m.index));out+=span(m[1]?'c':m[2]?'s':m[3]?'k':'m',m[0]);i=m.index+m[0].length}
  if(i<l.length)out+=span('p',l.slice(i));return out||span('p',' ')}
+function fitMock(root){root.querySelectorAll('.en>div').forEach(d=>{d.style.zoom='';const w=d.scrollWidth,a=root.clientWidth;if(a>0&&w>a+1)d.style.zoom=(a/w).toFixed(3)})}
+function fitAll(){document.querySelectorAll('.en').forEach(fitMock)}
+window.addEventListener('resize',fitAll);
 function render(){const ci=Math.min(cur,D.steps.length-1),s=D.steps[ci],prev=(ci&&D.steps[ci-1].f&&D.steps[ci-1].f===s.f)?D.steps[ci-1].c.split('\n').map(x=>x.trim()):null;
  $('pt').textContent=s.part;$('st').innerHTML=esc2(s.id+' · '+s.t)+(s.m?'<span class="tm2">⏱ '+s.m+' min</span>':'');$('fn').textContent=s.f;
  $('stm').innerHTML='<div class="en">'+s.x+'</div>'+(s.g.length?'<div class="key"><b>Guidelines</b><ul>'+s.g.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>':'')+'';
  $('tryw').innerHTML=s.u?'<h4 style="margin:6px 0">Try it: this window reacts like the real program</h4><div class="tryit">'+s.u+'</div>':'';
  $('code').innerHTML=s.c.replace(/\n$/,'').split('\n').map(l=>'<div class="ln">'+lineHTML(l)+'</div>').join('');
+ fitAll();
  liveInit(s);$('ctl').hidden=!s.sc;
  if(s.sc)paintLive();else{$('ui').innerHTML='<div class="nowin">This step has no graphical interface.<br>Follow the statement above.</div>';$('cap').innerHTML=''}
  if(unl)unlock(true);

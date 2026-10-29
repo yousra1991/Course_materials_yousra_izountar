@@ -179,5 +179,8 @@ function maj(){
  ET.parties.forEach(p=>{const L=ET.etapes.filter(e=>e.partie==p.id);$('b-'+p.id).style.width=(L.length?100*L.filter(e=>DONE.has(e.id)).length/L.length:0)+'%'});
  $('gp').textContent=Math.round(100*ET.etapes.filter(e=>DONE.has(e.id)).length/ET.etapes.length)+' % completed';
 }
-build();maj();
+function fitMock(root){root.querySelectorAll('.en>div').forEach(d=>{d.style.zoom='';const w=d.scrollWidth,a=root.clientWidth;if(a>0&&w>a+1)d.style.zoom=(a/w).toFixed(3)})}
+function fitAll(){document.querySelectorAll('.en').forEach(fitMock)}
+window.addEventListener('resize',fitAll);document.addEventListener('toggle',e=>{if(e.target.querySelectorAll)e.target.querySelectorAll('.en').forEach(fitMock)},true);
+build();maj();fitAll();
 </script></body></html>
