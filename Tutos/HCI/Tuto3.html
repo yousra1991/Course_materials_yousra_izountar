@@ -1,1 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HCI Tutorial 3 - Design of HCI: Double Diamond, Discover and Define</title>
+<style>
+@page { size: A4; margin: 10mm 12mm 12mm 12mm; }
+:root{ --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --main:#1d4ed8; --soft:#e8f0fe;
+       --ok:#15803d; --okbg:#dcfce7; --ko:#b91c1c; --kobg:#fee2e2; --part:#a16207; --partbg:#fef3c7; }
+*{box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.45;
+     font-size:14px;margin:0 auto;padding:16px;max-width:900px}
+.hdr{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border-radius:10px;padding:12px 16px;margin-bottom:12px}
+.hdr img{max-height:60px;width:auto;background:#fff;border-radius:50%;padding:3px}
+.hdr .l{font-size:11px;line-height:1.35}.hdr .r{font-size:11px;line-height:1.35;text-align:right}
+.header-table{width:100%;border-collapse:collapse;border-bottom:2px double var(--main);margin-bottom:12px}
+.header-table td{vertical-align:middle;padding:0 0 6px 0}
+.header-left{width:38%;font-size:11px;line-height:1.3}
+.header-center{width:24%;text-align:center}
+.header-center img{max-height:55px;width:auto}
+.header-right{width:38%;text-align:right;font-size:11px;line-height:1.3}
+.title-block{text-align:center;background:var(--soft);border:1.5px solid var(--main);border-radius:8px;padding:10px;margin-bottom:14px}
+.title-block h1{margin:0;font-size:19px;color:var(--main);text-transform:uppercase}
+.title-block h2{margin:3px 0 0;font-size:13px;color:#4b5563;font-weight:600}
+.card{border:1px solid var(--line);border-radius:8px;margin-bottom:12px;padding:12px 14px}
+.card h2{margin:0 0 8px;font-size:16px;color:var(--main);border-bottom:1px solid var(--line);padding-bottom:4px}
+.card h3{margin:12px 0 4px;font-size:14px;color:#111827}
+ul,ol{margin:4px 0;padding-left:22px} li{margin:3px 0}
+.tag{display:inline-block;background:var(--soft);color:var(--main);border-radius:4px;padding:1px 6px;font-size:12px;font-weight:600;margin-right:3px}
+.objectives{background:#f3f7ff;border-left:4px solid var(--main)}
+.q{background:#f3f4f6;border-left:3px solid var(--main);padding:8px 10px;margin:8px 0;border-radius:0 6px 6px 0}
+.q b.n{color:var(--main)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{background:#f9fafb;border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:13px}
+table.t{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}
+table.t th,table.t td{border:1px solid var(--line);padding:6px 8px;vertical-align:top;text-align:left}
+table.t th{background:var(--soft);color:var(--main)}
+details{margin:6px 0}
+details>summary{cursor:pointer;font-weight:700;color:var(--main);padding:5px 10px;background:var(--soft);border-radius:6px;list-style:none}
+details>summary::before{content:"\25B6\00A0";font-size:11px}
+details[open]>summary::before{content:"\25BC\00A0"}
+details>.sol{border:1px solid #bfd4fb;border-top:none;padding:8px 12px;border-radius:0 0 6px 6px;background:#fcfcff}
+.ans{color:#166534;font-weight:600}
+.toolbar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px}
+.toolbar button{font:inherit;font-size:13px;font-weight:600;color:#fff;background:var(--main);border:0;border-radius:6px;padding:7px 12px;cursor:pointer}
+.toolbar button.alt{background:#fff;color:var(--main);border:1.5px solid var(--main)}
+.badge{display:inline-block;font-size:11px;font-weight:700;border-radius:10px;padding:1px 8px;margin-top:4px;white-space:nowrap}
+.b-ko{background:var(--kobg);color:var(--ko)} .b-ok{background:var(--okbg);color:var(--ok)} .b-part{background:var(--partbg);color:var(--part)}
+.shot{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:6px;cursor:zoom-in}
+.cap{font-size:12px;color:var(--muted);margin:3px 0 8px}
+#lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9;overflow:auto;cursor:zoom-out;padding:12px}
+#lb img{display:block;margin:0 auto;max-width:none;width:min(2200px,200vw)}
+.locked{border:1.5px dashed #bfd4fb;background:#f3f7ff;color:var(--main);font-weight:700;padding:7px 12px;border-radius:6px;margin:6px 0}
+.unlock{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.unlock input{font:inherit;font-size:13px;padding:6px 10px;border:1.5px solid var(--main);border-radius:6px;min-width:240px}
+#msg{font-size:12px;font-weight:600;color:var(--ko)}
+.num{display:inline-block;min-width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;background:var(--main);color:#fff;font-size:12px;font-weight:700;margin-right:6px}
+.annot{position:relative;margin:6px 0 4px}
+.annot img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:6px}
+.bx{position:absolute;border:2px solid hsl(var(--h) 85% 42%);background:hsl(var(--h) 85% 50% / .14);border-radius:3px;pointer-events:none}
+.pin{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:hsl(var(--h) 85% 38%);color:#fff;font:700 11px Arial,sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff;pointer-events:none}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;margin:4px 0 8px}
+.legend span{white-space:nowrap}
+.legend i{display:inline-block;width:16px;height:16px;border-radius:50%;background:hsl(var(--h) 85% 38%);color:#fff;font:700 10px/16px Arial,sans-serif;text-align:center;font-style:normal;margin-right:4px}
+.footer{text-align:center;font-size:11px;color:var(--muted);border-top:1px solid var(--line);padding-top:6px;margin-top:14px}
+@media (max-width:640px){.hdr{grid-template-columns:1fr;text-align:center}.hdr .r{text-align:center}.grid-2{grid-template-columns:1fr}.header-table td{display:block;width:100%!important;text-align:center!important}}
+@media print{
+  body{font-size:11px;padding:0;max-width:none}
+  .toolbar,#lb{display:none!important}
+  .card{page-break-inside:avoid}
+  .screen{page-break-before:always}
+  table.t tr{page-break-inside:avoid}
+  .shot{cursor:default}
+}
 
+.dd{display:block;margin:8px auto;max-width:640px;width:100%;height:auto}
+.dd .sh{fill:#e8f0fe;stroke:#1d4ed8;stroke-width:2}
+.dd .ci{fill:#1d4ed8}.dd text{font:700 15px Arial,sans-serif;fill:#fff;text-anchor:middle}
+.dd .sm{font:12px Arial,sans-serif;fill:#374151;font-weight:400}
+.kc{border:1px solid var(--line);border-left:4px solid var(--main);border-radius:6px;padding:8px 10px;margin:8px 0;background:#fff;break-inside:avoid}
+.kc h4{margin:0 0 4px;font-size:14px}
+.ktag{display:inline-block;background:var(--soft);color:var(--main);border-radius:5px;padding:1px 7px;font-size:12px;font-weight:600;margin:1px 3px 1px 0}
+.mx{display:grid;grid-template-columns:28px 1fr 1fr;grid-template-rows:auto auto 24px;gap:4px;margin:8px 0;font-size:13px}
+.mx .ax{writing-mode:vertical-rl;transform:rotate(180deg);text-align:center;font-weight:700;color:var(--main);grid-row:1/3}
+.mx .qd{border:1.5px solid var(--main);border-radius:6px;min-height:92px;padding:6px 8px}
+.mx .qd b{color:var(--main);display:block;font-size:12px;margin-bottom:3px}
+.mx .xl{grid-column:2/4;text-align:center;font-weight:700;color:var(--main)}
+.chk{columns:3;column-gap:16px;list-style:none;padding:0;font-size:13px}.chk li{break-inside:avoid}
+@media(max-width:640px){.chk{columns:2}}
+table.t td.blank{height:34px}
+table.jm th:first-child,table.jm td:first-child{width:14%;font-weight:700;background:var(--soft)}
+table.jm td{font-size:12px}
+.tree ul{list-style:none;padding-left:18px;border-left:2px solid var(--line);margin:2px 0}
+.tree>ul{border-left:0;padding-left:0}
+</style>
+</head>
+<body>
+
+  <div class="hdr">
+    <img src="logo-ua1.png" alt="" onerror="this.style.display='none'">
+    <div class="l">
+      <b>People's Democratic Republic of Algeria</b><br>
+      Ministry of Higher Education and Scientific Research<br>
+      <b>University of Algiers 1 &ndash; Benyoucef Benkhedda</b><br>
+      Department of Computer Science
+    </div>
+    <div class="r">
+      <b>Specialty:</b> L3 ISIL<br>
+      <b>Module:</b> Human-Computer Interaction (HCI)<br>
+      <b>Topic:</b> Tutorial 3: Design of HCI<br>
+      <b>Academic Year:</b> 2026 / 2027
+    </div>
+  </div>
+
+  <div class="title-block">
+    <h1>HCI Tutorial 3: Design of HCI</h1>
+    <h2>Double Diamond &middot; Discover methods &middot; Define (persona, priority matrix, journey map, information architecture)</h2>
+  </div>
+
+  <div class="toolbar" id="unlockbar">
+    <div class="unlock">
+      <span id="msg"></span>
+      <input id="code" type="password" placeholder="Teacher code" autocomplete="off" onkeydown="if(event.key==='Enter')unlock()">
+      <button type="button" onclick="unlock()">Unlock solutions</button>
+    </div>
+  </div>
+  <div class="toolbar" id="solbar" style="display:none">
+    <button type="button" onclick="setAll(true)">Show all solutions</button>
+    <button type="button" class="alt" onclick="setAll(false)">Hide all solutions</button>
+  </div>
+
+
+  <div class="card objectives">
+    <h2>Objectives</h2>
+    <p>By the end of this tutorial, you should be able to:</p>
+    <ul>
+      <li>Explain the <b>Double Diamond</b>: its four phases, divergent and convergent thinking, and why we iterate.</li>
+      <li>Choose and justify a <b>discovery method</b> (interview, observation, discussion, brainstorming, card sorting).</li>
+      <li><b>Define</b> the problem: write insights and a problem statement, build a <b>persona</b>, a <b>priority matrix</b>, a <b>journey map</b> and an <b>information architecture</b>.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Context &middot; Redesign of the university website</h2>
+    <p>You are part of a design team in charge of the <b>redesign of the University of Algiers 1 website</b>. Today it is hard to use: students, teachers and administrative staff often cannot find what they need. The team starts a user-centred design process with the Double Diamond.</p>
+    <p>Throughout the tutorial, the main user is <b>Sara</b>, a L3 ISIL student. The secondary users are teachers and administrative staff.</p>
+  </div>
+
+  <!-- PART 1 -->
+  <div class="card">
+    <h2>Part 1 &middot; The Double Diamond (general concepts)</h2>
+    <svg class="dd" viewBox="0 0 620 200" role="img" aria-label="Double Diamond"><path class="sh" d="M30,100 L165,30 L165,170 Z"/><circle class="ci" cx="110" cy="100" r="15"/><text x="110" y="105">A</text><path class="sh" d="M165,30 L300,100 L165,170 Z"/><circle class="ci" cx="220" cy="100" r="15"/><text x="220" y="105">B</text><path class="sh" d="M320,100 L455,30 L455,170 Z"/><circle class="ci" cx="400" cy="100" r="15"/><text x="400" y="105">C</text><path class="sh" d="M455,30 L590,100 L455,170 Z"/><circle class="ci" cx="510" cy="100" r="15"/><text x="510" y="105">D</text><text class="sm" x="30" y="195" style="text-anchor:start;fill:#6b7280">Problem space</text><text class="sm" x="320" y="195" style="text-anchor:start;fill:#6b7280">Solution space</text></svg>
+    <div class="q"><b class="n">Q1.</b> Name the phases <b>A, B, C, D</b>. For each, say whether the thinking is <b>divergent</b> or <b>convergent</b>, and give its goal in one sentence. What do the first and the second diamond aim at?</div>
+    <table class="t"><tr><th>Letter</th><th>Phase</th><th>Divergent / convergent</th><th>Goal</th></tr>
+    <tr><td><b>A</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>B</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>C</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>D</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr></table>
+    <div class="q"><b class="n">Q2.</b> Define <b>divergence</b> and <b>convergence</b>. Give one example of each in the university website project.</div>
+    <div class="q"><b class="n">Q3.</b> For each activity, give the <b>phase</b> (Discover, Define, Develop, Deliver) and the <b>thinking</b> (divergent or convergent).</div>
+    <table class="t"><tr><th>#</th><th>Activity</th><th>Phase</th><th>Thinking</th></tr><tr><td><b>1</b></td><td>Observe students using the current site in the computer lab</td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>2</b></td><td>Write a persona of a typical L3 student</td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>3</b></td><td>Sketch ten different layouts for the home page</td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>4</b></td><td>Run a usability test with five students on the prototype</td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>5</b></td><td>Place the candidate features in a priority matrix</td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>6</b></td><td>Interview the administration staff</td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>7</b></td><td>Draw the journey map of a student looking for results</td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>8</b></td><td>Build a clickable prototype in Figma</td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>9</b></td><td>Publish the new site and monitor visits and complaints</td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>10</b></td><td>Run a card sorting session on the menu items</td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>11</b></td><td>Hold a brainstorming session on ideas for the student space</td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>12</b></td><td>Write the problem statement "How might we help students find information in one click?"</td><td class="blank"></td><td class="blank"></td></tr></table>
+    <div class="q"><b class="n">Q4.</b> Why is <b>iteration</b> important, especially between Develop and Deliver? Give an example for the website.</div>
+    <div class="q"><b class="n">Q5.</b> How does involving users in <b>each phase</b> improve the site?</div>
+    <p><b>Solution</b></p>
+    <div class="locked" data-i="0">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+  <!-- PART 2 -->
+  <div class="card">
+    <h2>Part 2 &middot; Discover: methods</h2>
+    <p>During the research phase, the team collected the nine findings below. Methods: <span class="ktag">Interview</span><span class="ktag">Observation</span><span class="ktag">Conversation / Discussion</span><span class="ktag">Brainstorming</span><span class="ktag">Card sorting</span></p>
+    <div class="q"><b class="n">Q1.</b> Classify each finding by the method that probably produced it.</div>
+    <table class="t"><tr><th style="width:6%">#</th><th>Finding collected</th><th style="width:22%">Method</th></tr><tr><td><b>1</b></td><td>Sara, a L3 student, said she feels lost and a bit anxious every time she must find her exam timetable or results on the site.<br><i style="font-size:12px;color:#6b7280">Hint: obtained through a direct exchange of feelings or opinions</i></td><td class="blank"></td></tr><tr><td><b>2</b></td><td>We saw Sara and others zooming and scrolling sideways on their phones because the menus are tiny and the layout is the desktop one.<br><i style="font-size:12px;color:#6b7280">Hint: gathered by watching real user behaviour</i></td><td class="blank"></td></tr><tr><td><b>3</b></td><td>Administrative staff explained that most e-mails and visits are about the same five questions: registration deadlines, certificates, results, timetable and appeals.<br><i style="font-size:12px;color:#6b7280">Hint: information reported by professionals during a guided exchange</i></td><td class="blank"></td></tr><tr><td><b>4</b></td><td>During a team session, one designer suggested a single "Student space" with notifications and a chatbot.<br><i style="font-size:12px;color:#6b7280">Hint: emerged from a creative group idea session</i></td><td class="blank"></td></tr><tr><td><b>5</b></td><td>In an informal talk with a group of students, most said they want the timetable in one click, mostly use their phone, and read Arabic, French and English.<br><i style="font-size:12px;color:#6b7280">Hint: opinions collected through an informal group talk</i></td><td class="blank"></td></tr><tr><td><b>6</b></td><td>Observation showed that Sara often leaves the site and asks in a Facebook group, because the site search returns nothing useful.<br><i style="font-size:12px;color:#6b7280">Hint: derived from careful watching without direct questioning</i></td><td class="blank"></td></tr><tr><td><b>7</b></td><td>In a card sorting activity, Sara put "timetable", "exam schedule" and "results" in one group named "My studies", and "certificates", "registration" and "appeals" in another named "Administrative procedures".<br><i style="font-size:12px;color:#6b7280">Hint: comes from a method used to organise and categorise concepts</i></td><td class="blank"></td></tr><tr><td><b>8</b></td><td>The team proposed a "deadline calendar with reminders", based on Sara missing the re-registration date last year.<br><i style="font-size:12px;color:#6b7280">Hint: idea suggested internally by designers during creative exploration</i></td><td class="blank"></td></tr><tr><td><b>9</b></td><td>Teachers told us they want to publish course material and announcements in a few clicks, and that today it takes them several steps.<br><i style="font-size:12px;color:#6b7280">Hint: result of exchanging information with domain experts</i></td><td class="blank"></td></tr></table>
+    <div class="q"><b class="n">Q2.</b> Findings 1 and 6 describe the same problem. Explain why it is important to <b>combine</b> several methods.</div>
+    <div class="q"><b class="n">Q3.</b> Which method would you use to: (a) understand what students feel and expect; (b) see where they get stuck on the current site; (c) find how they group the content; (d) gather many opinions quickly? Justify.</div>
+    <div class="q"><b class="n">Q4.</b> Write a short <b>discovery plan</b>: who you meet (how many, which profiles), with which methods, and what you will produce.</div>
+    <p><b>Solution</b></p>
+    <div class="locked" data-i="1">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+  <!-- PART 3 -->
+  <div class="card">
+    <h2>Part 3 &middot; Define (converging)</h2>
+    <p>The team now turns the nine findings into a clear problem and into decisions.</p>
+    <div class="q"><b class="n">Q1.</b> <b>Synthesis.</b> Group the findings into <b>three insights</b>, then write one <b>problem statement</b> of the form <i>&laquo;&nbsp;How might we&hellip;&nbsp;&raquo;</i> that names the user, the need and the context, without a solution.</div>
+
+    <div class="q"><b class="n">Q2.</b> <b>Persona.</b> Create the persona of Sara from the findings.</div>
+    <table class="t"><tr><td style="width:22%"><b>Name, age, study</b></td><td class="blank"></td></tr><tr><td><b>Context</b> (device, place, languages)</td><td class="blank"></td></tr><tr><td><b>Goals</b></td><td class="blank" style="height:46px"></td></tr><tr><td><b>Frustrations</b></td><td class="blank" style="height:46px"></td></tr><tr><td><b>Behaviours</b></td><td class="blank"></td></tr><tr><td><b>Quote</b></td><td class="blank"></td></tr></table>
+
+    <div class="q"><b class="n">Q3.</b> <b>Priority matrix.</b> The team estimated impact and effort (1 = low, 5 = high). Rule: <b>high impact = 4 or 5</b>, <b>low effort = 1 or 2</b>. Fill the quadrant of each feature, place the letters in the matrix, then decide what goes in the first release.</div>
+    <table class="t"><tr><th>#</th><th>Feature</th><th>Impact</th><th>Effort</th><th>Quadrant</th></tr><tr><td><b>A</b></td><td>Responsive mobile layout with readable menus</td><td>5</td><td>2</td><td class="blank"></td></tr><tr><td><b>B</b></td><td>Search bar that really finds timetable, results and forms</td><td>4</td><td>2</td><td class="blank"></td></tr><tr><td><b>C</b></td><td>Shortcuts on the home page: timetable, results, deadlines</td><td>5</td><td>1</td><td class="blank"></td></tr><tr><td><b>D</b></td><td>Deadline calendar with reminders</td><td>4</td><td>4</td><td class="blank"></td></tr><tr><td><b>E</b></td><td>Chatbot answering the five frequent questions</td><td>4</td><td>5</td><td class="blank"></td></tr><tr><td><b>F</b></td><td>Animated news carousel on the home page</td><td>2</td><td>1</td><td class="blank"></td></tr><tr><td><b>G</b></td><td>3D virtual tour of the campus</td><td>1</td><td>5</td><td class="blank"></td></tr><tr><td><b>H</b></td><td>Dark mode</td><td>2</td><td>4</td><td class="blank"></td></tr></table>
+    <div class="mx"><div class="ax">IMPACT</div>
+    <div class="qd"><b>Major projects (high impact, high effort)</b></div>
+    <div class="qd"><b>Quick wins (high impact, low effort)</b></div>
+    <div class="qd"><b>Avoid / later (low impact, high effort)</b></div>
+    <div class="qd"><b>Fill-ins (low impact, low effort)</b></div>
+    <div class="xl">EFFORT &rarr; (high on the left, low on the right)</div></div>
+
+    <div class="q"><b class="n">Q4.</b> <b>Journey map.</b> Scenario: <i>Sara wants to see her exam results.</i> Fill the map for five stages: 1 Need, 2 Search, 3 Navigate, 4 Act, 5 After. Mark the <b>lowest emotional point</b>.</div>
+    <table class="t jm"><tr><th></th><th>1 Need</th><th>2 Search</th><th>3 Navigate</th><th>4 Act</th><th>5 After</th></tr><tr><td>Actions</td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td></tr><tr><td>Thoughts</td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td></tr><tr><td>Emotion</td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td></tr><tr><td>Pain points</td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td></tr><tr><td>Opportunities</td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td><td class="blank" style="height:46px"></td></tr></table>
+
+    <div class="q"><b class="n">Q5.</b> <b>Information architecture.</b> Organise the 15 cards below into a <b>site map</b> (home, top-level menu, sub-items). Name each group in the users' words. Constraints: 4 to 7 top-level items, at most 3 levels. Where do you put the language choice?</div>
+    <ul class="chk"><li>&#9744; Timetable</li><li>&#9744; Exam schedule</li><li>&#9744; Results</li><li>&#9744; Certificate request</li><li>&#9744; Registration / re-registration</li><li>&#9744; Appeals (recours)</li><li>&#9744; Course material</li><li>&#9744; Announcements</li><li>&#9744; Departments</li><li>&#9744; Research labs</li><li>&#9744; Library</li><li>&#9744; Deadline calendar</li><li>&#9744; International / Erasmus</li><li>&#9744; Contact</li><li>&#9744; Language (AR / FR / EN)</li></ul>
+    <div class="q" style="min-height:90px"></div>
+    <p><b>Solution and marking guide</b></p>
+    <div class="locked" data-i="2">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+
+  <div class="footer">University of Algiers 1 &middot; Department of Computer Science &middot; Specialty ISIL &middot; Module HCI &middot; Tutorial 3</div>
+
+<script id="enc-data" type="application/json">{"salt": "7KQuA9RGlXaj5w/q/WHhOA==", "iter": 250000, "items": ["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"]}</script>
+<script>
+function setAll(open){document.querySelectorAll('details.sol-d').forEach(function(d){d.open=open;});}
+document.addEventListener('click',function(e){
+  var t=e.target;
+  if(t.classList&&t.classList.contains('shot')){var lb=document.getElementById('lb');lb.firstChild.src=t.src;lb.style.display='block';}
+  else if(t.closest&&t.closest('#lb')){document.getElementById('lb').style.display='none';}
+});
+function b64(s){var b=atob(s),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a;}
+async function unlock(){
+  var msg=document.getElementById('msg');msg.textContent='';
+  var code=document.getElementById('code').value.trim();
+  if(!code){return;}
+  if(!(window.crypto&&crypto.subtle)){msg.textContent='This browser cannot decrypt (use https or a recent browser).';return;}
+  try{
+    var D=JSON.parse(document.getElementById('enc-data').textContent);
+    var km=await crypto.subtle.importKey('raw',new TextEncoder().encode(code),'PBKDF2',false,['deriveKey']);
+    var key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(D.salt),iterations:D.iter,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+    var out=[];
+    for(var i=0;i<D.items.length;i++){
+      var raw=b64(D.items[i]);
+      var pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:raw.slice(0,12)},key,raw.slice(12));
+      out.push(new TextDecoder().decode(pt));
+    }
+    document.querySelectorAll('.locked').forEach(function(el){
+      var d=document.createElement('details');d.className='sol-d';
+      d.innerHTML='<summary>Show solution</summary><div class="sol">'+out[+el.dataset.i]+'</div>';
+      el.replaceWith(d);
+      d.querySelectorAll('img[data-ref]').forEach(function(im){var s=document.getElementById(im.dataset.ref);if(s)im.src=s.src;});
+    });
+    document.getElementById('unlockbar').style.display='none';
+    document.getElementById('solbar').style.display='flex';
+  }catch(err){msg.textContent='Wrong code.';}
+}
+</script>
+</body>
+</html>
