@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HCI Tutorial 5.1 - Evaluation: Bastien and Scapin Criteria</title>
+<style>
+@page { size: A4; margin: 10mm 12mm 12mm 12mm; }
+:root{ --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --main:#1d4ed8; --soft:#e8f0fe;
+       --ok:#15803d; --okbg:#dcfce7; --ko:#b91c1c; --kobg:#fee2e2; --part:#a16207; --partbg:#fef3c7; }
+*{box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.45;
+     font-size:14px;margin:0 auto;padding:16px;max-width:900px}
+.hdr{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border-radius:10px;padding:12px 16px;margin-bottom:12px}
+.hdr img{max-height:60px;width:auto;background:#fff;border-radius:50%;padding:3px}
+.hdr .l{font-size:11px;line-height:1.35}.hdr .r{font-size:11px;line-height:1.35;text-align:right}
+.header-table{width:100%;border-collapse:collapse;border-bottom:2px double var(--main);margin-bottom:12px}
+.header-table td{vertical-align:middle;padding:0 0 6px 0}
+.header-left{width:38%;font-size:11px;line-height:1.3}
+.header-center{width:24%;text-align:center}
+.header-center img{max-height:55px;width:auto}
+.header-right{width:38%;text-align:right;font-size:11px;line-height:1.3}
+.title-block{text-align:center;background:var(--soft);border:1.5px solid var(--main);border-radius:8px;padding:10px;margin-bottom:14px}
+.title-block h1{margin:0;font-size:19px;color:var(--main);text-transform:uppercase}
+.title-block h2{margin:3px 0 0;font-size:13px;color:#4b5563;font-weight:600}
+.card{border:1px solid var(--line);border-radius:8px;margin-bottom:12px;padding:12px 14px}
+.card h2{margin:0 0 8px;font-size:16px;color:var(--main);border-bottom:1px solid var(--line);padding-bottom:4px}
+.card h3{margin:12px 0 4px;font-size:14px;color:#111827}
+ul,ol{margin:4px 0;padding-left:22px} li{margin:3px 0}
+.tag{display:inline-block;background:var(--soft);color:var(--main);border-radius:4px;padding:1px 6px;font-size:12px;font-weight:600;margin-right:3px}
+.objectives{background:#f3f7ff;border-left:4px solid var(--main)}
+.q{background:#f3f4f6;border-left:3px solid var(--main);padding:8px 10px;margin:8px 0;border-radius:0 6px 6px 0}
+.q b.n{color:var(--main)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{background:#f9fafb;border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:13px}
+table.t{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}
+table.t th,table.t td{border:1px solid var(--line);padding:6px 8px;vertical-align:top;text-align:left}
+table.t th{background:var(--soft);color:var(--main)}
+details{margin:6px 0}
+details>summary{cursor:pointer;font-weight:700;color:var(--main);padding:5px 10px;background:var(--soft);border-radius:6px;list-style:none}
+details>summary::before{content:"\25B6\00A0";font-size:11px}
+details[open]>summary::before{content:"\25BC\00A0"}
+details>.sol{border:1px solid #bfd4fb;border-top:none;padding:8px 12px;border-radius:0 0 6px 6px;background:#fcfcff}
+.ans{color:#166534;font-weight:600}
+.toolbar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px}
+.toolbar button{font:inherit;font-size:13px;font-weight:600;color:#fff;background:var(--main);border:0;border-radius:6px;padding:7px 12px;cursor:pointer}
+.toolbar button.alt{background:#fff;color:var(--main);border:1.5px solid var(--main)}
+.badge{display:inline-block;font-size:11px;font-weight:700;border-radius:10px;padding:1px 8px;margin-top:4px;white-space:nowrap}
+.b-ko{background:var(--kobg);color:var(--ko)} .b-ok{background:var(--okbg);color:var(--ok)} .b-part{background:var(--partbg);color:var(--part)}
+.shot{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:6px;cursor:zoom-in}
+.cap{font-size:12px;color:var(--muted);margin:3px 0 8px}
+#lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9;overflow:auto;cursor:zoom-out;padding:12px}
+#lb img{display:block;margin:0 auto;max-width:none;width:min(2200px,200vw)}
+.locked{border:1.5px dashed #bfd4fb;background:#f3f7ff;color:var(--main);font-weight:700;padding:7px 12px;border-radius:6px;margin:6px 0}
+.unlock{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.unlock input{font:inherit;font-size:13px;padding:6px 10px;border:1.5px solid var(--main);border-radius:6px;min-width:240px}
+#msg{font-size:12px;font-weight:600;color:var(--ko)}
+.num{display:inline-block;min-width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;background:var(--main);color:#fff;font-size:12px;font-weight:700;margin-right:6px}
+.annot{position:relative;margin:6px 0 4px}
+.annot img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:6px}
+.bx{position:absolute;border:2px solid hsl(var(--h) 85% 42%);background:hsl(var(--h) 85% 50% / .14);border-radius:3px;pointer-events:none}
+.pin{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:hsl(var(--h) 85% 38%);color:#fff;font:700 11px Arial,sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff;pointer-events:none}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;margin:4px 0 8px}
+.legend span{white-space:nowrap}
+.legend i{display:inline-block;width:16px;height:16px;border-radius:50%;background:hsl(var(--h) 85% 38%);color:#fff;font:700 10px/16px Arial,sans-serif;text-align:center;font-style:normal;margin-right:4px}
+.footer{text-align:center;font-size:11px;color:var(--muted);border-top:1px solid var(--line);padding-top:6px;margin-top:14px}
+@media (max-width:640px){.hdr{grid-template-columns:1fr;text-align:center}.hdr .r{text-align:center}.grid-2{grid-template-columns:1fr}.header-table td{display:block;width:100%!important;text-align:center!important}}
+@media print{
+  body{font-size:11px;padding:0;max-width:none}
+  .toolbar,#lb{display:none!important}
+  .card{page-break-inside:avoid}
+  .screen{page-break-before:always}
+  table.t tr{page-break-inside:avoid}
+  .shot{cursor:default}
+}
+
+.win{width:100%;max-width:700px;margin:10px auto;border:2px solid #333;border-radius:6px;background:#f0f0f0;font-family:Tahoma,Arial,sans-serif;font-size:12px;position:relative;user-select:none}
+.win .bar{background:#0078d7;color:#fff;padding:4px 8px;font-weight:700;display:flex;justify-content:space-between}
+.win .body{padding:12px 16px 12px 34px;background:#fff;display:flex;flex-direction:column;gap:9px}
+.win .rowx{position:relative}
+.win .lab{font-size:11px}
+.win .f{border:1px solid #cfcfcf;height:22px;font-size:11px;padding:2px 6px;color:#666;background:#fff;margin-top:2px}
+.win .btn{font-size:12px;font-weight:700;border:0;border-radius:3px;padding:6px 14px;color:#fff;background:#2e9d46;font-family:inherit}
+.win .acts{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.mk{position:absolute;left:-28px;top:-2px;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#d61f1f;color:#fff;font:700 11px Arial,sans-serif;box-shadow:0 0 0 2px #fff}
+.kc{border:1px solid var(--line);border-left:4px solid var(--main);border-radius:6px;padding:8px 10px;margin:8px 0;background:#fff;break-inside:avoid}
+.kc h4{margin:0 0 4px;font-size:14px}
+.ktag{display:inline-block;background:var(--soft);color:var(--main);border-radius:5px;padding:1px 7px;font-size:12px;font-weight:600;margin:1px 3px 1px 0}
+table.t td.blank{height:34px}
+.part{display:flex;align-items:center;gap:10px;margin:0 0 6px}
+.part .ic{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+.part h2{border:0!important;margin:0!important;padding:0!important}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 10px}
+.pill{background:var(--soft);color:var(--main);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600}
+.sit{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0;break-inside:avoid;background:#fff}
+.sit .sn{display:inline-block;background:#1d4ed8;color:#fff;border-radius:6px;padding:0 8px;font-weight:700;margin-right:6px}
+.sit table{margin-top:8px}
+.lb{font-size:10.5px;color:#9ca3af}
+.vv{color:#b91c1c;font-weight:700}.vr{color:#15803d;font-weight:700}
+.crit{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin:8px 0}
+.crit .cc{border:1px solid var(--line);border-top:4px solid var(--main);border-radius:8px;padding:8px 10px;background:#fff}
+.crit .cc h4{margin:0 0 3px;font-size:14px;color:var(--main)}
+.crit .cc p{margin:0 0 4px;font-size:12.5px}
+.crit .cc ul{margin:2px 0;padding-left:16px;font-size:12.5px}
+</style>
+</head>
+<body>
+
+  <div class="hdr">
+    <img src="logo-ua1.png" alt="" onerror="this.style.display='none'">
+    <div class="l">
+      <b>People's Democratic Republic of Algeria</b><br>
+      Ministry of Higher Education and Scientific Research<br>
+      <b>University of Algiers 1 &ndash; Benyoucef Benkhedda</b><br>
+      Department of Computer Science
+    </div>
+    <div class="r">
+      <b>Specialty:</b> L3 ISIL<br>
+      <b>Module:</b> Human-Computer Interaction (HCI)<br>
+      <b>Topic:</b> Tutorial 5.1: Evaluation of HCI, Bastien and Scapin criteria<br>
+      <b>Academic Year:</b> 2026 / 2027
+    </div>
+  </div>
+
+  <div class="title-block">
+    <h1>HCI Tutorial 5.1: Ergonomic Criteria of Bastien and Scapin</h1>
+    <h2>Evaluation of HCI &middot; Ergonomic inspection of the university website</h2>
+  </div>
+
+  <div class="toolbar" id="unlockbar">
+    <div class="unlock">
+      <span id="msg"></span>
+      <input id="code" type="password" placeholder="Teacher code" autocomplete="off" onkeydown="if(event.key==='Enter')unlock()">
+      <button type="button" onclick="unlock()">Unlock solutions</button>
+    </div>
+  </div>
+  <div class="toolbar" id="solbar" style="display:none">
+    <button type="button" onclick="setAll(true)">Show all solutions</button>
+    <button type="button" class="alt" onclick="setAll(false)">Hide all solutions</button>
+  </div>
+
+
+  <div class="card objectives">
+    <h2>Objectives</h2>
+    <p>By the end of this tutorial, you should be able to:</p>
+    <ul>
+      <li>Name and define the <b>8 ergonomic criteria of Bastien and Scapin</b> and their sub-criteria.</li>
+      <li>Decide which criterion a design decision <b>respects or violates</b>, and justify it.</li>
+      <li>Carry out a short <b>ergonomic inspection</b> of a screen and propose fixes.</li>
+      <li>Rate the <b>severity</b> of problems and set priorities.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Context &middot; Evaluating the university website</h2>
+    <p>The team of the <b>University of Algiers 1 website</b> has a first version online. Before asking students to test it, a group of ergonomists (you) <b>inspects it with the criteria of Bastien and Scapin</b>. Along the way you meet several designers, each with a decision to judge. Sara, the student of the previous tutorials, is the main user.</p>
+    <div class="meta"><span class="pill">Ergonomic inspection</span><span class="pill">8 criteria</span><span class="pill">15 design decisions</span></div>
+  </div>
+
+  <div class="card">
+    <h2>Reminder &middot; the 8 criteria of Bastien and Scapin</h2>
+    <div class="crit"><div class="cc"><h4>1. Guidance</h4><p>Means to advise, orient, inform and guide the user during the interaction.</p><ul><li><b>Prompting</b>: Lead the user towards specific actions and tell them what to enter and in which format.</li><li><b>Grouping / distinction of items</b>: Visual organisation of items: by location and by format.</li><li><b>Immediate feedback</b>: A quick and informative response to every user action.</li><li><b>Legibility</b>: Size, contrast and spacing that make the information easy to read.</li></ul></div><div class="cc"><h4>2. Workload</h4><p>Reduce the perceptual and cognitive load and increase the efficiency of the dialogue.</p><ul><li><b>Brevity</b>: Limit reading and input effort: conciseness and minimal actions.</li><li><b>Information density</b>: Limit the unnecessary information shown at the same time.</li></ul></div><div class="cc"><h4>3. Explicit control</h4><p>The system does only what the user asks, only when asked; the user stays in control.</p><ul><li><b>Explicit user action</b>: The system acts only after an explicit request.</li><li><b>User control</b>: The user can interrupt, cancel, go back and decide the pace.</li></ul></div><div class="cc"><h4>4. Adaptability</h4><p>The system behaves according to the context, the needs and the preferences of the user.</p><ul><li><b>Flexibility</b>: Several ways to reach the same goal.</li><li><b>Users' experience</b>: Respect the level of the user: novice or expert.</li></ul></div><div class="cc"><h4>5. Error management</h4><p>Avoid errors, report them well, and allow their correction.</p><ul><li><b>Error protection</b>: Prevent errors, confirm dangerous actions.</li><li><b>Quality of error messages</b>: Pertinent, readable, precise: what happened and what to do.</li><li><b>Error correction</b>: Easy ways to correct a mistake.</li></ul></div><div class="cc"><h4>6. Consistency</h4><p>The same design choices (names, formats, positions, procedures) in similar contexts.</p></div><div class="cc"><h4>7. Significance of codes</h4><p>Match between a code, a name or an icon and what it stands for.</p></div><div class="cc"><h4>8. Compatibility</h4><p>Match with the characteristics of the users (habits, language, expectations) and of their tasks.</p></div></div>
+  </div>
+
+  <div class="card">
+    <div class="part"><span class="ic">&#128218;</span><h2>Part 1 &middot; Know the criteria</h2></div>
+    <div class="q"><b class="n">Q1.</b> For each of the 8 criteria, give <b>one example of a good design</b> on the university website.</div>
+    <table class="t"><tr><th style="width:30%">Criterion</th><th>Example on the website</th></tr><tr><td><b>1. Guidance</b></td><td class="blank"></td></tr><tr><td><b>2. Workload</b></td><td class="blank"></td></tr><tr><td><b>3. Explicit control</b></td><td class="blank"></td></tr><tr><td><b>4. Adaptability</b></td><td class="blank"></td></tr><tr><td><b>5. Error management</b></td><td class="blank"></td></tr><tr><td><b>6. Consistency</b></td><td class="blank"></td></tr><tr><td><b>7. Significance of codes</b></td><td class="blank"></td></tr><tr><td><b>8. Compatibility</b></td><td class="blank"></td></tr></table>
+    <p><b>Solution</b></p>
+    <div class="locked" data-i="0">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+  <div class="card">
+    <div class="part"><span class="ic">&#128269;</span><h2>Part 2 &middot; One designer decided&hellip;</h2></div>
+    <div class="q"><b class="n">Q2.</b> For each decision, give the <b>criterion</b> (and the sub-criterion if there is one), say whether the decision <b>respects</b> or <b>violates</b> it, and explain why. If it is violated, propose a <b>fix</b>. <b>Careful: some designers did a good job.</b></div>
+    
+    <div class="sit"><span class="sn">1</span>When a student uploads a file in the wrong format, the designer decides the site displays "Error 500".
+      <table class="t"><tr><td class="blank" style="width:26%;height:46px"><span class="lb">Criterion</span></td><td class="blank" style="width:22%"><span class="lb">Sub-criterion</span></td><td class="blank" style="width:16%"><span class="lb">Respected / violated</span></td><td class="blank"><span class="lb">Why (and a fix if violated)</span></td></tr></table></div>
+    <div class="sit"><span class="sn">2</span>The designer writes under the field "Student number": "8 digits, for example 20231234".
+      <table class="t"><tr><td class="blank" style="width:26%;height:46px"><span class="lb">Criterion</span></td><td class="blank" style="width:22%"><span class="lb">Sub-criterion</span></td><td class="blank" style="width:16%"><span class="lb">Respected / violated</span></td><td class="blank"><span class="lb">Why (and a fix if violated)</span></td></tr></table></div>
+    <div class="sit"><span class="sn">3</span>The designer puts "Timetable", "Exam schedule" and "Results" in one framed block titled "My studies", and "Certificate", "Registration" and "Appeals" in another block of a different colour.
+      <table class="t"><tr><td class="blank" style="width:26%;height:46px"><span class="lb">Criterion</span></td><td class="blank" style="width:22%"><span class="lb">Sub-criterion</span></td><td class="blank" style="width:16%"><span class="lb">Respected / violated</span></td><td class="blank"><span class="lb">Why (and a fix if violated)</span></td></tr></table></div>
+    <div class="sit"><span class="sn">4</span>The designer shows the re-registration deadline in light grey, 9 px, at the bottom of the page.
+      <table class="t"><tr><td class="blank" style="width:26%;height:46px"><span class="lb">Criterion</span></td><td class="blank" style="width:22%"><span class="lb">Sub-criterion</span></td><td class="blank" style="width:16%"><span class="lb">Respected / violated</span></td><td class="blank"><span class="lb">Why (and a fix if violated)</span></td></tr></table></div>
+    <div class="sit"><span class="sn">5</span>The designer lets the "Send" button show nothing for ten seconds while a file uploads.
+      <table class="t"><tr><td class="blank" style="width:26%;height:46px"><span class="lb">Criterion</span></td><td class="blank" style="width:22%"><span class="lb">Sub-criterion</span></td><td class="blank" style="width:16%"><span class="lb">Respected / violated</span></td><td class="blank"><span class="lb">Why (and a fix if violated)</span></td></tr></table></div>
+    <div class="sit"><span class="sn">6</span>To request a certificate, the designer asks students to retype their name, number, faculty and year, which are already known from the login, over seven steps.
+      <table class="t"><tr><td class="blank" style="width:26%;height:46px"><span class="lb">Criterion</span></td><td class="blank" style="width:22%"><span class="lb">Sub-criterion</span></td><td class="blank" style="width:16%"><span class="lb">Respected / violated</span></td><td class="blank"><span class="lb">Why (and a fix if violated)</span></td></tr></table></div>
+    <div class="sit"><span class="sn">7</span>The designer fills the home page with 60 links, four banners, a news ticker and a weather widget.
+      <table class="t"><tr><td class="blank" style="width:26%;height:46px"><span class="lb">Criterion</span></td><td class="blank" style="width:22%"><span class="lb">Sub-criterion</span></td><td class="blank" style="width:16%"><span class="lb">Respected / violated</span></td><td class="blank"><span class="lb">Why (and a fix if violated)</span></td></tr></table></div>
+    <div class="sit"><span class="sn">8</span>The designer makes a video start playing and a pop-up open as soon as the home page loads.
+      <table class="t"><tr><td class="blank" style="width:26%;height:46px"><span class="lb">Criterion</span></td><td class="blank" style="width:22%"><span class="lb">Sub-criterion</span></td><td class="blank" style="width:16%"><span class="lb">Respected / violated</span></td><td class="blank"><span class="lb">Why (and a fix if violated)</span></td></tr></table></div>
+    <div class="sit"><span class="sn">9</span>The designer adds "Back" and "Cancel" on every step of the registration form, and a "Save draft" button.
+      <table class="t"><tr><td class="blank" style="width:26%;height:46px"><span class="lb">Criterion</span></td><td class="blank" style="width:22%"><span class="lb">Sub-criterion</span></td><td class="blank" style="width:16%"><span class="lb">Respected / violated</span></td><td class="blank"><span class="lb">Why (and a fix if violated)</span></td></tr></table></div>
+    <div class="sit"><span class="sn">10</span>The designer lets teachers create their own shortcuts, and offers first-time students a guided tour with a "Skip" button.
+      <table class="t"><tr><td class="blank" style="width:26%;height:46px"><span class="lb">Criterion</span></td><td class="blank" style="width:22%"><span class="lb">Sub-criterion</span></td><td class="blank" style="width:16%"><span class="lb">Respected / violated</span></td><td class="blank"><span class="lb">Why (and a fix if violated)</span></td></tr></table></div>
+    <div class="sit"><span class="sn">11</span>Before deleting an uploaded document, the designer shows "Delete this file? This cannot be undone" with Cancel and Delete.
+      <table class="t"><tr><td class="blank" style="width:26%;height:46px"><span class="lb">Criterion</span></td><td class="blank" style="width:22%"><span class="lb">Sub-criterion</span></td><td class="blank" style="width:16%"><span class="lb">Respected / violated</span></td><td class="blank"><span class="lb">Why (and a fix if violated)</span></td></tr></table></div>
+    <div class="sit"><span class="sn">12</span>The designer calls the same button "Submit" in the registration form, "Validate" in the appeals form and "Send" in the certificate form, and moves it from the right to the left.
+      <table class="t"><tr><td class="blank" style="width:26%;height:46px"><span class="lb">Criterion</span></td><td class="blank" style="width:22%"><span class="lb">Sub-criterion</span></td><td class="blank" style="width:16%"><span class="lb">Respected / violated</span></td><td class="blank"><span class="lb">Why (and a fix if violated)</span></td></tr></table></div>
+    <div class="sit"><span class="sn">13</span>The designer marks open procedures with a red padlock and closed procedures with a green check mark.
+      <table class="t"><tr><td class="blank" style="width:26%;height:46px"><span class="lb">Criterion</span></td><td class="blank" style="width:22%"><span class="lb">Sub-criterion</span></td><td class="blank" style="width:16%"><span class="lb">Respected / violated</span></td><td class="blank"><span class="lb">Why (and a fix if violated)</span></td></tr></table></div>
+    <div class="sit"><span class="sn">14</span>The designer displays the Arabic version of the site with the menu on the left and the text aligned left, exactly as in the French version.
+      <table class="t"><tr><td class="blank" style="width:26%;height:46px"><span class="lb">Criterion</span></td><td class="blank" style="width:22%"><span class="lb">Sub-criterion</span></td><td class="blank" style="width:16%"><span class="lb">Respected / violated</span></td><td class="blank"><span class="lb">Why (and a fix if violated)</span></td></tr></table></div>
+    <div class="sit"><span class="sn">15</span>The designer shows an "Edit" link next to each value on the summary page, so a mistake can be fixed without restarting the form.
+      <table class="t"><tr><td class="blank" style="width:26%;height:46px"><span class="lb">Criterion</span></td><td class="blank" style="width:22%"><span class="lb">Sub-criterion</span></td><td class="blank" style="width:16%"><span class="lb">Respected / violated</span></td><td class="blank"><span class="lb">Why (and a fix if violated)</span></td></tr></table></div>
+    <p><b>Solution</b></p>
+    <div class="locked" data-i="1">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+  <div class="card">
+    <div class="part"><span class="ic">&#129520;</span><h2>Part 3 &middot; Inspect a screen</h2></div>
+    <p>A designer built the <b>certificate request form</b> below. The window is only a picture. Each numbered point is a problem.</p>
+    
+  <div class="win" aria-label="Certificate request form (picture, not clickable)">
+    <div class="bar"><span>Univ. Alger 1 &middot; Certificate request</span><span>&ndash; &#9634; &times;</span></div>
+    <div class="body">
+      <div class="rowx"><span class="mk">1</span><div class="lab">Student</div><div class="f" style="color:#c8c8c8">ID</div></div>
+      <div class="rowx"><span class="mk">2</span><div style="font-size:8px;color:#d0d0d0">All fields are mandatory</div></div>
+      <div class="rowx"><span class="mk">3</span><div style="display:flex;gap:16px"><div style="flex:1"><div class="lab">Name</div><div class="f">Benali</div></div><div style="flex:1"><div class="lab">Pr&eacute;nom</div><div class="f">Sara</div></div><div style="flex:1"><div class="lab">Faculty</div><div class="f">Sciences</div></div></div></div>
+      <div class="rowx"><span class="mk">4</span><div class="lab">Date of birth</div><div class="f" style="width:50%">2001/12/05</div></div>
+      <div class="rowx"><span class="mk">5</span><div class="lab">Student number (again)</div><div class="f" style="width:50%">2023123</div></div>
+      <div class="rowx"><span class="mk">6</span><div style="color:#c00;font-size:11px">Invalid input (code 17)</div></div>
+      <div class="rowx"><span class="mk">7</span><div class="acts"><button class="btn" type="button" tabindex="-1">Send</button><button class="btn" type="button" tabindex="-1" style="background:#c62828;padding:10px 20px;font-size:14px">Delete my request</button></div></div>
+      <div class="rowx"><span class="mk">8</span><div style="font-size:12px">Procedure status: <b>CLOSED</b> <span style="color:#2e9d46;font-size:16px;font-weight:800">&#10003;</span></div></div>
+      <div class="rowx"><span class="mk">9</span><div style="background:#fff3cd;border:1px solid #e0c36a;padding:4px 8px;font-size:11px">This page will reload in 10 seconds</div></div>
+    </div>
+  </div>
+
+    <div class="q"><b class="n">Q3.</b> For each number, give the <b>criterion violated</b> (and sub-criterion), explain the <b>problem</b> and propose a <b>fix</b>.</div>
+    <table class="t"><tr><th>#</th><th>Criterion / sub-criterion</th><th>Problem</th><th>Fix</th></tr><tr><td><b>1</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>2</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>3</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>4</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>5</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>6</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>7</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>8</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td><b>9</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr></table>
+    <p><b>Solution</b></p>
+    <div class="locked" data-i="2">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+  <div class="card">
+    <div class="part"><span class="ic">&#9878;</span><h2>Part 4 &middot; Priorities and limits</h2></div>
+    <div class="q"><b class="n">Q4.</b> From the audit, choose the <b>three most serious</b> problems and rate each one from <b>1 to 4</b> (1 cosmetic, 2 minor, 3 major, 4 catastrophic). Justify with the <b>frequency</b>, the <b>impact</b> and the <b>persistence</b> of the problem.</div>
+    <table class="t"><tr><th>Problem (number)</th><th>Severity</th><th>Justification</th></tr><tr><td class="blank"></td><td class="blank" style="width:12%"></td><td class="blank"></td></tr><tr><td class="blank"></td><td class="blank" style="width:12%"></td><td class="blank"></td></tr><tr><td class="blank"></td><td class="blank" style="width:12%"></td><td class="blank"></td></tr></table>
+    <div class="q"><b class="n">Q5.</b> Why is it better to have <b>several evaluators</b> in an ergonomic inspection?</div>
+    <div class="q"><b class="n">Q6.</b> Give <b>two limits</b> of an ergonomic inspection, and explain why a <b>user test</b> is the next step.</div>
+    <p><b>Solution and marking guide</b></p>
+    <div class="locked" data-i="3">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+
+  <div class="footer">University of Algiers 1 &middot; Department of Computer Science &middot; Specialty ISIL &middot; Module HCI &middot; Tutorial 5.1</div>
+
+<script id="enc-data" type="application/json">{"salt": "OEXbtGFWWGR5LCcyKzl1wQ==", "iter": 250000, "items": ["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"]}</script>
+<script>
+function setAll(open){document.querySelectorAll('details.sol-d').forEach(function(d){d.open=open;});}
+document.addEventListener('click',function(e){
+  var t=e.target;
+  if(t.classList&&t.classList.contains('shot')){var lb=document.getElementById('lb');lb.firstChild.src=t.src;lb.style.display='block';}
+  else if(t.closest&&t.closest('#lb')){document.getElementById('lb').style.display='none';}
+});
+function b64(s){var b=atob(s),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a;}
+async function unlock(){
+  var msg=document.getElementById('msg');msg.textContent='';
+  var code=document.getElementById('code').value.trim();
+  if(!code){return;}
+  if(!(window.crypto&&crypto.subtle)){msg.textContent='This browser cannot decrypt (use https or a recent browser).';return;}
+  try{
+    var D=JSON.parse(document.getElementById('enc-data').textContent);
+    var km=await crypto.subtle.importKey('raw',new TextEncoder().encode(code),'PBKDF2',false,['deriveKey']);
+    var key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(D.salt),iterations:D.iter,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+    var out=[];
+    for(var i=0;i<D.items.length;i++){
+      var raw=b64(D.items[i]);
+      var pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:raw.slice(0,12)},key,raw.slice(12));
+      out.push(new TextDecoder().decode(pt));
+    }
+    document.querySelectorAll('.locked').forEach(function(el){
+      var d=document.createElement('details');d.className='sol-d';
+      d.innerHTML='<summary>Show solution</summary><div class="sol">'+out[+el.dataset.i]+'</div>';
+      el.replaceWith(d);
+      d.querySelectorAll('img[data-ref]').forEach(function(im){var s=document.getElementById(im.dataset.ref);if(s)im.src=s.src;});
+    });
+    document.getElementById('unlockbar').style.display='none';
+    document.getElementById('solbar').style.display='flex';
+  }catch(err){msg.textContent='Wrong code.';}
+}
+</script>
+</body>
+</html>

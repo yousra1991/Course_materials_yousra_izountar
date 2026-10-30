@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HCI Tutorial 5.2 - Usability Testing and User Testing</title>
+<style>
+@page { size: A4; margin: 10mm 12mm 12mm 12mm; }
+:root{ --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --main:#1d4ed8; --soft:#e8f0fe;
+       --ok:#15803d; --okbg:#dcfce7; --ko:#b91c1c; --kobg:#fee2e2; --part:#a16207; --partbg:#fef3c7; }
+*{box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.45;
+     font-size:14px;margin:0 auto;padding:16px;max-width:900px}
+.hdr{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border-radius:10px;padding:12px 16px;margin-bottom:12px}
+.hdr img{max-height:60px;width:auto;background:#fff;border-radius:50%;padding:3px}
+.hdr .l{font-size:11px;line-height:1.35}.hdr .r{font-size:11px;line-height:1.35;text-align:right}
+.header-table{width:100%;border-collapse:collapse;border-bottom:2px double var(--main);margin-bottom:12px}
+.header-table td{vertical-align:middle;padding:0 0 6px 0}
+.header-left{width:38%;font-size:11px;line-height:1.3}
+.header-center{width:24%;text-align:center}
+.header-center img{max-height:55px;width:auto}
+.header-right{width:38%;text-align:right;font-size:11px;line-height:1.3}
+.title-block{text-align:center;background:var(--soft);border:1.5px solid var(--main);border-radius:8px;padding:10px;margin-bottom:14px}
+.title-block h1{margin:0;font-size:19px;color:var(--main);text-transform:uppercase}
+.title-block h2{margin:3px 0 0;font-size:13px;color:#4b5563;font-weight:600}
+.card{border:1px solid var(--line);border-radius:8px;margin-bottom:12px;padding:12px 14px}
+.card h2{margin:0 0 8px;font-size:16px;color:var(--main);border-bottom:1px solid var(--line);padding-bottom:4px}
+.card h3{margin:12px 0 4px;font-size:14px;color:#111827}
+ul,ol{margin:4px 0;padding-left:22px} li{margin:3px 0}
+.tag{display:inline-block;background:var(--soft);color:var(--main);border-radius:4px;padding:1px 6px;font-size:12px;font-weight:600;margin-right:3px}
+.objectives{background:#f3f7ff;border-left:4px solid var(--main)}
+.q{background:#f3f4f6;border-left:3px solid var(--main);padding:8px 10px;margin:8px 0;border-radius:0 6px 6px 0}
+.q b.n{color:var(--main)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{background:#f9fafb;border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:13px}
+table.t{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}
+table.t th,table.t td{border:1px solid var(--line);padding:6px 8px;vertical-align:top;text-align:left}
+table.t th{background:var(--soft);color:var(--main)}
+details{margin:6px 0}
+details>summary{cursor:pointer;font-weight:700;color:var(--main);padding:5px 10px;background:var(--soft);border-radius:6px;list-style:none}
+details>summary::before{content:"\25B6\00A0";font-size:11px}
+details[open]>summary::before{content:"\25BC\00A0"}
+details>.sol{border:1px solid #bfd4fb;border-top:none;padding:8px 12px;border-radius:0 0 6px 6px;background:#fcfcff}
+.ans{color:#166534;font-weight:600}
+.toolbar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px}
+.toolbar button{font:inherit;font-size:13px;font-weight:600;color:#fff;background:var(--main);border:0;border-radius:6px;padding:7px 12px;cursor:pointer}
+.toolbar button.alt{background:#fff;color:var(--main);border:1.5px solid var(--main)}
+.badge{display:inline-block;font-size:11px;font-weight:700;border-radius:10px;padding:1px 8px;margin-top:4px;white-space:nowrap}
+.b-ko{background:var(--kobg);color:var(--ko)} .b-ok{background:var(--okbg);color:var(--ok)} .b-part{background:var(--partbg);color:var(--part)}
+.shot{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:6px;cursor:zoom-in}
+.cap{font-size:12px;color:var(--muted);margin:3px 0 8px}
+#lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9;overflow:auto;cursor:zoom-out;padding:12px}
+#lb img{display:block;margin:0 auto;max-width:none;width:min(2200px,200vw)}
+.locked{border:1.5px dashed #bfd4fb;background:#f3f7ff;color:var(--main);font-weight:700;padding:7px 12px;border-radius:6px;margin:6px 0}
+.unlock{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.unlock input{font:inherit;font-size:13px;padding:6px 10px;border:1.5px solid var(--main);border-radius:6px;min-width:240px}
+#msg{font-size:12px;font-weight:600;color:var(--ko)}
+.num{display:inline-block;min-width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;background:var(--main);color:#fff;font-size:12px;font-weight:700;margin-right:6px}
+.annot{position:relative;margin:6px 0 4px}
+.annot img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:6px}
+.bx{position:absolute;border:2px solid hsl(var(--h) 85% 42%);background:hsl(var(--h) 85% 50% / .14);border-radius:3px;pointer-events:none}
+.pin{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:hsl(var(--h) 85% 38%);color:#fff;font:700 11px Arial,sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff;pointer-events:none}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;margin:4px 0 8px}
+.legend span{white-space:nowrap}
+.legend i{display:inline-block;width:16px;height:16px;border-radius:50%;background:hsl(var(--h) 85% 38%);color:#fff;font:700 10px/16px Arial,sans-serif;text-align:center;font-style:normal;margin-right:4px}
+.footer{text-align:center;font-size:11px;color:var(--muted);border-top:1px solid var(--line);padding-top:6px;margin-top:14px}
+@media (max-width:640px){.hdr{grid-template-columns:1fr;text-align:center}.hdr .r{text-align:center}.grid-2{grid-template-columns:1fr}.header-table td{display:block;width:100%!important;text-align:center!important}}
+@media print{
+  body{font-size:11px;padding:0;max-width:none}
+  .toolbar,#lb{display:none!important}
+  .card{page-break-inside:avoid}
+  .screen{page-break-before:always}
+  table.t tr{page-break-inside:avoid}
+  .shot{cursor:default}
+}
+
+.kc{border:1px solid var(--line);border-left:4px solid var(--main);border-radius:6px;padding:8px 10px;margin:8px 0;background:#fff;break-inside:avoid}
+.ktag{display:inline-block;background:var(--soft);color:var(--main);border-radius:5px;padding:1px 7px;font-size:12px;font-weight:600;margin:1px 3px 1px 0}
+table.t td.blank{height:34px}
+.part{display:flex;align-items:center;gap:10px;margin:0 0 6px}
+.part .ic{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+.part h2{border:0!important;margin:0!important;padding:0!important}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 10px}
+.pill{background:var(--soft);color:var(--main);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600}
+.try{background:linear-gradient(135deg,#eff6ff,#e0e7ff);border:1.5px dashed var(--main);border-radius:10px;padding:10px 14px;margin:10px 0}
+.try b.l{color:var(--main)}
+.stage{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;justify-content:center;margin:8px 0}
+.ph{width:270px;border:8px solid #111827;border-radius:30px;background:#fff;position:relative;overflow:hidden;font:12px/1.35 'Segoe UI',Arial,sans-serif;color:#1f2937;box-shadow:0 8px 24px rgba(30,64,175,.18);flex:none}
+.ph .tb{background:#1d4ed8;color:#fff;display:flex;align-items:center;gap:8px;padding:9px 10px}
+.ph .tb .lg{width:22px;height:22px;border-radius:6px;background:#fff;color:#1d4ed8;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:11px}
+.ph .tb b{font-size:12px;flex:1}
+.ph .lang{font-size:10px;border:1px solid #93c5fd;border-radius:6px;padding:1px 4px}
+.ph .bd{padding:10px;display:flex;flex-direction:column;gap:9px;height:372px}
+.ph .srch{border:1px solid #cbd5e1;border-radius:8px;padding:7px 9px;color:#6b7280;background:#f8fafc}
+.ph .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.ph .tile{border:1px solid #bfdbfe;background:#eff6ff;border-radius:10px;padding:8px 2px;text-align:center;font-size:11px;font-weight:600;color:#1e3a8a}
+.ph .tile i{display:block;font-style:normal;font-size:19px}
+.ph .card2{border:1px solid #e5e7eb;border-radius:8px;padding:7px 9px;background:#fff}
+.ph .card2 small{color:#6b7280;display:block}
+.ph .nav{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #e5e7eb;background:#fff}
+.ph .nav span{text-align:center;padding:7px 0;font-size:10px;color:#475569}
+.ph .nav span.on{color:#1d4ed8;font-weight:700;border-top:2px solid #1d4ed8;margin-top:-1px}
+.ph h5{margin:0;font-size:13px}
+.heat{position:absolute;inset:0;pointer-events:none;mix-blend-mode:multiply}
+.side{flex:1;min-width:230px;font-size:13px}
+#f5s{visibility:hidden}
+.f5w{position:relative;border:2px dashed #93c5fd;border-radius:34px;display:flex;align-items:center;justify-content:center;flex:none}
+.f5w>span{position:absolute;color:#94a3b8;font-size:12px;text-align:center;padding:0 40px}
+.cd{font:800 34px system-ui;color:var(--main);text-align:center;min-height:44px}
+.btnx{font:700 14px system-ui;background:var(--main);color:#fff;border:0;border-radius:8px;padding:9px 16px;cursor:pointer}
+.btnx:disabled{opacity:.6;cursor:default}
+.sus td,.sus th{text-align:center}.sus td:nth-child(2){text-align:left}
+.res td,.res th{text-align:center}.res td:first-child,.res th:first-child{text-align:left}
+</style>
+</head>
+<body>
+
+  <div class="hdr">
+    <img src="logo-ua1.png" alt="" onerror="this.style.display='none'">
+    <div class="l">
+      <b>People's Democratic Republic of Algeria</b><br>
+      Ministry of Higher Education and Scientific Research<br>
+      <b>University of Algiers 1 &ndash; Benyoucef Benkhedda</b><br>
+      Department of Computer Science
+    </div>
+    <div class="r">
+      <b>Specialty:</b> L3 ISIL<br>
+      <b>Module:</b> Human-Computer Interaction (HCI)<br>
+      <b>Topic:</b> Tutorial 5.2: Evaluation of HCI, usability and user testing<br>
+      <b>Academic Year:</b> 2026 / 2027
+    </div>
+  </div>
+
+  <div class="title-block">
+    <h1>HCI Tutorial 5.2: Usability Testing and User Testing</h1>
+    <h2>Questionnaires &middot; Perception and 5-second tests &middot; Observation &middot; Heatmaps &middot; Interviews &middot; A/B testing</h2>
+  </div>
+
+  <div class="toolbar" id="unlockbar">
+    <div class="unlock">
+      <span id="msg"></span>
+      <input id="code" type="password" placeholder="Teacher code" autocomplete="off" onkeydown="if(event.key==='Enter')unlock()">
+      <button type="button" onclick="unlock()">Unlock solutions</button>
+    </div>
+  </div>
+  <div class="toolbar" id="solbar" style="display:none">
+    <button type="button" onclick="setAll(true)">Show all solutions</button>
+    <button type="button" class="alt" onclick="setAll(false)">Hide all solutions</button>
+  </div>
+
+
+  <div class="card objectives">
+    <h2>Objectives</h2>
+    <p>By the end of this tutorial, you should be able to:</p>
+    <ul>
+      <li>Explain what to <b>evaluate</b> and distinguish <b>utility, usability and usage</b> (ISO 9241-11).</li>
+      <li>Design <b>questionnaires</b> (Likert, SUS), a <b>perception test</b> and a <b>five-second test</b>.</li>
+      <li>Plan and analyse a <b>usability test with observation</b> (scenario, measures, number of users).</li>
+      <li>Read a <b>heatmap</b>, run an <b>A/B test</b> and <b>interview</b> users, then combine all the results into a decision.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Context &middot; Testing the university website with users</h2>
+    <p>The ergonomists inspected the University of Algiers 1 website (Tutorial 5.1) and the designers fixed the main problems. Now the team must <b>test the website with real users</b>: students such as <b>Sara</b>, teachers, and administrative staff. You prepare and analyse the tests. A few weeks later, the first version is live and the team studies how it is used.</p>
+    <div class="meta"><span class="pill">User testing</span><span class="pill">Questionnaires</span><span class="pill">Observation</span><span class="pill">Heatmaps</span><span class="pill">A/B test</span></div>
+  </div>
+
+  <div class="card">
+    <div class="part"><span class="ic">&#127919;</span><h2>Part 1 &middot; Evaluation goals and usability</h2></div>
+    <div class="q"><b class="n">Q1.</b> In one or two sentences, explain what it means to <b>evaluate</b> the website, and why evaluating <b>before</b> release matters for a university site.</div>
+    <div class="q"><b class="n">Q2.</b> Explain <b>utility</b>, <b>usability</b> and <b>usage</b>, with one example of each for the website.</div>
+    <div class="q"><b class="n">Q3.</b> ISO 9241-11 defines usability by <b>effectiveness</b>, <b>efficiency</b> and <b>satisfaction</b>. Give one concrete example of each for the website.</div>
+    <p><b>Solution</b></p>
+    <div class="locked" data-i="0">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+  <div class="card">
+    <div class="part"><span class="ic">&#128221;</span><h2>Part 2 &middot; Questionnaires</h2></div>
+    <div class="q"><b class="n">Q4.</b> Which groups are the best targets for a <b>written questionnaire</b>: students, teachers, administrative staff? Justify each.</div>
+    <div class="q"><b class="n">Q5.</b> Write a <b>5-item Likert questionnaire</b> (1 to 5) for <b>students</b>: difficulty of the tasks, clarity of the interface, effort, feeling of control, global satisfaction.</div>
+    <div class="q"><b class="n">Q6.</b> Propose <b>2 open questions</b> for teachers or staff: one about how the site fits their work, one about the reactions of students.</div>
+    <div class="q"><b class="n">Q7.</b> <b>SUS.</b> A student answered the System Usability Scale below (1 = strongly disagree, 5 = strongly agree). Compute her score: odd items count <i>answer &minus; 1</i>, even items count <i>5 &minus; answer</i>; add everything and multiply by 2.5. The average SUS is about 68. Interpret the result.</div>
+    <table class="t sus"><tr><th>#</th><th>Statement</th><th>Answer</th><th>Contribution</th></tr><tr><td>1</td><td>I think that I would like to use this website frequently.</td><td>4</td><td class="blank" style="width:12%"></td></tr><tr><td>2</td><td>I found the website unnecessarily complex.</td><td>2</td><td class="blank" style="width:12%"></td></tr><tr><td>3</td><td>I thought the website was easy to use.</td><td>4</td><td class="blank" style="width:12%"></td></tr><tr><td>4</td><td>I think I would need the support of a technical person to use it.</td><td>2</td><td class="blank" style="width:12%"></td></tr><tr><td>5</td><td>I found the various functions of the website well integrated.</td><td>4</td><td class="blank" style="width:12%"></td></tr><tr><td>6</td><td>I thought there was too much inconsistency in the website.</td><td>3</td><td class="blank" style="width:12%"></td></tr><tr><td>7</td><td>I imagine most students would learn to use it very quickly.</td><td>4</td><td class="blank" style="width:12%"></td></tr><tr><td>8</td><td>I found the website very cumbersome to use.</td><td>2</td><td class="blank" style="width:12%"></td></tr><tr><td>9</td><td>I felt very confident using the website.</td><td>3</td><td class="blank" style="width:12%"></td></tr><tr><td>10</td><td>I needed to learn a lot of things before I could get going.</td><td>2</td><td class="blank" style="width:12%"></td></tr></table>
+    <p>Sum = &hellip;&hellip; &times; 2.5 = &hellip;&hellip; / 100 &nbsp;&nbsp; Interpretation: &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;</p>
+    <p><b>Solution</b></p>
+    <div class="locked" data-i="1">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+  <div class="card">
+    <div class="part"><span class="ic">&#128065;</span><h2>Part 3 &middot; Perception test and five-second test</h2></div>
+    <p>You have the <b>home screen</b> of the mobile website with a search bar, three shortcuts (Timetable, Results, Deadlines), announcements and a bottom menu.</p>
+    <div class="try"><b class="l">&#9654; Try the five-second test.</b> Press the button: the screen appears for 5 seconds, then disappears. Then answer Q9 <b>from memory</b>.</div>
+    <div class="stage">
+      <div class="f5w"><span>The screen will appear here</span><div id="f5s">
+<div class="ph" aria-label="Home screen">
+  <div class="tb"><span>&#9776;</span><span class="lg">UA</span><b>Alger 1</b><span class="lang">AR|FR|EN</span></div>
+  <div class="bd">
+    <div class="srch">&#128269; Search: results, timetable...</div>
+    <h5>Quick access</h5>
+    <div class="tiles"><div class="tile"><i>&#128197;</i>Timetable</div><div class="tile"><i>&#128202;</i>Results</div><div class="tile"><i>&#9200;</i>Deadlines</div></div>
+    <h5>Announcements</h5>
+    <div class="card2"><b>Make-up exams</b><small>Updated 28 Oct 2026</small></div>
+    <div class="card2"><b>Re-registration opens</b><small>Updated 25 Oct 2026</small></div>
+  </div>
+  <div class="nav"><span class="on">Home</span><span>My studies</span><span>Procedures</span><span>More</span></div>
+  
+</div></div></div>
+      <div class="side"><div class="cd" id="f5c"></div><button class="btnx" id="f5b" type="button">Start the 5-second test</button><p id="f5m" style="font-weight:700;color:var(--main)"></p>
+      <p>What do you remember? Write it here:</p><div class="q" style="min-height:70px"></div></div>
+    </div>
+    <div class="q"><b class="n">Q8.</b> <b>Perception test.</b> Write at least <b>4 questions</b> to ask after showing the screen with <b>no time limit</b>: comprehension, first visual focus, possible actions, and clarity for a student on a phone.</div>
+    <div class="q"><b class="n">Q9.</b> <b>Five-second test.</b> Propose <b>2 or 3 recall questions</b> and <b>2 or 3 rating questions</b> (5-point scale) on the clarity of the main action, readability, and simplicity.</div>
+    <div class="q"><b class="n">Q10.</b> Explain the difference between a perception test and a five-second test, and why the latter checks that the screen is <b>immediately understandable and not overwhelming</b>.</div>
+    <p><b>Solution</b></p>
+    <div class="locked" data-i="2">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+  <div class="card">
+    <div class="part"><span class="ic">&#128300;</span><h2>Part 4 &middot; Usability test with observation</h2></div>
+    <div class="q"><b class="n">Q11.</b> Write one realistic <b>task scenario</b> for a student using the prototype on her phone (a goal and a context, <b>no instructions</b> on how to do it).</div>
+    <div class="q"><b class="n">Q12.</b> For this scenario give <b>one success criterion</b> and <b>two quantitative measures</b>.</div>
+    <div class="q"><b class="n">Q13.</b> Propose at least <b>4 qualitative observation items</b> that the observer notes during the test.</div>
+    <div class="q"><b class="n">Q14.</b> How many users would you test <b>at minimum</b>? Justify, knowing that access to students, teachers and staff is limited.</div>
+    <div class="q"><b class="n">Q15.</b> <b>Read the data.</b> Five students did three tasks (&#10003; success, &#10007; failure, time, number of errors). Complete the table, find the worst task, give two hypotheses and a next step.</div>
+    <table class="t res"><tr><th>Task</th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th></tr><tr><td>T1 Find the exam timetable</td><td>&#10003; 25 s, 0 err.</td><td>&#10003; 32 s, 1 err.</td><td>&#10003; 18 s, 0 err.</td><td>&#10003; 40 s, 1 err.</td><td>&#10003; 28 s, 0 err.</td></tr><tr><td>T2 Find your results for S5</td><td>&#10003; 48 s, 1 err.</td><td>&#10003; 75 s, 2 err.</td><td>&#10007; 120 s, 4 err.</td><td>&#10003; 55 s, 1 err.</td><td>&#10007; 120 s, 3 err.</td></tr><tr><td>T3 Request a certificate</td><td>&#10003; 150 s, 2 err.</td><td>&#10007; 180 s, 5 err.</td><td>&#10003; 140 s, 3 err.</td><td>&#10007; 180 s, 4 err.</td><td>&#10007; 180 s, 6 err.</td></tr></table>
+    <table class="t res"><tr><th>Task</th><th>Completion rate</th><th>Mean time (successes)</th><th>Mean errors per student</th></tr><tr><td>T1 Find the exam timetable</td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td>T2 Find your results for S5</td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr><tr><td>T3 Request a certificate</td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr></table>
+    <p>Worst task: &hellip;&hellip;&hellip;&hellip; &nbsp; Hypotheses: &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;</p>
+    <p><b>Solution</b></p>
+    <div class="locked" data-i="3">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+  <div class="card">
+    <div class="part"><span class="ic">&#128293;</span><h2>Part 5 &middot; Eye-tracking and click maps</h2></div>
+    <p>After one month the site records where visitors tap. The map below shows the <b>taps</b> on the home screen (fictional data, red = many, yellow = fewer, none = cold).</p>
+    <div class="stage">
+<div class="ph" aria-label="Home screen">
+  <div class="tb"><span>&#9776;</span><span class="lg">UA</span><b>Alger 1</b><span class="lang">AR|FR|EN</span></div>
+  <div class="bd">
+    <div class="srch">&#128269; Search: results, timetable...</div>
+    <h5>Quick access</h5>
+    <div class="tiles"><div class="tile"><i>&#128197;</i>Timetable</div><div class="tile"><i>&#128202;</i>Results</div><div class="tile"><i>&#9200;</i>Deadlines</div></div>
+    <h5>Announcements</h5>
+    <div class="card2"><b>Make-up exams</b><small>Updated 28 Oct 2026</small></div>
+    <div class="card2"><b>Re-registration opens</b><small>Updated 25 Oct 2026</small></div>
+  </div>
+  <div class="nav"><span class="on">Home</span><span>My studies</span><span>Procedures</span><span>More</span></div>
+  <div class="heat" style="background:radial-gradient(circle at 32% 16%, rgba(220,38,38,.95), rgba(220,38,38,.5) 6%, transparent 13%),radial-gradient(circle at 62% 16%, rgba(239,68,68,.9), rgba(245,158,11,.45) 8%, transparent 14%),radial-gradient(circle at 19% 23.5%, rgba(245,158,11,.95), rgba(250,204,21,.45) 5%, transparent 10%),radial-gradient(circle at 16% 6%, rgba(239,68,68,.9), rgba(250,204,21,.5) 5%, transparent 10%),radial-gradient(circle at 18% 33.5%, rgba(250,204,21,.8), transparent 9%),radial-gradient(circle at 50% 33.5%, rgba(245,158,11,.8), transparent 10%),radial-gradient(circle at 87% 95%, rgba(239,68,68,.85), transparent 9%)"></div>
+</div><div class="side"><p><b>Look at it:</b> which areas are hot, warm and cold? Is anything surprising?</p></div></div>
+    <div class="q"><b class="n">Q16.</b> Formulate <b>one research question</b> that a heatmap could answer for this home screen.</div>
+    <div class="q"><b class="n">Q17.</b> What does a <b>heatmap</b> show? What does a <b>scanpath (gaze plot)</b> or click path show?</div>
+    <div class="q"><b class="n">Q18.</b> <b>Interpret</b> the map above: give at least four observations, with a possible cause and an action for each.</div>
+    <div class="q"><b class="n">Q19.</b> If you have no eye-tracker, propose <b>one alternative</b> to approximate where users look or tap.</div>
+    <p><b>Solution</b></p>
+    <div class="locked" data-i="4">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+  <div class="card">
+    <div class="part"><span class="ic">&#9878;</span><h2>Part 6 &middot; Interviews and A/B testing</h2></div>
+    <div class="q"><b class="n">Q20.</b> You interview teachers and staff after several weeks of use. Propose <b>4 semi-structured questions</b>: 2 about the <b>integration in their work</b>, 2 about the <b>reactions of students</b>.</div>
+    <div class="q"><b class="n">Q21.</b> Two home pages were tested at the same time on real visitors: <b>A</b> (shortcut tiles) and <b>B</b> (big search bar first, no tiles).</div>
+    <table class="t res"><tr><th>Version</th><th>Visitors</th><th>Found their results within 30 s</th><th>Median time</th><th>Satisfaction (1 to 5)</th></tr>
+    <tr><td>A &middot; tiles</td><td>200</td><td>140</td><td>22 s</td><td>4.1</td></tr><tr><td>B &middot; search first</td><td>200</td><td>118</td><td>31 s</td><td>4.3</td></tr></table>
+    <ol style="list-style:lower-alpha"><li>Which <b>KPIs</b> compare A and B?</li><li>How should visitors be <b>assigned</b> to A or B?</li><li>Compute the success rate of each version.</li><li>Which version do you keep, considering performance <b>and</b> satisfaction? (Optional: is the 11-point gap likely to be due to chance? Use a two-proportion z-test.)</li></ol>
+    <div class="q"><b class="n">Q22.</b> Explain how you combine the <b>quantitative</b> results (A/B, logs, success rates) and the <b>qualitative</b> results (interviews, observation) to take a final decision on the design.</div>
+    <p><b>Solution and marking guide</b></p>
+    <div class="locked" data-i="5">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+
+  <div class="footer">University of Algiers 1 &middot; Department of Computer Science &middot; Specialty ISIL &middot; Module HCI &middot; Tutorial 5.2</div>
+
+<script id="enc-data" type="application/json">{"salt": "GaeedLyNs2JNlu8pNyKi9A==", "iter": 250000, "items": ["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"]}</script>
+<script>
+function setAll(open){document.querySelectorAll('details.sol-d').forEach(function(d){d.open=open;});}
+document.addEventListener('click',function(e){
+  var t=e.target;
+  if(t.classList&&t.classList.contains('shot')){var lb=document.getElementById('lb');lb.firstChild.src=t.src;lb.style.display='block';}
+  else if(t.closest&&t.closest('#lb')){document.getElementById('lb').style.display='none';}
+});
+function b64(s){var b=atob(s),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a;}
+async function unlock(){
+  var msg=document.getElementById('msg');msg.textContent='';
+  var code=document.getElementById('code').value.trim();
+  if(!code){return;}
+  if(!(window.crypto&&crypto.subtle)){msg.textContent='This browser cannot decrypt (use https or a recent browser).';return;}
+  try{
+    var D=JSON.parse(document.getElementById('enc-data').textContent);
+    var km=await crypto.subtle.importKey('raw',new TextEncoder().encode(code),'PBKDF2',false,['deriveKey']);
+    var key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(D.salt),iterations:D.iter,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+    var out=[];
+    for(var i=0;i<D.items.length;i++){
+      var raw=b64(D.items[i]);
+      var pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:raw.slice(0,12)},key,raw.slice(12));
+      out.push(new TextDecoder().decode(pt));
+    }
+    document.querySelectorAll('.locked').forEach(function(el){
+      var d=document.createElement('details');d.className='sol-d';
+      d.innerHTML='<summary>Show solution</summary><div class="sol">'+out[+el.dataset.i]+'</div>';
+      el.replaceWith(d);
+      d.querySelectorAll('img[data-ref]').forEach(function(im){var s=document.getElementById(im.dataset.ref);if(s)im.src=s.src;});
+    });
+    document.getElementById('unlockbar').style.display='none';
+    document.getElementById('solbar').style.display='flex';
+  }catch(err){msg.textContent='Wrong code.';}
+}
+</script>
+<script>
+(function(){var b=document.getElementById('f5b');if(!b)return;
+var s=document.getElementById('f5s'),c=document.getElementById('f5c'),m=document.getElementById('f5m');
+b.onclick=function(){b.disabled=true;s.style.visibility='visible';m.textContent='';var n=5;c.textContent=n+' s';
+ var t=setInterval(function(){n--;c.textContent=n>0?n+' s':'';
+  if(n<=0){clearInterval(t);s.style.visibility='hidden';m.textContent='Time is up. Answer from memory (Q9).';b.disabled=false;b.textContent='Run it again';}},1000);};})();
+</script></body>
+</html>
