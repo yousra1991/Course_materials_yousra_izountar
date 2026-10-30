@@ -1,1 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HCI Tutorial 4 - Interfaces and Interactions with Mockups</title>
+<style>
+@page { size: A4; margin: 10mm 12mm 12mm 12mm; }
+:root{ --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --main:#1d4ed8; --soft:#e8f0fe;
+       --ok:#15803d; --okbg:#dcfce7; --ko:#b91c1c; --kobg:#fee2e2; --part:#a16207; --partbg:#fef3c7; }
+*{box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.45;
+     font-size:14px;margin:0 auto;padding:16px;max-width:900px}
+.hdr{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border-radius:10px;padding:12px 16px;margin-bottom:12px}
+.hdr img{max-height:60px;width:auto;background:#fff;border-radius:50%;padding:3px}
+.hdr .l{font-size:11px;line-height:1.35}.hdr .r{font-size:11px;line-height:1.35;text-align:right}
+.header-table{width:100%;border-collapse:collapse;border-bottom:2px double var(--main);margin-bottom:12px}
+.header-table td{vertical-align:middle;padding:0 0 6px 0}
+.header-left{width:38%;font-size:11px;line-height:1.3}
+.header-center{width:24%;text-align:center}
+.header-center img{max-height:55px;width:auto}
+.header-right{width:38%;text-align:right;font-size:11px;line-height:1.3}
+.title-block{text-align:center;background:var(--soft);border:1.5px solid var(--main);border-radius:8px;padding:10px;margin-bottom:14px}
+.title-block h1{margin:0;font-size:19px;color:var(--main);text-transform:uppercase}
+.title-block h2{margin:3px 0 0;font-size:13px;color:#4b5563;font-weight:600}
+.card{border:1px solid var(--line);border-radius:8px;margin-bottom:12px;padding:12px 14px}
+.card h2{margin:0 0 8px;font-size:16px;color:var(--main);border-bottom:1px solid var(--line);padding-bottom:4px}
+.card h3{margin:12px 0 4px;font-size:14px;color:#111827}
+ul,ol{margin:4px 0;padding-left:22px} li{margin:3px 0}
+.tag{display:inline-block;background:var(--soft);color:var(--main);border-radius:4px;padding:1px 6px;font-size:12px;font-weight:600;margin-right:3px}
+.objectives{background:#f3f7ff;border-left:4px solid var(--main)}
+.q{background:#f3f4f6;border-left:3px solid var(--main);padding:8px 10px;margin:8px 0;border-radius:0 6px 6px 0}
+.q b.n{color:var(--main)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{background:#f9fafb;border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:13px}
+table.t{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}
+table.t th,table.t td{border:1px solid var(--line);padding:6px 8px;vertical-align:top;text-align:left}
+table.t th{background:var(--soft);color:var(--main)}
+details{margin:6px 0}
+details>summary{cursor:pointer;font-weight:700;color:var(--main);padding:5px 10px;background:var(--soft);border-radius:6px;list-style:none}
+details>summary::before{content:"\25B6\00A0";font-size:11px}
+details[open]>summary::before{content:"\25BC\00A0"}
+details>.sol{border:1px solid #bfd4fb;border-top:none;padding:8px 12px;border-radius:0 0 6px 6px;background:#fcfcff}
+.ans{color:#166534;font-weight:600}
+.toolbar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px}
+.toolbar button{font:inherit;font-size:13px;font-weight:600;color:#fff;background:var(--main);border:0;border-radius:6px;padding:7px 12px;cursor:pointer}
+.toolbar button.alt{background:#fff;color:var(--main);border:1.5px solid var(--main)}
+.badge{display:inline-block;font-size:11px;font-weight:700;border-radius:10px;padding:1px 8px;margin-top:4px;white-space:nowrap}
+.b-ko{background:var(--kobg);color:var(--ko)} .b-ok{background:var(--okbg);color:var(--ok)} .b-part{background:var(--partbg);color:var(--part)}
+.shot{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:6px;cursor:zoom-in}
+.cap{font-size:12px;color:var(--muted);margin:3px 0 8px}
+#lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9;overflow:auto;cursor:zoom-out;padding:12px}
+#lb img{display:block;margin:0 auto;max-width:none;width:min(2200px,200vw)}
+.locked{border:1.5px dashed #bfd4fb;background:#f3f7ff;color:var(--main);font-weight:700;padding:7px 12px;border-radius:6px;margin:6px 0}
+.unlock{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.unlock input{font:inherit;font-size:13px;padding:6px 10px;border:1.5px solid var(--main);border-radius:6px;min-width:240px}
+#msg{font-size:12px;font-weight:600;color:var(--ko)}
+.num{display:inline-block;min-width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;background:var(--main);color:#fff;font-size:12px;font-weight:700;margin-right:6px}
+.annot{position:relative;margin:6px 0 4px}
+.annot img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:6px}
+.bx{position:absolute;border:2px solid hsl(var(--h) 85% 42%);background:hsl(var(--h) 85% 50% / .14);border-radius:3px;pointer-events:none}
+.pin{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:hsl(var(--h) 85% 38%);color:#fff;font:700 11px Arial,sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff;pointer-events:none}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;margin:4px 0 8px}
+.legend span{white-space:nowrap}
+.legend i{display:inline-block;width:16px;height:16px;border-radius:50%;background:hsl(var(--h) 85% 38%);color:#fff;font:700 10px/16px Arial,sans-serif;text-align:center;font-style:normal;margin-right:4px}
+.footer{text-align:center;font-size:11px;color:var(--muted);border-top:1px solid var(--line);padding-top:6px;margin-top:14px}
+@media (max-width:640px){.hdr{grid-template-columns:1fr;text-align:center}.hdr .r{text-align:center}.grid-2{grid-template-columns:1fr}.header-table td{display:block;width:100%!important;text-align:center!important}}
+@media print{
+  body{font-size:11px;padding:0;max-width:none}
+  .toolbar,#lb{display:none!important}
+  .card{page-break-inside:avoid}
+  .screen{page-break-before:always}
+  table.t tr{page-break-inside:avoid}
+  .shot{cursor:default}
+}
 
+[hidden]{display:none!important}
+.kc{border:1px solid var(--line);border-left:4px solid var(--main);border-radius:6px;padding:8px 10px;margin:8px 0;background:#fff;break-inside:avoid}
+.kc h4{margin:0 0 4px;font-size:14px}
+.ktag{display:inline-block;background:var(--soft);color:var(--main);border-radius:5px;padding:1px 7px;font-size:12px;font-weight:600;margin:1px 3px 1px 0}
+table.t td.blank{height:34px}
+.part{display:flex;align-items:center;gap:10px;margin:0 0 6px}
+.part .ic{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+.part h2{border:0!important;margin:0!important;padding:0!important}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 10px}
+.pill{background:var(--soft);color:var(--main);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600}
+.try{background:linear-gradient(135deg,#eff6ff,#e0e7ff);border:1.5px dashed var(--main);border-radius:10px;padding:10px 14px;margin:10px 0}
+.try b.l{color:var(--main)}
+.stage{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;justify-content:center;margin:8px 0}
+.ph{width:270px;border:8px solid #111827;border-radius:30px;background:#fff;position:relative;overflow:hidden;font:12px/1.35 'Segoe UI',Arial,sans-serif;color:#1f2937;box-shadow:0 8px 24px rgba(30,64,175,.18);flex:none}
+.ph .tb{background:#1d4ed8;color:#fff;display:flex;align-items:center;gap:8px;padding:9px 10px}
+.ph .tb .lg{width:22px;height:22px;border-radius:6px;background:#fff;color:#1d4ed8;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:11px}
+.ph .tb b{font-size:12px;flex:1}
+.ph .lang{font-size:10px;border:1px solid #93c5fd;border-radius:6px;padding:1px 4px}
+.ph .bd{padding:10px;display:flex;flex-direction:column;gap:9px;min-height:380px}
+.ph .srch{border:1px solid #cbd5e1;border-radius:8px;padding:7px 9px;color:#6b7280;background:#f8fafc}
+.ph .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.ph .tile{border:1px solid #bfdbfe;background:#eff6ff;border-radius:10px;padding:8px 2px;text-align:center;font-size:11px;font-weight:600;color:#1e3a8a;cursor:pointer}
+.ph .tile i{display:block;font-style:normal;font-size:19px}
+.ph .card2{border:1px solid #e5e7eb;border-radius:8px;padding:7px 9px;background:#fff}
+.ph .card2 small{color:#6b7280;display:block}
+.ph .nav{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #e5e7eb;background:#fff}
+.ph .nav span{text-align:center;padding:7px 0;font-size:10px;color:#475569}
+.ph .nav span.on{color:#1d4ed8;font-weight:700;border-top:2px solid #1d4ed8;margin-top:-1px}
+.ph h5{margin:0;font-size:13px}
+.ph .row{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eef2f7;padding:6px 0}
+.ph .ok{color:#15803d;font-weight:700}.ph .ko{color:#b91c1c;font-weight:700}
+.ph .btn2{background:#1d4ed8;color:#fff;border:0;border-radius:10px;padding:11px;font:700 13px inherit;font-family:inherit;width:100%;cursor:pointer}
+.ph .btn2.sec{background:#fff;color:#1d4ed8;border:1.5px solid #1d4ed8}
+.ph .chip{display:inline-block;border:1px solid #93c5fd;border-radius:999px;padding:4px 12px;font-weight:600;color:#1d4ed8;cursor:pointer;margin-right:5px}
+.ph .chip.on{background:#1d4ed8;color:#fff}
+.ph .fab{position:absolute;right:10px;bottom:48px;width:34px;height:34px;border-radius:50%;background:#f59e0b;color:#111;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.ph .scr{display:flex;flex-direction:column;min-height:480px}
+.ph .scr .bd{flex:1}
+.ph .back{cursor:pointer;font-size:16px;padding:0 4px}
+.ph .dim{position:absolute;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:18px;z-index:3}
+.ph .dlg{background:#fff;border-radius:12px;padding:14px;width:100%}
+.ph .dlg p{margin:0 0 10px}
+.ph .toast{position:absolute;left:12px;right:12px;bottom:56px;background:#14532d;color:#fff;border-radius:10px;padding:9px 11px;font-weight:600;z-index:4}
+.pe{position:relative}
+.mk{position:absolute;right:-4px;top:-8px;display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:#d61f1f;color:#fff;font:700 10px Arial,sans-serif;box-shadow:0 0 0 2px #fff;z-index:2}
+.mk.l{right:auto;left:-4px}
+.mk.bt{top:auto;bottom:-10px}
+.mk.nl{right:auto;left:10px;top:-10px}
+.side{flex:1;min-width:230px;font-size:13px}
+.log{background:#0f172a;color:#cbd5e1;border-radius:8px;padding:8px 10px;font:12px/1.5 Consolas,monospace;min-height:84px;margin-top:6px}
+.log b{color:#7dd3fc}
+.draw{border:2px dashed #93c5fd;border-radius:26px;width:210px;height:360px;margin:6px auto;display:flex;align-items:flex-start;justify-content:center;color:#94a3b8;font-size:12px;padding-top:12px}
+.sw{display:inline-block;width:150px;max-width:100%;border-radius:8px;padding:8px 10px;font-weight:700;font-size:13px;border:1px solid #e5e7eb}
+.chk{columns:2;list-style:none;padding:0;font-size:13px}.chk li{break-inside:avoid;margin:2px 0}
+.mini{width:150px;border:5px solid #111827;border-radius:20px;overflow:hidden;font-size:9px;line-height:1.3;background:#fff}
+.mini .h{background:#1d4ed8;color:#fff;padding:5px 7px;font-weight:700}
+.mini .b{padding:7px;display:flex;flex-direction:column;gap:5px;min-height:150px}
+.mini .c{border:1px solid #bfdbfe;background:#eff6ff;border-radius:6px;padding:4px 6px}
+.mini .g{background:#dcfce7;border-color:#86efac}
+.mini .bt{background:#1d4ed8;color:#fff;border-radius:6px;text-align:center;padding:5px;font-weight:700}
+.capm{text-align:center;font-size:12px;font-weight:700;color:var(--main);margin-top:3px}
+@media print{.try .stage{break-inside:avoid}}
+
+.copyb{font:600 13px system-ui;background:var(--main);color:#fff;border:0;border-radius:6px;padding:6px 12px;cursor:pointer}
+.sol{padding:8px 4px}
+</style>
+</head>
+<body>
+
+  <div class="hdr">
+    <img src="logo-ua1.png" alt="" onerror="this.style.display='none'">
+    <div class="l">
+      <b>People's Democratic Republic of Algeria</b><br>
+      Ministry of Higher Education and Scientific Research<br>
+      <b>University of Algiers 1 &ndash; Benyoucef Benkhedda</b><br>
+      Department of Computer Science
+    </div>
+    <div class="r">
+      <b>Specialty:</b> L3 ISIL<br>
+      <b>Module:</b> Human-Computer Interaction (HCI)<br>
+      <b>Topic:</b> Tutorial 4: Interfaces and Interactions with Mockups<br>
+      <b>Academic Year:</b> 2026 / 2027
+    </div>
+  </div>
+
+  <div class="title-block">
+    <h1>HCI Tutorial: Interfaces and Interactions with Mockups</h1>
+    <h2>GUI and WIMP &middot; Mockups &middot; Interaction design &middot; Accessibility &middot; Creative task</h2>
+  </div>
+
+  <div class="toolbar" id="unlockbar">
+    <div class="unlock">
+      <span id="msg"></span>
+      <input id="code" type="password" placeholder="Teacher code" autocomplete="off" onkeydown="if(event.key==='Enter')unlock()">
+      <button type="button" onclick="unlock()">Unlock solutions</button>
+    </div>
+  </div>
+  <div class="toolbar" id="solbar" style="display:none">
+    <button type="button" onclick="setAll(true)">Show all solutions</button>
+    <button type="button" class="alt" onclick="setAll(false)">Hide all solutions</button>
+  </div>
+
+
+  <div class="card objectives">
+    <h2>Objectives</h2>
+    <p>By the end of this tutorial, you should be able to:</p>
+    <ul>
+      <li>Identify the <b>GUI components</b> and the <b>WIMP elements</b> of a screen, and propose some for a given need.</li>
+      <li>Explain the difference between a <b>static</b> and an <b>interactive mockup</b>, and design a key screen.</li>
+      <li>Describe <b>interaction</b> types (direct, indirect, gesture) and design <b>feedback</b> (visual, auditory, haptic).</li>
+      <li>Check the <b>accessibility</b> of a screen (contrast, size, targets) and improve it.</li>
+      <li>Design and present an <b>interactive mockup</b> of a new feature.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Context &middot; From the problem to the mockup</h2>
+    <p>You continue the redesign of the <b>University of Algiers 1 website</b>. In the previous tutorial your team found the problem (<i>students cannot find information quickly on a phone</i>), built the persona of <b>Sara</b>, and chose three quick wins: a readable mobile layout, a working search, and home shortcuts. Now you <b>design the mockup</b> and define the <b>interaction</b>.</p>
+    <div class="meta"><span class="pill">Mobile first</span><span class="pill">Persona: Sara, L3 ISIL</span><span class="pill">Languages: AR / FR / EN</span></div>
+  </div>
+
+  <!-- PART 1 -->
+  <div class="card">
+    <div class="part"><span class="ic">&#128433;</span><h2>Part 1 &middot; Understanding the GUI</h2></div>
+    <div class="q"><b class="n">Q1.</b> Define <b>Graphical User Interface (GUI)</b> and explain its role in HCI design.</div>
+    <div class="q"><b class="n">Q2.</b> Look at the home screen wireframe. For each <b>numbered component</b>, give its <b>name</b>, its <b>type</b>, the <b>WIMP element</b> it belongs to (Window, Icon, Menu, Pointer), and its <b>role</b>.</div>
+    <div class="stage">
+      
+<div class="ph" aria-label="Home screen wireframe">
+  <div class="tb"><span class="pe">&#9776;<span class="mk l ">2</span></span><span class="pe lg">UA<span class="mk bt">1</span></span><b>Alger 1</b><span class="pe lang">AR | FR | EN<span class="mk ">4</span></span></div>
+  <div class="bd">
+    <div class="pe srch">&#128269; Search: results, timetable...<span class="mk ">3</span></div>
+    <h5>Quick access</h5>
+    <div class="pe tiles"><div class="tile"><i>&#128197;</i>Timetable</div><div class="tile"><i>&#128202;</i>Results</div><div class="tile"><i>&#9200;</i>Deadlines</div><span class="mk ">5</span></div>
+    <h5>Announcements</h5>
+    <div class="pe"><div class="card2"><b>Make-up exams</b><small>Updated 28 Oct 2026</small></div><div class="card2" style="margin-top:6px"><b>Re-registration opens</b><small>Updated 25 Oct 2026</small></div><span class="mk ">6</span></div>
+  </div>
+  <div class="pe fab" style="position:absolute">?<span class="mk ">8</span></div>
+  <div class="pe nav"><span class="on">Home</span><span>My studies</span><span>Procedures</span><span>More</span><span class="mk nl">7</span></div>
+</div>
+      <div class="side"><table class="t"><tr><th>#</th><th>Component</th><th>Type</th><th>WIMP</th><th>Role</th></tr><tr><td style="width:6%"><b>1</b></td><td class="blank" style="width:24%"></td><td class="blank" style="width:24%"></td><td class="blank" style="width:20%"></td><td class="blank"></td></tr><tr><td style="width:6%"><b>2</b></td><td class="blank" style="width:24%"></td><td class="blank" style="width:24%"></td><td class="blank" style="width:20%"></td><td class="blank"></td></tr><tr><td style="width:6%"><b>3</b></td><td class="blank" style="width:24%"></td><td class="blank" style="width:24%"></td><td class="blank" style="width:20%"></td><td class="blank"></td></tr><tr><td style="width:6%"><b>4</b></td><td class="blank" style="width:24%"></td><td class="blank" style="width:24%"></td><td class="blank" style="width:20%"></td><td class="blank"></td></tr><tr><td style="width:6%"><b>5</b></td><td class="blank" style="width:24%"></td><td class="blank" style="width:24%"></td><td class="blank" style="width:20%"></td><td class="blank"></td></tr><tr><td style="width:6%"><b>6</b></td><td class="blank" style="width:24%"></td><td class="blank" style="width:24%"></td><td class="blank" style="width:20%"></td><td class="blank"></td></tr><tr><td style="width:6%"><b>7</b></td><td class="blank" style="width:24%"></td><td class="blank" style="width:24%"></td><td class="blank" style="width:20%"></td><td class="blank"></td></tr><tr><td style="width:6%"><b>8</b></td><td class="blank" style="width:24%"></td><td class="blank" style="width:24%"></td><td class="blank" style="width:20%"></td><td class="blank"></td></tr></table></div>
+    </div>
+    <div class="q"><b class="n">Q3.</b> Propose <b>one concrete feature</b> of the website for each WIMP element.</div>
+    <table class="t"><tr><th style="width:20%">WIMP</th><th>Proposal for the website</th></tr>
+      <tr><td><b>Window</b></td><td class="blank"></td></tr><tr><td><b>Icon</b></td><td class="blank"></td></tr><tr><td><b>Menu</b></td><td class="blank"></td></tr><tr><td><b>Pointer</b></td><td class="blank"></td></tr></table>
+    <p><b>Solution</b></p>
+    <div class="locked" data-i="1">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+  <!-- PART 2 -->
+  <div class="card">
+    <div class="part"><span class="ic">&#128241;</span><h2>Part 2 &middot; Mockup design</h2></div>
+    <div class="try"><b class="l">&#9654; Try it first.</b> The phone below is an <b>interactive mockup</b> (fictional data). Open <i>Timetable</i>, <i>Results</i> and <i>Deadlines</i>, choose a semester, then try to download the transcript, and cancel once. Watch the interaction log.</div>
+    
+<div class="stage" id="proto">
+  <div class="ph" id="phone">
+    <div class="scr" data-s="home">
+      <div class="tb"><span>&#9776;</span><span class="lg">UA</span><b>Univ. Alger 1</b><span class="lang">AR | FR | EN</span></div>
+      <div class="bd">
+        <div class="srch">&#128269; Search: results, timetable...</div>
+        <h5>Quick access</h5>
+        <div class="tiles"><div class="tile" data-go="tt"><i>&#128197;</i>Timetable</div><div class="tile" data-go="res"><i>&#128202;</i>Results</div><div class="tile" data-go="dl"><i>&#9200;</i>Deadlines</div></div>
+        <h5>Announcements</h5>
+        <div class="card2"><b>Make-up exams</b><small>Updated 28 Oct 2026</small></div>
+        <div class="card2"><b>Re-registration opens</b><small>Updated 25 Oct 2026</small></div>
+      </div>
+      <div class="nav"><span class="on">Home</span><span>My studies</span><span>Procedures</span><span>More</span></div>
+    </div>
+    <div class="scr" data-s="res" hidden>
+      <div class="tb"><span class="back" data-go="home">&lsaquo;</span><b>Results</b></div>
+      <div class="bd">
+        <div><span class="chip on" data-act="sem">S5</span><span class="chip" data-act="sem">S6</span></div>
+        <div>
+          <div class="row"><span>Human-Computer Interaction</span><span class="ok">14.5 &#10003;</span></div>
+          <div class="row"><span>Software engineering</span><span class="ok">12.0 &#10003;</span></div>
+          <div class="row"><span>Networks</span><span class="ko">8.5 &#10007;</span></div>
+        </div>
+        <small style="color:#6b7280">Fictional data. Last updated 28 Oct 2026, 09:12</small>
+        <button class="btn2" data-act="ask">Download transcript (PDF)</button>
+        <button class="btn2 sec" data-go="home">Back to home</button>
+      </div>
+      <div class="nav"><span>Home</span><span class="on">My studies</span><span>Procedures</span><span>More</span></div>
+    </div>
+    <div class="scr" data-s="tt" hidden>
+      <div class="tb"><span class="back" data-go="home">&lsaquo;</span><b>Timetable</b></div>
+      <div class="bd"><div class="card2"><b>Mon 08:30</b> HCI lecture<small>Amphi B</small></div><div class="card2"><b>Tue 10:00</b> HCI lab<small>Lab 3</small></div><div class="card2"><b>Wed 13:30</b> Networks<small>Room 12</small></div><small style="color:#6b7280">Fictional data.</small></div>
+      <div class="nav"><span>Home</span><span class="on">My studies</span><span>Procedures</span><span>More</span></div>
+    </div>
+    <div class="scr" data-s="dl" hidden>
+      <div class="tb"><span class="back" data-go="home">&lsaquo;</span><b>Deadlines</b></div>
+      <div class="bd"><div class="card2"><b>Re-registration</b><small>Until 15 Nov 2026 &middot; 16 days left</small></div><div class="card2"><b>Certificate request</b><small>No deadline</small></div><small style="color:#6b7280">Fictional data.</small></div>
+      <div class="nav"><span>Home</span><span>My studies</span><span class="on">Procedures</span><span>More</span></div>
+    </div>
+    <div class="dim" id="dlg" hidden><div class="dlg"><p><b>Download transcript S5?</b><br>The PDF is about 120 KB.</p><button class="btn2" data-act="ok">Download</button><button class="btn2 sec" data-act="cancel" style="margin-top:6px">Cancel</button></div></div>
+    <div class="toast" id="toast" hidden>&#10004; Transcript downloaded</div>
+  </div>
+  <div class="side">
+    <p><b>Interaction log</b> (what you did, what the prototype answered):</p>
+    <div class="log" id="log">Tap anything on the phone...</div>
+  </div>
+</div>
+
+    <div class="q"><b class="n">Q4.</b> Explain the difference between a <b>static</b> and an <b>interactive</b> mockup. Give one advantage of each, and say what you could test with the prototype that an image would not show.</div>
+    <div class="q"><b class="n">Q5.</b> List the <b>main screens</b> of the mobile website (use the site map of the previous tutorial).</div>
+    <div class="q"><b class="n">Q6.</b> Draw (on paper or here) <b>one key screen</b>, for example <i>Request a certificate</i>. Show the GUI components: buttons, text fields, icons, colours, and the main action.</div>
+    <div class="draw">Sketch here (paper is fine)</div>
+    <p><b>Solution</b></p>
+    <div class="locked" data-i="2">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+  <!-- PART 3 -->
+  <div class="card">
+    <div class="part"><span class="ic">&#128070;</span><h2>Part 3 &middot; Interaction design</h2></div>
+    <div class="q"><b class="n">Q7.</b> Define <b>interaction</b> in HCI and explain why it matters for the website.</div>
+    <div class="q"><b class="n">Q8.</b> Give <b>two examples of direct</b> and <b>two examples of indirect</b> interaction that the website could use.</div>
+    <div class="q"><b class="n">Q9.</b> Suggest one <b>gesture-based interaction</b> or <b>haptic event</b> and explain how it improves usability for Sara.</div>
+    <div class="q"><b class="n">Q10.</b> Sara has just submitted a <b>certificate request</b>. Describe the <b>visual</b>, <b>auditory</b> and <b>haptic</b> feedback you would give.</div>
+    <div class="q"><b class="n">Q11.</b> Complete the table with one example of each <b>interaction task</b> in your mockup.</div>
+    <table class="t"><tr><th>Interaction task</th><th>Example in the website</th></tr><tr><td style="width:28%"><b>Selecting</b></td><td class="blank"></td></tr><tr><td style="width:28%"><b>Scrolling</b></td><td class="blank"></td></tr><tr><td style="width:28%"><b>Typing / entering text</b></td><td class="blank"></td></tr><tr><td style="width:28%"><b>Dragging</b></td><td class="blank"></td></tr><tr><td style="width:28%"><b>Confirming an action</b></td><td class="blank"></td></tr></table>
+    <p><b>Solution</b></p>
+    <div class="locked" data-i="3">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+  <!-- PART 4 -->
+  <div class="card">
+    <div class="part"><span class="ic">&#9855;</span><h2>Part 4 &middot; Usability and accessibility</h2></div>
+    <div class="q"><b class="n">Q12.</b> List <b>three GUI design principles</b> that improve accessibility.</div>
+    <div class="q"><b class="n">Q13.</b> Color, size and contrast. For each sample, say whether the text is <b>readable</b> (target contrast: <b>4.5 : 1</b>), explain why, and propose a fix. You may use a free online contrast checker.</div>
+    <table class="t"><tr><th style="width:30%">Sample</th><th>Where</th><th>Readable?</th><th>Fix</th></tr><tr><td><span class="sw" style="color:#aaaaaa;background:#ffffff">Sample text</span></td><td>Deadline text on a white card</td><td class="blank" style="width:14%"></td><td class="blank" style="width:26%"></td></tr><tr><td><span class="sw" style="color:#1d4ed8;background:#ffffff">Sample text</span></td><td>Link "Download transcript"</td><td class="blank" style="width:14%"></td><td class="blank" style="width:26%"></td></tr><tr><td><span class="sw" style="color:#ffffff;background:#f59e0b">Sample text</span></td><td>White label on an orange button</td><td class="blank" style="width:14%"></td><td class="blank" style="width:26%"></td></tr><tr><td><span class="sw" style="color:#374151;background:#f3f4f6">Sample text</span></td><td>Body text on a light grey panel</td><td class="blank" style="width:14%"></td><td class="blank" style="width:26%"></td></tr><tr><td><span class="sw" style="color:#d61f1f;background:#2e9d46">Sample text</span></td><td>Red "closed" / green "open" badges side by side (text on colour)</td><td class="blank" style="width:14%"></td><td class="blank" style="width:26%"></td></tr></table>
+    <div class="q"><b class="n">Q14.</b> Suggest one improvement that makes the interface more <b>reassuring and pleasant</b> during stressful periods such as exams and deadlines.</div>
+    <p><b>Solution</b></p>
+    <div class="locked" data-i="4">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+
+  <!-- PART 5 -->
+  <div class="card">
+    <div class="part"><span class="ic">&#128295;</span><h2>Part 5 &middot; Build your prototype (workshop)</h2></div>
+    <div class="meta"><span class="pill">Team of 2 to 3</span><span class="pill">About 90 min</span><span class="pill">3 screens</span><span class="pill">Video 30 to 40 s</span></div>
+    <p><b>Goal.</b> At the end of this part you have a <b>clickable prototype of three screens</b> (Home, a task, a result) and a <b>30 to 40 second video</b>. Follow the steps in order: each one is small and has a time limit.</p>
+    <table class="t"><tr><th style="width:6%">#</th><th style="width:30%">Step</th><th>What to do</th></tr><tr><td><span class="num">1</span></td><td><b>Choose and define your feature</b><br><span style="font-size:12px;color:#6b7280">10 min &middot; Q15</span></td><td>One feature, one persona need. Keep it small: a flow of <b>three screens</b>, not a whole website.</td></tr><tr><td><span class="num">2</span></td><td><b>Draw the user flow</b><br><span style="font-size:12px;color:#6b7280">10 min &middot; Q16</span></td><td>Boxes and arrows from the start to the success message. Count the taps: aim for <b>4 or fewer</b>.</td></tr><tr><td><span class="num">3</span></td><td><b>Sketch on paper</b><br><span style="font-size:12px;color:#6b7280">15 min &middot; Q17</span></td><td>One rough frame per screen. Draw buttons, text, icons. No colours yet. Fix problems here, it costs nothing.</td></tr><tr><td><span class="num">4</span></td><td><b>Set up your tool and a mini design kit</b><br><span style="font-size:12px;color:#6b7280">10 min &middot; Q18</span></td><td>Pick the tool and fix 2 colours, 1 font, text of 16 px or more, buttons of 44 px or more.</td></tr><tr><td><span class="num">5</span></td><td><b>Build, link and add feedback</b><br><span style="font-size:12px;color:#6b7280">35 min &middot; Q19</span></td><td>Copy-paste components so the screens stay consistent, use real texts, make every button lead somewhere, and add the confirmation after the main action.</td></tr><tr><td><span class="num">6</span></td><td><b>Test with a classmate</b><br><span style="font-size:12px;color:#6b7280">10 min &middot; Q20</span></td><td>Give 3 tasks, say nothing, watch and note. Fix the worst problem.</td></tr><tr><td><span class="num">7</span></td><td><b>Record the 30 to 40 s video</b><br><span style="font-size:12px;color:#6b7280">10 min &middot; Q21</span></td><td>Script, screen-record, save. One take is enough.</td></tr></table>
+
+    <h3>Step 1 &middot; Choose your feature</h3>
+    <div class="q"><b class="n">Q15.</b> Pick one idea below (or invent one) and fill the card: the <b>feature</b>, <b>Sara's need</b>, <b>how it works</b>, how it supports <b>motivation</b> and <b>accessibility</b>.</div>
+    <table class="t"><tr><th>Starter idea</th><th>Sara's need</th><th>Core flow</th></tr><tr><td><b>Deadline reminders</b></td><td>Sara missed the re-registration date</td><td>Tick a deadline, get a reminder 3 days and 1 day before</td></tr><tr><td><b>Voice or quick search (AR / FR)</b></td><td>Typing on a small screen is slow, the site search finds nothing</td><td>Say or type "results", get the right page first</td></tr><tr><td><b>"My day" dashboard</b></td><td>She wants timetable, news and deadlines at one glance</td><td>One home screen that shows today only</td></tr><tr><td><b>Certificate request in 3 steps</b></td><td>Queueing at the office for a paper</td><td>Choose, confirm, receive a reference number</td></tr></table>
+    <table class="t"><tr><td style="width:24%"><b>Feature</b></td><td class="blank"></td></tr><tr><td><b>Sara's need</b></td><td class="blank"></td></tr><tr><td><b>How it works</b></td><td class="blank" style="height:46px"></td></tr><tr><td><b>Motivation</b></td><td class="blank"></td></tr><tr><td><b>Accessibility</b></td><td class="blank"></td></tr></table>
+
+    <h3>Step 2 &middot; Draw the user flow</h3>
+    <div class="q"><b class="n">Q16.</b> Complete the flow: what does Sara see, what does she tap, where does it lead? Count the taps from Home to the success message.</div>
+    <table class="t"><tr><th style="width:14%">Screen</th><th>Goal of the screen</th><th>Main components</th><th>Tap leads to</th></tr>
+    <tr><td><b>1 Home</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+    <tr><td><b>2 Task</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+    <tr><td><b>3 Result</b></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr></table>
+    <p>Number of taps: &hellip;&hellip; (target: 4 or fewer)</p>
+
+    <h3>Step 3 &middot; Sketch the three screens</h3>
+    <div class="q"><b class="n">Q17.</b> Sketch Home, task and result on paper (or in the frames below). Show buttons, text, icons and the main action.</div>
+    <div class="stage"><div class="draw" style="width:150px;height:260px;margin:0">Screen 1</div><div class="draw" style="width:150px;height:260px;margin:0">Screen 2</div><div class="draw" style="width:150px;height:260px;margin:0">Screen 3</div></div>
+
+    <h3>Step 4 &middot; Choose your tool and your mini design kit</h3>
+    <div class="q"><b class="n">Q18.</b> Choose a tool, then fix your design kit so the three screens look like one product.</div>
+    <table class="t"><tr><th style="width:22%">Tool</th><th style="width:28%">Why</th><th>How to make a clickable prototype</th></tr><tr><td><b>Figma (recommended)</b></td><td>Free account, runs in the browser, real prototype mode</td><td style="font-size:13px">Frame (F) 390 &times; 844 &rarr; Rectangle/Text &rarr; Auto layout (Shift+A) &rarr; <b>Prototype</b> tab: drag the connector from a button to a frame, <b>On tap &rarr; Navigate to</b> &rarr; press <b>Present</b> (&#9654;).</td></tr><tr><td><b>Canva</b></td><td>Simplest, ready-made phone templates</td><td style="font-size:13px">Create a design 390 &times; 844 px &rarr; add pages &rarr; select a button &rarr; <b>Link</b> &rarr; choose the page &rarr; <b>Present</b>.</td></tr><tr><td><b>PowerPoint / Slides</b></td><td>Already installed, works offline</td><td style="font-size:13px">One slide = one screen &rarr; select a shape &rarr; <b>Insert &rarr; Link &rarr; Place in This Document</b> &rarr; slide show mode.</td></tr><tr><td><b>HTML starter (below)</b></td><td>If you like to code</td><td style="font-size:13px">Copy the starter, save as <b>prototype.html</b>, edit the texts and colours, open it in your browser or phone.</td></tr></table>
+    <table class="t"><tr><th style="width:20%">Element</th><th>Rule</th><th style="width:34%">Your choice</th></tr><tr><td><b>Main colour</b></td><td>one strong colour for the primary action (contrast 4.5:1 with its text)</td><td class="blank"></td></tr><tr><td><b>Background / text</b></td><td>light background, dark text</td><td class="blank"></td></tr><tr><td><b>Font and sizes</b></td><td>one sans-serif font; body 16 px or more; titles 20 px or more</td><td class="blank"></td></tr><tr><td><b>Buttons</b></td><td>height 44 px or more, rounded, one primary and one secondary style</td><td class="blank"></td></tr><tr><td><b>Feedback</b></td><td>colour + icon + word (never colour alone)</td><td class="blank"></td></tr></table>
+
+    <h3>Step 5 &middot; Build, link and add feedback</h3>
+    <div class="q"><b class="n">Q19.</b> Build the three screens in your tool, link them, and add the confirmation after the main action. Keep the link or file.</div>
+    <ol>
+      <li>Create <b>one frame</b> (390 &times; 844) and build the header and the primary button once; <b>duplicate</b> the frame for the other screens.</li>
+      <li>Replace the texts by <b>real content</b> (names, dates, labels), not placeholders.</li>
+      <li>Link every button to a screen; test the whole flow in <b>Present / Preview</b> mode.</li>
+      <li>Add the feedback of your design: a message, a colour change, a dialog before an irreversible action.</li>
+    </ol>
+    <details><summary>No design tool? Start from a ready HTML prototype</summary>
+      <div class="sol"><p>Copy the code, save it as <b>prototype.html</b>, open it in a browser (or send it to your phone). It already has 3 linked screens, a primary button of 48 px, and feedback (message and vibration). Change the <b>TODO</b> parts.</p>
+      <button type="button" class="copyb" onclick="var t=document.getElementById('starter').textContent;if(navigator.clipboard){navigator.clipboard.writeText(t);this.textContent='Copied ✔';}">Copy the code</button>
+      <pre id="starter" style="max-height:260px;overflow:auto;background:#0f172a;color:#e2e8f0;border-radius:8px;padding:10px;font-size:11px;margin-top:8px">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;&lt;head&gt;&lt;meta charset="utf-8"&gt;&lt;meta name="viewport" content="width=device-width,initial-scale=1"&gt;
+&lt;title&gt;My prototype&lt;/title&gt;
+&lt;style&gt;
+:root{--main:#1d4ed8;--ok:#14532d}  /* TODO 1: change the colours */
+body{margin:0;background:#e5e7eb;font:16px/1.4 system-ui,Arial,sans-serif}
+.phone{max-width:390px;min-height:100vh;margin:0 auto;background:#fff}
+.screen{display:none;padding:16px}.screen.on{display:block}
+header{background:var(--main);color:#fff;padding:14px 16px;font-weight:700}
+.btn{display:block;width:100%;min-height:48px;margin:12px 0;border:0;border-radius:12px;background:var(--main);color:#fff;font:700 16px system-ui;cursor:pointer}
+.btn.sec{background:#fff;color:var(--main);border:2px solid var(--main)}
+.card{border:1px solid #d1d5db;border-radius:12px;padding:12px;margin:10px 0}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ok);color:#fff;padding:12px 16px;border-radius:12px;display:none}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;
+&lt;div class="phone"&gt;
+ &lt;header id="title"&gt;Home&lt;/header&gt;
+
+ &lt;!-- SCREEN 1: Home  (TODO 2: change the texts) --&gt;
+ &lt;section class="screen on" id="home"&gt;
+  &lt;div class="card"&gt;&lt;b&gt;Re-registration&lt;/b&gt;&lt;br&gt;3 days left&lt;/div&gt;
+  &lt;button class="btn" onclick="go('task','Remind me')"&gt;Remind me&lt;/button&gt;
+ &lt;/section&gt;
+
+ &lt;!-- SCREEN 2: Task  (TODO 3: put YOUR task here) --&gt;
+ &lt;section class="screen" id="task"&gt;
+  &lt;p&gt;Choose when to be reminded:&lt;/p&gt;
+  &lt;label&gt;&lt;input type="checkbox" checked&gt; 3 days before&lt;/label&gt;&lt;br&gt;
+  &lt;label&gt;&lt;input type="checkbox"&gt; 1 day before&lt;/label&gt;
+  &lt;button class="btn" onclick="done()"&gt;Set reminder&lt;/button&gt;
+  &lt;button class="btn sec" onclick="go('home','Home')"&gt;Back&lt;/button&gt;
+ &lt;/section&gt;
+
+ &lt;!-- SCREEN 3: Result / confirmation --&gt;
+ &lt;section class="screen" id="result"&gt;
+  &lt;div class="card"&gt;&lt;b&gt;&amp;#10004; Reminder set&lt;/b&gt;&lt;br&gt;You will be notified.&lt;/div&gt;
+  &lt;button class="btn sec" onclick="go('home','Home')"&gt;Back to home&lt;/button&gt;
+ &lt;/section&gt;
+&lt;/div&gt;
+&lt;div class="toast" id="toast"&gt;&amp;#10004; Saved&lt;/div&gt;
+&lt;script&gt;
+function go(id,t){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on');});
+  document.getElementById(id).classList.add('on');
+  document.getElementById('title').textContent=t;
+}
+function done(){            // feedback: screen + message + short vibration
+  go('result','Confirmation');
+  if(navigator.vibrate){navigator.vibrate(40);}
+  var x=document.getElementById('toast');x.style.display='block';
+  setTimeout(function(){x.style.display='none';},2000);
+}
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;
+</pre></div>
+    </details>
+
+    <h3>Step 6 &middot; Test with a classmate</h3>
+    <div class="q"><b class="n">Q20.</b> Give your classmate three tasks without helping. Note what happens, then fix the most serious problem.</div>
+    <table class="t"><tr><th style="width:34%">Task</th><th>Success? (yes / no)</th><th>Time (s)</th><th>Errors or hesitation</th></tr>
+    <tr><td>1. Find &hellip;</td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+    <tr><td>2. Do &hellip;</td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+    <tr><td>3. Check that &hellip;</td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr></table>
+    <p><b>Problem fixed:</b> &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;</p>
+
+    <h3>Step 7 &middot; Record the video</h3>
+    <div class="q"><b class="n">Q21.</b> Record a video of <b>30 to 40 seconds</b>. Suggested script:</div>
+    <table class="t"><tr><th style="width:18%">Time</th><th>Content</th></tr>
+    <tr><td>0 &ndash; 5 s</td><td>Who is Sara and what is her problem?</td></tr>
+    <tr><td>5 &ndash; 25 s</td><td>Show the flow on screen: Home &rarr; task &rarr; result (follow the taps).</td></tr>
+    <tr><td>25 &ndash; 35 s</td><td>Point out the interaction type and the feedback (visual, haptic, audio), and one accessibility choice.</td></tr>
+    <tr><td>35 &ndash; 40 s</td><td>One lesson learned from the test.</td></tr></table>
+    <p style="font-size:13px">Recording: Windows <b>Win+G</b> (Game Bar), Mac <b>Shift+Cmd+5</b>, or the screen recorder of your phone. Figma and PowerPoint can be recorded in presentation mode.</p>
+
+    <h3>Before you submit</h3>
+    <ul class="chk"><li>&#9744; The feature answers a named need of Sara</li><li>&#9744; Exactly 3 screens: Home, task, result</li><li>&#9744; Every button leads somewhere (no dead end)</li><li>&#9744; The main action shows a confirmation (and a way back)</li><li>&#9744; Text 16 px or more, contrast 4.5:1 or more, buttons 44 px or more</li><li>&#9744; Same colours, font and header on all screens</li><li>&#9744; No information given by colour alone</li><li>&#9744; Tested with one classmate and one problem fixed</li><li>&#9744; Video of 30 to 40 seconds, with a voice or captions</li><li>&#9744; Names of the team members on the first screen or in the file name</li></ul>
+    <p><b>Deliverables:</b> the prototype (Figma link with view access, <code>prototype.html</code>, or exported PDF), the filled sheets Q15 to Q20, and the video.</p>
+    <p><b>How it is graded (on 10)</b></p>
+    <table class="t"><tr><th style="width:24%">Criterion</th><th>What we look for</th><th style="width:8%">Pts</th></tr><tr><td><b>Relevance</b></td><td>The feature solves a real need of the persona</td><td>2</td></tr><tr><td><b>Mockup quality</b></td><td>3 consistent, readable screens, a clear main action</td><td>2</td></tr><tr><td><b>Interaction</b></td><td>Working links, 4 taps or fewer, a way back</td><td>2</td></tr><tr><td><b>Feedback and accessibility</b></td><td>Visual + at least one more channel, contrast, targets, labels</td><td>2</td></tr><tr><td><b>Test and video</b></td><td>Test notes with one fix; video of 30 to 40 s</td><td>2</td></tr></table>
+    <p><b>Solution, example and marking guide</b></p>
+    <div class="locked" data-i="0">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+
+
+  <div class="footer">University of Algiers 1 &middot; Department of Computer Science &middot; Specialty ISIL &middot; Module HCI &middot; Interfaces and Mockups</div>
+
+<script id="enc-data" type="application/json">{"salt": "G4xidfUpowCVUv9XHG9AhA==", "iter": 250000, "items": ["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"]}</script>
+<script>
+function setAll(open){document.querySelectorAll('details.sol-d').forEach(function(d){d.open=open;});}
+document.addEventListener('click',function(e){
+  var t=e.target;
+  if(t.classList&&t.classList.contains('shot')){var lb=document.getElementById('lb');lb.firstChild.src=t.src;lb.style.display='block';}
+  else if(t.closest&&t.closest('#lb')){document.getElementById('lb').style.display='none';}
+});
+function b64(s){var b=atob(s),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a;}
+async function unlock(){
+  var msg=document.getElementById('msg');msg.textContent='';
+  var code=document.getElementById('code').value.trim();
+  if(!code){return;}
+  if(!(window.crypto&&crypto.subtle)){msg.textContent='This browser cannot decrypt (use https or a recent browser).';return;}
+  try{
+    var D=JSON.parse(document.getElementById('enc-data').textContent);
+    var km=await crypto.subtle.importKey('raw',new TextEncoder().encode(code),'PBKDF2',false,['deriveKey']);
+    var key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(D.salt),iterations:D.iter,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+    var out=[];
+    for(var i=0;i<D.items.length;i++){
+      var raw=b64(D.items[i]);
+      var pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:raw.slice(0,12)},key,raw.slice(12));
+      out.push(new TextDecoder().decode(pt));
+    }
+    document.querySelectorAll('.locked').forEach(function(el){
+      var d=document.createElement('details');d.className='sol-d';
+      d.innerHTML='<summary>Show solution</summary><div class="sol">'+out[+el.dataset.i]+'</div>';
+      el.replaceWith(d);
+      d.querySelectorAll('img[data-ref]').forEach(function(im){var s=document.getElementById(im.dataset.ref);if(s)im.src=s.src;});
+    });
+    document.getElementById('unlockbar').style.display='none';
+    document.getElementById('solbar').style.display='flex';
+  }catch(err){msg.textContent='Wrong code.';}
+}
+</script>
+<script>
+(function(){var P=document.getElementById('proto');if(!P)return;
+var L=document.getElementById('log'),first=true;
+function add(a,f){if(first){L.innerHTML='';first=false;}L.innerHTML+='<div>&rsaquo; <b>'+a+'</b> &rarr; '+f+'</div>';L.scrollTop=L.scrollHeight;}
+function go(n){P.querySelectorAll('.scr').forEach(function(s){s.hidden=(s.dataset.s!==n);});document.getElementById('dlg').hidden=true;}
+P.addEventListener('click',function(e){var t=e.target.closest('[data-go],[data-act]');if(!t)return;
+ if(t.dataset.go){var n=t.dataset.go;go(n);add('tap '+(t.textContent.trim().replace(/\s+/g,' ').slice(0,18)||'back'),'screen "'+n+'" displayed');}
+ var a=t.dataset.act;
+ if(a==='sem'){t.parentNode.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});t.classList.add('on');add('select '+t.textContent,'chip highlighted (visual feedback)');}
+ if(a==='ask'){document.getElementById('dlg').hidden=false;add('tap Download','confirmation dialog (prevents an accidental action)');}
+ if(a==='cancel'){document.getElementById('dlg').hidden=true;add('tap Cancel','dialog closed, nothing changed (reversible)');}
+ if(a==='ok'){document.getElementById('dlg').hidden=true;var T=document.getElementById('toast');T.hidden=false;setTimeout(function(){T.hidden=true;},2600);
+   var h='';try{if(navigator.vibrate){navigator.vibrate(40);h=' + short vibration';}}catch(_){}
+   add('tap Download (confirm)','message "Transcript downloaded"'+h);}
+});})();
+</script></body>
+</html>
