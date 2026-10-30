@@ -1,1 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HCI Tutorial 1 - UI vs UX and Types of Adaptation</title>
+<style>
+@page { size: A4; margin: 10mm 12mm 12mm 12mm; }
+:root{ --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --main:#4f46e5; --soft:#eef2ff;
+       --ok:#15803d; --okbg:#dcfce7; --ko:#b91c1c; --kobg:#fee2e2; --part:#a16207; --partbg:#fef3c7; }
+*{box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.45;
+     font-size:14px;margin:0 auto;padding:16px;max-width:900px}
+.header-table{width:100%;border-collapse:collapse;border-bottom:2px double var(--main);margin-bottom:12px}
+.header-table td{vertical-align:middle;padding:0 0 6px 0}
+.header-left{width:38%;font-size:11px;line-height:1.3}
+.header-center{width:24%;text-align:center}
+.header-center img{max-height:55px;width:auto}
+.header-right{width:38%;text-align:right;font-size:11px;line-height:1.3}
+.title-block{text-align:center;background:var(--soft);border:1.5px solid var(--main);border-radius:8px;padding:10px;margin-bottom:14px}
+.title-block h1{margin:0;font-size:19px;color:var(--main);text-transform:uppercase}
+.title-block h2{margin:3px 0 0;font-size:13px;color:#4b5563;font-weight:600}
+.card{border:1px solid var(--line);border-radius:8px;margin-bottom:12px;padding:12px 14px}
+.card h2{margin:0 0 8px;font-size:16px;color:var(--main);border-bottom:1px solid var(--line);padding-bottom:4px}
+.card h3{margin:12px 0 4px;font-size:14px;color:#111827}
+ul,ol{margin:4px 0;padding-left:22px} li{margin:3px 0}
+.tag{display:inline-block;background:var(--soft);color:var(--main);border-radius:4px;padding:1px 6px;font-size:12px;font-weight:600;margin-right:3px}
+.objectives{background:#f5f7ff;border-left:4px solid var(--main)}
+.q{background:#f3f4f6;border-left:3px solid var(--main);padding:8px 10px;margin:8px 0;border-radius:0 6px 6px 0}
+.q b.n{color:var(--main)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{background:#f9fafb;border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:13px}
+table.t{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}
+table.t th,table.t td{border:1px solid var(--line);padding:6px 8px;vertical-align:top;text-align:left}
+table.t th{background:var(--soft);color:var(--main)}
+details{margin:6px 0}
+details>summary{cursor:pointer;font-weight:700;color:var(--main);padding:5px 10px;background:var(--soft);border-radius:6px;list-style:none}
+details>summary::before{content:"\25B6\00A0";font-size:11px}
+details[open]>summary::before{content:"\25BC\00A0"}
+details>.sol{border:1px solid #c7d2fe;border-top:none;padding:8px 12px;border-radius:0 0 6px 6px;background:#fcfcff}
+.ans{color:#166534;font-weight:600}
+.toolbar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px}
+.toolbar button{font:inherit;font-size:13px;font-weight:600;color:#fff;background:var(--main);border:0;border-radius:6px;padding:7px 12px;cursor:pointer}
+.toolbar button.alt{background:#fff;color:var(--main);border:1.5px solid var(--main)}
+.badge{display:inline-block;font-size:11px;font-weight:700;border-radius:10px;padding:1px 8px;margin-top:4px;white-space:nowrap}
+.b-ko{background:var(--kobg);color:var(--ko)} .b-ok{background:var(--okbg);color:var(--ok)} .b-part{background:var(--partbg);color:var(--part)}
+.shot{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:6px;cursor:zoom-in}
+.cap{font-size:12px;color:var(--muted);margin:3px 0 8px}
+#lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9;overflow:auto;cursor:zoom-out;padding:12px}
+#lb img{display:block;margin:0 auto;max-width:none;width:min(2200px,200vw)}
+.locked{border:1.5px dashed #c7d2fe;background:#f5f7ff;color:var(--main);font-weight:700;padding:7px 12px;border-radius:6px;margin:6px 0}
+.unlock{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.unlock input{font:inherit;font-size:13px;padding:6px 10px;border:1.5px solid var(--main);border-radius:6px;min-width:240px}
+#msg{font-size:12px;font-weight:600;color:var(--ko)}
+.footer{text-align:center;font-size:11px;color:var(--muted);border-top:1px solid var(--line);padding-top:6px;margin-top:14px}
+@media (max-width:640px){.grid-2{grid-template-columns:1fr}.header-table td{display:block;width:100%!important;text-align:center!important}}
+@media print{
+  body{font-size:11px;padding:0;max-width:none}
+  .toolbar,#lb{display:none!important}
+  .card{page-break-inside:avoid}
+  .screen{page-break-before:always}
+  table.t tr{page-break-inside:avoid}
+  .shot{cursor:default}
+}
+</style>
+</head>
+<body>
 
+  <table class="header-table">
+    <tr>
+      <td class="header-left">
+        <b>People's Democratic Republic of Algeria</b><br>
+        <b>ESST - Higher School of Sciences and Technologies of Algiers</b><br>
+        Department of Computer Science
+      </td>
+      <td class="header-center">
+        <img src="https://tse1.mm.bing.net/th/id/OIP.Q_6BBRFVc9IAP0x9vdjg-wHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3" alt="ESST Logo">
+      </td>
+      <td class="header-right">
+        <b>Specialty:</b> ISIL<br>
+        <b>Module:</b> Human-Computer Interaction (HCI)<br>
+        <b>Topic:</b> Tutorial 1: UI vs UX and Types of Adaptation<br>
+        <b>Academic Year:</b> 2026 / 2027
+      </td>
+    </tr>
+  </table>
+
+  <div class="title-block">
+    <h1>HCI Tutorial 1: UI vs UX and Types of Adaptation</h1>
+    <h2>Exercise 1: How the UI affects the UX &middot; Exercise 2: Types of adaptation</h2>
+  </div>
+
+  <div class="toolbar" id="unlockbar">
+    <div class="unlock">
+      <span id="msg"></span>
+      <input id="code" type="password" placeholder="Teacher code" autocomplete="off" onkeydown="if(event.key==='Enter')unlock()">
+      <button type="button" onclick="unlock()">Unlock solutions</button>
+    </div>
+  </div>
+  <div class="toolbar" id="solbar" style="display:none">
+    <button type="button" onclick="setAll(true)">Show all solutions</button>
+    <button type="button" class="alt" onclick="setAll(false)">Hide all solutions</button>
+  </div>
+
+
+  <div class="card objectives">
+    <h2>Objectives</h2>
+    <p>By the end of this tutorial, you should be able to:</p>
+    <ul>
+      <li>Distinguish <b>UI</b> (what users see and touch) from <b>UX</b> (the overall experience) and explain how interface choices affect the experience.</li>
+      <li>Identify which <b>design principle</b> is violated in a situation (visibility, feedback, consistency, error prevention, accessibility).</li>
+      <li>Propose a <b>realistic fix</b> for a UI problem.</li>
+      <li>Identify the <b>source of adaptation</b> of an interface: context, task, user characteristics or technical constraints.</li>
+      <li>Distinguish <b>adaptable</b> from <b>adaptive</b> systems and say <b>what</b> is adapted.</li>
+      <li>Apply the <b>4-step adaptation method</b> and check its risks.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Quick reminder</h2>
+    <div class="grid-2">
+      <div class="box">
+        <b>UI vs UX</b><br>
+        <b>UI:</b> layout, colours, typography, icons, buttons, feedback.<br>
+        <b>UX:</b> ease of use, efficiency, errors, emotions, satisfaction.<br><br>
+        <span class="tag">Visibility</span><span class="tag">Feedback</span><span class="tag">Consistency</span><span class="tag">Error prevention</span><span class="tag">Accessibility</span>
+      </div>
+      <div class="box">
+        <b>Adaptation</b><br>
+        <b>4 sources:</b> context, task, user characteristics, technical constraints.<br>
+        <b>Adaptable:</b> the user changes the settings. <b>Adaptive:</b> the system adapts automatically.<br>
+        <b>What can be adapted:</b> content, presentation, navigation, modality, behaviour.
+      </div>
+    </div>
+  </div>
+
+  <!-- EXERCISE 1 -->
+  <div class="card">
+    <h2>Exercise 1 &middot; How the UI affects the UX</h2>
+
+    <h3>1.1 &ndash; Good-looking is not the same as good experience</h3>
+    <div class="q">
+      <b class="n">Situation.</b> An online shop has a very attractive design, but customers cannot find the delivery costs and abandon their purchases.<br>
+      <b>a)</b> What does this situation show about the relation between UI and UX?<br>
+      <b>b)</b> Propose two UI changes that would improve the experience.
+    </div>
+    <div class="locked" data-i="0">&#128274; Solution &ndash; teachers only</div>
+
+    <h3>1.2 &ndash; Which principle is violated?</h3>
+    <p>For each situation, name the violated principle and the main consequence for the user.</p>
+    <table class="t">
+      <tr><th style="width:4%">#</th><th>Situation</th></tr>
+      <tr><td>a</td><td>A pay button is light grey on white with 9 px text.</td></tr>
+      <tr><td>b</td><td>After clicking &laquo;&nbsp;Submit&nbsp;&raquo;, nothing changes for 5 seconds.</td></tr>
+      <tr><td>c</td><td>&laquo;&nbsp;Save&nbsp;&raquo; is a floppy-disk icon on one screen and a tick on another.</td></tr>
+      <tr><td>d</td><td>A student uploads a 20 MB file and the page shows no progress for a minute.</td></tr>
+      <tr><td>e</td><td>Dates appear as <i>12/10/2026</i> on one page and as <i>Oct 14th, 2026</i> on another.</td></tr>
+    </table>
+    <div class="locked" data-i="1">&#128274; Solution &ndash; teachers only</div>
+
+    <h3>1.3 &ndash; Propose a fix</h3>
+    <p>For each problem, propose a concrete correction and name the principle it restores.</p>
+    <table class="t">
+      <tr><th style="width:4%">#</th><th>Problem</th></tr>
+      <tr><td>a</td><td>A form displays: <i>Error 500: NullPointerException at RegService.java:42</i>.</td></tr>
+      <tr><td>b</td><td>A <i>Delete registration</i> button looks identical to <i>Save</i>, sits right next to it, and works without confirmation.</td></tr>
+      <tr><td>c</td><td>A toolbar shows only icons (trash, gear, upload) and users misunderstand them.</td></tr>
+      <tr><td>d</td><td>A button is labelled &laquo;&nbsp;Go&nbsp;&raquo;.</td></tr>
+      <tr><td>e</td><td>Touch targets are only 8 px high.</td></tr>
+      <tr><td>f</td><td>The password rules are only shown after the form has been submitted.</td></tr>
+    </table>
+    <div class="locked" data-i="2">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+  <!-- EXERCISE 2 -->
+  <div class="card">
+    <h2>Exercise 2 &middot; Types of adaptation</h2>
+
+    <h3>2.1 &ndash; Source of adaptation</h3>
+    <p>For each scenario, say which source drives the adaptation: <b>context</b>, <b>task</b>, <b>user characteristics</b> or <b>technical constraints</b>. Justify in one sentence.</p>
+    <table class="t">
+      <tr><th style="width:4%">#</th><th>Scenario</th></tr>
+      <tr><td>a</td><td>A video player lowers its quality when the student's internet connection is slow.</td></tr>
+      <tr><td>b</td><td>A student revises at night and the platform switches to dark mode after 8 pm.</td></tr>
+      <tr><td>c</td><td>A mobile banking app hides the balance by default when the user is outdoors, in a public queue.</td></tr>
+      <tr><td>d</td><td>An app uses a step-by-step flow with confirmations only for critical, rarely done actions (e.g. a money transfer).</td></tr>
+      <tr><td>e</td><td>A student with dyslexia can enable a dyslexia-friendly font and wider line spacing.</td></tr>
+      <tr><td>f</td><td>When the campus Wi-Fi is overloaded, the portal serves a lighter version of its pages.</td></tr>
+    </table>
+    <div class="locked" data-i="3">&#128274; Solution &ndash; teachers only</div>
+
+    <h3>2.2 &ndash; Adaptable or adaptive? What is adapted?</h3>
+    <p>For each scenario, say who triggers the adaptation (<b>adaptable</b> = user, <b>adaptive</b> = system) and what is adapted (<b>content, presentation, navigation, modality, behaviour</b>).</p>
+    <table class="t">
+      <tr><th style="width:4%">#</th><th>Scenario</th></tr>
+      <tr><td>a</td><td>A user chooses Arabic or French in the settings and the interface switches its layout direction.</td></tr>
+      <tr><td>b</td><td>The platform switches to dark mode after 8 pm.</td></tr>
+      <tr><td>c</td><td>On a limited data pack, a platform replaces a 120 MB lecture video by a text version and a PDF.</td></tr>
+      <tr><td>d</td><td>The campus portal serves a lighter version of its pages when the Wi-Fi is overloaded.</td></tr>
+    </table>
+    <div class="locked" data-i="4">&#128274; Solution &ndash; teachers only</div>
+
+    <h3>2.3 &ndash; Apply the 4-step method</h3>
+    <div class="q">
+      <b class="n">Case.</b> A learning platform automatically enables large text because it guesses that a student has a visual impairment.<br>
+      <b>a)</b> Put the four steps of the adaptation decision method in order.<br>
+      <b>b)</b> Apply them to this case.<br>
+      <b>c)</b> Which risk is the most serious? Propose a safer design.
+    </div>
+    <div class="locked" data-i="5">&#128274; Solution &ndash; teachers only</div>
+  </div>
+
+
+  <div class="footer">ESST Algiers &middot; Department of Computer Science &middot; Specialty ISIL &middot; Module HCI &middot; Tutorial 1</div>
+
+<script id="enc-data" type="application/json">{"salt": "+3fYQKFILS5ytY/5stfchw==", "iter": 250000, "items": ["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"]}</script>
+<script>
+function setAll(open){document.querySelectorAll('details.sol-d').forEach(function(d){d.open=open;});}
+document.addEventListener('click',function(e){
+  var t=e.target;
+  if(t.classList&&t.classList.contains('shot')){var lb=document.getElementById('lb');lb.firstChild.src=t.src;lb.style.display='block';}
+  else if(t.closest&&t.closest('#lb')){document.getElementById('lb').style.display='none';}
+});
+function b64(s){var b=atob(s),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a;}
+async function unlock(){
+  var msg=document.getElementById('msg');msg.textContent='';
+  var code=document.getElementById('code').value.trim();
+  if(!code){return;}
+  if(!(window.crypto&&crypto.subtle)){msg.textContent='This browser cannot decrypt (use https or a recent browser).';return;}
+  try{
+    var D=JSON.parse(document.getElementById('enc-data').textContent);
+    var km=await crypto.subtle.importKey('raw',new TextEncoder().encode(code),'PBKDF2',false,['deriveKey']);
+    var key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(D.salt),iterations:D.iter,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+    var out=[];
+    for(var i=0;i<D.items.length;i++){
+      var raw=b64(D.items[i]);
+      var pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:raw.slice(0,12)},key,raw.slice(12));
+      out.push(new TextDecoder().decode(pt));
+    }
+    document.querySelectorAll('.locked').forEach(function(el){
+      var d=document.createElement('details');d.className='sol-d';
+      d.innerHTML='<summary>Show solution</summary><div class="sol">'+out[+el.dataset.i]+'</div>';
+      el.replaceWith(d);
+    });
+    document.getElementById('unlockbar').style.display='none';
+    document.getElementById('solbar').style.display='flex';
+  }catch(err){msg.textContent='Wrong code.';}
+}
+</script>
+</body>
+</html>
