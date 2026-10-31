@@ -36,13 +36,12 @@
     '#an-tip{font-size:12px;color:#334155;flex-basis:100%;margin:2px 2px 0}' +
     'mark.an-hl{color:inherit;border-radius:2px;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
     'body.an-erase mark.an-hl{cursor:crosshair;outline:1px dashed #dc2626}' +
-    '#an-layer{position:absolute;left:0;top:0;width:100%;height:0;z-index:50;pointer-events:none}' +
-    '#an-svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}' +
-    '#an-svg.pen{pointer-events:auto;touch-action:none;cursor:crosshair}' +
-    '#an-svg.erase{pointer-events:none}' +
-    '#an-svg path.s{fill:none;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}' +
-    '#an-svg path.h{fill:none;stroke:transparent;stroke-width:16;pointer-events:none}' +
-    '#an-svg.erase path.h{pointer-events:stroke}' +
+    '.an-layer{position:absolute;left:0;top:0;width:100%;height:100%;z-index:50;pointer-events:none}' +
+    '.an-svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}' +
+    '.an-svg path.s{fill:none;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}' +
+    '.an-svg path.h{fill:none;stroke:transparent;stroke-width:16;pointer-events:none}' +
+    'body.an-erase .an-svg path.h{pointer-events:stroke;cursor:crosshair}' +
+    'body.an-pen,body.an-pen *{user-select:none!important;-webkit-user-select:none!important;cursor:crosshair}' +
     '.an-note{position:absolute;width:190px;background:#fef9c3;border:1px solid #ca8a04;border-radius:6px;box-shadow:0 3px 10px rgba(0,0,0,.25);pointer-events:auto;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
     '.an-note .nh{display:flex;justify-content:space-between;align-items:center;background:#fde047;border-radius:5px 5px 0 0;cursor:grab;touch-action:none;padding:2px 4px;color:#713f12;font-size:11px;font-weight:700;user-select:none}' +
     '.an-note .nx{border:0;background:transparent;font-size:16px;line-height:1;cursor:pointer;color:#713f12;min-width:28px;min-height:28px}' +
@@ -57,7 +56,7 @@
       if (p.nodeType !== 1) continue;
       var t = p.tagName;
       if (t === 'SCRIPT' || t === 'STYLE' || t === 'NOSCRIPT' || t === 'TEXTAREA' || t === 'SVG' || t === 'svg') return true;
-      if (p.classList && (p.classList.contains('an-ui') || p.id === 'an-layer')) return true;
+      if (p.classList && (p.classList.contains('an-ui') || p.classList.contains('an-layer'))) return true;
     }
     return false;
   }
@@ -124,24 +123,43 @@
     return true;
   }
 
-  /* ---------- layer: notes + pen ---------- */
-  var layer, svg, NS = 'http://www.w3.org/2000/svg';
-  function sizeLayer() { if (layer) layer.style.height = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) + 'px'; }
-  function pt(ev) { var b = document.body.getBoundingClientRect(); return { x: Math.round(ev.clientX - b.left), y: Math.round(ev.clientY - b.top) }; }
+  /* ---------- layers: notes + pen, attached to the slide / step / section under them ---------- */
+  var NS = 'http://www.w3.org/2000/svg';
+  var ANCH = '.slide, details, section[id]';
+  function anchorId(a) { if (a === document.body) return ''; return a.id || a.getAttribute('data-an-id') || ''; }
+  function anchorEl(id) { if (!id) return document.body; return document.getElementById(id) || document.querySelector('[data-an-id="' + id + '"]'); }
+  function labelAnchors() {
+    var i = 0; Array.prototype.forEach.call(document.querySelectorAll(ANCH), function (a) { i++; if (!a.id && !a.getAttribute('data-an-id')) a.setAttribute('data-an-id', 'an' + i); });
+  }
+  function layerFor(a) {
+    var L = null; for (var i = 0; i < a.children.length; i++) if (a.children[i].classList && a.children[i].classList.contains('an-layer')) { L = a.children[i]; break; }
+    if (L) return L;
+    if (getComputedStyle(a).position === 'static') a.style.position = 'relative';
+    L = el('div', 'an-layer'); var sv = document.createElementNS(NS, 'svg'); sv.setAttribute('class', 'an-svg'); L.appendChild(sv); a.appendChild(L); return L;
+  }
+  function svgOf(a) { return layerFor(a).querySelector('svg'); }
+  function anchorAt(ev) {
+    var list = document.elementsFromPoint ? document.elementsFromPoint(ev.clientX, ev.clientY) : [ev.target];
+    for (var i = 0; i < list.length; i++) { var e = list[i]; if (e.matches && e.matches(ANCH) && !e.closest('.an-ui')) return e; }
+    return document.body;
+  }
+  function pt(ev, a) { var b = a.getBoundingClientRect(); return { x: Math.round(ev.clientX - b.left), y: Math.round(ev.clientY - b.top) }; }
   function pathD(a) { return a.map(function (p, i) { return (i ? 'L' : 'M') + p[0] + ' ' + p[1]; }).join(' '); }
   function drawStroke(s) {
-    var g = document.createElementNS(NS, 'g'); g.dataset.id = s.id;
+    var a = anchorEl(s.a); if (!a) return null; var sv = svgOf(a);
+    var g = document.createElementNS(NS, 'g'); g.setAttribute('data-id', s.id);
     var h = document.createElementNS(NS, 'path'); h.setAttribute('class', 'h'); h.setAttribute('d', pathD(s.d));
     var p = document.createElementNS(NS, 'path'); p.setAttribute('class', 's'); p.setAttribute('d', pathD(s.d));
     p.setAttribute('stroke', PEN[s.c] || PEN.r); p.setAttribute('stroke-width', '3');
-    g.appendChild(h); g.appendChild(p); svg.appendChild(g); return g;
+    g.appendChild(h); g.appendChild(p); sv.appendChild(g); return g;
   }
   function addNoteEl(n, focus) {
-    var d = el('div', 'an-note'); d.dataset.id = n.id; d.style.left = n.x + 'px'; d.style.top = n.y + 'px';
+    var a = anchorEl(n.a); if (!a) return;
+    var d = el('div', 'an-note'); d.setAttribute('data-id', n.id); d.style.left = n.x + 'px'; d.style.top = n.y + 'px';
     var hd = el('div', 'nh', '<span>Note</span>'); var x = el('button', 'nx', '&times;'); x.type = 'button'; x.setAttribute('aria-label', 'Delete this note');
     hd.appendChild(x);
     var ta = el('textarea'); ta.value = n.t || ''; ta.setAttribute('aria-label', 'Your note'); ta.placeholder = 'Write here...';
-    d.appendChild(hd); d.appendChild(ta); layer.appendChild(d);
+    d.appendChild(hd); d.appendChild(ta); layerFor(a).appendChild(d);
     var tm; ta.addEventListener('input', function () { n.t = ta.value; clearTimeout(tm); tm = setTimeout(save, 300); });
     x.addEventListener('click', function () { removeItem(n.id); });
     hd.addEventListener('pointerdown', function (ev) {
@@ -155,25 +173,24 @@
   }
   function removeItem(id) {
     if (id[0] === 'h') { S.hl = S.hl.filter(function (x) { return x.id !== id; }); unwrap(id); }
-    else if (id[0] === 'n') { S.notes = S.notes.filter(function (x) { return x.id !== id; }); var d = layer.querySelector('.an-note[data-id="' + id + '"]'); if (d) d.remove(); }
-    else { S.strokes = S.strokes.filter(function (x) { return x.id !== id; }); var g = svg.querySelector('g[data-id="' + id + '"]'); if (g) g.remove(); }
+    else if (id[0] === 'n') { S.notes = S.notes.filter(function (x) { return x.id !== id; }); var d = document.querySelector('.an-note[data-id="' + id + '"]'); if (d) d.remove(); }
+    else { S.strokes = S.strokes.filter(function (x) { return x.id !== id; }); var g = document.querySelector('.an-svg g[data-id="' + id + '"]'); if (g) g.remove(); }
     S.log = S.log.filter(function (x) { return x !== id; }); save();
   }
 
   /* ---------- interactions ---------- */
   var cur = null;
   function bindPen() {
-    svg.addEventListener('pointerdown', function (ev) {
-      if (tool === 'erase') {
-        var g = ev.target.closest && ev.target.closest('g[data-id]'); if (g) removeItem(g.dataset.id); return;
-      }
-      if (tool !== 'pen') return;
-      ev.preventDefault(); svg.setPointerCapture(ev.pointerId);
-      var p = pt(ev); cur = { id: nid('s'), c: penC, d: [[p.x, p.y]] };
+    document.addEventListener('pointerdown', function (ev) {
+      if (tool !== 'pen' || (ev.pointerType === 'mouse' && ev.button !== 0)) return;
+      if (ev.target.closest && ev.target.closest('.an-ui, .an-note')) return;
+      ev.preventDefault();
+      var a = anchorAt(ev), p = pt(ev, a);
+      cur = { id: nid('s'), c: penC, a: anchorId(a), d: [[p.x, p.y]], A: a };
       cur.g = drawStroke(cur);
-    });
-    svg.addEventListener('pointermove', function (ev) {
-      if (!cur) return; var p = pt(ev), l = cur.d[cur.d.length - 1];
+    }, true);
+    document.addEventListener('pointermove', function (ev) {
+      if (!cur) return; var p = pt(ev, cur.A), l = cur.d[cur.d.length - 1];
       if (Math.abs(p.x - l[0]) + Math.abs(p.y - l[1]) < 2) return;
       cur.d.push([p.x, p.y]);
       var ps = cur.g.querySelectorAll('path'); ps[0].setAttribute('d', pathD(cur.d)); ps[1].setAttribute('d', pathD(cur.d));
@@ -181,10 +198,10 @@
     function end() {
       if (!cur) return;
       if (cur.d.length < 2) cur.d.push([cur.d[0][0] + 1, cur.d[0][1] + 1]);
-      var s = { id: cur.id, c: cur.c, d: cur.d }; S.strokes.push(s); S.log.push(s.id);
+      var s = { id: cur.id, c: cur.c, a: cur.a, d: cur.d }; S.strokes.push(s); S.log.push(s.id);
       cur.g.remove(); drawStroke(s); cur = null; save();
     }
-    svg.addEventListener('pointerup', end); svg.addEventListener('pointercancel', end);
+    document.addEventListener('pointerup', end); document.addEventListener('pointercancel', end);
   }
 
   var selT = null;
@@ -197,13 +214,15 @@
     var t = ev.target;
     if (t.closest && t.closest('.an-ui, .an-note')) return;
     if (tool === 'erase') {
+      var g = t.closest && t.closest('.an-svg g[data-id]');
+      if (g) { ev.preventDefault(); ev.stopPropagation(); removeItem(g.getAttribute('data-id')); return; }
       var m = t.closest && t.closest('mark.an-hl');
       if (m) { ev.preventDefault(); ev.stopPropagation(); removeItem(m.dataset.id); }
       return;
     }
     if (tool === 'note') {
       ev.preventDefault(); ev.stopPropagation();
-      var p = pt(ev), n = { id: nid('n'), x: Math.max(0, p.x - 20), y: Math.max(0, p.y - 10), t: '' };
+      var a = anchorAt(ev), p = pt(ev, a), n = { id: nid('n'), a: anchorId(a), x: Math.max(0, p.x - 20), y: Math.max(0, p.y - 10), t: '' };
       S.notes.push(n); S.log.push(n.id); addNoteEl(n, true); save();
     }
   }, true);
@@ -234,7 +253,8 @@
       tool = (tool === t) ? null : t;
       Array.prototype.forEach.call(bar.querySelectorAll('[data-t]'), function (b) { b.setAttribute('aria-pressed', String(b.dataset.t === tool)); });
       bar.querySelector('#an-pens').hidden = tool !== 'pen';
-      svg.setAttribute('class', tool === 'pen' ? 'pen' : tool === 'erase' ? 'erase' : '');
+      document.documentElement.style.touchAction = tool === 'pen' ? 'none' : '';
+      document.body.classList.toggle('an-pen', tool === 'pen');
       document.body.classList.toggle('an-erase', tool === 'erase');
       document.body.classList.toggle('an-note-mode', tool === 'note');
       bar.querySelector('#an-tip').textContent = tool ? tips[tool] : 'Choose a tool. Your notes stay in this browser only.';
@@ -253,7 +273,7 @@
         if (confirm('Delete all your highlights, drawings and notes on this page?')) {
           S.hl.slice().forEach(function (x) { unwrap(x.id); });
           S.hl = []; S.notes = []; S.strokes = []; S.log = [];
-          layer.querySelectorAll('.an-note').forEach(function (n) { n.remove(); }); svg.innerHTML = ''; save();
+          Array.prototype.forEach.call(document.querySelectorAll('.an-note'), function (n) { n.remove(); }); Array.prototype.forEach.call(document.querySelectorAll('.an-svg'), function (v) { v.innerHTML = ''; }); save();
         }
       }
       else if (b.id === 'an-print') window.print();
@@ -261,21 +281,17 @@
   }
 
   function init() {
-    load();
-    var cs = getComputedStyle(document.body); if (cs.position === 'static') document.body.style.position = 'relative';
-    layer = el('div'); layer.id = 'an-layer';
-    svg = document.createElementNS(NS, 'svg'); svg.id = 'an-svg'; layer.appendChild(svg); document.body.appendChild(layer);
-    sizeLayer(); window.addEventListener('resize', sizeLayer); window.addEventListener('load', sizeLayer);
-    if (window.ResizeObserver) new ResizeObserver(sizeLayer).observe(document.body);
+    load(); labelAnchors();
     S.strokes.forEach(drawStroke); S.notes.forEach(function (n) { addNoteEl(n, false); });
     applyAll(); bindPen(); build();
+    if (document.getElementById('deckbar')) document.getElementById('an-dock').style.bottom = '76px';
     /* solutions decrypted later by teachers: re-apply highlights that sit inside them */
     if (window.MutationObserver) {
       var t, busy = false;
       new MutationObserver(function (ml) {
         if (busy) return;
-        if (!ml.some(function (m) { return Array.prototype.some.call(m.addedNodes, function (n) { return n.nodeType === 1 && !(n.matches && n.matches('.an-ui,#an-layer,mark.an-hl')) && !(n.closest && n.closest('#an-layer')); }); })) return;
-        clearTimeout(t); t = setTimeout(function () { busy = true; applyAll(); sizeLayer(); setTimeout(function () { busy = false; }, 50); }, 300);
+        if (!ml.some(function (m) { return Array.prototype.some.call(m.addedNodes, function (n) { return n.nodeType === 1 && !(n.matches && n.matches('.an-ui,.an-layer,mark.an-hl')) && !(n.closest && n.closest('.an-layer')); }); })) return;
+        clearTimeout(t); t = setTimeout(function () { busy = true; applyAll(); setTimeout(function () { busy = false; }, 50); }, 300);
       }).observe(document.body, { childList: true, subtree: true });
     }
   }
