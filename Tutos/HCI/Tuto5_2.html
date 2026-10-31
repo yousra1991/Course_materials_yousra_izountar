@@ -311,6 +311,7 @@ var s=document.getElementById('f5s'),c=document.getElementById('f5c'),m=document
 b.onclick=function(){b.disabled=true;s.style.visibility='visible';m.textContent='';var n=5;c.textContent=n+' s';
  var t=setInterval(function(){n--;c.textContent=n>0?n+' s':'';
   if(n<=0){clearInterval(t);s.style.visibility='hidden';m.textContent='Time is up. Answer from memory (Q9).';b.disabled=false;b.textContent='Run it again';}},1000);};})();
-</script><script src="../../assets/annotate.js" defer></script>
+</script><script src="../../assets/tuto-answers.js" defer></script>
+<script src="../../assets/annotate.js" defer></script>
 </body>
 </html>

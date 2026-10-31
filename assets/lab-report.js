@@ -124,9 +124,10 @@
   var css = '' +
     '#lr-btn{position:fixed;left:12px;bottom:12px;z-index:9998;background:#0f766e;color:#fff;border:0;border-radius:999px;padding:11px 18px;font:700 14px "Segoe UI",Arial,sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.3)}' +
     '#lr-btn:focus-visible,#lr-modal button:focus-visible{outline:3px solid #f59e0b;outline-offset:2px}' +
-    '#lr-modal{position:fixed;inset:0;z-index:10000;background:rgba(15,23,42,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:16px}' +
+    '#lr-modal{position:fixed;left:0;top:0;right:0;bottom:0;z-index:10000;background:rgba(15,23,42,.6);display:flex;align-items:center;justify-content:center;padding:10px}' +
     '#lr-modal[hidden]{display:none}#lr-modal *{box-sizing:border-box;font-family:"Segoe UI",Arial,sans-serif}' +
-    '#lr-box{background:#fff;color:#1f2937;border-radius:12px;max-width:760px;width:100%;padding:16px 18px;box-shadow:0 10px 40px rgba(0,0,0,.4)}' +
+    '#lr-box{background:#fff;color:#1f2937;border-radius:12px;max-width:760px;width:100%;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);display:flex;flex-direction:column;padding:14px 16px 10px;box-shadow:0 10px 40px rgba(0,0,0,.4)}' +
+    '#lr-body{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;padding-right:4px}' +
     '#lr-box h2{margin:0 0 4px;color:#0f766e;font-size:20px}#lr-box p{margin:4px 0 10px;font-size:13px;color:#475569}' +
     '#lr-box label{display:block;font-size:12px;font-weight:700;color:#334155;margin:6px 0 2px}' +
     '#lr-box input[type=text],#lr-box textarea{width:100%;border:1.5px solid #94a3b8;border-radius:8px;padding:8px;font-size:14px;color:#111827;background:#fff}' +
@@ -136,7 +137,7 @@
     '.lr-st{font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px;margin-left:6px}.lr-st.ok{background:#dcfce7;color:#15803d}.lr-st.no{background:#fef3c7;color:#92400e}' +
     '.lr-th{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.lr-th div{position:relative}.lr-th img{height:70px;border:1px solid #94a3b8;border-radius:4px;display:block}.lr-th button{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:0;background:#b91c1c;color:#fff;cursor:pointer;line-height:1}' +
     '.lr-bt{border:1.5px solid #94a3b8;background:#f1f5f9;border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;color:#0f172a}.lr-bt.p{background:#0f766e;border-color:#0f766e;color:#fff;font-weight:700}' +
-    '.lr-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;position:sticky;bottom:0;background:#fff;padding:8px 0}#lr-msg{color:#b91c1c;font-size:13px;margin-top:6px;width:100%}' +
+    '.lr-act{flex:0 0 auto;display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;border-top:1px solid #e2e8f0;padding:8px 0 2px}#lr-msg{color:#b91c1c;font-size:13px;margin-top:6px;width:100%}' +
     '@media print{#lr-btn,#lr-modal{display:none!important}}';
   var modal, listEl;
 
@@ -190,11 +191,11 @@
     var st = el('style'); st.textContent = css; document.head.appendChild(st);
     var btn = el('button', null, '&#128196; ' + esc(TXT.btn)); btn.id = 'lr-btn'; btn.type = 'button'; btn.setAttribute('aria-haspopup', 'dialog'); document.body.appendChild(btn);
     modal = el('div'); modal.id = 'lr-modal'; modal.hidden = true; modal.setAttribute('role', 'dialog'); modal.setAttribute('aria-modal', 'true'); modal.setAttribute('aria-labelledby', 'lr-t');
-    modal.innerHTML = '<div id="lr-box"><h2 id="lr-t">' + esc(TXT.title) + '</h2><p>' + esc(TXT.intro) + '</p>' +
+    modal.innerHTML = '<div id="lr-box"><div id="lr-body" tabindex="0" aria-label="' + esc(TXT.title) + '"><h2 id="lr-t">' + esc(TXT.title) + '</h2><p>' + esc(TXT.intro) + '</p>' +
       '<div class="lr-id"><div><label for="lr-name">' + esc(TXT.name) + '</label><input type="text" id="lr-name" autocomplete="name"></div>' +
       '<div><label for="lr-mat">' + esc(TXT.mat) + '</label><input type="text" id="lr-mat" inputmode="numeric"></div>' +
       '<div><label for="lr-grp">' + esc(TXT.grp) + '</label><input type="text" id="lr-grp"></div></div>' +
-      '<div class="lr-pt" style="margin-top:14px">' + esc(TXT.work) + '</div><div id="lr-list"></div>' +
+      '<div class="lr-pt" style="margin-top:14px">' + esc(TXT.work) + '</div><div id="lr-list"></div></div>' +
       '<div class="lr-act"><button type="button" class="lr-bt p" id="lr-pdf">' + esc(TXT.pdf) + '</button><button type="button" class="lr-bt" id="lr-dl">' + esc(TXT.dl) + '</button><button type="button" class="lr-bt" id="lr-x">' + esc(TXT.close) + '</button><div id="lr-msg" role="alert"></div></div></div>';
     document.body.appendChild(modal); listEl = modal.querySelector('#lr-list');
     ['name', 'mat', 'grp'].forEach(function (k) { var i = modal.querySelector('#lr-' + (k === 'name' ? 'name' : k)); i.value = R[k] || ''; i.addEventListener('input', function () { R[k] = i.value; save(); }); });
