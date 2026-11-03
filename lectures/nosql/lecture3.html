@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chapitre 3 – Traitement de données dans les systèmes clouds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a1220; --panel:#101c2e; --panel2:#152740; --line:#24384f;
+  --ink:#e9f1fb; --ink-dim:#8aa0bf; --accent:#ffb454; --accent2:#5fd2ff;
+  --good:#6fd18f; --bad:#ff6f65; --accent-ink:#1a1206;
+  --sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --display:'Space Grotesk',var(--sans);
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --radius:7px; box-sizing:border-box;
+}
+:root[data-theme="light"]{
+  --bg:#eef2f6; --panel:#ffffff; --panel2:#e7edf3;
+  --line:#cdd9e4; --ink:#0f1e30; --ink-dim:#4c6178;
+  --accent:#b96e0a; --accent2:#0a83ab; --good:#177a44; --bad:#b8362c; --accent-ink:#fff9f0;
+}
+*{box-sizing:border-box;}
+html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%;}
+body{
+  height:100%; margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans);
+  overflow:hidden; transition:background .2s,color .2s;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  background-image:radial-gradient(var(--line) 1px, transparent 1px);
+  background-size:28px 28px;
+  background-position:-4px -4px;
+}
+:root[data-theme="light"] body{background-image:radial-gradient(var(--line) 1px, transparent 1px);}
+.deck{position:relative; height:100%; width:100%;}
+.slide{
+  position:absolute; inset:0; display:none; flex-direction:column;
+  padding:clamp(24px,5vw,64px) clamp(20px,7vw,100px);
+  padding-top:calc(clamp(24px,5vw,64px) + env(safe-area-inset-top,0px));
+  overflow-y:auto;
+}
+.slide.active{display:flex;}
+.slide > *{flex-shrink:0;}
+.kicker{
+  font-family:var(--mono); font-size:12px; color:var(--ink-dim); font-weight:500;
+  margin-bottom:14px; display:inline-flex; align-items:center; gap:8px;
+}
+.kicker::before{content:''; width:7px; height:7px; background:var(--accent2); border-radius:1px; transform:rotate(45deg); flex:0 0 auto;}
+h1{font-family:var(--display); font-size:clamp(28px,4.2vw,52px); line-height:1.06; margin:0 0 14px; font-weight:700; letter-spacing:-0.015em;}
+h2{font-family:var(--display); font-size:clamp(21px,2.8vw,32px); line-height:1.15; margin:0 0 16px; font-weight:700; letter-spacing:-0.01em;}
+h3{font-family:var(--display); font-size:17px; margin:0 0 8px; font-weight:600;}
+p{font-size:15.5px; line-height:1.6; color:var(--ink-dim); max-width:74ch; margin:0 0 10px;}
+.lead{font-size:18px; color:var(--ink); max-width:68ch;}
+.example{border-left:2px dashed var(--accent); background:var(--panel); padding:11px 15px; border-radius:0 6px 6px 0; margin-top:6px; position:relative;}
+.example b{color:var(--accent); font-weight:600; font-family:var(--mono); font-size:.93em;}
+.grid{display:grid; gap:14px; margin-top:12px;}
+.grid.cols-2{grid-template-columns:1fr 1fr;}
+.grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.grid.cols-5{grid-template-columns:repeat(5,1fr);}
+@media (max-width:800px){.grid.cols-2,.grid.cols-3,.grid.cols-5{grid-template-columns:1fr;}}
+.card{background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--accent2); border-radius:var(--radius); padding:15px 17px;}
+.card .n{color:var(--accent2); font-size:12px; font-weight:600; margin-bottom:6px; font-family:var(--mono); letter-spacing:.02em;}
+table{border-collapse:collapse; width:100%; margin-top:8px; font-size:14px;}
+th,td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top; line-height:1.5;}
+th{background:var(--panel2); color:var(--accent2); font-weight:600; font-size:12px; font-family:var(--mono); letter-spacing:.01em;}
+td{color:var(--ink-dim);}
+tr:nth-child(even) td{background:rgba(127,127,127,.05);}
+.proscons{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:8px;}
+@media (max-width:700px){.proscons{grid-template-columns:1fr;}}
+.proscons .box{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px;}
+.proscons .box.pro{border-left:3px solid var(--good);}
+.proscons .box.con{border-left:3px solid var(--bad);}
+.proscons ul{margin:0; padding-left:18px; font-size:14px; color:var(--ink-dim); line-height:1.6;}
+.proscons li{margin-bottom:6px;}
+.pillrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+.pill{background:var(--panel2); border:1px solid var(--line); border-radius:5px; padding:6px 13px; font-size:13px; color:var(--ink); font-family:var(--mono);}
+.footer{margin-top:auto; display:flex; align-items:center; justify-content:space-between; padding-top:14px; font-size:12px; color:var(--ink-dim); font-family:var(--mono); border-top:1px solid var(--line);}
+.num{position:fixed; top:calc(16px + env(safe-area-inset-top,0px) + 9px); right:100px; font-size:12px; color:var(--ink-dim); z-index:10; font-family:var(--mono);}
+.num::before{content:'// ';}
+.topbtns{position:fixed; top:calc(14px + env(safe-area-inset-top,0px)); right:16px; display:flex; gap:8px; z-index:20;}
+.iconbtn{background:var(--panel2); border:1px solid var(--line); color:var(--ink); width:34px; height:34px; border-radius:6px; cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center;}
+.iconbtn:hover{border-color:var(--accent2); color:var(--accent2);}
+.nav{position:fixed; bottom:calc(18px + env(safe-area-inset-bottom,0px)); right:24px; display:flex; gap:8px; z-index:10;}
+.nav button{background:var(--panel2); border:1px solid var(--line); color:var(--ink); width:38px; height:38px; border-radius:6px; cursor:pointer; font-size:16px;}
+.nav button:hover{border-color:var(--accent2); color:var(--accent2);}
+.progress{position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg,var(--accent2),var(--accent)); z-index:15; transition:width .25s;}
+.menu-overlay{position:fixed; inset:0; background:rgba(4,8,14,.7); display:none; align-items:center; justify-content:center; z-index:30;}
+.menu-overlay.open{display:flex;}
+.menu-panel{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px; width:min(440px,90vw); max-height:80vh; overflow-y:auto;}
+.menu-panel h4{margin:0 0 12px; font-size:12px; color:var(--ink-dim); letter-spacing:.04em; font-family:var(--mono); font-weight:500;}
+.menu-item{display:flex; gap:10px; align-items:center; padding:9px 10px; border-radius:6px; cursor:pointer; font-size:14px; border-left:2px solid transparent;}
+.menu-item:hover{background:var(--panel2); border-left-color:var(--line);}
+.menu-item.current{background:var(--panel2); color:var(--accent2); border-left-color:var(--accent2);}
+.menu-item .mi-n{color:var(--ink-dim); font-size:11px; width:30px; font-family:var(--mono);}
+::-webkit-scrollbar{width:8px;} ::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
+
+/* ---- Interactive widgets ---- */
+.demo{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; margin-top:14px; position:relative;}
+.demo::before{content:''; position:absolute; left:0; top:14px; bottom:14px; width:3px; background:var(--accent2); border-radius:0 2px 2px 0;}
+.demo h4{margin:0 0 4px; font-size:12.5px; color:var(--ink); letter-spacing:.02em; font-family:var(--mono); font-weight:600;}
+.demo .hint{font-size:13px; color:var(--ink-dim); margin-bottom:12px;}
+.btn{background:var(--accent); color:var(--accent-ink); border:none; padding:9px 18px; border-radius:6px; font-size:14px; font-weight:600; font-family:var(--sans); cursor:pointer;}
+.btn:hover{filter:brightness(1.08);}
+.btn.ghost{background:transparent; color:var(--accent2); border:1px solid var(--accent2);}
+.btnrow{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px;}
+.switch{display:inline-flex; border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+.switch button{background:var(--panel2); color:var(--ink-dim); border:none; padding:7px 14px; font-size:13px; cursor:pointer; font-family:var(--mono);}
+.switch button.on{background:var(--accent); color:var(--accent-ink); font-weight:700;}
+.slider-row{display:flex; align-items:center; gap:14px; margin-bottom:14px;}
+.slider-row input[type=range]{flex:1; accent-color:var(--accent2);}
+.slider-row .val{min-width:120px; text-align:right; font-weight:600; color:var(--accent2); font-size:13.5px; font-family:var(--mono);}
+.queue{display:flex; flex-direction:column; gap:6px;}
+.qline{display:flex; align-items:center; gap:10px;}
+.qline .lbl{width:74px; font-size:12px; color:var(--ink-dim); font-family:var(--mono);}
+.track{flex:1; height:16px; background:var(--panel2); border-radius:4px; overflow:hidden; position:relative; border:1px solid var(--line);}
+.fill{height:100%; width:0%; background:var(--accent2); border-radius:3px; transition:width .12s linear;}
+.qline .time{width:56px; font-size:12px; color:var(--ink-dim); text-align:right; font-family:var(--mono);}
+.barchart{display:flex; align-items:flex-end; gap:10px; height:150px; margin-top:8px; padding:0 4px;}
+.barchart .bwrap{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%;}
+.barchart .bar{width:100%; background:var(--accent2); border-radius:4px 4px 0 0; display:flex; align-items:flex-start; justify-content:center; color:var(--accent-ink); font-size:11.5px; font-weight:700; font-family:var(--mono); padding-top:5px; transition:height .35s ease;}
+.barchart .blabel{margin-top:6px; font-size:11px; color:var(--ink-dim); font-family:var(--mono);}
+.nodeflow{display:flex; align-items:center; justify-content:center; gap:14px; margin:14px 0; flex-wrap:wrap;}
+.node{width:58px; height:58px; border-radius:50%; background:var(--panel2); border:1.5px solid var(--accent2); display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--accent2); font-weight:600; font-family:var(--mono); cursor:pointer; transition:all .2s; text-align:center; line-height:1.15;}
+.node:hover{border-color:var(--accent); box-shadow:0 0 0 3px rgba(255,180,84,.15);}
+.node.down{background:rgba(255,111,101,.12); border-color:var(--bad); color:var(--bad); opacity:.6; text-decoration:line-through;}
+.node.active-pulse{animation:pulse 1s ease infinite;}
+.node.master{border-color:var(--accent); color:var(--accent); border-width:2px;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,180,84,.5);}70%{box-shadow:0 0 0 12px rgba(255,180,84,0);}100%{box-shadow:0 0 0 0 rgba(255,180,84,0);}}
+.arrow{color:var(--ink-dim); font-size:20px;}
+.status{font-size:13px; margin-top:10px; color:var(--ink); min-height:18px;}
+.status b{color:var(--accent2);}
+.arch-tabs{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;}
+.arch-tabs button{background:var(--panel2); border:1px solid var(--line); color:var(--ink-dim); padding:8px 14px; border-radius:6px; font-size:13px; cursor:pointer; font-family:var(--mono);}
+.arch-tabs button.on{background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:700;}
+.arch-box{border:1px solid var(--line); border-radius:var(--radius); background:var(--panel2); padding:16px; display:flex; flex-direction:column; gap:10px; align-items:center;}
+.arch-box .net{background:var(--panel); color:var(--accent2); font-size:11px; letter-spacing:.04em; padding:6px 10px; border-radius:4px; width:100%; text-align:center; font-family:var(--mono);
+  background-image:repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 12px); background-size:100% 1px; background-repeat:no-repeat; background-position:center;}
+.arch-box .row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
+.chip{border:1px solid var(--line); border-radius:5px; padding:8px 12px; font-size:12px; text-align:center; min-width:52px; transition:all .2s; font-family:var(--mono);}
+.chip.cpu{background:#1c2a3d;}
+.chip.disk{background:#2a2013; border-color:#4a3a1c; color:var(--accent);}
+.chip.mem{background:#132a38; border-color:#1f4a58; color:var(--accent2);}
+:root[data-theme="light"] .chip.cpu{background:#e4ecf7;}
+:root[data-theme="light"] .chip.disk{background:#f6ecd8;}
+:root[data-theme="light"] .chip.mem{background:#dcf3ec;}
+.chip.hot{box-shadow:0 0 0 3px var(--bad); border-color:var(--bad);}
+.unit{display:flex; flex-direction:column; gap:6px; align-items:center; padding:6px; border:1px dashed var(--line); border-radius:6px;}
+.shardline{display:flex; gap:2px; margin:14px 0; border-radius:6px; overflow:hidden; height:34px;}
+.shardline .seg{flex:1; display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:700; color:var(--accent-ink); transition:opacity .2s; font-family:var(--mono);}
+.shardmark{position:relative; height:20px; margin-top:-4px;}
+.shardmark .flag{position:absolute; top:0; transform:translateX(-50%); font-size:16px; transition:left .25s ease;}
+.numinput{background:var(--panel2); border:1px solid var(--line); color:var(--ink); padding:8px 12px; border-radius:6px; font-size:14px; width:160px; font-family:var(--mono);}
+.quiz-q{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin-bottom:12px;}
+.quiz-q .qt{font-size:14.5px; color:var(--ink); margin-bottom:10px; font-weight:600; font-family:var(--display);}
+.quiz-opts{display:flex; flex-direction:column; gap:7px; counter-reset:opt;}
+.quiz-opt{background:var(--panel2); border:1px solid var(--line); border-radius:6px; padding:9px 12px 9px 38px; font-size:13.5px; cursor:pointer; color:var(--ink-dim); position:relative;}
+.quiz-opt::before{counter-increment:opt; content:counter(opt,lower-alpha); position:absolute; left:12px; top:9px; font-family:var(--mono); color:var(--ink-dim); font-size:12px;}
+.quiz-opt:hover{border-color:var(--accent2);}
+.quiz-opt.correct{border-color:var(--good); color:var(--good); background:rgba(111,209,143,.1); font-weight:600;}
+.quiz-opt.correct::before{color:var(--good);}
+.quiz-opt.wrong{border-color:var(--bad); color:var(--bad); background:rgba(255,111,101,.1);}
+.quiz-opt.wrong::before{color:var(--bad);}
+.quiz-opt.disabled{pointer-events:none;}
+.scorebox{position:sticky; top:0; background:var(--panel2); border:1px solid var(--line); border-radius:var(--radius); padding:10px 16px; margin-bottom:14px; font-size:14px; display:flex; justify-content:space-between; align-items:center; font-family:var(--mono);}
+.timeline{display:flex; align-items:center; margin-top:20px; gap:0;}
+.tl-step{flex:1; text-align:center; position:relative;}
+.tl-step .dot2{width:11px; height:11px; background:var(--accent2); margin:0 auto 10px; border:2px solid var(--panel); box-shadow:0 0 0 1px var(--accent2); transform:rotate(45deg);}
+.tl-step .line{position:absolute; top:5px; left:50%; width:100%; height:1px; background-image:repeating-linear-gradient(90deg, var(--line) 0 5px, transparent 5px 10px); z-index:-1;}
+.tl-step:last-child .line{display:none;}
+.tl-step h5{font-size:13px; margin:0 0 4px; color:var(--ink); font-family:var(--mono); font-weight:600;}
+.tl-step p{font-size:12px; margin:0; max-width:none;}
+.mg .tl3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 20px}
+.mg .tl3 div{background:var(--card);border-top:5px solid var(--am);padding:14px;border-radius:10px;font-size:16px;box-shadow:var(--sh)}
+.mg .tl3 b{display:block;font:700 19px "Bricolage Grotesque",sans-serif;color:var(--g);margin-bottom:4px}
+.mg pre{background:#14231c;color:#e8f0eb;padding:16px;border-radius:12px;overflow-x:auto;font:14px/1.5 "Courier New",monospace;margin:0;align-self:start}
+.mg code{font:.85em "Courier New",monospace;background:var(--g2);padding:1px 6px;border-radius:5px}
+.mg details code{color:var(--ink)}
+.mg details p code{color:var(--g)}
+.mg h3.sub{font-size:26px;color:var(--g);margin:24px 0 6px}
+.mg .lab{background:var(--card);border:2px dashed var(--g);border-radius:16px;padding:18px 22px;margin:22px 0}
+.mg .lab h4{margin:14px 0 8px;font:700 17px "Bricolage Grotesque",sans-serif;color:var(--g)}
+.mg .lab h4:first-child{margin-top:0}
+.mg .bt{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0;font-size:16px}
+.mg .lab button{font:600 15px "Bricolage Grotesque",sans-serif;padding:7px 14px;border-radius:8px;border:2px solid var(--g);background:var(--g);color:#fff;cursor:pointer}
+.mg .lab button.gh{background:none;color:var(--g)}
+.mg .lab input[type=text],.mg .lab input:not([type]),.mg .lab select{font:inherit;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.mg .lab pre{margin:8px 0;white-space:pre-wrap;font-size:13px}
+.mg .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mg .q{font-weight:600;margin:6px 0}
+.mg .bar{height:14px;background:var(--g2);border-radius:8px;overflow:hidden}
+.mg .bar i{display:block;height:100%;transition:width .2s}
+.mg .flow{display:flex;flex-wrap:wrap;gap:8px}
+.mg .flow span{flex:1;min-width:110px;text-align:center;padding:12px 6px;border:2px solid var(--line);border-radius:10px;font:600 14px "Bricolage Grotesque",sans-serif;transition:.2s}
+.mg .flow span.on{background:var(--am);border-color:var(--am);color:#14231c;transform:scale(1.05)}
+.mg .fig{background:var(--card);border-radius:18px;padding:18px 20px 12px;margin:0 0 26px;box-shadow:var(--sh)}
+.mg .fig svg{width:100%;height:auto;display:block}
+.mg .fig figcaption{text-align:center;font-size:14px;color:var(--mut);margin-top:8px}
+.mg .fig text{fill:var(--ink);font:600 13px "Bricolage Grotesque","Segoe UI",Arial,sans-serif}
+.mg .fig .t2{font-size:11px;font-weight:500;fill:var(--mut)}
+.mg .fig .tt{font-size:16px;font-weight:800;fill:var(--g)}
+.mg .fig .bx{fill:var(--card);stroke:var(--g);stroke-width:2}
+.mg .fig .b2{fill:var(--g2);stroke:var(--g);stroke-width:1.5}
+.mg .fig .pn{fill:none;stroke:var(--g);stroke-width:2;stroke-dasharray:6 4}
+.mg .fig .am{fill:var(--am);stroke:var(--am)}
+.mg .fig .c1{fill:var(--g)}
+.mg .fig .c2{fill:var(--g2);stroke:var(--g);stroke-width:1}
+.mg .fig .c3{fill:var(--card);stroke:var(--mut);stroke-width:1}
+.mg .fig .ar{stroke:var(--mut);stroke-width:2;fill:none}
+.mg .fig .wt{fill:#fff}
+.mg table.cm td:first-child{font:13px/1.5 "Courier New",monospace;background:#14231c;color:#e8f0eb;white-space:pre-wrap;width:48%;border-bottom:1px solid #2b4237}
+.mg table.cm td:last-child{font-size:15px}
+.mg table.cm th{font-size:14px}
+.mg .use{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:6px 0 10px}
+.mg .use div{background:var(--g2);border-radius:10px;padding:10px 14px;font-size:15px}
+.mg .use b{color:var(--g)}
+.mg .use ul{margin:4px 0 0;padding-left:18px}
+.mg .ex{background:var(--card);border-radius:18px;padding:22px 26px;margin:0 0 26px;box-shadow:var(--sh)}
+.mg .ex h3{margin:0 0 4px;font-size:24px;color:var(--g)}
+.mg .ex .lead{margin-bottom:12px}
+.mg{--g:var(--accent2);--g2:var(--panel2);--card:var(--panel);--mut:var(--ink-dim);--am:var(--accent)}
+.mg h2{margin-bottom:10px}.mg .lead{margin-bottom:14px}
+.mg pre{background:#0b1522;color:#e9f1fb;padding:14px;border-radius:8px;overflow-x:auto;font:12.5px/1.5 var(--mono);margin:8px 0}
+.mg code{font:.88em var(--mono);background:var(--panel2);padding:1px 6px;border-radius:4px;color:var(--accent)}
+.mg table.cm td:first-child code,.mg td code{color:var(--accent)}
+.mg .scroll{overflow-x:auto}
+.mg .key{border-left:2px dashed var(--accent);background:var(--panel);padding:11px 15px;border-radius:0 6px 6px 0;margin:10px 0;font-size:14.5px;color:var(--ink-dim)}
+.mg .key b{color:var(--accent)}
+.mg .ex,.mg .blk{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent2);border-radius:7px;padding:14px 18px;margin:8px 0;box-shadow:none}
+.mg .blk{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.mg .blk h3,.mg .ex h3{color:var(--accent2)}
+.mg ul,.mg ol{color:var(--ink-dim);font-size:14.5px;line-height:1.6;padding-left:20px;margin:4px 0}
+.mg .lab{background:var(--panel);border:1px dashed var(--accent2);border-radius:7px;padding:14px 18px;margin:10px 0}
+.mg .lab h4{font:600 13px var(--mono);color:var(--accent2);margin:12px 0 8px}.mg .lab h4:first-child{margin-top:0}
+.mg .lab button,.mg .bt button{background:var(--accent);color:var(--accent-ink);border:none;padding:7px 14px;border-radius:6px;font:600 13.5px var(--sans);cursor:pointer}
+.mg .lab button.gh{background:transparent;color:var(--accent2);border:1px solid var(--accent2)}
+.mg input,.mg select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font:13.5px var(--mono)}
+.mg .bt{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0;font-size:14px;color:var(--ink)}
+.mg .q{font-weight:600;color:var(--ink);font-size:14.5px;margin:6px 0}
+.mg .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mg .bar{height:14px;background:var(--panel2);border-radius:8px;overflow:hidden}.mg .bar i{display:block;height:100%;transition:width .2s}
+.mg .flow{display:flex;flex-wrap:wrap;gap:8px}.mg .flow span{flex:1;min-width:100px;text-align:center;padding:10px 6px;border:1px solid var(--line);border-radius:6px;font:600 12.5px var(--mono);color:var(--ink-dim)}
+.mg .flow span.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);transform:scale(1.05)}
+.mg table.cm td:first-child{font:12.5px/1.5 var(--mono);background:#0b1522;color:#e9f1fb;white-space:pre-wrap;width:46%}
+.mg table.cm td:last-child{font-size:14px}
+.mg .use{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0}.mg .use div{background:var(--panel2);border-radius:6px;padding:9px 13px;font-size:14px;color:var(--ink-dim)}.mg .use b{color:var(--accent2)}
+.mg .tl3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:8px 0}
+.mg .tl3 div{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:7px;padding:12px 14px;font-size:14.5px;color:var(--ink-dim)}
+.mg .tl3 b{display:block;font:600 16px var(--display);color:var(--accent2);margin-bottom:4px}
+.mg .fig{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:12px;margin:8px 0}
+.mg .fig svg{width:100%;max-height:52vh;height:auto;display:block}
+.mg .fig figcaption{text-align:center;font-size:12.5px;color:var(--ink-dim);margin-top:6px}
+.mg details{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:10px 14px;margin:8px 0;color:var(--ink)}
+.mg summary{cursor:pointer;font-weight:600;font-size:14.5px}.mg details p{margin:8px 0 0;color:var(--accent2)}
+.mg h3.sub{color:var(--accent2);font-size:19px;margin:10px 0 4px}
+.mg .tlh{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.mg .tlh div{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:7px;padding:12px;font-size:14px;color:var(--ink-dim)}
+.mg .tlh b{display:block;font:700 22px var(--display);color:var(--accent2)}
+@media(max-width:800px){.mg .blk,.mg .two,.mg .use,.mg .tl3,.mg .tlh{grid-template-columns:1fr}}
+
+
+.diag{background:var(--panel2);border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin:14px 0;}
+.diag svg{width:100%;height:auto;display:block;max-height:430px;}
+.diag figcaption{font-size:12.5px;color:var(--ink-dim);margin-top:6px;font-family:var(--mono);}
+.sv text{fill:var(--ink);font-size:13px;font-family:var(--sans);}
+.sv .sm{fill:var(--ink-dim);font-size:11.5px;}
+.sv .bx{fill:var(--panel);stroke:var(--line);stroke-width:1.5;}
+.sv .hl{fill:var(--panel);stroke:var(--accent2);stroke-width:2;}
+.sv .wr{fill:var(--panel);stroke:var(--accent);stroke-width:2;}
+.sv .ar{stroke:var(--accent2);stroke-width:2;fill:none;marker-end:url(#arr);}
+.sv .dash{stroke:var(--ink-dim);stroke-width:1.5;stroke-dasharray:5 4;fill:none;}
+.sv .axis{stroke:var(--ink-dim);stroke-width:1.2;fill:none;}
+.sv .dem{stroke:var(--accent);stroke-width:3;fill:none;}
+.sv .cap{stroke:var(--accent2);stroke-width:3;fill:none;}
+.sv .ok{fill:var(--good);}
+.sv .bad{fill:var(--bad);}
+.sv .cloudfill{fill:var(--accent2);fill-opacity:.12;stroke:var(--accent2);stroke-width:2;}
+.sv .tag{font-weight:700;}
+.sv .bigT{font-family:var(--display);font-size:16px;font-weight:700;}
+.rm td{font-size:13.5px}
+.rm td.y{color:var(--good);font-weight:700;text-align:center}
+.rm td.n{color:var(--ink-dim);text-align:center}
+.rm th{text-align:center}
+.rm th:first-child,.rm td:first-child{text-align:left}
+.ex-box{border-left:2px dashed var(--accent);background:var(--panel);padding:11px 15px;border-radius:0 6px 6px 0;margin-top:10px;}
+.ex-box b{color:var(--accent);font-family:var(--mono);}
+.note-box{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--radius);padding:12px 16px;margin-top:12px;font-size:14px;color:var(--ink-dim);}
+.note-box b{color:var(--ink);}
+details{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:10px 14px;margin:8px 0;}
+summary{cursor:pointer;color:var(--ink);font-weight:600;}
+details p{margin:8px 0 0;}
+.sl-x{font-size:14px}
+ul.tight{margin:0;padding-left:18px;font-size:15px;color:var(--ink-dim);line-height:1.6}
+ul.tight li{margin-bottom:6px}
+ul.tight b{color:var(--ink)}
+@media (max-width:700px){.slide{padding:22px 16px 80px}.grid.cols-3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck" id="deck">
+<svg viewBox="0 0 10 10" width="0" height="0" style="position:absolute"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--accent2)"/></marker></defs></svg>
+<!-- 1 -->
+<section class="slide mg active" data-title="Titre"><div class="kicker">Chapitre 3 · BDD NoSQL et cloud / L3 ISIL / 2026-2027 · IZOUNTAR Yousra</div>
+<h1>Le traitement de données dans les systèmes clouds</h1>
+<p class="lead">Ce qu’est le cloud computing, comment il est architecturé, quels services il propose, et pourquoi il change la façon de stocker et de traiter les données.</p>
+<div class="pillrow"><span class="pill">1.1 Introduction</span><span class="pill">1.2 Cloud computing</span><span class="pill">1.3 Architecture</span><span class="pill">1.4 BDD dans le cloud</span><span class="pill">1.5 SGBD parallèles vs cloud</span></div></section>
+<!-- 2 -->
+<section class="slide mg" data-title="Plan du chapitre"><div class="kicker">Plan</div><h2>Plan du chapitre</h2>
+<div class="grid cols-3">
+<div class="card"><div class="n">1.1</div><h3>Introduction</h3><p style="margin:0">Données volumineuses, besoin de flexibilité.</p></div>
+<div class="card"><div class="n">1.2</div><h3>Qu’est-ce que le cloud ?</h3><p style="margin:0">Définition, caractéristiques, modèles de service.</p></div>
+<div class="card"><div class="n">1.3</div><h3>Architecture du cloud</h3><p style="margin:0">Front-end, back-end, composants clés.</p></div>
+<div class="card"><div class="n">1.4</div><h3>BDD dans le cloud</h3><p style="margin:0">Accessibilité, scalabilité, coûts, haute disponibilité, sécurité.</p></div>
+<div class="card"><div class="n">1.5</div><h3>SGBD parallèles vs cloud</h3><p style="margin:0">Définitions, comparaison, cas d’utilisation.</p></div>
+</div></section>
+<!-- 3 -->
+<section class="slide mg" data-title="1.1 Introduction"><div class="kicker">1.1 Introduction</div><h2>1.1 Introduction : pourquoi le cloud ?</h2>
+<p class="lead">Les volumes de données augmentent, et les entreprises veulent des solutions plus flexibles et plus efficaces.</p>
+<div class="grid cols-2">
+<div class="card"><h3>Système traditionnel</h3><p style="margin:0">Serveurs achetés à l’avance, dimensionnés pour le pic, installés et maintenus sur place.</p></div>
+<div class="card"><h3>Plateforme cloud</h3><p style="margin:0">Ressources <b>élastiques</b> : on augmente ou on réduit selon le besoin, et le cloud prend en charge SQL (MySQL, PostgreSQL) comme NoSQL (MongoDB, DynamoDB).</p></div>
+</div>
+<div class="note-box"><b>Idée clé :</b> le cloud n’est pas un type de base de données. C’est une <b>façon de fournir</b> des bases (et des serveurs, du stockage, des logiciels) via Internet.</div></section>
+<!-- 4 -->
+<section class="slide mg" data-title="1.2 Qu’est-ce que le cloud ?"><div class="kicker">1.2 Qu’est-ce que le cloud computing ?</div><h2>1.2 Qu’est-ce que le cloud computing ?</h2>
+<p class="lead">Accéder à des ressources informatiques (serveurs, stockage, bases de données, logiciels, services) <b>via Internet</b>, sans les posséder physiquement.</p>
+<figure class="diag"><svg viewBox="0 0 760 300" class="sv" role="img" aria-label="Accès au cloud via Internet">
+<rect class="bx" x="20" y="40" width="150" height="60" rx="8"/><text x="95" y="76" text-anchor="middle">💻 Ordinateur</text>
+<rect class="bx" x="20" y="120" width="150" height="60" rx="8"/><text x="95" y="156" text-anchor="middle">📱 Smartphone</text>
+<rect class="bx" x="20" y="200" width="150" height="60" rx="8"/><text x="95" y="236" text-anchor="middle">🖥 Tablette</text>
+<path class="ar" d="M170 70 L255 130"/><path class="ar" d="M170 150 L255 150"/><path class="ar" d="M170 230 L255 170"/>
+<path class="cloudfill" d="M300 150 q-40 -10 -20 -40 q10 -35 50 -25 q15 -35 60 -25 q40 0 40 35 q35 5 25 35 q-5 25 -40 20 z"/>
+<text x="345" y="165" text-anchor="middle" class="sm">Internet</text>
+<path class="ar" d="M420 150 L470 150"/>
+<rect class="hl" x="480" y="60" width="250" height="180" rx="10"/>
+<text x="605" y="95" text-anchor="middle" class="bigT">Centre de données distant</text>
+<text x="605" y="125" text-anchor="middle" class="sm">serveurs · stockage · BDD · logiciels</text>
+<text x="605" y="160" text-anchor="middle" class="sm">géré par AWS, Azure, Google Cloud…</text>
+<text x="605" y="200" text-anchor="middle" class="sm">aucun matériel chez vous</text>
+</svg><figcaption>Figure : vous utilisez les ressources depuis n’importe quel appareil, elles tournent dans des centres de données distants gérés par un fournisseur.</figcaption></figure>
+<div class="grid cols-2">
+<div class="card"><h3>Pourquoi “cloud” ?</h3><p style="margin:0">Dans les schémas informatiques, Internet est dessiné sous forme de nuage : une infrastructure décentralisée et invisible derrière les services.</p></div>
+<div class="card"><h3>Histoire</h3><p style="margin:0">Issu de l’évolution de la virtualisation et des réseaux, popularisé au début des années 2000.</p></div>
+</div></section>
+<!-- 5 -->
+<section class="slide mg" data-title="Caractéristiques clés"><div class="kicker">1.2 · Caractéristiques</div><h2>Caractéristiques clés du cloud</h2>
+<div class="grid cols-3">
+<div class="card"><h3>1. Accès à distance</h3><p style="margin:0 0 8px">Depuis n’importe quel appareil connecté. Favorise le travail collaboratif entre équipes dispersées.</p><div class="ex-box"><b>Exemple</b> consulter ses fichiers ou une application métier depuis un navigateur.</div></div>
+<div class="card"><h3>2. Élasticité</h3><p style="margin:0 0 8px">Augmenter ou réduire la capacité automatiquement et instantanément selon la demande.</p><div class="ex-box"><b>Exemple</b> un site e-commerce qui monte en charge pendant le Black Friday, puis redescend.</div></div>
+<div class="card"><h3>3. Paiement à l’usage</h3><p style="margin:0 0 8px">Modèle “pay-as-you-go” : on paie seulement ce qu’on consomme, sans gros investissement initial.</p><div class="ex-box"><b>Exemple</b> 1 To stocké = on paie 1 To ; si on passe à 2 To, la facture change.</div></div>
+</div>
+<div class="note-box">Ces trois caractéristiques rendent le cloud <b>flexible, économique et adapté aux besoins évolutifs</b>.</div></section>
+<!-- 6 -->
+<section class="slide mg" data-title="Élasticité"><div class="kicker">1.2 · Élasticité</div><h2>Élasticité : suivre la demande</h2>
+<p class="lead">La capacité (courbe bleue) suit la demande (courbe orange) : on paie la ressource quand on en a besoin, pas en permanence.</p>
+<figure class="diag"><svg viewBox="0 0 760 340" class="sv" role="img" aria-label="Élasticité : demande et capacité">
+<line class="axis" x1="70" y1="290" x2="720" y2="290"/><line class="axis" x1="70" y1="290" x2="70" y2="30"/>
+<text x="395" y="325" text-anchor="middle" class="sm">Temps</text>
+<text x="20" y="165" class="sm" transform="rotate(-90 20 165)" text-anchor="middle">Ressources (CPU, RAM, stockage)</text>
+<polyline class="dem" points="70,240 160,235 230,225 300,230 360,120 420,70 480,80 540,200 600,230 720,240"/>
+<polyline class="cap" points="70,250 230,250 230,215 350,215 350,110 440,110 440,95 540,95 540,215 620,215 620,250 720,250"/>
+<rect x="500" y="40" width="14" height="4" style="fill:var(--accent)"/><text x="522" y="48" class="sm">Demande (besoin réel)</text>
+<rect x="500" y="58" width="14" height="4" style="fill:var(--accent2)"/><text x="522" y="66" class="sm">Capacité fournie par le cloud</text>
+<text x="400" y="145" class="sm">pic de trafic (Black Friday)</text>
+<text x="80" y="275" class="sm">creux : on réduit les ressources</text>
+</svg><figcaption>Schéma pédagogique : sans élasticité, il faudrait acheter des serveurs pour le pic et les laisser inutilisés le reste du temps.</figcaption></figure>
+<div class="note-box"><b>Lecture :</b> quand la courbe bleue se superpose à l’orange, les ressources sont bien dimensionnées. Trop haut = coût inutile ; trop bas = service dégradé.</div></section>
+<!-- 7 -->
+<section class="slide mg" data-title="1.3 Architecture"><div class="kicker">1.3 Architecture du cloud</div><h2>1.3 Architecture : front-end et back-end</h2>
+<div class="grid cols-2">
+<div class="card"><h3>Front-end (interface)</h3><p style="margin:0">La partie visible par l’utilisateur final : navigateur, application, interface graphique.</p></div>
+<div class="card"><h3>Back-end (infrastructure)</h3><p style="margin:0">Gère les ressources, les services et les bases de données qui soutiennent les opérations.</p></div>
+</div><figure class="diag"><svg viewBox="0 0 780 400" class="sv" role="img" aria-label="Architecture cloud front-end back-end">
+<rect x="10" y="20" width="200" height="350" rx="10" class="hl" style="fill:var(--panel)"/>
+<text x="110" y="48" text-anchor="middle" class="bigT">FRONT-END</text>
+<text x="110" y="68" text-anchor="middle" class="sm">partie visible</text>
+<rect x="30" y="100" width="160" height="90" rx="8" class="bx"/>
+<text x="110" y="135" text-anchor="middle">Infrastructure client</text>
+<text x="110" y="158" text-anchor="middle" class="sm">interface graphique (GUI)</text>
+<text x="110" y="178" text-anchor="middle" class="sm">Gmail, Google Docs, Asana</text>
+<path class="ar" d="M110 190 L110 230"/>
+<text x="110" y="250" text-anchor="middle" class="sm">navigateur</text>
+<text x="110" y="268" text-anchor="middle" class="sm">via Internet</text>
+<path class="ar" d="M220 200 L290 200" style="stroke:var(--accent)"/>
+<text x="255" y="190" text-anchor="middle" class="sm">Internet</text>
+<rect x="300" y="20" width="470" height="350" rx="10" class="wr" style="fill:var(--panel)"/>
+<text x="535" y="48" text-anchor="middle" class="bigT">BACK-END</text>
+<text x="535" y="68" text-anchor="middle" class="sm">infrastructure qui fait le travail</text>
+<rect x="320" y="90" width="150" height="50" rx="8" class="bx"/><text x="395" y="120" text-anchor="middle">Application</text>
+<rect x="320" y="150" width="150" height="50" rx="8" class="bx"/><text x="395" y="180" text-anchor="middle">Runtime cloud</text>
+<rect x="320" y="210" width="150" height="50" rx="8" class="bx"/><text x="395" y="240" text-anchor="middle">Service</text>
+<rect x="320" y="270" width="150" height="50" rx="8" class="bx"/><text x="395" y="300" text-anchor="middle">Storage</text>
+<rect x="490" y="90" width="130" height="230" rx="8" class="hl" style="fill:var(--panel)"/><text x="555" y="200" text-anchor="middle">Infrastructure</text><text x="555" y="220" text-anchor="middle" class="sm">serveurs, réseaux,</text><text x="555" y="236" text-anchor="middle" class="sm">dispositifs de stockage</text>
+<rect x="640" y="90" width="115" height="110" rx="8" class="bx"/><text x="697" y="140" text-anchor="middle">Management</text><text x="697" y="158" text-anchor="middle" class="sm">coordonne</text>
+<rect x="640" y="210" width="115" height="110" rx="8" class="bx"/><text x="697" y="260" text-anchor="middle">Security</text><text x="697" y="278" text-anchor="middle" class="sm">pare-feu virtuels</text>
+</svg><figcaption>Architecture simplifiée : le front-end envoie les requêtes via Internet, le back-end les traite.</figcaption></figure><div class="note-box">Schéma à retenir : <b>Client → Internet → Back-end</b>. Le client ne voit que l’interface, pas les serveurs derrière.</div></section>
+<!-- 8 -->
+<section class="slide mg" data-title="Composants du back-end"><div class="kicker">1.3 · Composants</div><h2>Composants clés du back-end</h2>
+<table class="rm"><tr><th>Composant</th><th>Rôle</th><th>Exemple concret</th></tr>
+<tr><td><b>Application</b></td><td>Tout logiciel ou plateforme que l’utilisateur veut utiliser ; fournit les services en arrière-plan.</td><td>un site de réservation</td></tr>
+<tr><td><b>Service</b></td><td>Gère toutes les opérations sur la plateforme et organise les services selon les besoins.</td><td>l’orchestrateur qui répartit les tâches</td></tr>
+<tr><td><b>Runtime cloud</b></td><td>Environnement virtuel qui fait tourner plusieurs programmes sur le même serveur (virtualisation). Comparable à un OS dans le cloud.</td><td>plusieurs apps sur une même machine</td></tr>
+<tr><td><b>Storage</b></td><td>Espace évolutif pour stocker et gérer les données, avec accès simultané par plusieurs utilisateurs.</td><td>Amazon S3, Google Drive</td></tr>
+<tr><td><b>Infrastructure</b></td><td>Composants matériels et logiciels : serveurs, réseaux, dispositifs de stockage.</td><td>les data centers</td></tr>
+<tr><td><b>Management</b></td><td>Coordonne les éléments du cloud et garantit un fonctionnement fluide, y compris la sécurité.</td><td>supervision, monitoring</td></tr>
+<tr><td><b>Security</b></td><td>Protège les systèmes grâce à des pare-feu virtuels et d’autres mesures.</td><td>chiffrement, contrôle d’accès</td></tr>
+<tr><td><b>Internet</b></td><td>Le lien entre le front-end et le back-end.</td><td>HTTPS</td></tr>
+</table></section>
+<!-- 9 -->
+<section class="slide mg" data-title="Modèles SaaS, PaaS, IaaS"><div class="kicker">1.2 · Modèles de service</div><h2>Les trois modèles de service</h2>
+<p class="lead">Plus on monte dans la pile, plus le fournisseur gère de choses à votre place.</p><figure class="diag"><svg viewBox="0 0 760 330" class="sv" role="img" aria-label="SaaS PaaS IaaS">
+<rect class="wr" x="60" y="20" width="640" height="80" rx="10" style="fill:var(--panel)"/>
+<text x="90" y="55" class="bigT">SaaS : Software-as-a-Service</text><text x="90" y="80" class="sm">Vous utilisez un logiciel en ligne (navigateur, sans installation)</text>
+<rect class="hl" x="60" y="115" width="640" height="80" rx="10" style="fill:var(--panel)"/>
+<text x="90" y="150" class="bigT">PaaS : Platform-as-a-Service</text><text x="90" y="175" class="sm">Vous développez et déployez vos applications (outils, bibliothèques, runtime prêts)</text>
+<rect class="bx" x="60" y="210" width="640" height="80" rx="10"/>
+<text x="90" y="245" class="bigT">IaaS : Infrastructure-as-a-Service</text><text x="90" y="270" class="sm">Vous louez serveurs, stockage et réseau : “louer des machines au lieu de les acheter”</text>
+</svg><figcaption>Du bas vers le haut : vous gérez de moins en moins de couches techniques.</figcaption></figure>
+<div class="grid cols-3">
+<div class="card"><h3>SaaS</h3><p style="margin:0">Utiliser un logiciel en ligne.<br><b>Ex. :</b> Gmail, Zoom, Google Docs</p></div>
+<div class="card"><h3>PaaS</h3><p style="margin:0">Développer une application sans gérer l’infrastructure.<br><b>Ex. :</b> Heroku, Google App Engine</p></div>
+<div class="card"><h3>IaaS</h3><p style="margin:0">Louer une infrastructure complète pour héberger vos outils.<br><b>Ex. :</b> Amazon EC2</p></div>
+</div></section>
+<!-- 10 -->
+<section class="slide mg" data-title="Qui gère quoi ?"><div class="kicker">1.2 · Responsabilités</div><h2>Qui gère quoi ?</h2>
+<p class="lead">Tableau indicatif et généralisé : <b>✔</b> = géré par le fournisseur, <b>—</b> = à votre charge.</p>
+<div class="scroll"><table class="rm">
+<tr><th>Couche</th><th>Hébergement local</th><th>IaaS</th><th>PaaS</th><th>SaaS</th></tr>
+<tr><td>Application</td><td class="n">Vous</td><td class="n">Vous</td><td class="n">Vous</td><td class="y">Fournisseur</td></tr>
+<tr><td>Données</td><td class="n">Vous</td><td class="n">Vous</td><td class="n">Vous</td><td class="n">Vous (vos contenus)</td></tr>
+<tr><td>Runtime / middleware</td><td class="n">Vous</td><td class="n">Vous</td><td class="y">Fournisseur</td><td class="y">Fournisseur</td></tr>
+<tr><td>Système d’exploitation</td><td class="n">Vous</td><td class="n">Vous</td><td class="y">Fournisseur</td><td class="y">Fournisseur</td></tr>
+<tr><td>Virtualisation</td><td class="n">Vous</td><td class="y">Fournisseur</td><td class="y">Fournisseur</td><td class="y">Fournisseur</td></tr>
+<tr><td>Serveurs, stockage, réseau</td><td class="n">Vous</td><td class="y">Fournisseur</td><td class="y">Fournisseur</td><td class="y">Fournisseur</td></tr>
+</table></div>
+<div class="ex-box"><b>Lecture :</b> avec SaaS, vous n’avez plus qu’à utiliser le logiciel et gérer vos données.</div></section>
+<!-- 11 -->
+<section class="slide mg" data-title="1.4 BDD dans le cloud"><div class="kicker">1.4 Bases de données dans le cloud</div><h2>1.4 Une base de données “dans le cloud”</h2>
+<p class="lead">Une base hébergée sur des serveurs distants (AWS, Azure, Google Cloud), accessible via Internet ou un réseau privé sécurisé.</p><figure class="diag"><svg viewBox="0 0 760 300" class="sv" role="img" aria-label="Accès mondial aux données">
+<rect class="bx" x="20" y="120" width="170" height="60" rx="8"/><text x="105" y="155" text-anchor="middle">Équipe à Alger</text>
+<rect class="bx" x="20" y="210" width="170" height="60" rx="8"/><text x="105" y="245" text-anchor="middle">Équipe à Paris</text>
+<path class="ar" d="M190 150 L300 150"/><path class="ar" d="M190 240 L300 180"/>
+<rect class="hl" x="300" y="90" width="200" height="130" rx="10"/>
+<text x="400" y="122" text-anchor="middle" class="bigT">MongoDB Atlas</text>
+<text x="400" y="150" text-anchor="middle" class="sm">base hébergée chez le fournisseur</text>
+<text x="400" y="172" text-anchor="middle" class="sm">accès via navigateur ou MongoDB Compass</text>
+<path class="ar" d="M500 150 L560 150"/>
+<rect class="bx" x="570" y="110" width="170" height="80" rx="8"/><text x="655" y="145" text-anchor="middle">Navigateur /</text><text x="655" y="165" text-anchor="middle">Compass / appli</text>
+</svg><figcaption>Exemple : des équipes dans deux pays utilisent la même base hébergée sur Atlas.</figcaption></figure>
+<div class="grid cols-2">
+<div class="card"><h3>A/ Accessibilité mondiale</h3><p style="margin:0">Données accessibles de n’importe où avec Internet, travail collaboratif et accès en temps réel.</p></div>
+<div class="card"><h3>Avec MongoDB Atlas</h3><p style="margin:0">Connexion via navigateur ou MongoDB Compass depuis n’importe quel endroit connecté.</p></div>
+</div></section>
+<!-- 12 -->
+<section class="slide mg" data-title="Scalabilité"><div class="kicker">1.4 · Scalabilité</div><h2>Scalabilité : verticale ou horizontale ?</h2><figure class="diag"><svg viewBox="0 0 760 320" class="sv" role="img" aria-label="Scalabilité verticale et horizontale">
+<text x="190" y="30" text-anchor="middle" class="bigT">Verticale (scale up)</text>
+<rect class="hl" x="100" y="120" width="180" height="150" rx="8" style="fill:var(--panel)"/><text x="190" y="205" text-anchor="middle">Un serveur plus puissant</text><text x="190" y="225" text-anchor="middle" class="sm">+ RAM, + CPU</text>
+<text x="190" y="295" text-anchor="middle" class="sm">limité par la machine</text>
+<line class="axis" x1="380" y1="30" x2="380" y2="300"/>
+<text x="570" y="30" text-anchor="middle" class="bigT">Horizontale (scale out)</text>
+<rect class="bx" x="520" y="60" width="90" height="26" rx="5"/><text x="565" y="78" text-anchor="middle" class="sm">Serveur 1</text>
+<rect class="bx" x="520" y="100" width="90" height="26" rx="5"/><text x="565" y="118" text-anchor="middle" class="sm">Serveur 2</text>
+<rect class="bx" x="520" y="140" width="90" height="26" rx="5"/><text x="565" y="158" text-anchor="middle" class="sm">Serveur 3</text>
+<rect class="bx" x="520" y="180" width="90" height="26" rx="5"/><text x="565" y="198" text-anchor="middle" class="sm">Serveur N</text>
+<path class="ar" d="M470 150 L515 73"/><path class="ar" d="M470 150 L515 113"/><path class="ar" d="M470 150 L515 153"/><path class="ar" d="M470 150 L515 193"/>
+<rect class="wr" x="410" y="130" width="55" height="40" rx="6" style="fill:var(--panel)"/><text x="437" y="155" text-anchor="middle" class="sm">répart.</text>
+<text x="565" y="295" text-anchor="middle" class="sm">ajouter des machines : quasi illimité</text>
+</svg><figcaption>Deux manières d’absorber plus de charge.</figcaption></figure>
+<div class="grid cols-2">
+<div class="card"><h3>Horizontale</h3><p style="margin:0">Ajouter de nouveaux serveurs pour répartir la charge et gérer un volume croissant de données. <b>C’est la voie privilégiée du cloud et de NoSQL</b> (sharding).</p></div>
+<div class="card"><h3>Verticale</h3><p style="margin:0">Améliorer les performances d’un serveur existant (mémoire, processeur). Simple, mais limitée par la taille maximale de la machine.</p></div>
+</div></section>
+<!-- 13 -->
+<section class="slide mg" data-title="Coûts et haute disponibilité"><div class="kicker">1.4 · Coûts & disponibilité</div><h2>Réduction des coûts et haute disponibilité</h2>
+<div class="grid cols-2">
+<div class="card"><h3>C/ Réduction des coûts</h3><p style="margin:0 0 8px">Plus besoin d’acheter des serveurs physiques ni d’assurer leur maintenance. Le fournisseur gère infrastructure, mises à jour et réparations.</p><div class="ex-box"><b>Résultat :</b> dépenses d’infrastructure réduites, service performant.</div></div>
+<div class="card"><h3>D/ Haute disponibilité</h3><p style="margin:0 0 8px">Redondance sur plusieurs data centers : en cas de panne d’un serveur, les données restent accessibles ailleurs.</p></div>
+</div><figure class="diag"><svg viewBox="0 0 760 290" class="sv" role="img" aria-label="Haute disponibilité multi-régions">
+<rect class="hl" x="30" y="50" width="200" height="190" rx="10" style="fill:var(--panel)"/><text x="130" y="80" text-anchor="middle" class="bigT">Europe</text>
+<rect class="wr" x="60" y="100" width="140" height="40" rx="6" style="fill:var(--panel)"/><text x="130" y="125" text-anchor="middle" class="sm">Réplica (primaire)</text>
+<rect class="bx" x="60" y="160" width="140" height="40" rx="6"/><text x="130" y="185" text-anchor="middle" class="sm">Réplica secondaire</text>
+<rect class="hl" x="280" y="50" width="200" height="190" rx="10" style="fill:var(--panel)"/><text x="380" y="80" text-anchor="middle" class="bigT">Amérique du Nord</text>
+<rect class="bx" x="310" y="100" width="140" height="40" rx="6"/><text x="380" y="125" text-anchor="middle" class="sm">Réplica</text>
+<rect class="bx" x="310" y="160" width="140" height="40" rx="6"/><text x="380" y="185" text-anchor="middle" class="sm">Réplica</text>
+<rect class="hl" x="530" y="50" width="200" height="190" rx="10" style="fill:var(--panel)"/><text x="630" y="80" text-anchor="middle" class="bigT">Afrique du Nord</text>
+<rect class="bx" x="560" y="100" width="140" height="40" rx="6"/><text x="630" y="125" text-anchor="middle" class="sm">Réplica</text>
+<rect class="bx" x="560" y="160" width="140" height="40" rx="6"/><text x="630" y="185" text-anchor="middle" class="sm">Réplica</text>
+<path class="dash" d="M200 180 L280 180"/><path class="dash" d="M480 180 L530 180"/>
+<text x="380" y="270" text-anchor="middle" class="sm">Si la région Europe tombe en panne, les données restent accessibles depuis les autres régions.</text>
+</svg><figcaption>Schéma : les données sont répliquées dans plusieurs régions. Atlas en est un exemple (Europe et Amérique du Nord dans l’exemple du cours).</figcaption></figure></section>
+<!-- 14 -->
+<section class="slide mg" data-title="Sécurité dans le cloud"><div class="kicker">1.4 · Sécurité</div><h2>E/ Sécurité</h2>
+<p class="lead">Les fournisseurs proposent des solutions avancées pour protéger les données sensibles.</p>
+<div class="grid cols-3">
+<div class="card"><h3>Chiffrement</h3><p style="margin:0">Les données sont chiffrées <b>en transit</b> (réseau) et <b>au repos</b> (disque) : impossible à lire en cas de compromission.</p></div>
+<div class="card"><h3>Authentification forte</h3><p style="margin:0">Authentification multi-facteurs, clés API, identifiants robustes : seuls les utilisateurs autorisés accèdent à la base.</p></div>
+<div class="card"><h3>Règles IP</h3><p style="margin:0">Restreindre l’accès à certaines adresses IP pour bloquer les connexions non autorisées.</p></div>
+</div>
+<div class="note-box"><b>Sauvegardes régulières</b> : elles évitent la perte de données, même si tout le reste échoue.</div></section>
+<!-- 15 -->
+<section class="slide mg" data-title="1.5 SGBD parallèles"><div class="kicker">1.5 Étude comparative · définitions</div><h2>1.5 SGBD parallèles et systèmes clouds</h2>
+<div class="grid cols-2">
+<div class="card"><h3>SGBD parallèles</h3><p style="margin:0">Plusieurs processeurs ou machines exécutent les tâches <b>en parallèle</b> pour traiter de très grandes quantités de données. Architecture souvent MPP (Massively Parallel Processing).</p></div>
+<div class="card"><h3>Systèmes clouds</h3><p style="margin:0">Environnements virtuels qui fournissent stockage et puissance de calcul via Internet. Exemples : MongoDB Atlas, Amazon DynamoDB.</p></div>
+</div><figure class="diag"><svg viewBox="0 0 760 300" class="sv" role="img" aria-label="Architecture MPP">
+<rect class="bx" x="20" y="120" width="130" height="60" rx="8"/><text x="85" y="155" text-anchor="middle">Requête</text>
+<path class="ar" d="M150 150 L200 150"/>
+<rect class="hl" x="205" y="30" width="530" height="240" rx="10" style="fill:var(--panel)"/>
+<text x="470" y="58" text-anchor="middle" class="sm">Plusieurs serveurs / processeurs travaillent en même temps (MPP)</text>
+<rect class="wr" x="230" y="90" width="110" height="150" rx="8" style="fill:var(--panel)"/><text x="285" y="120" text-anchor="middle" class="sm">Nœud 1</text><text x="285" y="150" text-anchor="middle" class="sm">CPU + disque</text><text x="285" y="180" text-anchor="middle" class="sm">1/4 des données</text>
+<rect class="wr" x="360" y="90" width="110" height="150" rx="8" style="fill:var(--panel)"/><text x="415" y="120" text-anchor="middle" class="sm">Nœud 2</text><text x="415" y="150" text-anchor="middle" class="sm">CPU + disque</text><text x="415" y="180" text-anchor="middle" class="sm">1/4 des données</text>
+<rect class="wr" x="490" y="90" width="110" height="150" rx="8" style="fill:var(--panel)"/><text x="545" y="120" text-anchor="middle" class="sm">Nœud 3</text><text x="545" y="150" text-anchor="middle" class="sm">CPU + disque</text><text x="545" y="180" text-anchor="middle" class="sm">1/4 des données</text>
+<rect class="wr" x="620" y="90" width="100" height="150" rx="8" style="fill:var(--panel)"/><text x="670" y="120" text-anchor="middle" class="sm">Nœud 4</text><text x="670" y="150" text-anchor="middle" class="sm">CPU + disque</text><text x="670" y="180" text-anchor="middle" class="sm">1/4 des données</text>
+</svg><figcaption>Principe MPP : la requête est découpée, chaque nœud traite sa part des données, puis les résultats sont rassemblés.</figcaption></figure>
+<div class="ex-box"><b>Exemples cités :</b> Teradata (fondé en 1979, entrepôts de données, MPP) et Greenplum (base parallèle open source basée sur PostgreSQL, pour le Big Data).</div></section>
+<!-- 16 -->
+<section class="slide mg" data-title="Comparaison parallèles vs cloud"><div class="kicker">1.5 Comparaison</div><h2>Comparaison selon plusieurs critères</h2>
+<div class="scroll"><table class="rm">
+<tr><th>Critère</th><th>SGBD parallèles</th><th>Systèmes cloud</th></tr>
+<tr><td><b>Architecture</b></td><td>Infrastructures internes à l’entreprise</td><td>Serveurs virtuels hébergés par des tiers</td></tr>
+<tr><td><b>Évolutivité</b></td><td>Limitée par le matériel interne (ajout complexe)</td><td>Scalabilité horizontale facile (ajout de serveurs à la demande)</td></tr>
+<tr><td><b>Coût</b></td><td>Investissement initial élevé (serveurs)</td><td>Paiement à l’usage, modèle flexible</td></tr>
+<tr><td><b>Accessibilité</b></td><td>Locale ou via des réseaux privés</td><td>Mondiale via Internet</td></tr>
+<tr><td><b>Maintenance</b></td><td>Interne, par une équipe spécialisée</td><td>Par le fournisseur cloud</td></tr>
+<tr><td><b>Sécurité</b></td><td>Contrôlée directement par l’entreprise</td><td>Dépend des mécanismes du fournisseur</td></tr>
+<tr><td><b>Disponibilité</b></td><td>Dépend des ressources internes et de la redondance locale</td><td>Élevée grâce à la redondance multi-régions</td></tr>
+</table></div></section>
+<!-- 17 -->
+<section class="slide mg" data-title="Cas d’utilisation et conclusion"><div class="kicker">1.5 Cas d’utilisation · Conclusion</div><h2>Quand utiliser quoi ?</h2>
+<div class="grid cols-2">
+<div class="card"><h3>SGBD parallèles</h3><p style="margin:0">Environnements où les performances locales sont cruciales : centres de données de banques, analyses scientifiques.</p></div>
+<div class="card"><h3>Systèmes cloud</h3><p style="margin:0">Applications à collaboration mondiale : SaaS (Zoom, Google Workspace), e-commerce (Amazon, eBay, Etsy, AliExpress).</p></div>
+</div>
+<div class="note-box"><b>Conclusion :</b> SGBD parallèles et cloud ne sont pas concurrents mais <b>complémentaires</b>. Une solution <b>hybride</b> combine les deux, en profitant des points forts de chacun : performance et contrôle local, flexibilité et accessibilité du cloud.</div></section>
+<!-- 18 -->
+<section class="slide mg" data-title="Auto-évaluation"><div class="kicker">Révision</div><h2>Auto-évaluation</h2>
+<details><summary>1. Quelle est la différence entre front-end et back-end ?</summary><p>Le front-end est la partie visible par l’utilisateur (interface). Le back-end gère les ressources, services et bases de données.</p></details>
+<details><summary>2. Que signifie l’élasticité ?</summary><p>La capacité d’augmenter ou de réduire automatiquement les ressources selon la demande.</p></details>
+<details><summary>3. Quelle est la différence entre scalabilité horizontale et verticale ?</summary><p>Horizontale : ajouter des serveurs. Verticale : rendre un serveur plus puissant.</p></details>
+<details><summary>4. Dans quel modèle le fournisseur gère-t-il aussi l’OS et le runtime, mais pas votre application ?</summary><p>PaaS : vous développez et déployez, le fournisseur gère la plateforme.</p></details>
+<details><summary>5. Citez deux mesures de sécurité d’une base dans le cloud.</summary><p>Chiffrement (en transit et au repos), authentification multi-facteurs, règles IP, sauvegardes.</p></details></section>
+<!-- 19 -->
+<section class="slide mg" data-title="Ce qu’il faut retenir"><div class="kicker">Fin</div><h2>Ce qu’il faut retenir</h2>
+<div class="grid cols-2">
+<div class="card"><h3>Cloud</h3><p style="margin:0">Ressources via Internet, élastiques, paiement à l’usage, accessibles partout.</p></div>
+<div class="card"><h3>Services</h3><p style="margin:0">SaaS = utiliser · PaaS = développer · IaaS = louer l’infrastructure.</p></div>
+<div class="card"><h3>BDD cloud</h3><p style="margin:0">Scalabilité horizontale, haute disponibilité par réplication, chiffrement et contrôle d’accès.</p></div>
+<div class="card"><h3>Comparaison</h3><p style="margin:0">Parallèle = performance locale et contrôle ; cloud = flexibilité et accessibilité ; souvent les deux (hybride).</p></div>
+</div></section>
+
+</div>
+<div class="num" id="num">1 / 19</div>
+<div class="topbtns">
+  <button class="iconbtn" id="themeToggle" title="Mode clair / sombre">☀</button>
+  <button class="iconbtn" id="menuToggle" title="Aller à une section">☰</button>
+</div>
+<div class="nav">
+  <button id="prev" aria-label="Précédent">‹</button>
+  <button id="next" aria-label="Suivant">›</button>
+</div>
+<div class="menu-overlay" id="menuOverlay">
+  <div class="menu-panel"><h4>NAVIGATION</h4><div id="menuList"></div></div>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const titles = ["Titre", "Plan du chapitre", "1.1 Introduction", "1.2 Qu’est-ce que le cloud ?", "Caractéristiques clés", "Élasticité", "1.3 Architecture", "Composants du back-end", "Modèles SaaS, PaaS, IaaS", "Qui gère quoi ?", "1.4 BDD dans le cloud", "Scalabilité", "Coûts et haute disponibilité", "Sécurité dans le cloud", "1.5 SGBD parallèles", "Comparaison parallèles vs cloud", "Cas d’utilisation et conclusion", "Auto-évaluation", "Ce qu’il faut retenir"];
+let i = 0;
+function show(n){
+  slides[i].classList.remove('active');
+  i = (n + slides.length) % slides.length;
+  slides[i].classList.add('active');
+  document.getElementById('num').textContent = (i+1) + ' / ' + slides.length;
+  document.getElementById('progress').style.width = (((i+1)/slides.length)*100) + '%';
+  renderMenu();
+}
+document.getElementById('next').onclick = () => show(i+1);
+document.getElementById('prev').onclick = () => show(i-1);
+window.addEventListener('keydown', (e) => {
+  if(document.getElementById('menuOverlay').classList.contains('open')) return;
+  if(document.activeElement.tagName === 'INPUT') return;
+  if(e.key === 'ArrowRight' || e.key === ' ') show(i+1);
+  if(e.key === 'ArrowLeft') show(i-1);
+  if(e.key === 'Escape') closeMenu();
+});
+let touchX = null;
+window.addEventListener('touchstart', e => touchX = e.touches[0].clientX);
+window.addEventListener('touchend', e => {
+  if(touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if(dx < -40) show(i+1);
+  if(dx > 40) show(i-1);
+  touchX = null;
+});
+const themeBtn = document.getElementById('themeToggle');
+let light = false;
+themeBtn.onclick = () => {
+  light = !light;
+  document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
+  themeBtn.textContent = light ? '☾' : '☀';
+};
+const menuOverlay = document.getElementById('menuOverlay');
+const menuList = document.getElementById('menuList');
+function renderMenu(){
+  menuList.innerHTML = '';
+  titles.forEach((t, idx) => {
+    const item = document.createElement('div');
+    item.className = 'menu-item' + (idx === i ? ' current' : '');
+    item.innerHTML = '<span class="mi-n">' + (idx+1) + '</span><span>' + t + '</span>';
+    item.onclick = () => { show(idx); closeMenu(); };
+    menuList.appendChild(item);
+  });
+}
+function closeMenu(){ menuOverlay.classList.remove('open'); }
+document.getElementById('menuToggle').onclick = () => { renderMenu(); menuOverlay.classList.add('open'); };
+menuOverlay.addEventListener('click', (e) => { if(e.target === menuOverlay) closeMenu(); });
+renderMenu();
+document.getElementById('progress').style.width = (100/slides.length) + '%';
+</script>
+<script src="../../assets/annotate.js" defer></script>
+
+</body>
+</html>
