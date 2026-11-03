@@ -158,12 +158,12 @@ button.go{background:var(--g);color:#fff}button.go:disabled{opacity:.6}
 .qz-warn{position:fixed;inset:0;z-index:100;background:#7a140f;display:grid;place-items:center;padding:24px;text-align:center}
 .qz-warn[hidden]{display:none}.qz-warn>div{max-width:560px;background:var(--card);border-radius:16px;padding:26px;box-shadow:var(--sh)}
 .qz-warn p{font:700 19px "Bricolage Grotesque",sans-serif;color:var(--bad);margin:0 0 16px}
-</style></head><body><main style="max-width:900px;margin:auto;padding:0 20px 70px">
-<div class="brand"><img class="logo" src="logo.png" alt="Université d'Alger 1 logo" onerror="this.style.display='none'"><div class="bi"><h2>Université d'Alger 1 – Benyoucef Benkhedda</h2><p class="bs">Faculty of Sciences · Computer Science Department</p><dl><dt>Module</dt><dd>Human-Computer Interaction (HCI)</dd><dt>Level</dt><dd>L3 – Semester 5 (ISIL, SI)</dd><dt>Instructor</dt><dd>Dr. Izountar Yousra</dd><dt>Academic year</dt><dd>2026 / 2027</dd><dt>Document</dt><dd>Quiz (QCM) – The Define phase of the Double Diamond</dd><dt>Duration</dt><dd>15 min</dd><dt>Questions</dt><dd>15, one correct answer each</dd></dl></div></div>
-<h1 style="font-size:clamp(28px,4.4vw,46px);margin:26px 0 8px">Quiz · The Define phase</h1>
-<div class="key"><b>Instructions:</b> type the <b>session code</b> given by your instructor. You have <b>15 minutes</b> from the moment you open the quiz, in <b>full screen</b>, and you can send your answers <b>only once</b>. Leaving the quiz (other tab, other window, leaving full screen, reloading the page) is counted and seen by your instructor; after 3 exits your answers are sent automatically. When the time is up, they are sent automatically too.</div>
+</style></head><body><main style="max-width:900px;margin:auto;padding:0 20px 70px"><div class="lang top"><button type="button" data-l="en">English</button><button type="button" data-l="fr">Français</button></div>
+<div class="brand"><img class="logo" src="logo.png" alt="Université d'Alger 1 logo" onerror="this.style.display='none'"><div class="bi"><h2>Université d'Alger 1 – Benyoucef Benkhedda</h2><p class="bs"><span class="l-en">Faculty of Sciences · Computer Science Department</span><span class="l-fr">Faculté des Sciences · Département d&#39;Informatique</span></p><dl><dt>Module</dt><dd><span class="l-en">Human-Computer Interaction (HCI)</span><span class="l-fr">Interaction Homme-Machine (IHM)</span></dd><dt><span class="l-en">Level</span><span class="l-fr">Niveau</span></dt><dd>L3 – <span class="l-en">Semester 5</span><span class="l-fr">Semestre 5</span> (ISIL, SI)</dd><dt><span class="l-en">Instructor</span><span class="l-fr">Enseignant(e)</span></dt><dd>Dr. Izountar Yousra</dd><dt><span class="l-en">Academic year</span><span class="l-fr">Année universitaire</span></dt><dd>2026 / 2027</dd><dt>Document</dt><dd><span class="l-en">Quiz (QCM) – The Define phase of the Double Diamond</span><span class="l-fr">Quiz (QCM) – La phase Define du Double Diamant</span></dd><dt><span class="l-en">Duration</span><span class="l-fr">Durée</span></dt><dd>15 min</dd><dt>Questions</dt><dd><span class="l-en">15, one correct answer each</span><span class="l-fr">15, une seule bonne réponse chacune</span></dd></dl></div></div>
+<h1 style="font-size:clamp(28px,4.4vw,46px);margin:26px 0 8px"><span class="l-en">Quiz · The Define phase</span><span class="l-fr">Quiz · La phase Define</span></h1>
+<div class="key"><span class="l-en"><b>Instructions:</b> type the <b>session code</b> given by your instructor. You have <b>15 minutes</b> from the moment you open the quiz, in <b>full screen</b>, and you can send your answers <b>only once</b>. Leaving the quiz (other tab, other window, leaving full screen, reloading the page) is counted and seen by your instructor; after 3 exits your answers are sent automatically. When the time is up, they are sent automatically too.</span><span class="l-fr"><b>Consignes :</b> tapez le <b>code de séance</b> donné par votre enseignant(e). Vous avez <b>15 minutes</b> à partir de l&#39;ouverture du quiz, en <b>plein écran</b>, et vous ne pouvez envoyer vos réponses <b>qu&#39;une seule fois</b>. Quitter le quiz (autre onglet, autre fenêtre, sortie du plein écran, rechargement de la page) est compté et visible par votre enseignant(e) ; après 3 sorties, vos réponses sont envoyées automatiquement. À la fin du temps, elles sont aussi envoyées automatiquement.</span></div>
 <div id="qz"></div>
-<p style="margin-top:30px"><a href="../../index.html">← Back to the course materials</a></p>
+<p style="margin-top:30px"><a href="../../index.html"><span class="l-en">← Back to the course materials</span><span class="l-fr">← Retour aux supports de cours</span></a></p>
 </main>
 <script src="../nosql/lab4-config.js"></script><script>/* ===== Lab 4 QCM: opens with the session code, full screen, exits counted (shared by the lab page and the quiz page) ===== */
 window.QcmCore = function (o) {
@@ -276,6 +276,9 @@ window.QcmCore = function (o) {
   return { poll, fill: p => { if (!RUN) fill(p); } };
 };
 
-QcmCore({mount:document.getElementById('qz'),fr:false,quiz:'hcidefine',idKey:'hci-id'});
+const L=window.__L||'en';
+document.querySelectorAll('.l-en,.l-fr').forEach(e=>e.style.display=e.classList.contains('l-'+L)?'':'none');
+document.querySelectorAll('.lang button').forEach(b=>{b.classList.toggle('on',b.dataset.l===L);b.onclick=()=>{try{localStorage.setItem('nosqllang',b.dataset.l)}catch(e){}const u=new URL(location.href);u.searchParams.set('lang',b.dataset.l);location.href=u.toString()}});
+QcmCore({mount:document.getElementById('qz'),fr:L==='fr',quiz:'hcidefine',idKey:'hci-id'});
 </script>
 </body></html>
