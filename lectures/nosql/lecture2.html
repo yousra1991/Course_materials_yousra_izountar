@@ -549,12 +549,39 @@ C  11     ← Omar</pre><p>Sections A→Z, et dans chaque section, meilleure moy
 <h4>🧪 Index : combien de documents lus ?</h4><div class="bt"><label>Taille de la collection <input id="w7r" max="1000000" min="1000" step="1000" type="range" value="100000"/> <b id="w7rv"></b></label><label><input id="w7i" type="checkbox"/> index unique sur numero_inscription</label></div><p class="q" id="w7x"></p></div><div class="footer"><span>Validation et index (suite)</span><span>48 / 56</span></div></section>
 
 <!-- 49 -->
-<section class="slide mg"><div class="kicker">9. Opérateurs et types BSON</div><h2>9. Opérateurs et types BSON</h2><div class="scroll"><table><tr><th>Famille</th><th>Opérateurs</th></tr>
-<tr><td><b>Comparaison</b></td><td><code>$eq</code> <code>$ne</code> <code>$gt</code> <code>$gte</code> <code>$lt</code> <code>$lte</code> <code>$in</code> <code>$nin</code></td></tr>
-<tr><td><b>Logiques</b></td><td><code>$and</code> <code>$or</code> <code>$not</code> <code>$nor</code> ; ex. <code>{ $or: [{ status: "A" }, { status: "D" }] }</code></td></tr>
-<tr><td><b>Éléments / évaluation</b></td><td><code>$exists</code> <code>$type</code> <code>$regex</code> (ex. <code>"^J"</code>) <code>$expr</code></td></tr>
-<tr><td><b>Agrégation</b></td><td><code>$sum</code> <code>$avg</code> <code>$max</code> <code>$min</code> <code>$push</code> <code>$addToSet</code> (élément unique)</td></tr>
-<tr><td><b>Mise à jour</b></td><td><code>$set</code> <code>$unset</code> <code>$inc</code> <code>$mul</code> <code>$rename</code></td></tr></table></div><div class="footer"><span>9. Opérateurs et types BSON</span><span>49 / 56</span></div></section>
+<section class="slide mg"><div class="kicker">9. Opérateurs et types BSON</div><h2>9. Opérateurs et types BSON</h2><div class="scroll"><table style="font-size:13px"><tr><th>Opérateur</th><th>Rôle</th><th>Exemple</th></tr>
+<tr><td colspan="3" style="background:var(--panel2)"><b>Comparaison (compare la valeur d’un champ)</b></td></tr>
+<tr><td><code>$eq</code></td><td>Égal à</td><td><code style="white-space:normal">{ age: { $eq: 20 } }   // identique à { age: 20 }</code></td></tr>
+<tr><td><code>$ne</code></td><td>Différent de</td><td><code style="white-space:normal">{ statut: { $ne: "exclu" } }</code></td></tr>
+<tr><td><code>$gt</code></td><td>Strictement supérieur à</td><td><code style="white-space:normal">{ note: { $gt: 10 } }</code></td></tr>
+<tr><td><code>$gte</code></td><td>Supérieur ou égal à</td><td><code style="white-space:normal">{ age: { $gte: 18 } }</code></td></tr>
+<tr><td><code>$lt</code></td><td>Strictement inférieur à</td><td><code style="white-space:normal">{ note: { $lt: 10 } }</code></td></tr>
+<tr><td><code>$lte</code></td><td>Inférieur ou égal à</td><td><code style="white-space:normal">{ age: { $lte: 20 } }</code></td></tr>
+<tr><td><code>$in</code></td><td>La valeur est dans la liste</td><td><code style="white-space:normal">{ ville: { $in: ["Alger", "Oran"] } }</code></td></tr>
+<tr><td><code>$nin</code></td><td>La valeur n’est pas dans la liste</td><td><code style="white-space:normal">{ ville: { $nin: ["Alger", "Oran"] } }</code></td></tr>
+<tr><td colspan="3" style="background:var(--panel2)"><b>Logiques (combinent plusieurs conditions)</b></td></tr>
+<tr><td><code>$and</code></td><td>Toutes les conditions sont vraies</td><td><code style="white-space:normal">{ $and: [{ note: { $gte: 10 } }, { age: { $lt: 25 } }] }</code></td></tr>
+<tr><td><code>$or</code></td><td>Au moins une condition est vraie</td><td><code style="white-space:normal">{ $or: [{ statut: "A" }, { statut: "D" }] }</code></td></tr>
+<tr><td><code>$not</code></td><td>Inverse la condition d’un champ</td><td><code style="white-space:normal">{ note: { $not: { $gt: 10 } } }   // note ≤ 10 ou absente</code></td></tr>
+<tr><td><code>$nor</code></td><td>Aucune des conditions n’est vraie</td><td><code style="white-space:normal">{ $nor: [{ statut: "A" }, { statut: "D" }] }</code></td></tr>
+<tr><td colspan="3" style="background:var(--panel2)"><b>Éléments / évaluation (structure ou contenu du champ)</b></td></tr>
+<tr><td><code>$exists</code></td><td>Le champ existe (true) ou non (false)</td><td><code style="white-space:normal">{ email: { $exists: true } }</code></td></tr>
+<tr><td><code>$type</code></td><td>Le type BSON du champ</td><td><code style="white-space:normal">{ age: { $type: "int" } }</code></td></tr>
+<tr><td><code>$regex</code></td><td>Le champ correspond à une expression régulière</td><td><code style="white-space:normal">{ nom: { $regex: "^J" } }   // noms commençant par J</code></td></tr>
+<tr><td><code>$expr</code></td><td>Compare deux champs du même document</td><td><code style="white-space:normal">{ $expr: { $gt: ["$depenses", "$budget"] } }</code></td></tr>
+<tr><td colspan="3" style="background:var(--panel2)"><b>Agrégation (dans $group, sur plusieurs documents)</b></td></tr>
+<tr><td><code>$sum</code></td><td>Somme (ou comptage avec 1)</td><td><code style="white-space:normal">{ $group: { _id: "$section", total: { $sum: 1 } } }   // nombre d’étudiants par section</code></td></tr>
+<tr><td><code>$avg</code></td><td>Moyenne</td><td><code style="white-space:normal">{ $group: { _id: "$section", moyenne: { $avg: "$note" } } }</code></td></tr>
+<tr><td><code>$max</code></td><td>Valeur maximale</td><td><code style="white-space:normal">{ $group: { _id: null, meilleure: { $max: "$note" } } }</code></td></tr>
+<tr><td><code>$min</code></td><td>Valeur minimale</td><td><code style="white-space:normal">{ $group: { _id: null, plusBasse: { $min: "$note" } } }</code></td></tr>
+<tr><td><code>$push</code></td><td>Ajoute chaque valeur dans un tableau (doublons acceptés)</td><td><code style="white-space:normal">{ $group: { _id: "$section", noms: { $push: "$nom" } } }</code></td></tr>
+<tr><td><code>$addToSet</code></td><td>Ajoute chaque valeur dans un tableau (sans doublons)</td><td><code style="white-space:normal">{ $group: { _id: "$section", villes: { $addToSet: "$ville" } } }</code></td></tr>
+<tr><td colspan="3" style="background:var(--panel2)"><b>Mise à jour (modifient les documents)</b></td></tr>
+<tr><td><code>$set</code></td><td>Définit la valeur d’un champ (le crée s’il n’existe pas)</td><td><code style="white-space:normal">updateOne({ nom: "Ali" }, { $set: { statut: "A" } })</code></td></tr>
+<tr><td><code>$unset</code></td><td>Supprime un champ</td><td><code style="white-space:normal">updateOne({ nom: "Ali" }, { $unset: { telephone: "" } })</code></td></tr>
+<tr><td><code>$inc</code></td><td>Ajoute une valeur numérique au champ</td><td><code style="white-space:normal">updateOne({ nom: "Ali" }, { $inc: { note: 1 } })</code></td></tr>
+<tr><td><code>$mul</code></td><td>Multiplie le champ par une valeur</td><td><code style="white-space:normal">updateOne({ nom: "Ali" }, { $mul: { salaire: 1.1 } })</code></td></tr>
+<tr><td><code>$rename</code></td><td>Renomme un champ</td><td><code style="white-space:normal">updateOne({ nom: "Ali" }, { $rename: { ville: "wilaya" } })</code></td></tr></table></div><div class="footer"><span>9. Opérateurs et types BSON</span><span>49 / 56</span></div></section>
 
 <!-- 50 -->
 <section class="slide mg"><div class="kicker">9. Opérateurs et types BSON</div><h2>9. Opérateurs et types BSON (suite)</h2><div class="scroll"><table><tr><th>Type BSON</th><th>Description</th><th>Type BSON</th><th>Description</th></tr>
