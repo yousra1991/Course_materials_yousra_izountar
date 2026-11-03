@@ -328,9 +328,9 @@ build();maj();
     const html = `<!DOCTYPE html><html lang="${LANG}"><head><meta charset="utf-8"><title>Lab 4 – ${esc(p.last)} ${esc(p.first)}</title><style>
 body{font:15px/1.5 Georgia,serif;color:#14231c;max-width:900px;margin:auto;padding:24px}h1{color:#1f7a4d;margin:0 0 4px}h2{color:#1f7a4d;border-bottom:2px solid #c9d8cf;padding-bottom:4px;margin-top:34px}
 h3{font:700 16px Arial,sans-serif;margin:22px 0 8px}.ok{color:#1f7a4d;font-size:12px;border:1px solid #1f7a4d;border-radius:99px;padding:1px 8px}.no{color:#b3261e;font-size:12px;border:1px solid #b3261e;border-radius:99px;padding:1px 8px}
-table{border-collapse:collapse}td{padding:3px 14px 3px 0}pre{background:#10201a;color:#d5e7db;padding:12px;border-radius:8px;white-space:pre-wrap;font:13px/1.45 Consolas,monospace}
-figure{margin:10px 0}img{max-width:100%;border:1px solid #c9d8cf;border-radius:6px}figcaption{font:12px Arial,sans-serif;color:#4f6158}.em{color:#4f6158;font-style:italic}.st{page-break-inside:avoid}</style></head><body>
-<h1>NoSQL – MongoDB Lab 4 · ${T('Report', 'Rapport')}</h1><p>Université d'Alger 1 · Master 2 ASD · Dr. Izountar Yousra</p>
+table{border-collapse:collapse}td{padding:3px 14px 3px 0}pre{background:#f3f6f2;color:#14231c;border:1px solid #c9d8cf;border-left:4px solid #1f7a4d;padding:12px;border-radius:8px;white-space:pre-wrap;font:13px/1.45 Consolas,monospace}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+figure{margin:10px 0;page-break-inside:avoid}img{max-width:100%;max-height:900px;border:1px solid #c9d8cf;border-radius:6px}.pb{position:fixed;top:12px;right:12px;font:700 15px Arial,sans-serif;padding:10px 16px;border-radius:8px;border:none;background:#1f7a4d;color:#fff;cursor:pointer}@media print{.pb{display:none}body{padding:0}@page{margin:14mm}}figcaption{font:12px Arial,sans-serif;color:#4f6158}.em{color:#4f6158;font-style:italic}.st{page-break-inside:avoid}</style></head><body>
+<button class="pb" onclick="window.print()">${T('🖨 Save as PDF', '🖨 Enregistrer en PDF')}</button><h1>NoSQL – MongoDB Lab 4 · ${T('Report', 'Rapport')}</h1><p>Université d'Alger 1 · Master 2 ASD · Dr. Izountar Yousra</p>
 <table><tr><td><b>${T('Last name', 'Nom')}</b></td><td>${esc(p.last)}</td></tr><tr><td><b>${T('First name', 'Prénom')}</b></td><td>${esc(p.first)}</td></tr>
 <tr><td><b>${T('Student ID', 'Matricule')}</b></td><td>${esc(p.matricule)}</td></tr><tr><td><b>${T('Group', 'Groupe')}</b></td><td>${esc(p.group)}</td></tr>
 <tr><td><b>Date</b></td><td>${now.toLocaleString(LANG === 'fr' ? 'fr-FR' : 'en-GB')}</td></tr><tr><td><b>${T('Progress', 'Avancement')}</b></td><td>${c.steps} / ${ET.etapes.length} · ${c.caps} capture(s) · ${ET.etapes.filter(e => DONE.has(e.id)).length} ${T('marked done', 'marquées terminées')}</td></tr></table>
@@ -351,6 +351,14 @@ ${body}</body></html>`;
     document.body.append(a); a.click(); a.remove();
     const m = document.getElementById('rp-msg'); m.className = 'okm'; m.textContent = T('Report downloaded.', 'Rapport téléchargé.');
   }
+  function pdf() {
+    const p = who(), m = document.getElementById('rp-msg'); if (!check(p)) return; saveId();
+    const { html } = buildReport(p);
+    const auto = html.replace('</body>', '<script>window.onload=function(){setTimeout(function(){window.print()},400)}<\/script></body>');
+    const w = window.open(URL.createObjectURL(new Blob([auto], { type: 'text/html' })), '_blank');
+    if (!w) { m.className = 'bad'; m.textContent = T('Your browser blocked the new tab: allow pop-ups for this site, or download the HTML report and print it.', 'Votre navigateur a bloqué le nouvel onglet : autorisez les fenêtres pop-up pour ce site, ou téléchargez le rapport HTML et imprimez-le.'); return; }
+    m.className = 'okm'; m.textContent = T('In the print window, choose "Save as PDF" as the printer.', 'Dans la fenêtre d\'impression, choisissez « Enregistrer au format PDF » comme imprimante.');
+  }
   async function send() {
     const p = who(), m = document.getElementById('rp-msg'); if (!check(p)) return; saveId();
     if (!API) { m.className = 'bad'; m.textContent = T('Sending is not activated yet: download your report and give it to your instructor.', 'L\'envoi n\'est pas encore activé : téléchargez votre rapport et remettez-le à votre enseignant(e).'); return; }
@@ -367,15 +375,16 @@ ${body}</body></html>`;
   function mountReport() {
     const s = document.createElement('section'); s.id = 'report';
     s.innerHTML = `<h2>${T('My report', 'Mon rapport')}</h2>
-<p class="lead">${T('At the end of the session, fill in your identity, then <b>send</b> your report (your code and captures for every step). If sending does not work, <b>download</b> it and give the file to your instructor.', 'À la fin de la séance, remplissez votre identité, puis <b>envoyez</b> votre rapport (votre code et vos captures pour chaque étape). Si l\'envoi ne fonctionne pas, <b>téléchargez</b>-le et remettez le fichier à votre enseignant(e).')}</p>
+<p class="lead">${T('At the end of the session, fill in your identity, then <b>send</b> your report (your code and captures for every step). You can also keep a copy as a <b>PDF</b>. If sending does not work, save it as PDF and give the file to your instructor.', 'À la fin de la séance, remplissez votre identité, puis <b>envoyez</b> votre rapport (votre code et vos captures pour chaque étape). Vous pouvez aussi en garder une copie en <b>PDF</b>. Si l\'envoi ne fonctionne pas, enregistrez-le en PDF et remettez le fichier à votre enseignant(e).')}</p>
 <div class="rpf"><label>${T('Last name', 'Nom')}<input id="rp-last" autocomplete="family-name"></label><label>${T('First name', 'Prénom')}<input id="rp-first" autocomplete="given-name"></label>
 <label>${T('Student ID', 'Matricule')}<input id="rp-mat" inputmode="numeric"></label><label>${T('Group', 'Groupe')}<select id="rp-grp"><option value="">—</option><option>G1</option><option>G2</option></select></label></div>
 <p id="rp-st" class="tm"></p>
-<p><button type="button" class="go" id="rp-send">${T('📤 Send my report', '📤 Envoyer mon rapport')}</button> <button type="button" class="gh" id="rp-dl">${T('⬇ Download my report', '⬇ Télécharger mon rapport')}</button></p>
+<p><button type="button" class="go" id="rp-send">${T('📤 Send my report', '📤 Envoyer mon rapport')}</button> <button type="button" class="gh" id="rp-pdf">${T('🖨 Save as PDF', '🖨 Enregistrer en PDF')}</button> <button type="button" class="gh" id="rp-dl">${T('⬇ Download (HTML)', '⬇ Télécharger (HTML)')}</button></p>
 <p id="rp-msg"></p>`;
     const nx = document.querySelector('.nx'); nx.parentNode.insertBefore(s, nx);
     try { const p = JSON.parse(lsGet(IK) || '{}'); ['last', 'first', 'matricule', 'group'].forEach((k, i) => { if (p[k]) document.getElementById(['rp-last', 'rp-first', 'rp-mat', 'rp-grp'][i]).value = p[k]; }); } catch (e) {}
     document.getElementById('rp-dl').onclick = download;
+    document.getElementById('rp-pdf').onclick = pdf;
     document.getElementById('rp-send').onclick = send;
     const nv = document.getElementById('nv'); if (nv) { const a = document.createElement('a'); a.href = '#report'; a.textContent = T('📄 My report', '📄 Mon rapport'); nv.append(a); }
   }
