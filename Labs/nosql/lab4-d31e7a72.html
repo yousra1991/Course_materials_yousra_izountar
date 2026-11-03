@@ -135,9 +135,9 @@ button.go{background:var(--g);color:#fff}button.go:disabled{opacity:.6}
 #rp-msg{font:600 15px "Bricolage Grotesque",sans-serif}#rp-msg.okm{color:var(--g)}#rp-msg.bad{color:var(--bad)}
 @media(max-width:900px){.rpf{grid-template-columns:1fr 1fr}}
 @media print{.work,.drop{display:none}}
-.qz-id{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0}
-.qz-id label{display:flex;flex-direction:column;font:600 14px "Bricolage Grotesque",sans-serif;color:var(--mut);gap:4px}
-.qz-id input,.qz-id select{font:16px "Source Serif 4",Georgia,serif;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.qz-id{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:12px 0}
+.qz-id label{min-width:0;display:flex;flex-direction:column;font:600 14px "Bricolage Grotesque",sans-serif;color:var(--mut);gap:4px}
+.qz-id input,.qz-id select{width:100%;min-width:0;box-sizing:border-box;font:16px "Source Serif 4",Georgia,serif;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
 .qz-st{font:700 17px "Bricolage Grotesque",sans-serif;color:var(--mut);margin:6px 0}.qz-st.okm{color:var(--g)}.qz-st.bad{color:var(--bad)}
 .qz-bar{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--bg);padding:10px 0;border-bottom:2px solid var(--line);font:600 15px "Bricolage Grotesque",sans-serif}
 #qz-t{font:800 26px "Bricolage Grotesque",sans-serif;color:var(--g)}#qz-t.low{color:var(--bad)}
@@ -221,9 +221,9 @@ build();maj();
 </script><script src="../../assets/annotate.js" defer></script>
 
 <script src="lab4-config.js"></script>
-<script>/* ===== Lab 4 QCM: launched by the instructor for everybody (shared by the lab page and the quiz page) ===== */
+<script>/* ===== Lab 4 QCM: opens with the session code, full screen, exits counted (shared by the lab page and the quiz page) ===== */
 window.QcmCore = function (o) {
-  const API = window.LAB_API || '', FR = o.fr, T = (a, b) => FR ? b : a, SK = 'nosqllab4-qcm', IK = 'nosqllab-4-id', POLL = 20000;
+  const API = window.LAB_API || '', FR = o.fr, T = (a, b) => FR ? b : a, SK = 'nosqllab4-qcm', IK = 'nosqllab-4-id', POLL = 30000;
   const root = o.mount, esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const ls = { get(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
   let S = null, ANS = [], END = 0, TICK = null, SENT = false, RUN = false, STATE = 'off', BUSY = false, EXITS = 0, MAX = 0, AWAY = false, MUTE = false;
@@ -233,19 +233,20 @@ window.QcmCore = function (o) {
   const call = async b => (await fetch(API, { method: 'POST', body: JSON.stringify(b) })).json();
   root.innerHTML = `<div class="qz-wait"><p class="qz-st" id="qz-st"></p>
 <div class="qz-id"><label>${T('Last name', 'Nom')}<input id="qz-ln" autocomplete="family-name"></label><label>${T('First name', 'Prénom')}<input id="qz-fn" autocomplete="given-name"></label>
-<label>${T('Student ID', 'Matricule')}<input id="qz-mt" inputmode="numeric"></label><label>${T('Group', 'Groupe')}<select id="qz-gp"><option value="">—</option><option>G1</option><option>G2</option></select></label></div>
+<label>${T('Student ID', 'Matricule')}<input id="qz-mt" inputmode="numeric"></label><label>${T('Group', 'Groupe')}<select id="qz-gp"><option value="">—</option><option>G1</option><option>G2</option></select></label><label>${T('Session code', 'Code de séance')}<input id="qz-cd" autocomplete="off" autocapitalize="characters" spellcheck="false"></label></div>
 <p><button type="button" class="go" id="qz-go">${T('▶ Start the quiz (full screen)', '▶ Commencer le quiz (plein écran)')}</button> <span id="qz-m1" class="qz-msg"></span></p></div>
 <div class="qz-run" hidden><div class="qz-bar"><span id="qz-who"></span><span id="qz-pr"></span><span id="qz-t">--:--</span></div><div id="qz-qs"></div>
 <p><button type="button" class="go" id="qz-sb">${T('Send my answers', 'Envoyer mes réponses')}</button> <span id="qz-m2" class="qz-msg"></span></p></div>
 <div class="qz-end" hidden></div><div class="qz-warn" hidden><div><p id="qz-wt"></p><button type="button" class="go" id="qz-back">${T('↩ Back to the quiz (full screen)', '↩ Revenir au quiz (plein écran)')}</button></div></div>`;
   const $ = s => root.querySelector(s), W = $('.qz-wait'), R = $('.qz-run'), E = $('.qz-end');
   const idv = () => ({ last: $('#qz-ln').value.trim(), first: $('#qz-fn').value.trim(), matricule: $('#qz-mt').value.trim(), group: $('#qz-gp').value });
+  const code = () => $('#qz-cd').value.trim();
   const fill = p => { if (!p) return; if (p.last) $('#qz-ln').value = p.last; if (p.first) $('#qz-fn').value = p.first; if (p.matricule) $('#qz-mt').value = p.matricule; if (p.group) $('#qz-gp').value = p.group; };
-  fill(ls.get(IK)); const saved = ls.get(SK); if (saved && saved.p) fill(saved.p);
+  fill(ls.get(IK)); const saved = ls.get(SK); if (saved && saved.p) fill(saved.p); if (saved && saved.code && !saved.sent) $('#qz-cd').value = saved.code;
   const st = (t, cls) => { const e = $('#qz-st'); e.className = 'qz-st ' + (cls || ''); e.textContent = t; };
-  const ERR = { closed: T('The quiz has not been launched yet.', "Le quiz n'a pas encore été lancé."), ended: T('The quiz is over.', 'Le quiz est terminé.'),
+  const ERR = { closed: T('The quiz is closed for now.', 'Le quiz est fermé pour le moment.'), code: T('Wrong code. Ask your instructor for the session code.', 'Code incorrect. Demandez le code de séance à votre enseignant(e).'), ended: T('The quiz is over.', 'Le quiz est terminé.'),
     done: T('You have already sent your answers: only one attempt is allowed.', 'Vous avez déjà envoyé vos réponses : un seul passage est autorisé.'),
-    identity: T('Fill in your last name, first name and group.', 'Remplissez votre nom, prénom et groupe.') };
+    identity: T('Fill in your last name, first name and group.', 'Remplissez votre nom, prénom et groupe.'), nocode: T('Type the session code given by your instructor.', 'Tapez le code de séance donné par votre enseignant(e).') };
 
   function showDone(j) {
     $('.qz-warn').hidden = true; try { if (isFull()) (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (e) {}
@@ -258,14 +259,15 @@ window.QcmCore = function (o) {
     if (RUN || BUSY || SENT) return;
     const p = idv(), m = $('#qz-m1');
     if (!p.last || !p.first || !p.group) { if (!auto) { m.className = 'qz-msg bad'; m.textContent = ERR.identity; } return; }
+    if (!code()) { m.className = 'qz-msg bad'; m.textContent = ERR.nocode; return; }
     BUSY = true; m.className = 'qz-msg'; m.textContent = T('Opening…', 'Ouverture…');
     try {
-      const j = await call(Object.assign({ action: 'qcmStart' }, p));
+      const j = await call(Object.assign({ action: 'qcmStart', code: code() }, p));
       if (!j.ok) { if (j.error === 'done') { ls.set(SK, { p, sent: true }); showDone(null); } else { m.className = 'qz-msg bad'; m.textContent = ERR[j.error] || j.error; } return; }
       ls.set(IK, p);
       const old = ls.get(SK), resumed = !!(old && old.key === j.key && old.ans); ANS = resumed ? old.ans : new Array(j.questions.length).fill(-1);
       MAX = j.maxExits || 0; EXITS = resumed ? (old.exits || 0) : 0;   // a reload or a closed tab was already counted when the page was hidden
-      S = { key: j.key, p }; ls.set(SK, { key: j.key, p, ans: ANS, exits: EXITS }); END = Date.now() + j.remaining; render(j.questions);
+      S = { key: j.key, p }; ls.set(SK, { key: j.key, p, ans: ANS, exits: EXITS, code: code() }); END = Date.now() + j.remaining; render(j.questions);
       if (resumed && MAX && EXITS >= MAX) submit(true);
     } catch (e) { m.className = 'qz-msg bad'; m.textContent = T('Connection problem, try again.', 'Problème de connexion, réessayez.'); }
     finally { BUSY = false; }
@@ -275,7 +277,7 @@ window.QcmCore = function (o) {
     $('#qz-who').textContent = `${S.p.last.toUpperCase()} ${S.p.first} · ${S.p.group}`;
     $('#qz-qs').innerHTML = Q.map((q, i) => `<div class="qq"><h3>${i + 1}. ${esc(FR ? q.q_fr : q.q)}</h3>${q.code ? `<pre>${esc(q.code)}</pre>` : ''}` +
       (FR ? q.opts_fr : q.opts).map((x, k) => `<label><input type="radio" name="q${i}" value="${k}" ${ANS[i] === k ? 'checked' : ''}><span><b>${'ABCD'[k]}.</b> ${/[{($\[]/.test(x) ? '<code>' + esc(x) + '</code>' : esc(x)}</span></label>`).join('') + '</div>').join('');
-    $('#qz-qs').onchange = ev => { const n = ev.target.name; if (!n) return; ANS[+n.slice(1)] = +ev.target.value; ls.set(SK, { key: S.key, p: S.p, ans: ANS, exits: EXITS }); prog(); };
+    $('#qz-qs').onchange = ev => { const n = ev.target.name; if (!n) return; ANS[+n.slice(1)] = +ev.target.value; ls.set(SK, { key: S.key, p: S.p, ans: ANS, exits: EXITS, code: code() }); prog(); };
     prog(); tick(); clearInterval(TICK); TICK = setInterval(tick, 500);
     if (FS && !isFull()) { AWAY = true; $('#qz-wt').textContent = T('Click to continue the quiz in full screen.', 'Cliquez pour continuer le quiz en plein écran.'); $('.qz-warn').hidden = false; }
   }
@@ -297,24 +299,21 @@ window.QcmCore = function (o) {
     }
     SENT = false; $('#qz-sb').disabled = false; m.className = 'qz-msg bad'; m.textContent = T('Sending failed: check your connection and click again.', "Échec de l'envoi : vérifiez votre connexion et cliquez de nouveau.");
   }
-  async function poll() {
-    if (!API) { st(T('The quiz is not activated yet.', "Le quiz n'est pas encore activé."), 'bad'); return; }
+  async function poll() {   // only while answering: server clock, and closing of the quiz (B2 emptied)
+    if (!RUN || SENT || !S) return;
     try {
-      const j = await call({ action: 'qcmStatus' }); STATE = j.state;
-      if (o.onState) o.onState(STATE, RUN);
-      if (RUN && STATE === 'open' && typeof j.remaining === 'number') END = Date.now() + j.remaining;   // keep everybody on the server clock
-      if (RUN && STATE !== 'open') submit(true);                                                       // closed or over: send now
-      if (STATE === 'off' && !RUN && E.hidden) st(T('⏳ Waiting for your instructor to launch the quiz… It will open here by itself.', '⏳ En attente du lancement du quiz par votre enseignant(e)… Il s\'ouvrira ici tout seul.'));
-      if (STATE === 'open' && !RUN) { st(T('▶ The quiz has started! Check your identity, then click « Start the quiz ».', '▶ Le quiz a commencé ! Vérifiez votre identité, puis cliquez sur « Commencer le quiz ».'), 'okm'); const sv = ls.get(SK); if (sv && sv.sent && same(sv.p, idv())) { if (E.hidden) showDone(null); } else if (o.onState) o.onState('ready', RUN); }
-      if (STATE === 'ended' && !RUN) st(ERR.ended);
-    } catch (e) { /* network hiccup: try again at the next poll */ }
+      const j = await call({ action: 'qcmStatus', key: S.key });
+      if (j.state === 'done') { ls.set(SK, { key: S.key, p: S.p, sent: true }); showDone(null); return; }
+      if (typeof j.remaining === 'number') END = Date.now() + j.remaining;
+      if (j.state === 'off') submit(true);
+    } catch (e) { /* network hiccup: try again later */ }
   }
   const same = (a, b) => !!a && !!b && ['last', 'first', 'matricule', 'group'].every(k => String(a[k] || '').toLowerCase() === String(b[k] || '').toLowerCase());
   $('#qz-go').onclick = () => { if (FS) goFull(); join(false); };
   // ---- leaving the quiz: other tab, other window, or full screen closed ----
   function leave(why) {
     if (!RUN || SENT || AWAY || MUTE) return;
-    AWAY = true; EXITS++; if (S) ls.set(SK, { key: S.key, p: S.p, ans: ANS, exits: EXITS });
+    AWAY = true; EXITS++; if (S) ls.set(SK, { key: S.key, p: S.p, ans: ANS, exits: EXITS, code: code() });
     if (MAX && EXITS >= MAX) { $('#qz-wt').textContent = T(`You left the quiz ${EXITS} times: your answers have been sent.`, `Vous avez quitté le quiz ${EXITS} fois : vos réponses ont été envoyées.`); submit(true); return; }
     $('#qz-wt').innerHTML = T(`⚠ You left the quiz (${EXITS}${MAX ? ' / ' + MAX : ''}). Your instructor can see it.`, `⚠ Vous avez quitté le quiz (${EXITS}${MAX ? ' / ' + MAX : ''}). Votre enseignant(e) le voit.`) +
       (MAX ? '<br>' + T(`At ${MAX}, your answers are sent automatically.`, `À ${MAX}, vos réponses sont envoyées automatiquement.`) : '');
@@ -326,8 +325,11 @@ window.QcmCore = function (o) {
   document.addEventListener('fullscreenchange', () => { if (FS && !isFull()) leave('fullscreen'); });
   document.addEventListener('webkitfullscreenchange', () => { if (FS && !isFull()) leave('fullscreen'); });
   $('#qz-sb').onclick = () => submit(false);
-  poll(); setInterval(() => { if (!SENT) poll(); }, POLL);
-  return { poll };
+  if (!API) st(T('The quiz is not activated yet.', "Le quiz n'est pas encore activé."), 'bad');
+  else if (saved && saved.key && !saved.sent) st(T('Your quiz is in progress: click « Start the quiz » to continue (your time keeps running).', 'Votre quiz est en cours : cliquez sur « Commencer le quiz » pour continuer (votre temps continue de tourner).'), 'okm');
+  else st(T('Fill in your identity and the session code given by your instructor. You will have 15 minutes, in full screen, and only one attempt.', 'Remplissez votre identité et le code de séance donné par votre enseignant(e). Vous aurez 15 minutes, en plein écran, et un seul passage.'));
+  setInterval(poll, POLL);
+  return { poll, fill: p => { if (!RUN) fill(p); } };
 };
 
 /* ===== Lab 4: per-step work (code + captures) and report ===== */
@@ -529,14 +531,15 @@ ${body}</body></html>`;
   }
   function quiz() {
     if (!window.QcmCore) return;
-    const ov = document.createElement('div'); ov.className = 'qzov'; ov.innerHTML = `<div class="qzbox"><div class="qzh"><b>${T('🧪 Lab 4 quiz · 15 min', '🧪 Quiz du Lab 4 · 15 min')}</b><button type="button" class="qzx" hidden>${T('Close', 'Fermer')}</button></div><div class="qzm"></div></div>`;
+    const ov = document.createElement('div'); ov.className = 'qzov'; ov.innerHTML = `<div class="qzbox"><div class="qzh"><b>${T('🧪 Lab 4 quiz · 15 min', '🧪 Quiz du Lab 4 · 15 min')}</b><button type="button" class="qzx">${T('Close', 'Fermer')}</button></div><div class="qzm"></div></div>`;
     document.body.append(ov);
-    const x = ov.querySelector('.qzx'); x.onclick = () => ov.classList.remove('on');
-    let closed = false; x.addEventListener('click', () => closed = true);
-    QcmCore({ mount: ov.querySelector('.qzm'), fr: LANG === 'fr',
-      onState: (s, run) => { const open = s === 'open' || s === 'ready'; if (open && !closed) ov.classList.add('on'); if (!open && !run) ov.classList.remove('on'); },
-      onRun: () => { x.hidden = true; ov.classList.add('on'); },
-      onDone: () => { x.hidden = false; ov.classList.add('on'); } });
+    const x = ov.querySelector('.qzx'); let core = null; const show = () => { if (core) core.fill(who()); ov.classList.add('on'); };
+    x.onclick = () => ov.classList.remove('on');
+    core = QcmCore({ mount: ov.querySelector('.qzm'), fr: LANG === 'fr', onRun: () => { x.hidden = true; show(); }, onDone: () => { x.hidden = false; show(); } });
+    const btn = T('🧪 Final quiz (session code)', '🧪 Quiz final (code de séance)');
+    const nv = document.getElementById('nv'); if (nv) { const a = document.createElement('a'); a.href = '#'; a.textContent = btn; a.onclick = ev => { ev.preventDefault(); show(); }; nv.append(a); }
+    const rp = document.getElementById('report'); if (rp) { const p = document.createElement('p'); p.innerHTML = `<button type="button" class="go" id="qz-open">${btn}</button>`; rp.append(p); p.querySelector('button').onclick = show; }
+    try { const sv = JSON.parse(localStorage.getItem('nosqllab4-qcm') || 'null'); if (sv && sv.key && !sv.sent) show(); } catch (e) {}   // quiz in progress: reopen it
   }
   init();
 })();
