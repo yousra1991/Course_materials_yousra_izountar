@@ -127,6 +127,13 @@ section>h2 .tm{font-size:15px}
 .th{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}.th figure{position:relative;margin:0}
 .th img{height:90px;border-radius:6px;border:1px solid var(--line);cursor:zoom-in;display:block}
 .th button{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;border:none;background:var(--bad);color:#fff;cursor:pointer;font-size:13px;line-height:24px;padding:0}
+.askq{position:fixed;right:18px;bottom:18px;z-index:900;width:min(380px,calc(100vw - 32px));background:var(--card);color:var(--ink);border:2px solid var(--g);border-radius:14px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.22)}.askq[hidden]{display:none}
+.askq.pop{animation:aqp .35s ease}@keyframes aqp{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+.aqh{font:700 15px "Bricolage Grotesque",sans-serif;color:var(--g)}.aqn{color:var(--mut);font-weight:600}.aqq{margin:8px 0;font-size:16px}
+.askq textarea{width:100%;box-sizing:border-box;font:15px/1.4 "Source Serif 4",Georgia,serif;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical}
+.aqb{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}.aqm{font-size:14px}.aqm.bad{color:#b3261e}@media print{.askq{display:none}}
+.psend{margin:18px 0 6px;padding:12px 14px;border:1px solid var(--line);border-left:4px solid var(--g);border-radius:12px;background:var(--card)}.psend p{margin:8px 0 0}
+#me{scroll-margin-top:80px;transition:box-shadow .3s}#me.flash{box-shadow:0 0 0 3px var(--g);border-radius:12px}
 .rpf{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:10px 0}
 .rpf label{display:flex;flex-direction:column;font:600 14px "Bricolage Grotesque",sans-serif;color:var(--mut);gap:4px}
 .rpf input,.rpf select{font:16px "Source Serif 4",Georgia,serif;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
@@ -163,7 +170,7 @@ button.go{background:var(--g);color:#fff}button.go:disabled{opacity:.6}
 <main>
 <div class="lang top"><button type="button" data-l="en">English</button><button type="button" data-l="fr">Français</button></div>
 <div class="brand"><img class="logo" src="logo.png" alt="Université d'Alger 1 logo" onerror="this.style.display='none'"><div class="bi"><h2>Université d'Alger 1 – Benyoucef Benkhedda</h2><p class="bs">Faculty of Sciences · Computer Science Department</p><dl><dt>Module</dt><dd>NoSQL &amp; Cloud Databases</dd><dt>Level</dt><dd>Master 2 – ASD</dd><dt>Instructor</dt><dd>Dr. Izountar Yousra</dd><dt>Academic year</dt><dd>2026 / 2027</dd><dt>Lab</dt><dd>Lab 4 of 4 – Aggregation, Validation & Indexes</dd><dt>Tools</dt><dd>MongoDB Atlas (M0) · mongosh</dd></dl></div></div>
-<header class="hero"><div><span class="pill">Lab 4 / 4</span><span class="pill">NoSQL · MongoDB</span><h1>Aggregation, Validation & Indexes</h1><p>Aggregation pipeline ($match, $group, $project, $unwind, $lookup, $out), $jsonSchema validators and indexes measured with explain(), a final challenge and expert exercises.</p><p>For each exercise, the <b>expected result</b> and guidelines are provided, from 🟢 simple to 🔴 difficult: write the commands yourself in <code>mongosh</code>. Start the commands of every exercise with <code>use univ</code> and add <code>//</code> comments. Under each step, <b>paste your code and add a capture</b> of your result: at the end, send your report from the section <b>My report</b>.</p></div>
+<header class="hero"><div><span class="pill">Lab 4 / 4</span><span class="pill">NoSQL · MongoDB</span><h1>Aggregation, Validation & Indexes</h1><p>Aggregation pipeline ($match, $group, $project, $unwind, $lookup, $out), $jsonSchema validators and indexes measured with explain(), a final challenge and expert exercises.</p><p>For each exercise, the <b>expected result</b> and guidelines are provided, from 🟢 simple to 🔴 difficult: write the commands yourself in <code>mongosh</code>. Start the commands of every exercise with <code>use univ</code> and add <code>//</code> comments. Under each step, <b>paste your code and add a capture</b> of your result, then <b>send each part</b> as soon as you finish it (button at the end of the part).</p></div>
 <div class="tl"><div><b>1</b>Aggregation</div><div><b>2</b>Validation</div><div><b>3</b>Indexes</div><div><b>4</b>Final challenge</div><div><b>5</b>Expert (bonus)</div></div></header>
 <div id="parts"></div>
 <div class="nx"><span><a href="lab3-8c41a432.html">← Lab 3</a></span><span><a href="lab4-qcm-e569a01c.html">Final quiz (15 min) →</a></span></div>
@@ -206,7 +213,7 @@ function applyLang(){
  document.querySelectorAll('.lang button').forEach(b=>{b.classList.toggle('on',b.dataset.l===LANG);b.onclick=()=>{try{localStorage.setItem('nosqllang',b.dataset.l)}catch(e){}const u=new URL(location.href);u.searchParams.set('lang',b.dataset.l);location.href=u.toString()}});
  if(!FR)return;
  document.documentElement.lang='fr';
- const q=(s,h)=>{const el=document.querySelector(s);if(el)el.innerHTML=h},F={"dl": "<dt>Module</dt><dd>BDD NoSQL et cloud</dd><dt>Niveau</dt><dd>Master 2 – ASD</dd><dt>Enseignant(e)</dt><dd>Dr. Izountar Yousra</dd><dt>Année universitaire</dt><dd>2026 / 2027</dd><dt>Lab</dt><dd>Lab 4 sur 4 – Agrégation, validation et index</dd><dt>Outils</dt><dd>MongoDB Atlas (M0) · mongosh</dd>", "h1": "Agrégation, validation et index", "r": "Pipeline d'agrégation ($match, $group, $project, $unwind, $lookup, $out), validateurs $jsonSchema et index mesurés avec explain(), un défi final et des exercices experts.", "intro": "Pour chaque exercice, le <b>résultat attendu</b> et des indications sont fournis, du 🟢 simple au 🔴 difficile : écrivez vous-même les commandes dans <code>mongosh</code>. Commencez les commandes de chaque exercice par <code>use univ</code> et ajoutez des commentaires <code>//</code>. Sous chaque étape, <b>collez votre code et ajoutez une capture</b> de votre résultat : à la fin, envoyez votre rapport depuis la section <b>Mon rapport</b>.", "tl": "<div><b>1</b>Agrégation</div><div><b>2</b>Validation</div><div><b>3</b>Index</div><div><b>4</b>Défi final</div><div><b>5</b>Experts (bonus)</div>", "foot": "BDD NoSQL et cloud · Université d'Alger 1 · Vos cases, votre code et vos captures sont enregistrés uniquement dans votre navigateur, jusqu'à l'envoi du rapport."};
+ const q=(s,h)=>{const el=document.querySelector(s);if(el)el.innerHTML=h},F={"dl": "<dt>Module</dt><dd>BDD NoSQL et cloud</dd><dt>Niveau</dt><dd>Master 2 – ASD</dd><dt>Enseignant(e)</dt><dd>Dr. Izountar Yousra</dd><dt>Année universitaire</dt><dd>2026 / 2027</dd><dt>Lab</dt><dd>Lab 4 sur 4 – Agrégation, validation et index</dd><dt>Outils</dt><dd>MongoDB Atlas (M0) · mongosh</dd>", "h1": "Agrégation, validation et index", "r": "Pipeline d'agrégation ($match, $group, $project, $unwind, $lookup, $out), validateurs $jsonSchema et index mesurés avec explain(), un défi final et des exercices experts.", "intro": "Pour chaque exercice, le <b>résultat attendu</b> et des indications sont fournis, du 🟢 simple au 🔴 difficile : écrivez vous-même les commandes dans <code>mongosh</code>. Commencez les commandes de chaque exercice par <code>use univ</code> et ajoutez des commentaires <code>//</code>. Sous chaque étape, <b>collez votre code et ajoutez une capture</b> de votre résultat, puis <b>envoyez chaque partie</b> dès qu'elle est terminée (bouton à la fin de la partie).", "tl": "<div><b>1</b>Agrégation</div><div><b>2</b>Validation</div><div><b>3</b>Index</div><div><b>4</b>Défi final</div><div><b>5</b>Experts (bonus)</div>", "foot": "BDD NoSQL et cloud · Université d'Alger 1 · Vos cases, votre code et vos captures sont enregistrés uniquement dans votre navigateur, jusqu'à l'envoi du rapport."};
  q('nav .nl a:first-child','Accueil');q('nav > a[href="#plan"]','Plan de la séance');
  q('.brand .bs',"Faculté des Sciences · Département d'Informatique");q('.brand dl',F.dl);
  q('.hero h1',F.h1);q('.hero div p:nth-of-type(1)',F.r);q('.hero div p:nth-of-type(2)',F.intro);q('.hero .tl',F.tl);
@@ -433,20 +440,20 @@ window.QcmCore = function (o) {
     const g = id => (document.getElementById(id).value || '').trim();
     return { last: g('rp-last'), first: g('rp-first'), matricule: g('rp-mat'), group: g('rp-grp') };
   }
-  function counts() {
+  function counts(only) {
     let steps = 0, caps = 0;
-    ET.etapes.forEach(e => { const w = W[e.id]; if (w && (w.code.trim() || w.imgs.length)) steps++; if (w) caps += w.imgs.length; });
-    return { steps, caps };
+    ET.etapes.filter(e => !only || e.partie == only).forEach(e => { const w = W[e.id]; if (w && (w.code.trim() || w.imgs.length)) steps++; if (w) caps += w.imgs.length; });
+    return { steps, caps, total: ET.etapes.filter(e => !only || e.partie == only).length };
   }
   function status() {
     const el = document.getElementById('rp-st'); if (!el) return;
-    const c = counts();
+    const c = counts(); if (ET.parties) ET.parties.forEach(p => partInfo(p.id));
     el.textContent = T(`${c.steps} / ${ET.etapes.length} steps with work · ${c.caps} capture(s)`, `${c.steps} / ${ET.etapes.length} étapes avec du travail · ${c.caps} capture(s)`);
   }
-  function buildReport(p) {
-    const c = counts(), now = new Date();
+  function buildReport(p, only) {
+    const c = counts(only), now = new Date(), PT = only ? ET.parties.filter(x => x.id == only) : ET.parties;
     let body = '';
-    ET.parties.forEach(pt => {
+    PT.forEach(pt => {
       body += `<h2>${esc(strip(X(pt, 'titre')))}</h2>`;
       ET.etapes.filter(e => e.partie == pt.id).forEach(e => {
         const w = W[e.id] || { code: '', imgs: [] }, done = DONE.has(e.id);
@@ -456,21 +463,25 @@ window.QcmCore = function (o) {
           `</div>`;
       });
     });
-    const html = `<!DOCTYPE html><html lang="${LANG}"><head><meta charset="utf-8"><title>Lab 4 – ${esc(p.last)} ${esc(p.first)}</title><style>
+    const html = `<!DOCTYPE html><html lang="${LANG}"><head><meta charset="utf-8"><title>Lab 4${only ? ' – ' + esc(strip(X(PT[0], 'titre'))) : ''} – ${esc(p.last)} ${esc(p.first)}</title><style>
 body{font:15px/1.5 Georgia,serif;color:#14231c;max-width:900px;margin:auto;padding:24px}h1{color:#1f7a4d;margin:0 0 4px}h2{color:#1f7a4d;border-bottom:2px solid #c9d8cf;padding-bottom:4px;margin-top:34px}
 h3{font:700 16px Arial,sans-serif;margin:22px 0 8px}.ok{color:#1f7a4d;font-size:12px;border:1px solid #1f7a4d;border-radius:99px;padding:1px 8px}.no{color:#b3261e;font-size:12px;border:1px solid #b3261e;border-radius:99px;padding:1px 8px}
 table{border-collapse:collapse}td{padding:3px 14px 3px 0}pre{background:#f3f6f2;color:#14231c;border:1px solid #c9d8cf;border-left:4px solid #1f7a4d;padding:12px;border-radius:8px;white-space:pre-wrap;font:13px/1.45 Consolas,monospace}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 figure{margin:10px 0;page-break-inside:avoid}img{max-width:100%;max-height:900px;border:1px solid #c9d8cf;border-radius:6px}.pb{position:fixed;top:12px;right:12px;font:700 15px Arial,sans-serif;padding:10px 16px;border-radius:8px;border:none;background:#1f7a4d;color:#fff;cursor:pointer}@media print{.pb{display:none}body{padding:0}@page{margin:14mm}}figcaption{font:12px Arial,sans-serif;color:#4f6158}.em{color:#4f6158;font-style:italic}.st{page-break-inside:avoid}</style></head><body>
-<button class="pb" onclick="window.print()">${T('🖨 Save as PDF', '🖨 Enregistrer en PDF')}</button><h1>NoSQL – MongoDB Lab 4 · ${T('Report', 'Rapport')}</h1><p>Université d'Alger 1 · Master 2 ASD · Dr. Izountar Yousra</p>
+<button class="pb" onclick="window.print()">${T('🖨 Save as PDF', '🖨 Enregistrer en PDF')}</button><h1>NoSQL – MongoDB Lab 4 · ${only ? esc(strip(X(PT[0], 'titre'))) : T('Report', 'Rapport')}</h1><p>Université d'Alger 1 · Master 2 ASD · Dr. Izountar Yousra</p>
 <table><tr><td><b>${T('Last name', 'Nom')}</b></td><td>${esc(p.last)}</td></tr><tr><td><b>${T('First name', 'Prénom')}</b></td><td>${esc(p.first)}</td></tr>
 <tr><td><b>${T('Student ID', 'Matricule')}</b></td><td>${esc(p.matricule)}</td></tr><tr><td><b>${T('Group', 'Groupe')}</b></td><td>${esc(p.group)}</td></tr>
-<tr><td><b>Date</b></td><td>${now.toLocaleString(LANG === 'fr' ? 'fr-FR' : 'en-GB')}</td></tr><tr><td><b>${T('Progress', 'Avancement')}</b></td><td>${c.steps} / ${ET.etapes.length} · ${c.caps} capture(s) · ${ET.etapes.filter(e => DONE.has(e.id)).length} ${T('marked done', 'marquées terminées')}</td></tr></table>
+<tr><td><b>Date</b></td><td>${now.toLocaleString(LANG === 'fr' ? 'fr-FR' : 'en-GB')}</td></tr><tr><td><b>${T('Progress', 'Avancement')}</b></td><td>${c.steps} / ${c.total} · ${c.caps} capture(s) · ${ET.etapes.filter(e => (!only || e.partie == only) && DONE.has(e.id)).length} ${T('marked done', 'marquées terminées')}</td></tr></table>
 ${body}</body></html>`;
     return { html, c };
   }
-  function check(p) {
-    const m = document.getElementById('rp-msg');
-    if (!p.last || !p.first || !p.group) { m.className = 'bad'; m.textContent = T('Fill in your last name, first name and group first.', 'Remplissez d\'abord votre nom, prénom et groupe.'); return false; }
+  function check(p, m) {
+    m = m || document.getElementById('rp-msg');
+    if (!p.last || !p.first || !p.group) {
+      m.className = 'bad'; m.textContent = T('Fill in your last name, first name and group first (box "My identity" at the top).', 'Remplissez d\'abord votre nom, prénom et groupe (cadre « Mon identité » en haut).');
+      const me = document.getElementById('me'); if (me) { me.scrollIntoView({ behavior: 'smooth', block: 'center' }); me.classList.add('flash'); setTimeout(() => me.classList.remove('flash'), 1600); }
+      return false;
+    }
     return true;
   }
   function saveId() { lsSet(IK, JSON.stringify(who())); }
@@ -503,20 +514,102 @@ ${body}</body></html>`;
     } catch (e) { m.className = 'bad'; m.textContent = T('Sending failed. Download your report and give it to your instructor.', 'Échec de l\'envoi. Téléchargez votre rapport et remettez-le à votre enseignant(e).'); }
     btn.disabled = false;
   }
+  // ---- send one part ----
+  const SK = 'nosqllab-4-sent';
+  const sent = () => { try { return JSON.parse(lsGet(SK) || '{}'); } catch (e) { return {}; } };
+  function partInfo(pid) {
+    const el = document.getElementById('pm-' + pid); if (!el) return;
+    const w = sent()[pid], c = counts(pid);
+    el.className = 'tm'; el.textContent = T(`${c.steps} / ${c.total} steps with work · ${c.caps} capture(s)`, `${c.steps} / ${c.total} étapes avec du travail · ${c.caps} capture(s)`) +
+      (w ? T(` · ✔ sent ${w}`, ` · ✔ envoyée ${w}`) : '');
+  }
+  async function sendPart(pid, btn) {
+    const p = who(), m = document.getElementById('pm-' + pid); if (!check(p, m)) return; saveId();
+    if (!API) { m.className = 'bad'; m.textContent = T('Sending is not activated yet: keep working, you will send your report at the end.', 'L\'envoi n\'est pas encore activé : continuez, vous enverrez votre rapport à la fin.'); return; }
+    const { html, c } = buildReport(p, pid);
+    if (!c.steps && !confirm(T('This part has no code and no capture. Send it anyway?', 'Cette partie n\'a ni code ni capture. L\'envoyer quand même ?'))) return;
+    btn.disabled = true; m.className = ''; m.textContent = T('Sending…', 'Envoi en cours…');
+    try {
+      const r = await fetch(API, { method: 'POST', body: JSON.stringify(Object.assign({ action: 'part', part: pid, nparts: ET.parties.length, html, steps: c.steps, total: c.total, captures: c.caps }, p)) });
+      const j = await r.json(); if (!j.ok) throw new Error(j.error);
+      const s = sent(); s[pid] = j.when || new Date().toLocaleTimeString().slice(0, 5); lsSet(SK, JSON.stringify(s));
+      partInfo(pid); m.className = 'okm'; m.textContent = T('✔ Part received by your instructor. ', '✔ Partie reçue par votre enseignant(e). ') + T('You can send it again if you change it.', 'Vous pouvez la renvoyer si vous la modifiez.');
+      btn.textContent = T('📤 Send again', '📤 Renvoyer');
+    } catch (e) { m.className = 'bad'; m.textContent = T('Sending failed, try again in a moment. Your work stays saved in this browser.', 'Échec de l\'envoi, réessayez dans un instant. Votre travail reste enregistré dans ce navigateur.'); }
+    btn.disabled = false;
+  }
+  function mountParts() {
+    ET.parties.forEach((pt, i) => {
+      const s = document.getElementById(pt.id); if (!s) return;
+      const b = document.createElement('div'); b.className = 'psend';
+      const lbl = sent()[pt.id] ? T('📤 Send again', '📤 Renvoyer') : T(`📤 Send part ${i + 1}`, `📤 Envoyer la partie ${i + 1}`);
+      b.innerHTML = `<button type="button" class="go">${lbl}</button><p id="pm-${pt.id}"></p>`;
+      s.append(b); b.querySelector('button').onclick = ev => sendPart(pt.id, ev.currentTarget); partInfo(pt.id);
+    });
+  }
+  // ---- questions from the instructor (sheet "Lab4 questions") ----
+  let QB = null, QL = [], qBusy = false;
+  function qBox() {
+    if (QB) return QB;
+    QB = document.createElement('div'); QB.className = 'askq'; QB.hidden = true;
+    QB.innerHTML = `<div class="aqh">❓ ${T('Question from your instructor', 'Question de votre enseignant(e)')} <span class="aqn"></span></div><p class="aqq"></p>` +
+      `<textarea rows="3" placeholder="${T('Your answer…', 'Votre réponse…')}"></textarea><div class="aqb"><button type="button" class="go">${T('Send my answer', 'Envoyer ma réponse')}</button><span class="aqm"></span></div>`;
+    document.body.append(QB);
+    QB.querySelector('button').onclick = async () => {
+      const q = QL[0], ta = QB.querySelector('textarea'), m = QB.querySelector('.aqm'), b = QB.querySelector('button');
+      if (!q) return; if (!ta.value.trim()) { m.className = 'aqm bad'; m.textContent = T('Write an answer first.', 'Écrivez d\'abord une réponse.'); return; }
+      b.disabled = true; m.className = 'aqm'; m.textContent = T('Sending…', 'Envoi…');
+      try {
+        const r = await fetch(API, { method: 'POST', body: JSON.stringify(Object.assign({ action: 'answer', id: q.id, q: q.q, answer: ta.value }, who())) });
+        const j = await r.json(); if (!j.ok) throw new Error(j.error);
+        QL.shift(); ta.value = ''; m.textContent = ''; qShow();
+      } catch (e) { m.className = 'aqm bad'; m.textContent = T('Sending failed, try again.', 'Échec de l\'envoi, réessayez.'); }
+      b.disabled = false;
+    };
+    return QB;
+  }
+  function qShow() {
+    const b = qBox(), q = QL[0];
+    if (!q) { b.hidden = true; return; }
+    b.querySelector('.aqq').textContent = q.q;
+    b.querySelector('.aqn').textContent = QL.length > 1 ? `(1 / ${QL.length})` : '';
+    if (b.hidden) { b.hidden = false; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
+  }
+  async function qPoll() {
+    const p = who();
+    if (!API || qBusy || !p.group || !p.last || document.hidden || document.querySelector('.qzov.on')) { if (QB && document.querySelector('.qzov.on')) QB.hidden = true; return; }
+    qBusy = true;
+    try {
+      const r = await fetch(API, { method: 'POST', body: JSON.stringify(Object.assign({ action: 'msgs' }, p)) });
+      const j = await r.json();
+      if (j.ok) { const cur = QL[0] && QL[0].id; QL = j.msgs || []; if (cur) QL.sort((a, b) => (b.id === cur) - (a.id === cur)); qShow(); }
+    } catch (e) {}
+    qBusy = false;
+  }
+  function questions() {
+    if (!API) return;
+    setTimeout(qPoll, 2000); setInterval(qPoll, 40000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) qPoll(); });
+    ['rp-last', 'rp-grp'].forEach(i => document.getElementById(i).addEventListener('change', qPoll));
+  }
   function mountReport() {
     const s = document.createElement('section'); s.id = 'report';
     s.innerHTML = `<h2>${T('My report', 'Mon rapport')}</h2>
-<p class="lead">${T('At the end of the session, fill in your identity, then <b>send</b> your report (your code and captures for every step). You can also keep a copy as a <b>PDF</b>. If sending does not work, save it as PDF and give the file to your instructor.', 'À la fin de la séance, remplissez votre identité, puis <b>envoyez</b> votre rapport (votre code et vos captures pour chaque étape). Vous pouvez aussi en garder une copie en <b>PDF</b>. Si l\'envoi ne fonctionne pas, enregistrez-le en PDF et remettez le fichier à votre enseignant(e).')}</p>
-<div class="rpf"><label>${T('Last name', 'Nom')}<input id="rp-last" autocomplete="family-name"></label><label>${T('First name', 'Prénom')}<input id="rp-first" autocomplete="given-name"></label>
-<label>${T('Student ID', 'Matricule')}<input id="rp-mat" inputmode="numeric"></label><label>${T('Group', 'Groupe')}<select id="rp-grp"><option value="">—</option><option>G1</option><option>G2</option></select></label></div>
+<p class="lead">${T('At the end of the session, <b>send</b> your full report (your code and captures for every step). You can also keep a copy as a <b>PDF</b>. If sending does not work, save it as PDF and give the file to your instructor.', 'À la fin de la séance, <b>envoyez</b> votre rapport complet (votre code et vos captures pour chaque étape). Vous pouvez aussi en garder une copie en <b>PDF</b>. Si l\'envoi ne fonctionne pas, enregistrez-le en PDF et remettez le fichier à votre enseignant(e).')}</p>
 <p id="rp-st" class="tm"></p>
 <p><button type="button" class="go" id="rp-send">${T('📤 Send my report', '📤 Envoyer mon rapport')}</button> <button type="button" class="gh" id="rp-pdf">${T('🖨 Save as PDF', '🖨 Enregistrer en PDF')}</button> <button type="button" class="gh" id="rp-dl">${T('⬇ Download (HTML)', '⬇ Télécharger (HTML)')}</button></p>
 <p id="rp-msg"></p>`;
     const nx = document.querySelector('.nx'); nx.parentNode.insertBefore(s, nx);
+    const me = document.createElement('section'); me.id = 'me';
+    me.innerHTML = `<h2>${T('My identity', 'Mon identité')}</h2>
+<p class="lead">${T('Fill this in <b>before you start</b>. At the end of each part, click <b>📤 Send part …</b>: your instructor receives it at once. You can send a part again: the new version replaces the old one.', 'Remplissez ce cadre <b>avant de commencer</b>. À la fin de chaque partie, cliquez sur <b>📤 Envoyer la partie …</b> : votre enseignant(e) la reçoit aussitôt. Vous pouvez renvoyer une partie : la nouvelle version remplace l\'ancienne.')}</p>
+<div class="rpf"><label>${T('Last name', 'Nom')}<input id="rp-last" autocomplete="family-name"></label><label>${T('First name', 'Prénom')}<input id="rp-first" autocomplete="given-name"></label>
+<label>${T('Student ID', 'Matricule')}<input id="rp-mat" inputmode="numeric"></label><label>${T('Group', 'Groupe')}<select id="rp-grp"><option value="">—</option><option>G1</option><option>G2</option></select></label></div>`;
+    const parts = document.getElementById('parts'); parts.parentNode.insertBefore(me, parts);
     try { const p = JSON.parse(lsGet(IK) || '{}'); ['last', 'first', 'matricule', 'group'].forEach((k, i) => { if (p[k]) document.getElementById(['rp-last', 'rp-first', 'rp-mat', 'rp-grp'][i]).value = p[k]; }); } catch (e) {}
     document.getElementById('rp-dl').onclick = download;
     document.getElementById('rp-pdf').onclick = pdf;
-    ['rp-last', 'rp-first', 'rp-mat', 'rp-grp'].forEach(i => document.getElementById(i).addEventListener('input', saveId));
+    ['rp-last', 'rp-first', 'rp-mat', 'rp-grp'].forEach(i => { const el = document.getElementById(i); el.addEventListener('input', saveId); el.addEventListener('change', saveId); });
     document.getElementById('rp-send').onclick = send;
     const nv = document.getElementById('nv'); if (nv) { const a = document.createElement('a'); a.href = '#report'; a.textContent = T('📄 My report', '📄 Mon rapport'); nv.append(a); }
   }
@@ -525,7 +618,7 @@ ${body}</body></html>`;
     db = await idb();
     for (const e of ET.etapes) W[e.id] = { code: lsGet(CK + e.id) || '', imgs: await getImgs(e.id) };
     ET.etapes.filter(e => e.capture !== false).forEach(mount);
-    mountReport(); status(); quiz();
+    mountReport(); mountParts(); status(); quiz(); questions();
   }
   function quiz() {
     if (!window.QcmCore) return;
