@@ -533,4 +533,797 @@ IA    ← Sara, Yacine, Lina      → 3</pre><p><code>_id: "$modules"</code> : u
 <tr><td><b>Partiel</b></td><td>Indexe une partie des documents</td><td><code>createIndex({ moyenne: 1 }, { partialFilterExpression: { moyenne: { $gt: 10 } } })</code></td></tr></table></div><div class="footer"><span>Créer une collection avec $jsonSchema</span><span>44 / 60</span></div></section>
 
 <!-- 45 -->
-<section class="slide mg"><div class="kicker">8. Validation et index</div><h2>Index commentés</h2><div class="ex"><p class="lead">Un index évite de parcourir toute la collection.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>db.etudiants.createIndex({ nom: 1 })</td><td><b>Index simple</b> croissant (1) sur <code>nom</code> : recherches rapides par nom.</td></tr><tr><td>db.etudiants.createIndex({ section: 1, moyenne: -1 })</td><td><b>Index composé</b> : section croissante puis moyenne décroissante ; l’ordre des champs compte.</td></tr><tr><td>db.etudiants.createIndex({ numero_inscription: 1 }, { unique: true })</td><td><b>Index unique</b> : deux étudiants ne peuvent pas avoir le même numéro.</td></tr><tr><td>db.etudiants.createIndex({ moyenne: 1 }, { partialFilterExpression: { moyenne: { $gt: 10 } } })</td><td><b>Index partiel</b> : n’indexe que les moyennes &gt; 10, donc plus léger.</td></tr><tr><td>db.etudiants.getIndexes()</td><td>Liste les index existants de la collection.</td></tr><tr><td>db.etudiants.find({ nom: "Amina" }).explain("executionStats")</td><td>Montre le plan d’exécution : <code>IXSCAN</code> = index utilisé, <code>COLLSCAN</code> = parcours complet.</td></tr><tr><td>db.etudiants.dropIndex("nom_1")</td><td>Supprime l’index nommé <code>nom_1</code> (nom généré a
+<section class="slide mg"><div class="kicker">8. Validation et index</div><h2>Index commentés</h2><div class="ex"><p class="lead">Un index évite de parcourir toute la collection.</p><div class="scroll"><table class="cm"><tr><th>Code</th><th>Explication</th></tr><tr><td>db.etudiants.createIndex({ nom: 1 })</td><td><b>Index simple</b> croissant (1) sur <code>nom</code> : recherches rapides par nom.</td></tr><tr><td>db.etudiants.createIndex({ section: 1, moyenne: -1 })</td><td><b>Index composé</b> : section croissante puis moyenne décroissante ; l’ordre des champs compte.</td></tr><tr><td>db.etudiants.createIndex({ numero_inscription: 1 }, { unique: true })</td><td><b>Index unique</b> : deux étudiants ne peuvent pas avoir le même numéro.</td></tr><tr><td>db.etudiants.createIndex({ moyenne: 1 }, { partialFilterExpression: { moyenne: { $gt: 10 } } })</td><td><b>Index partiel</b> : n’indexe que les moyennes &gt; 10, donc plus léger.</td></tr><tr><td>db.etudiants.getIndexes()</td><td>Liste les index existants de la collection.</td></tr><tr><td>db.etudiants.find({ nom: "Amina" }).explain("executionStats")</td><td>Montre le plan d’exécution : <code>IXSCAN</code> = index utilisé, <code>COLLSCAN</code> = parcours complet.</td></tr><tr><td>db.etudiants.dropIndex("nom_1")</td><td>Supprime l’index nommé <code>nom_1</code> (nom généré automatiquement).</td></tr></table></div></div><div class="key"><b>À retenir :</b> les index accélèrent les lectures mais ralentissent insertions et mises à jour. Évitez les index inutiles et testez avec <code>find({ moyenne: { $gt: 10 } }).explain("executionStats")</code>.</div><div class="footer"><span>Index commentés</span><span>45 / 60</span></div></section>
+
+<!-- 46 -->
+<section class="slide mg"><div class="kicker">8. Validation et index</div><h2>Comment fonctionne un index ?</h2><p class="lead">Un index est une <b>liste triée</b> (arbre B) qui contient, pour chaque document, <b>la valeur du champ</b> et <b>un pointeur</b> (le <code>RecordId</code>) vers l’endroit où le document est stocké. Comme l’index d’un livre : mot → numéro de page.</p><div class="grid cols-2"><div class="ex"><h3>Index { moyenne: 1 }</h3><pre>clé (triée)   pointeur → document
+ 9.5   ──────────→  Yacine
+ 11    ──────────→  Omar
+ 12    ──────────→  Ali
+ 14.5  ──────────→  Amina
+ 15    ──────────→  Lina
+ 17    ──────────→  Sara</pre></div><div class="ex"><h3>find({ moyenne: { $gte: 14 } })</h3><p><b>1. IXSCAN</b> : MongoDB va directement à 14 dans la liste triée et lit les 3 clés suivantes (14.5, 15, 17).</p><p><b>2. FETCH</b> : il suit les 3 pointeurs pour récupérer les 3 documents complets (Amina, Lina, Sara).</p><p><b>Sans index : COLLSCAN</b> : il lit les 6 documents un par un pour tester la condition.</p></div></div><h3 class="sub">Le vérifier avec explain("executionStats")</h3><div class="scroll"><table><tr><th>Statistique</th><th>Avec index</th><th>Sans index</th><th>Signification</th></tr><tr><td><code>stage</code></td><td><code>IXSCAN → FETCH</code></td><td><code>COLLSCAN</code></td><td>Comment les documents ont été trouvés</td></tr><tr><td><code>totalKeysExamined</code></td><td>3</td><td>0</td><td>Clés lues dans l’index</td></tr><tr><td><code>totalDocsExamined</code></td><td>3</td><td>6</td><td>Documents lus</td></tr><tr><td><code>nReturned</code></td><td>3</td><td>3</td><td>Documents renvoyés</td></tr></table></div><div class="key"><b>Bon signe :</b> <code>totalDocsExamined</code> ≈ <code>nReturned</code>. <b>Requête couverte :</b> si on n’affiche que des champs de l’index (<code>find({ moyenne: { $gte: 14 } }, { _id: 0, moyenne: 1 })</code>), pas de FETCH : <code>totalDocsExamined</code> = 0.</div><div class="footer"><span>Comment fonctionne un index ?</span><span>46 / 60</span></div></section>
+
+<!-- 47 -->
+<section class="slide mg"><div class="kicker">8. Validation et index</div><h2>Pourquoi 1 ou -1 dans createIndex ?</h2><p class="lead">Le nombre indique <b>l’ordre de tri</b> des clés dans l’index : <code>1</code> = croissant, <code>-1</code> = décroissant. Ce n’est pas le <code>1</code> de la projection (« afficher le champ »).</p><div class="grid cols-2"><div class="ex"><h3>Index sur un seul champ</h3><pre>createIndex({ moyenne: 1 })   // 9.5 → 17
+createIndex({ moyenne: -1 })  // 17 → 9.5</pre><p><b>Le sens ne change rien</b> : MongoDB sait lire l’index dans les deux sens. Les deux servent à <code>sort({ moyenne: 1 })</code> et <code>sort({ moyenne: -1 })</code>. Par convention, on écrit <code>1</code>.</p></div><div class="ex"><h3>Index composé : le sens compte</h3><pre>createIndex({ section: 1, moyenne: -1 })
+
+A  17     ← Sara
+A  14.5   ← Amina
+B  12     ← Ali
+B  9.5    ← Yacine
+C  15     ← Lina
+C  11     ← Omar</pre><p>Sections A→Z, et dans chaque section, meilleure moyenne d’abord.</p></div></div><div class="scroll"><table><tr><th>Tri demandé</th><th>Index { section: 1, moyenne: -1 } utilisable ?</th></tr><tr><td><code>sort({ section: 1, moyenne: -1 })</code></td><td>✔ Oui : même ordre</td></tr><tr><td><code>sort({ section: -1, moyenne: 1 })</code></td><td>✔ Oui : ordre exactement inverse (lecture à l’envers)</td></tr><tr><td><code>sort({ section: 1, moyenne: 1 })</code></td><td>✘ Non : tri en mémoire (étape <code>SORT</code> dans explain)</td></tr></table></div><div class="key"><b>À retenir :</b> le sens ne compte que pour les index composés utilisés pour trier. Le nom de l’index vient de là : <code>{ nom: 1 }</code> → <code>"nom_1"</code>, <code>{ section: 1, moyenne: -1 }</code> → <code>"section_1_moyenne_-1"</code>.</div><div class="footer"><span>Pourquoi 1 ou -1 dans createIndex ?</span><span>47 / 60</span></div></section>
+
+<!-- 48 -->
+<section class="slide mg"><div class="kicker">8. Validation et index</div><h2>Index en images : clés triées et pointeurs</h2><p class="lead">À droite, les documents tels qu'ils sont rangés sur le disque : dans l'ordre où on les a insérés, chacun avec son adresse interne, le <b>RecordId</b>. À gauche, l'index : seulement la valeur du champ <code>nom</code>, <b>triée de A à Z</b>, et à côté le RecordId du document. C'est le « pointeur ».</p><div class="ixf"><svg viewBox="0 0 720 330" role="img" aria-label="Index sur nom trié de A à Z, chaque clé pointe vers le document de la collection"><defs><marker id="ixa1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="x-ah" d="M0,0 L10,5 L0,10 z"/></marker><marker id="ixb1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="x-ah2" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <text x="20" y="22" class="x-t-h">Index { nom: 1 }  (trié)</text>
+      <text x="396" y="22" class="x-t-h">Collection etudiants  (sur le disque)</text>
+      <!-- index entries sorted: Ali#2, Amina#1, Lina#5, Omar#6, Sara#3, Yacine#4 -->
+      <g>
+        <rect class="x-k" x="20" y="40" width="190" height="34" rx="5"/><text x="32" y="62">"Ali"</text><text x="150" y="62" class="x-t-key">→ #2</text>
+        <rect class="x-k" x="20" y="82" width="190" height="34" rx="5"/><text x="32" y="104">"Amina"</text><text x="150" y="104" class="x-t-key">→ #1</text>
+        <rect class="x-k" x="20" y="124" width="190" height="34" rx="5"/><text x="32" y="146">"Lina"</text><text x="150" y="146" class="x-t-key">→ #5</text>
+        <rect class="x-k" x="20" y="166" width="190" height="34" rx="5"/><text x="32" y="188">"Omar"</text><text x="150" y="188" class="x-t-key">→ #6</text>
+        <rect class="x-k" x="20" y="208" width="190" height="34" rx="5"/><text x="32" y="230">"Sara"</text><text x="150" y="230" class="x-t-key">→ #3</text>
+        <rect class="x-k" x="20" y="250" width="190" height="34" rx="5"/><text x="32" y="272">"Yacine"</text><text x="150" y="272" class="x-t-key">→ #4</text>
+      </g>
+      <g>
+        <rect class="x-doc" x="396" y="40" width="320" height="34" rx="5"/><text x="404" y="62" class="x-t-mut">#1</text><text x="430" y="62" class="x-sm">{ nom: "Amina", section: "A", moy: 14.5 }</text>
+        <rect class="x-doc" x="396" y="82" width="320" height="34" rx="5"/><text x="404" y="104" class="x-t-mut">#2</text><text x="430" y="104" class="x-sm">{ nom: "Ali", section: "B", moy: 12 }</text>
+        <rect class="x-doc" x="396" y="124" width="320" height="34" rx="5"/><text x="404" y="146" class="x-t-mut">#3</text><text x="430" y="146" class="x-sm">{ nom: "Sara", section: "A", moy: 17 }</text>
+        <rect class="x-doc" x="396" y="166" width="320" height="34" rx="5"/><text x="404" y="188" class="x-t-mut">#4</text><text x="430" y="188" class="x-sm">{ nom: "Yacine", section: "B", moy: 9.5 }</text>
+        <rect class="x-doc" x="396" y="208" width="320" height="34" rx="5"/><text x="404" y="230" class="x-t-mut">#5</text><text x="430" y="230" class="x-sm">{ nom: "Lina", section: "C", moy: 15 }</text>
+        <rect class="x-doc" x="396" y="250" width="320" height="34" rx="5"/><text x="404" y="272" class="x-t-mut">#6</text><text x="430" y="272" class="x-sm">{ nom: "Omar", section: "C", moy: 11 }</text>
+      </g>
+      <path class="x-ar" d="M210,57 C310,57 320,99 394,99"/>
+      <path class="x-ar" d="M210,99 C310,99 320,57 394,57"/>
+      <path class="x-ar" d="M210,141 C310,141 320,225 394,225"/>
+      <path class="x-ar" d="M210,183 C310,183 320,267 394,267"/>
+      <path class="x-ar" d="M210,225 C310,225 320,141 394,141"/>
+      <path class="x-ar" d="M210,267 C310,267 320,183 394,183"/>
+      <text x="20" y="312" class="x-t-mut">Index = clé + RecordId (pas de copie du document).</text>
+      <text x="396" y="312" class="x-t-mut">Ordre d'insertion, jamais réordonné.</text>
+    </svg></div><div class="footer"><span>Index en images : clés triées et pointeurs</span><span>48 / 60</span></div></section>
+
+<!-- 49 -->
+<section class="slide mg"><div class="kicker">8. Validation et index</div><h2>Index en images : COLLSCAN ou IXSCAN</h2><div class="ixcmp"><div class="ixf"><svg viewBox="0 0 330 270" role="img" aria-label="Sans index, lecture de tous les documents" style="min-width:300px"><defs><marker id="ixa2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="x-ah" d="M0,0 L10,5 L0,10 z"/></marker><marker id="ixb2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="x-ah2" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+        <text x="12" y="22" class="x-t-h">Sans index : COLLSCAN</text>
+        <g>
+          <rect class="x-doc" x="12" y="38" width="200" height="28" rx="4"/><text x="22" y="57">#1 Amina</text>
+          <rect class="x-doc" x="12" y="72" width="200" height="28" rx="4"/><text x="22" y="91">#2 Ali</text>
+          <rect class="x-doc" x="12" y="106" width="200" height="28" rx="4"/><text x="22" y="125">#3 Sara</text>
+          <rect class="x-doc" x="12" y="140" width="200" height="28" rx="4"/><text x="22" y="159">#4 Yacine</text>
+          <rect class="x-node" x="12" y="174" width="200" height="28" rx="4"/><text x="22" y="193" class="x-t-acc">#5 Lina ✔</text>
+          <rect class="x-doc" x="12" y="208" width="200" height="28" rx="4"/><text x="22" y="227">#6 Omar</text>
+        </g>
+        <path class="x-ar-warn" d="M236,40 L236,232"/>
+        <text x="246" y="140" class="x-t-warn">lit</text><text x="246" y="156" class="x-t-warn">les 6</text>
+        <text x="12" y="258" class="x-t-mut">totalDocsExamined: 6 · nReturned: 1</text>
+      </svg></div><div class="ixf"><svg viewBox="0 0 330 270" role="img" aria-label="Avec index, une clé lue puis un document" style="min-width:300px"><defs><marker id="ixa3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="x-ah" d="M0,0 L10,5 L0,10 z"/></marker><marker id="ixb3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="x-ah2" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+        <text x="12" y="22" class="x-t-h">Avec index : IXSCAN → FETCH</text>
+        <rect class="x-k" x="12" y="60" width="130" height="34" rx="5"/><text x="22" y="82">"Lina" → #5</text>
+        <text x="12" y="50" class="x-t-mut">1. IXSCAN dans l'index</text>
+        <path class="x-ar" d="M142,77 C190,77 180,160 196,174"/>
+        <text x="160" y="118" class="x-t-mut">2. FETCH</text>
+        <rect class="x-node" x="150" y="178" width="168" height="34" rx="5"/><text x="160" y="200" class="x-t-acc">#5 { nom: "Lina" … }</text>
+        <text x="12" y="258" class="x-t-mut">totalKeysExamined: 1 · totalDocsExamined: 1</text>
+      </svg></div></div><div class="key">C'est exactement ce qu'affiche <code>explain("executionStats")</code> : le nom de l'étape (<code>COLLSCAN</code> ou <code>IXSCAN</code>) et le nombre de clés et de documents lus.</div><div class="footer"><span>Index en images : COLLSCAN ou IXSCAN</span><span>49 / 60</span></div></section>
+
+<!-- 50 -->
+<section class="slide mg"><div class="kicker">8. Validation et index</div><h2>Index en images : index composé</h2><p class="lead">Chaque entrée de l'index contient <b>deux valeurs collées</b> : d'abord la section, triée A → C, puis, à l'intérieur de chaque section, la moyenne <b>de la plus haute à la plus basse</b> (<code>-1</code>). C'est pour ça que l'ordre des champs compte : l'index est rangé par section d'abord.</p><div class="ixf"><svg viewBox="0 0 720 300" role="img" aria-label="Index composé trié par section puis moyenne décroissante"><defs><marker id="ixa4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="x-ah" d="M0,0 L10,5 L0,10 z"/></marker><marker id="ixb4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="x-ah2" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <text x="20" y="22" class="x-t-h">Entrées de l'index (dans l'ordre où elles sont stockées)</text>
+      <g>
+        <rect class="x-k" x="20" y="40" width="300" height="34" rx="5"/><text x="32" y="62">("A", 17)</text><text x="270" y="62" class="x-t-key">→ #3</text>
+        <rect class="x-k" x="20" y="80" width="300" height="34" rx="5"/><text x="32" y="102">("A", 14.5)</text><text x="270" y="102" class="x-t-key">→ #1</text>
+        <rect class="x-k" x="20" y="126" width="300" height="34" rx="5"/><text x="32" y="148">("B", 12)</text><text x="270" y="148" class="x-t-key">→ #2</text>
+        <rect class="x-k" x="20" y="166" width="300" height="34" rx="5"/><text x="32" y="188">("B", 9.5)</text><text x="270" y="188" class="x-t-key">→ #4</text>
+        <rect class="x-k" x="20" y="212" width="300" height="34" rx="5"/><text x="32" y="234">("C", 15)</text><text x="270" y="234" class="x-t-key">→ #5</text>
+        <rect class="x-k" x="20" y="252" width="300" height="34" rx="5"/><text x="32" y="274">("C", 11)</text><text x="270" y="274" class="x-t-key">→ #6</text>
+      </g>
+      <text x="350" y="64" class="x-t-acc">Section A</text><text x="350" y="82" class="x-t-mut">17 puis 14.5</text>
+      <text x="350" y="150" class="x-t-acc">Section B</text><text x="350" y="168" class="x-t-mut">12 puis 9.5</text>
+      <text x="350" y="236" class="x-t-acc">Section C</text><text x="350" y="254" class="x-t-mut">15 puis 11</text>
+      <path class="x-ar-acc" d="M336,42 L336,112"/><path class="x-ar-acc" d="M336,128 L336,198"/><path class="x-ar-acc" d="M336,214 L336,284"/>
+      <text x="530" y="100" class="x-t-h">Utilisable pour</text>
+      <text x="530" y="122" class="x-t-acc">✔ { section: "A" }</text>
+      <text x="530" y="142" class="x-t-acc">✔ section + sort moyenne -1</text>
+      <text x="530" y="186" class="x-t-h">Pas pour</text>
+      <text x="530" y="208" class="x-t-warn">✘ { moyenne: { $gt: 15 } }</text>
+      <text x="530" y="228" class="x-t-mut">les 17, 15… sont dispersés</text>
+    </svg></div><div class="key">Comme les moyennes sont déjà triées dans chaque section, <code>find({ section: "A" }).sort({ moyenne: -1 })</code> lit l'index dans l'ordre et n'a <b>aucun tri à faire</b> en mémoire.</div><div class="footer"><span>Index en images : index composé</span><span>50 / 60</span></div></section>
+
+<!-- 51 -->
+<section class="slide mg"><div class="kicker">8. Validation et index</div><h2>Index en images : unique et partiel</h2><div class="ixcmp"><div class="ixf"><svg viewBox="0 0 330 250" role="img" aria-label="Index unique refusant un doublon" style="min-width:300px"><defs><marker id="ixa5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="x-ah" d="M0,0 L10,5 L0,10 z"/></marker><marker id="ixb5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="x-ah2" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+        <text x="12" y="22" class="x-t-h">{ numero: 1 }, { unique: true }</text>
+        <rect class="x-k" x="12" y="40" width="150" height="30" rx="5"/><text x="22" y="60">1001 → #1</text>
+        <rect class="x-k" x="12" y="76" width="150" height="30" rx="5"/><text x="22" y="96">1002 → #2</text>
+        <rect class="x-k" x="12" y="112" width="150" height="30" rx="5"/><text x="22" y="132">1003 → #3</text>
+        <rect class="x-bad" x="180" y="76" width="140" height="44" rx="5"/><text x="190" y="96" class="x-t-warn">insert 1002</text><text x="190" y="112" class="x-t-mut">nouvel étudiant</text>
+        <path class="x-ar-warn" d="M180,94 L166,94"/>
+        <text x="12" y="176" class="x-t-warn">✘ E11000 duplicate key</text>
+        <text x="12" y="198" class="x-t-mut">La clé 1002 existe déjà dans l'arbre :</text>
+        <text x="12" y="216" class="x-t-mut">le document n'est pas inséré.</text>
+      </svg></div><div class="ixf"><svg viewBox="0 0 330 250" role="img" aria-label="Index partiel ne contenant que les moyennes supérieures à 10" style="min-width:300px"><defs><marker id="ixa6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="x-ah" d="M0,0 L10,5 L0,10 z"/></marker><marker id="ixb6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="x-ah2" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+        <text x="12" y="22" class="x-t-h">{ moyenne: 1 }, partiel ($gt: 10)</text>
+        <rect class="x-k" x="12" y="40" width="130" height="28" rx="5"/><text x="22" y="59">11 → #6</text>
+        <rect class="x-k" x="12" y="74" width="130" height="28" rx="5"/><text x="22" y="93">12 → #2</text>
+        <rect class="x-k" x="12" y="108" width="130" height="28" rx="5"/><text x="22" y="127">14.5 → #1</text>
+        <rect class="x-k" x="12" y="142" width="130" height="28" rx="5"/><text x="22" y="161">15 → #5</text>
+        <rect class="x-k" x="12" y="176" width="130" height="28" rx="5"/><text x="22" y="195">17 → #3</text>
+        <rect class="x-bad" x="170" y="74" width="150" height="44" rx="5"/><text x="180" y="94" class="x-t-warn">Yacine 9.5 (#4)</text><text x="180" y="110" class="x-t-mut">pas dans l'index</text>
+        <text x="12" y="230" class="x-t-mut">5 clés au lieu de 6 : plus petit, plus léger.</text>
+      </svg></div></div><div class="footer"><span>Index en images : unique et partiel</span><span>51 / 60</span></div></section>
+
+<!-- 52 -->
+<section class="slide mg"><div class="kicker">8. Validation et index</div><h2>8. Validation et index (suite)</h2><div class="lab"><h4>🧪 Testez le validateur $jsonSchema</h4><div class="bt"><label>nom <input id="w7n" value="Amina"/></label><label>moyenne <input id="w7m" size="5" value="25"/></label><button id="w7b">insertOne()</button></div><pre id="w7o"></pre>
+<h4>🧪 Index : combien de documents lus ?</h4><div class="bt"><label>Taille de la collection <input id="w7r" max="1000000" min="1000" step="1000" type="range" value="100000"/> <b id="w7rv"></b></label><label><input id="w7i" type="checkbox"/> index unique sur numero_inscription</label></div><p class="q" id="w7x"></p></div><div class="footer"><span>Validation et index (suite)</span><span>52 / 60</span></div></section>
+
+<!-- 53 -->
+<section class="slide mg"><div class="kicker">9. Opérateurs et types BSON</div><h2>9. Opérateurs et types BSON</h2><div class="scroll"><table style="font-size:13px"><tr><th>Opérateur</th><th>Rôle</th><th>Exemple</th></tr>
+<tr><td colspan="3" style="background:var(--panel2)"><b>Comparaison (compare la valeur d’un champ)</b></td></tr>
+<tr><td><code>$eq</code></td><td>Égal à</td><td><code style="white-space:normal">{ age: { $eq: 20 } }   // identique à { age: 20 }</code></td></tr>
+<tr><td><code>$ne</code></td><td>Différent de</td><td><code style="white-space:normal">{ statut: { $ne: "exclu" } }</code></td></tr>
+<tr><td><code>$gt</code></td><td>Strictement supérieur à</td><td><code style="white-space:normal">{ note: { $gt: 10 } }</code></td></tr>
+<tr><td><code>$gte</code></td><td>Supérieur ou égal à</td><td><code style="white-space:normal">{ age: { $gte: 18 } }</code></td></tr>
+<tr><td><code>$lt</code></td><td>Strictement inférieur à</td><td><code style="white-space:normal">{ note: { $lt: 10 } }</code></td></tr>
+<tr><td><code>$lte</code></td><td>Inférieur ou égal à</td><td><code style="white-space:normal">{ age: { $lte: 20 } }</code></td></tr>
+<tr><td><code>$in</code></td><td>La valeur est dans la liste</td><td><code style="white-space:normal">{ ville: { $in: ["Alger", "Oran"] } }</code></td></tr>
+<tr><td><code>$nin</code></td><td>La valeur n’est pas dans la liste</td><td><code style="white-space:normal">{ ville: { $nin: ["Alger", "Oran"] } }</code></td></tr>
+<tr><td colspan="3" style="background:var(--panel2)"><b>Logiques (combinent plusieurs conditions)</b></td></tr>
+<tr><td><code>$and</code></td><td>Toutes les conditions sont vraies</td><td><code style="white-space:normal">{ $and: [{ note: { $gte: 10 } }, { age: { $lt: 25 } }] }</code></td></tr>
+<tr><td><code>$or</code></td><td>Au moins une condition est vraie</td><td><code style="white-space:normal">{ $or: [{ statut: "A" }, { statut: "D" }] }</code></td></tr>
+<tr><td><code>$not</code></td><td>Inverse la condition d’un champ</td><td><code style="white-space:normal">{ note: { $not: { $gt: 10 } } }   // note ≤ 10 ou absente</code></td></tr>
+<tr><td><code>$nor</code></td><td>Aucune des conditions n’est vraie</td><td><code style="white-space:normal">{ $nor: [{ statut: "A" }, { statut: "D" }] }</code></td></tr>
+<tr><td colspan="3" style="background:var(--panel2)"><b>Éléments / évaluation (structure ou contenu du champ)</b></td></tr>
+<tr><td><code>$exists</code></td><td>Le champ existe (true) ou non (false)</td><td><code style="white-space:normal">{ email: { $exists: true } }</code></td></tr>
+<tr><td><code>$type</code></td><td>Le type BSON du champ</td><td><code style="white-space:normal">{ age: { $type: "int" } }</code></td></tr>
+<tr><td><code>$regex</code></td><td>Le champ correspond à une expression régulière</td><td><code style="white-space:normal">{ nom: { $regex: "^J" } }   // noms commençant par J</code></td></tr>
+<tr><td><code>$expr</code></td><td>Compare deux champs du même document</td><td><code style="white-space:normal">{ $expr: { $gt: ["$depenses", "$budget"] } }</code></td></tr>
+<tr><td colspan="3" style="background:var(--panel2)"><b>Agrégation (dans $group, sur plusieurs documents)</b></td></tr>
+<tr><td><code>$sum</code></td><td>Somme (ou comptage avec 1)</td><td><code style="white-space:normal">{ $group: { _id: "$section", total: { $sum: 1 } } }   // nombre d’étudiants par section</code></td></tr>
+<tr><td><code>$avg</code></td><td>Moyenne</td><td><code style="white-space:normal">{ $group: { _id: "$section", moyenne: { $avg: "$note" } } }</code></td></tr>
+<tr><td><code>$max</code></td><td>Valeur maximale</td><td><code style="white-space:normal">{ $group: { _id: null, meilleure: { $max: "$note" } } }</code></td></tr>
+<tr><td><code>$min</code></td><td>Valeur minimale</td><td><code style="white-space:normal">{ $group: { _id: null, plusBasse: { $min: "$note" } } }</code></td></tr>
+<tr><td><code>$push</code></td><td>Ajoute chaque valeur dans un tableau (doublons acceptés)</td><td><code style="white-space:normal">{ $group: { _id: "$section", noms: { $push: "$nom" } } }</code></td></tr>
+<tr><td><code>$addToSet</code></td><td>Ajoute chaque valeur dans un tableau (sans doublons)</td><td><code style="white-space:normal">{ $group: { _id: "$section", villes: { $addToSet: "$ville" } } }</code></td></tr>
+<tr><td colspan="3" style="background:var(--panel2)"><b>Mise à jour (modifient les documents)</b></td></tr>
+<tr><td><code>$set</code></td><td>Définit la valeur d’un champ (le crée s’il n’existe pas)</td><td><code style="white-space:normal">updateOne({ nom: "Ali" }, { $set: { statut: "A" } })</code></td></tr>
+<tr><td><code>$unset</code></td><td>Supprime un champ</td><td><code style="white-space:normal">updateOne({ nom: "Ali" }, { $unset: { telephone: "" } })</code></td></tr>
+<tr><td><code>$inc</code></td><td>Ajoute une valeur numérique au champ</td><td><code style="white-space:normal">updateOne({ nom: "Ali" }, { $inc: { note: 1 } })</code></td></tr>
+<tr><td><code>$mul</code></td><td>Multiplie le champ par une valeur</td><td><code style="white-space:normal">updateOne({ nom: "Ali" }, { $mul: { salaire: 1.1 } })</code></td></tr>
+<tr><td><code>$rename</code></td><td>Renomme un champ</td><td><code style="white-space:normal">updateOne({ nom: "Ali" }, { $rename: { ville: "wilaya" } })</code></td></tr></table></div><div class="footer"><span>9. Opérateurs et types BSON</span><span>53 / 60</span></div></section>
+
+<!-- 54 -->
+<section class="slide mg"><div class="kicker">9. Opérateurs et types BSON</div><h2>9. Opérateurs et types BSON (suite)</h2><div class="scroll"><table><tr><th>Type BSON</th><th>Description</th><th>Type BSON</th><th>Description</th></tr>
+<tr><td><b>object</b></td><td>Document complexe</td><td><b>double</b></td><td>Décimal (une moyenne)</td></tr>
+<tr><td><b>string</b></td><td>Chaîne de caractères</td><td><b>bool</b></td><td>true ou false</td></tr>
+<tr><td><b>int</b></td><td>Entier 32 bits</td><td><b>array</b></td><td>Liste de valeurs</td></tr>
+<tr><td><b>long</b></td><td>Entier 64 bits</td><td><b>date</b></td><td>Dates</td></tr>
+<tr><td><b>objectId</b></td><td>Identifiant unique généré par MongoDB</td><td><b>null</b></td><td>Valeur nulle autorisée</td></tr></table></div><div class="lab"><h4>🧪 Filtrez avec les opérateurs de comparaison</h4><div class="scroll"><table id="w8d"></table></div><div class="bt"><label>{ age: { <select id="w8o"><option>$eq</option><option>$ne</option><option>$gt</option><option>$gte</option><option>$lt</option><option>$lte</option></select>: <input id="w8v" size="4" value="22"/> } }</label></div><pre id="w8q"></pre><div class="q" id="w8r"></div>
+<h4>🧪 Entraînement : quel type BSON ?</h4><p class="q">Valeur : <code id="w9v"></code></p><div class="bt" id="w9b"></div><p id="w9f"></p><button class="gh" id="w9n">Valeur suivante ›</button></div><div class="footer"><span>Opérateurs et types BSON (suite)</span><span>54 / 60</span></div></section>
+
+<!-- 55 -->
+<section class="slide mg"><div class="kicker">10. Synthèse</div><h2>10. Synthèse</h2><div class="scroll"><table><tr><th>Notion</th><th>Problème résolu</th><th>Solution</th></tr>
+<tr><td><b>NoSQL</b></td><td>Volumes, schémas rigides</td><td>Scalabilité horizontale, flexibilité</td></tr>
+<tr><td><b>Sharding</b></td><td>Trop de données pour un serveur</td><td>Répartition en shards via mongos</td></tr>
+<tr><td><b>Réplication</b></td><td>Panne de serveur</td><td>Replica set (copies redondantes)</td></tr>
+<tr><td><b>Agrégation</b></td><td>Calculs, regroupements, statistiques</td><td>Pipeline <code>$match</code> → <code>$group</code> → <code>$project</code></td></tr>
+<tr><td><b>$jsonSchema</b></td><td>Données incorrectes</td><td>Validation à l’insertion</td></tr>
+<tr><td><b>Index</b></td><td>Requêtes lentes</td><td>Index simple, composé, unique, partiel</td></tr></table></div><div class="footer"><span>10. Synthèse</span><span>55 / 60</span></div></section>
+
+<!-- 56 -->
+<section class="slide mg"><div class="kicker">11. Auto-évaluation</div><h2>11. Auto-évaluation</h2><p class="lead">Répondez dans votre tête, puis cliquez pour vérifier.</p><div class="footer"><span>11. Auto-évaluation</span><span>56 / 60</span></div></section>
+
+<!-- 57 -->
+<section class="slide mg"><div class="kicker">11. Auto-évaluation</div><h2>11. Auto-évaluation (suite)</h2><details><summary>Que signifie NoSQL ?</summary><p>Not Only SQL : il complète le SQL, il ne le remplace pas.</p></details><details><summary>Quelle est la limite de la scalabilité verticale ?</summary><p>Ajouter CPU/RAM à un seul serveur est coûteux et limité ; NoSQL préfère la scalabilité horizontale (ajout de serveurs).</p></details><details><summary>Citez les 4 types de BDD NoSQL avec un SGBD pour chacun.</summary><p>Documents (MongoDB), clé-valeur (Redis), colonnes (Cassandra), graphes (Neo4j).</p></details><details><summary>Pourquoi Redis est-il extrêmement rapide ?</summary><p>Accès direct par la clé, sans jointure, et données stockées en mémoire (RAM).</p></details><details><summary>Dans un graphe, que sont les nœuds et les arêtes ?</summary><p>Les nœuds sont les entités (Alice, Bob) ; les arêtes sont les relations (« amie », « suit »).</p></details><div class="footer"><span>Auto-évaluation (suite)</span><span>57 / 60</span></div></section>
+
+<!-- 58 -->
+<section class="slide mg"><div class="kicker">11. Auto-évaluation</div><h2>11. Auto-évaluation (suite)</h2><details><summary>Sous quelle forme MongoDB stocke-t-il les documents JSON ?</summary><p>En BSON (Binary JSON), rapide en lecture et en écriture.</p></details><details><summary>À quoi correspondent collection et document en SQL ?</summary><p>Collection ≈ table ; document ≈ ligne.</p></details><details><summary>Quelle architecture choisir pour une petite application en développement ?</summary><p>Un serveur autonome : une seule instance mongod, sans sharding ni réplication.</p></details><details><summary>Quels rôles jouent mongos et les Config Servers ?</summary><p>Mongos est le routeur ; il consulte les Config Servers (métadonnées sur l’emplacement des données) pour diriger la requête vers le bon shard.</p></details><details><summary>Quelle différence entre sharding et réplication ?</summary><p>Le sharding répartit les données entre plusieurs serveurs (scalabilité) ; la réplication en conserve des copies (haute disponibilité).</p></details><div class="footer"><span>Auto-évaluation (suite)</span><span>58 / 60</span></div></section>
+
+<!-- 59 -->
+<section class="slide mg"><div class="kicker">11. Auto-évaluation</div><h2>11. Auto-évaluation (suite)</h2><details><summary>Quelle étape du pipeline calcule la moyenne par section ?</summary><p><code>$group</code> avec <code>_id: "$section"</code> et <code>$avg</code>.</p></details><details><summary>Que donne <code>insertOne({ nom: "Ali", moyenne: 25 })</code> avec le validateur des moyennes ?</summary><p>Une erreur : <code>$jsonSchema</code> impose une moyenne entre 0 et 20.</p></details><details><summary>Quel index garantit un numéro d’inscription unique ?</summary><p>L’index unique : <code>{ unique: true }</code>.</p></details><details><summary>Quel est le prix à payer d’un index, et comment le tester ?</summary><p>Insertions et mises à jour plus lentes ; on teste son impact avec <code>explain()</code>.</p></details><details><summary>Quel type BSON pour une moyenne décimale ?</summary><p><code>double</code> (int = 32 bits, long = 64 bits).</p></details><div class="footer"><span>Auto-évaluation (suite)</span><span>59 / 60</span></div></section>
+
+<!-- 60 -->
+<section class="slide mg"><div class="kicker">Fin</div><h2>Ce qu'il faut retenir</h2><div class="grid cols-2"><div class="card"><h3>NoSQL</h3><p style="margin:0">Not Only SQL : scalabilité horizontale, schéma flexible, quatre modèles (documents, clé-valeur, colonnes, graphes).</p></div><div class="card"><h3>MongoDB</h3><p style="margin:0">Documents BSON, sharding et réplication, CRUD, pipeline d’agrégation, validation $jsonSchema et index.</p></div></div><div class="footer"><span>Conclusion</span><span>60 / 60</span></div></section>
+
+</div>
+
+<div class="num" id="num">1 / 60</div>
+<div class="topbtns">
+  <button class="iconbtn" id="themeToggle" title="Mode clair / sombre">☀</button>
+  <button class="iconbtn" id="menuToggle" title="Aller à une section">☰</button>
+</div>
+<div class="nav">
+  <button id="prev" aria-label="Précédent">‹</button>
+  <button id="next" aria-label="Suivant">›</button>
+</div>
+
+<div class="menu-overlay" id="menuOverlay">
+  <div class="menu-panel">
+    <h4>NAVIGATION</h4>
+    <div id="menuList"></div>
+  </div>
+</div>
+
+<script>
+/* ===================== NAVIGATION ===================== */
+const slides = document.querySelectorAll('.slide');
+const titles = ["Titre", "Plan général", "1. Pourquoi NoSQL ?", "2. Qu’est-ce que NoSQL ?", "Qu’est-ce que NoSQL ? (suite)", "3. Les 4 types de BDD NoSQL", "Les 4 types de BDD NoSQL (suite)", "Les 4 types de BDD NoSQL (suite)", "Les 4 types de BDD NoSQL (suite)", "1. Documents : MongoDB", "2. Clé-valeur : Redis", "3. Colonnes : Apache Cassandra", "4. Graphes : Neo4j (Cypher)", "Les 4 types de BDD NoSQL (suite)", "4. MongoDB", "MongoDB (suite)", "MongoDB (suite)", "5. Architecture", "Architecture (suite)", "Architecture (suite)", "Architecture (suite)", "6. CRUD", "Créer et lire", "Modifier et supprimer", "7. Agrégation", "Une étape pour chaque besoin", "Le jeu de données des exemples", "1. Filtrer : $match", "find() ou $match ?", "2. Regrouper : $group", "3. Calculer : accumulateurs et opérateurs", "3. Calculer (suite) : par document et global", "4. Transformer : $project et $addFields", "$project : une projection améliorée", "5. Trier et limiter : $sort, $limit, $skip", "6. Décomposer un tableau : $unwind", "$unwind pas à pas", "7. Joindre : $lookup", "8. Produire une sortie : $count, $out", "Tout combiner : un pipeline complet", "Constructeur de pipeline interactif", "SQL et agrégation : la correspondance", "8. Validation et index", "Créer une collection avec $jsonSchema", "Index commentés", "Comment fonctionne un index ?", "Pourquoi 1 ou -1 dans createIndex ?", "Index en images : clés triées et pointeurs", "Index en images : COLLSCAN ou IXSCAN", "Index en images : index composé", "Index en images : unique et partiel", "Validation et index (suite)", "9. Opérateurs et types BSON", "Opérateurs et types BSON (suite)", "10. Synthèse", "11. Auto-évaluation", "Auto-évaluation (suite)", "Auto-évaluation (suite)", "Auto-évaluation (suite)", "Conclusion"];
+let i = 0;
+function show(n){
+  slides[i].classList.remove('active');
+  i = (n + slides.length) % slides.length;
+  slides[i].classList.add('active');
+  document.getElementById('num').textContent = (i+1) + ' / ' + slides.length;
+  document.getElementById('progress').style.width = (((i+1)/slides.length)*100) + '%';
+  renderMenu();
+}
+document.getElementById('next').onclick = () => show(i+1);
+document.getElementById('prev').onclick = () => show(i-1);
+window.addEventListener('keydown', (e) => {
+  if(document.getElementById('menuOverlay').classList.contains('open')) return;
+  const tag = document.activeElement.tagName;
+  if(tag === 'INPUT') return;
+  if(e.key === 'ArrowRight' || e.key === ' ') show(i+1);
+  if(e.key === 'ArrowLeft') show(i-1);
+  if(e.key === 'Escape') closeMenu();
+});
+let touchX = null;
+window.addEventListener('touchstart', e => touchX = e.touches[0].clientX);
+window.addEventListener('touchend', e => {
+  if(touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if(dx < -40) show(i+1);
+  if(dx > 40) show(i-1);
+  touchX = null;
+});
+const themeBtn = document.getElementById('themeToggle');
+let light = false;
+themeBtn.onclick = () => {
+  light = !light;
+  document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
+  themeBtn.textContent = light ? '☾' : '☀';
+};
+const menuOverlay = document.getElementById('menuOverlay');
+const menuList = document.getElementById('menuList');
+function renderMenu(){
+  menuList.innerHTML = '';
+  titles.forEach((t, idx) => {
+    const item = document.createElement('div');
+    item.className = 'menu-item' + (idx === i ? ' current' : '');
+    item.innerHTML = '<span class="mi-n">' + (idx+1) + '</span><span>' + t + '</span>';
+    item.onclick = () => { show(idx); closeMenu(); };
+    menuList.appendChild(item);
+  });
+}
+function closeMenu(){ menuOverlay.classList.remove('open'); }
+document.getElementById('menuToggle').onclick = () => { renderMenu(); menuOverlay.classList.add('open'); };
+menuOverlay.addEventListener('click', (e) => { if(e.target === menuOverlay) closeMenu(); });
+renderMenu();
+document.getElementById('progress').style.width = (100/slides.length) + '%';
+
+/* ===================== SLIDE 3 — Séquentiel vs parallèle ===================== */
+(function(){
+  const seqBtn = document.getElementById('seqBtn'), parBtn = document.getElementById('parBtn');
+  const runBtn = document.getElementById('runSeqPar');
+  const statusEl = document.getElementById('seqParStatus');
+  const queueEl = document.getElementById('seqParQueue');
+  let mode = 'seq';
+  const REQS = ['Requête A','Requête B','Requête C','Requête D'];
+  const DUR = 900; // ms per request unit
+
+  function build(){
+    queueEl.innerHTML = '';
+    REQS.forEach((r,idx)=>{
+      const line = document.createElement('div'); line.className='qline';
+      line.innerHTML = '<span class="lbl">'+r+'</span><div class="track"><div class="fill" id="f'+idx+'"></div></div><span class="time" id="t'+idx+'">0.0s</span>';
+      queueEl.appendChild(line);
+    });
+  }
+  build();
+  seqBtn.onclick = ()=>{ mode='seq'; seqBtn.classList.add('on'); parBtn.classList.remove('on'); build(); statusEl.textContent='Mode : serveur unique.'; };
+  parBtn.onclick = ()=>{ mode='par'; parBtn.classList.add('on'); seqBtn.classList.remove('on'); build(); statusEl.textContent='Mode : 4 nœuds en parallèle.'; };
+
+  runBtn.onclick = () => {
+    build();
+    runBtn.disabled = true;
+    const start = performance.now();
+    if(mode === 'par'){
+      statusEl.innerHTML = 'Traitement en cours <b>en parallèle</b>…';
+      REQS.forEach((r,idx)=> animateOne(idx, 0, DUR, start));
+      setTimeout(()=>{ statusEl.innerHTML = 'Terminé en <b>~'+(DUR/1000).toFixed(1)+'s</b> — tous les nœuds ont fini ensemble.'; runBtn.disabled=false; }, DUR+150);
+    } else {
+      statusEl.innerHTML = 'Traitement en cours <b>séquentiel</b>…';
+      REQS.forEach((r,idx)=> animateOne(idx, idx*DUR, DUR, start));
+      const total = REQS.length*DUR;
+      setTimeout(()=>{ statusEl.innerHTML = 'Terminé en <b>~'+(total/1000).toFixed(1)+'s</b> — 4× plus long que le mode parallèle.'; runBtn.disabled=false; }, total+150);
+    }
+  };
+  function animateOne(idx, delay, dur, start){
+    setTimeout(()=>{
+      const fill = document.getElementById('f'+idx), timeEl = document.getElementById('t'+idx);
+      const t0 = performance.now();
+      function step(now){
+        const p = Math.min(1, (now-t0)/dur);
+        fill.style.width = (p*100)+'%';
+        timeEl.textContent = (((now-start))/1000).toFixed(1)+'s';
+        if(p<1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }, delay);
+  }
+})();
+
+/* ===================== SLIDE 6 — Cinq objectifs (carte interactive) ===================== */
+(function(){
+  const objectifs = [
+    {
+      titre: "1. Performance",
+      desc: "Accélérer l'exécution des requêtes grâce à la division et au traitement simultané des tâches (parallélisme intra/inter-requête).",
+      exemple: "Indexation et recherche parmi des milliards de documents en une fraction de seconde."
+    },
+    {
+      titre: "2. Disponibilité",
+      desc: "Garantir un accès continu et sans interruption au service 24h/24 et 7j/7, même lors des pics de charge.",
+      exemple: "Système bancaire en ligne accessible mondialement sans arrêt de service."
+    },
+    {
+      titre: "3. Fiabilité",
+      desc: "Assurer la tolérance aux pannes par la redondance et la réplication des données sur plusieurs nœuds.",
+      exemple: "Si un serveur physique s'éteint brusquement, un autre prend le relais sans perte de données."
+    },
+    {
+      titre: "4. Accès distribué",
+      desc: "Permettre à des utilisateurs ou applications situés sur différents sites d'accéder aux données de manière transparente.",
+      exemple: "Des équipes distantes à Alger, Paris et Dubaï travaillent en simultané sur la même base."
+    },
+    {
+      titre: "5. Maîtrise des coûts",
+      desc: "Préférer un ensemble de serveurs standards bon marché (commodity hardware) plutôt qu'une seule machine surdimensionnée très coûteuse.",
+      exemple: "Un cluster cloud à la demande coûte nettement moins cher qu'un mainframe propriétaire."
+    }
+  ];
+
+  const grid = document.getElementById('objGrid');
+  if (grid) {
+    grid.innerHTML = '';
+    objectifs.forEach(obj => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.cursor = 'pointer';
+      card.style.minHeight = '140px';
+      
+      card.innerHTML = `
+        <div class="n">${obj.titre}</div>
+        <p style="margin:0 0 8px; font-size:13.5px; color:var(--ink);">${obj.desc}</p>
+        <div class="example" style="display:none; margin-top:8px;"><b>Exemple :</b> ${obj.exemple}</div>
+        <span style="font-size:11px; color:var(--accent2); font-family:var(--mono);">👉 Cliquez pour afficher/masquer l'exemple</span>
+      `;
+
+      card.onclick = () => {
+        const ex = card.querySelector('.example');
+        const isHidden = ex.style.display === 'none';
+        ex.style.display = isHidden ? 'block' : 'none';
+      };
+
+      grid.appendChild(card);
+    });
+  }
+})();
+
+/* ===================== SLIDE 7 — Architecture explorer ===================== */
+(function(){
+  const box = document.getElementById('archBox');
+  const tabs = document.getElementById('archTabs');
+  const statusEl = document.getElementById('archStatus');
+  const exampleEl = document.getElementById('archExample');
+  let current = 'mem';
+
+  const ARCH = {
+    mem: {
+      render: ()=>`
+        <div class="row"><div class="chip cpu" id="c1">CPU</div><div class="chip cpu" id="c2">CPU</div><div class="chip cpu" id="c3">CPU</div><div class="chip cpu" id="c4">CPU</div></div>
+        <div class="net">RÉSEAU D'INTERCONNEXION</div>
+        <div class="row"><div class="chip disk">DISK</div><div class="chip disk">DISK</div><div class="chip mem" id="shared">MÉMOIRE PARTAGÉE</div></div>`,
+      hot: 'shared',
+      status: 'Toutes les CPU accèdent à la <b>même mémoire</b> : rapide, mais elle sature vite sous forte charge.',
+      example: '<b>Exemple —</b> SAP HANA in-memory, PostgreSQL avec parallélisme intra-requête sur une machine multi-cœurs.'
+    },
+    disk: {
+      render: ()=>`
+        <div class="row"><div class="unit"><div class="chip mem">MEM</div><div class="chip cpu">CPU</div></div><div class="unit"><div class="chip mem">MEM</div><div class="chip cpu">CPU</div></div></div>
+        <div class="net">RÉSEAU</div>
+        <div class="row"><div class="chip disk" id="shared">DISK PARTAGÉ</div></div>`,
+      hot: 'shared',
+      status: 'Chaque nœud a sa mémoire propre, mais tous écrivent sur le <b>même disque</b> : contention possible en écriture.',
+      example: '<b>Exemple —</b> Oracle RAC : plusieurs serveurs de calcul partagent un unique système de stockage (baie SAN).'
+    },
+    none: {
+      render: ()=>`
+        <div class="row"><div class="unit"><div class="chip mem" id="s1">MEM</div><div class="chip cpu" id="s1b">CPU</div><div class="chip disk" id="s1c">DISK</div></div><div class="unit"><div class="chip mem" id="s2">MEM</div><div class="chip cpu" id="s2b">CPU</div><div class="chip disk" id="s2c">DISK</div></div></div>
+        <div class="net">RÉSEAU</div>`,
+      hot: null,
+      status: 'Chaque nœud a sa <b>propre</b> mémoire et son propre disque : aucune ressource partagée, aucun goulot central.',
+      example: '<b>Exemple —</b> Hadoop/HDFS, Teradata, Google BigQuery.'
+    }
+  };
+
+  function render(){
+    const a = ARCH[current];
+    box.innerHTML = a.render();
+    statusEl.innerHTML = a.status;
+    exampleEl.innerHTML = a.example;
+  }
+  tabs.querySelectorAll('button').forEach(btn=>{
+    btn.onclick = ()=>{
+      tabs.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on');
+      current = btn.dataset.a;
+      render();
+    };
+  });
+  document.getElementById('archRun').onclick = ()=>{
+    const a = ARCH[current];
+    if(a.hot){
+      const el = document.getElementById(a.hot);
+      if(el){
+        el.classList.add('hot');
+        statusEl.innerHTML = '⚠ Charge envoyée — la ressource partagée <b>chauffe</b> : c\'est le goulot d\'étranglement.';
+        setTimeout(()=> el.classList.remove('hot'), 1400);
+      }
+    } else {
+      ['s1','s1b','s1c','s2','s2b','s2c'].forEach((id,idx)=>{
+        const el = document.getElementById(id);
+        if(el) setTimeout(()=>{ el.classList.add('hot'); setTimeout(()=>el.classList.remove('hot'),400); }, idx*80);
+      });
+      statusEl.innerHTML = '✅ Charge envoyée — chaque nœud traite sa part <b>indépendamment</b>, sans contention.';
+    }
+  };
+  render();
+})();
+
+/* ===================== SLIDE 9 — Répartition sur N nœuds ===================== */
+(function(){
+  const nodeSlider = document.getElementById('nodeSlider'), sizeSlider = document.getElementById('sizeSlider');
+  const nodeVal = document.getElementById('nodeVal'), sizeVal = document.getElementById('sizeVal');
+  const bars = document.getElementById('repartBars'), statusEl = document.getElementById('repartStatus');
+  function fmt(n){ return n.toLocaleString('fr-FR'); }
+  function render(){
+    const n = parseInt(nodeSlider.value), size = parseInt(sizeSlider.value);
+    nodeVal.textContent = n + ' nœud' + (n>1?'s':'');
+    sizeVal.textContent = fmt(size);
+    const per = Math.round(size/n);
+    bars.innerHTML = '';
+    for(let k=1;k<=n;k++){
+      const wrap = document.createElement('div'); wrap.className='bwrap';
+      wrap.innerHTML = '<div class="bar" style="height:'+(100/n).toFixed(0)+'%;">'+fmt(per)+'</div><div class="blabel">Nœud '+k+'</div>';
+      bars.appendChild(wrap);
+    }
+    statusEl.innerHTML = 'Chaque nœud gère <b>'+fmt(per)+'</b> enregistrements au lieu de <b>'+fmt(size)+'</b> sur un serveur unique — recherches et écritures environ <b>'+n+'×</b> plus rapides.';
+  }
+  nodeSlider.oninput = render; sizeSlider.oninput = render;
+  render();
+})();
+
+/* ===================== SLIDE 10 — Scalabilité Horizontale vs Verticale ===================== */
+(function(){
+  const loadSlider = document.getElementById('loadSlider');
+  const loadVal = document.getElementById('loadVal');
+  const visualArea = document.getElementById('scaleVisual');
+  const scaleDesc = document.getElementById('scaleDesc');
+  const btnVert = document.getElementById('btnScaleVert');
+  const btnHor = document.getElementById('btnScaleHor');
+
+  let mode = 'vert';
+
+  function updateScalability() {
+    if (!loadSlider || !visualArea || !scaleDesc) return;
+    const load = parseInt(loadSlider.value);
+    loadVal.textContent = load + ' % de charge';
+    visualArea.innerHTML = '';
+
+    if (mode === 'vert') {
+      const scaleFactor = load / 100;
+      const server = document.createElement('div');
+      server.style.cssText = `
+        width: ${60 * scaleFactor}px;
+        height: ${80 * scaleFactor}px;
+        background: var(--accent);
+        color: var(--accent-ink);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--mono);
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      `;
+      server.innerHTML = `<span>🖥 SERVEUR</span><span style="font-size:11px;">${scaleFactor * 16} Go RAM</span>`;
+      visualArea.appendChild(server);
+
+      scaleDesc.innerHTML = `<b>Scalabilité Verticale (Scale-UP) :</b> On augmente les capacités matérielles d'une seule machine (CPU, RAM, Disque).<br>
+      ⚠️ <i>Limite :</i> Coût très élevé (matériel propriétaire) et plafond physique du serveur.`;
+
+    } else {
+      const nodeCount = Math.ceil(load / 100);
+      for (let k = 1; k <= nodeCount; k++) {
+        const node = document.createElement('div');
+        node.style.cssText = `
+          width: 70px;
+          height: 70px;
+          background: var(--accent2);
+          color: var(--accent-ink);
+          border-radius: 8px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-family: var(--mono);
+          font-size: 12px;
+          font-weight: bold;
+          transition: all 0.3s ease;
+        `;
+        node.innerHTML = `<span>🖥 Nœud ${k}</span><span style="font-size:10px;">16 Go RAM</span>`;
+        visualArea.appendChild(node);
+      }
+
+      scaleDesc.innerHTML = `<b>Scalabilité Horizontale (Scale-OUT) :</b> On ajoute de nouvelles machines (nœuds) standards au cluster pour se partager le travail.<br>
+      ✅ <i>Avantage :</i> Coût réduit (serveurs ordinaires), aucune limite théorique de puissance.`;
+    }
+  }
+
+  if (loadSlider && btnVert && btnHor) {
+    loadSlider.oninput = updateScalability;
+    
+    btnVert.onclick = () => {
+      mode = 'vert';
+      btnVert.classList.add('on');
+      btnHor.classList.remove('on');
+      updateScalability();
+    };
+    btnHor.onclick = () => {
+      mode = 'hor';
+      btnHor.classList.add('on');
+      btnVert.classList.remove('on');
+      updateScalability();
+    };
+
+    updateScalability();
+  }
+})();
+
+/* ===================== SLIDE 11 — Latence simulée ===================== */
+(function(){
+  const latSlider = document.getElementById('latSlider'), latVal = document.getElementById('latVal');
+  const latFill = document.getElementById('latFill'), statusEl = document.getElementById('latStatus');
+  function render(){
+    const n = parseInt(latSlider.value);
+    latVal.textContent = n + ' nœud' + (n>1?'s':'');
+    const pct = Math.max(6, 100/n);
+    latFill.style.width = pct+'%';
+    statusEl.innerHTML = 'Latence relative estimée : <b>'+pct.toFixed(0)+'%</b> du temps d\'un serveur unique.';
+  }
+  latSlider.oninput = render;
+  render();
+})();
+
+/* ===================== SLIDE 13 — Tolérance aux pannes ===================== */
+(function(){
+  const cont = document.getElementById('failNodes'), statusEl = document.getElementById('failStatus');
+  const N = 5; let states = Array(N).fill(true);
+  function render(){
+    cont.innerHTML='';
+    for(let k=0;k<N;k++){
+      const n = document.createElement('div');
+      n.className = 'node' + (states[k] ? '' : ' down');
+      n.textContent = 'N'+(k+1);
+      n.onclick = ()=>{ states[k]=!states[k]; render(); };
+      cont.appendChild(n);
+    }
+    const alive = states.filter(Boolean).length;
+    if(alive === N) statusEl.textContent = 'Tous les nœuds sont actifs — service pleinement disponible.';
+    else if(alive === 0) statusEl.innerHTML = '❌ Tous les nœuds sont en panne — <b>service totalement indisponible</b>.';
+    else statusEl.innerHTML = '✅ '+alive+'/'+N+' nœuds actifs — le service <b>continue de fonctionner</b> grâce à la redondance (données répliquées sur les nœuds survivants).';
+  }
+  render();
+})();
+
+/* ===================== SLIDE 14 — Réplication maître/esclave ===================== */
+(function(){
+  const syncBtn = document.getElementById('syncBtn'), asyncBtn = document.getElementById('asyncBtn');
+  const writeBtn = document.getElementById('writeBtn');
+  const cont = document.getElementById('replNodes'), statusEl = document.getElementById('replStatus');
+  let mode = 'sync';
+  syncBtn.onclick = ()=>{ mode='sync'; syncBtn.classList.add('on'); asyncBtn.classList.remove('on'); };
+  asyncBtn.onclick = ()=>{ mode='async'; asyncBtn.classList.add('on'); syncBtn.classList.remove('on'); };
+
+  function build(){
+    cont.innerHTML = `
+      <div class="node master" id="master">Maître</div>
+      <span class="arrow">→</span>
+      <div class="node" id="rep1">Réplique 1</div>
+      <div class="node" id="rep2">Réplique 2</div>`;
+  }
+  build();
+  writeBtn.onclick = ()=>{
+    build();
+    writeBtn.disabled = true;
+    const master = document.getElementById('master');
+    master.classList.add('active-pulse');
+    statusEl.innerHTML = '✍ Écriture reçue sur le <b>maître</b>…';
+    const delay = mode === 'sync' ? 250 : 1600;
+    setTimeout(()=>{
+      ['rep1','rep2'].forEach((id,idx)=>{
+        setTimeout(()=>{
+          const el = document.getElementById(id);
+          el.classList.add('active-pulse');
+          el.style.borderColor = 'var(--good)'; el.style.color='var(--good)';
+        }, idx*150);
+      });
+      statusEl.innerHTML = mode === 'sync'
+        ? '✅ Mode <b>synchrone</b> : les répliques sont mises à jour <b>immédiatement</b>, avant confirmation de l\'écriture.'
+        : '⏳ Mode <b>asynchrone</b> : le maître a validé tout de suite, les répliques se mettent à jour <b>après un délai</b> (~1.6s ici) — incohérence temporaire possible.';
+      setTimeout(()=>{ master.classList.remove('active-pulse'); writeBtn.disabled=false; }, 500);
+    }, delay);
+  };
+})();
+
+/* ===================== SLIDE 16 — Sharding calculator ===================== */
+(function(){
+  const shardCountSlider = document.getElementById('shardCountSlider'), shardCountVal = document.getElementById('shardCountVal');
+  const idInput = document.getElementById('userIdInput'), calcBtn = document.getElementById('shardCalcBtn');
+  const line = document.getElementById('shardLine'), statusEl = document.getElementById('shardStatus');
+  const TOTAL = 1000000;
+  function colors(n){
+    const base = ['#4fd6c4','#f2b84b','#6fd18f','#e77070','#8fb2ff','#d38fe7','#ffd27a','#7ad3ff'];
+    return base.slice(0,n);
+  }
+  function drawLine(n, highlight){
+    const cs = colors(n);
+    line.innerHTML='';
+    for(let k=0;k<n;k++){
+      const seg = document.createElement('div'); seg.className='seg';
+      seg.style.background = cs[k];
+      seg.style.opacity = (highlight===k || highlight===null) ? '1' : '.28';
+      seg.textContent = 'Shard '+(k+1);
+      line.appendChild(seg);
+    }
+  }
+  function render(){
+    const n = parseInt(shardCountSlider.value);
+    shardCountVal.textContent = n + ' shards';
+    drawLine(n, null);
+    statusEl.textContent = 'Choisissez un ID puis cliquez sur "Localiser".';
+  }
+  shardCountSlider.oninput = render;
+  calcBtn.onclick = ()=>{
+    const n = parseInt(shardCountSlider.value);
+    let id = parseInt(idInput.value);
+    if(isNaN(id) || id<1) id=1;
+    if(id>TOTAL) id=TOTAL;
+    idInput.value = id;
+    const per = Math.ceil(TOTAL/n);
+    const shardIdx = Math.min(n-1, Math.floor((id-1)/per));
+    const lo = shardIdx*per+1, hi = Math.min(TOTAL, (shardIdx+1)*per);
+    drawLine(n, shardIdx);
+    statusEl.innerHTML = 'Utilisateur ID <b>'+id.toLocaleString('fr-FR')+'</b> → <b>Shard '+(shardIdx+1)+'</b> (plage '+lo.toLocaleString('fr-FR')+' – '+hi.toLocaleString('fr-FR')+').';
+  };
+  render();
+})();
+
+/* ===================== SLIDE 18 — Cluster combiné ===================== */
+(function(){
+  const btn = document.getElementById('genClusterBtn'), view = document.getElementById('clusterView');
+  btn.onclick = ()=>{
+    view.innerHTML='';
+    for(let s=1;s<=3;s++){
+      const col = document.createElement('div');
+      col.style.cssText='display:flex; flex-direction:column; align-items:center; gap:8px;';
+      col.innerHTML = '<div style="font-size:12px; color:var(--accent); font-weight:700;">SHARD '+s+'</div>';
+      const primary = document.createElement('div'); primary.className='node master'; primary.textContent='Primaire';
+      const rep = document.createElement('div'); rep.className='node'; rep.textContent='Réplique';
+      col.appendChild(primary); col.appendChild(rep);
+      view.appendChild(col);
+      setTimeout(()=>{ primary.classList.add('active-pulse'); setTimeout(()=>{ rep.style.borderColor='var(--good)'; rep.style.color='var(--good)'; primary.classList.remove('active-pulse'); }, 400); }, s*200);
+    }
+  };
+})();
+
+/* ===================== SLIDE 20 — Quiz ===================== */
+(function(){
+  const QUIZ = [
+    {q:"Qu'est-ce qui caractérise le mieux une BDD parallèle par rapport à une BDD traditionnelle ?", opts:["Elle utilise un serveur plus puissant","Elle répartit le traitement sur plusieurs unités simultanées","Elle stocke moins de données","Elle n'utilise pas de réseau"], correct:1},
+    {q:"Scalabilité horizontale signifie :", opts:["Ajouter de la RAM à la même machine","Ajouter des machines supplémentaires au cluster","Réduire le nombre de serveurs","Changer de système d'exploitation"], correct:1},
+    {q:"Dans l'architecture Shared Nothing, que partagent les nœuds ?", opts:["La mémoire","Le disque","Rien : chaque nœud a sa propre mémoire et son propre disque","Le réseau uniquement, pas le calcul"], correct:2},
+    {q:"Quel est le principal point faible de l'architecture Mémoire Partagée ?", opts:["Coût réseau élevé","La mémoire devient un goulot d'étranglement","Trop de redondance","Aucune limite connue"], correct:1},
+    {q:"La réplication a pour objectif principal :", opts:["La scalabilité et la performance pure","La disponibilité et la fiabilité","Réduire l'espace de stockage","Simplifier le schéma de données"], correct:1},
+    {q:"En réplication synchrone :", opts:["Les répliques sont mises à jour après un délai","La confirmation attend que toutes les répliques soient à jour","Il n'y a qu'une seule réplique possible","Aucune cohérence n'est garantie"], correct:1},
+    {q:"Le sharding consiste à :", opts:["Dupliquer toutes les données sur chaque nœud","Diviser les données en morceaux stockés sur des nœuds différents","Chiffrer les données avant stockage","Fusionner plusieurs bases en une seule"], correct:1},
+    {q:"Quel inconvénient est spécifique au sharding (pas à la réplication) ?", opts:["Consommation élevée d'espace disque","Requêtes croisant plusieurs shards plus lentes","Synchronisation asynchrone risquée","Coût de bande passante pour les copies"], correct:1}
+  ];
+  const area = document.getElementById('quizArea'), scoreEl = document.getElementById('quizScore');
+  let score = 0, answered = 0;
+  function build(){
+    area.innerHTML=''; score=0; answered=0; scoreEl.textContent = '0 / '+QUIZ.length;
+    QUIZ.forEach((item, qi)=>{
+      const box = document.createElement('div'); box.className='quiz-q';
+      const qt = document.createElement('div'); qt.className='qt'; qt.textContent = (qi+1)+'. '+item.q;
+      box.appendChild(qt);
+      const opts = document.createElement('div'); opts.className='quiz-opts';
+      item.opts.forEach((optText, oi)=>{
+        const opt = document.createElement('div'); opt.className='quiz-opt'; opt.textContent = optText;
+        opt.onclick = ()=>{
+          const siblings = opts.querySelectorAll('.quiz-opt');
+          siblings.forEach(s=>s.classList.add('disabled'));
+          if(oi === item.correct){
+            opt.classList.add('correct'); score++;
+          } else {
+            opt.classList.add('wrong');
+            siblings[item.correct].classList.add('correct');
+          }
+          answered++;
+          scoreEl.textContent = score+' / '+QUIZ.length;
+        };
+        opts.appendChild(opt);
+      });
+      box.appendChild(opts);
+      area.appendChild(box);
+    });
+  }
+  document.getElementById('quizReset').onclick = build;
+  build();
+})();
+</script>
+<script>(function(){
+
+const $=i=>document.getElementById(i);
+// 1
+function w1(){const l=+$('w1').value;$('w1v').textContent=l+'×';const ok=l<=4;$('w1o').innerHTML=`<div class="bar"><i style="width:${Math.min(l*10,100)}%;background:${ok?'var(--g)':'var(--bad)'}"></i></div><p>Vertical : un seul gros serveur, capacité max 4×, coût ≈ ${l*l} u. ${ok?'✅':'❌ <b>saturé</b>'}</p><p>Horizontal : <b>${l} serveur${l>1?'s':''}</b> de base, coût ≈ ${l} u. ✅ la charge est répartie.</p>`}
+$('w1').oninput=w1;w1();
+// 2
+let d2={nom:'Amina'},c2=[];const F={twitter:['twitter','@amina'],hobbies:['hobbies',['lecture','foot']],adresse:['adresse',{ville:'Alger',cp:16000}]};
+function w2(){$('w2n').textContent=JSON.stringify(d2,null,1);$('w2s').textContent='users(id, nom'+c2.map(f=>', '+f).join('')+')\n'+(c2.length?c2.map(f=>'ALTER TABLE users ADD '+f+'…;').join('\n')+'\n→ migration + NULL sur les lignes existantes'+(c2.includes('hobbies')||c2.includes('adresse')?'\n→ tableau/sous-objet : nouvelle table + jointure':''):'schéma inchangé')}
+document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{const f=b.dataset.f;if(!f){d2={nom:'Amina'};c2=[]}else{d2[F[f][0]]=F[f][1];if(!c2.includes(f))c2.push(f)}w2()});w2();
+// 3
+const S=[['Sessions utilisateur à accès ultra rapide (RAM)','Clé-valeur'],['Suggérer les amis d’amis dans un réseau social','Graphes'],['Catalogue produits aux attributs très variables','Documents'],['Historique massif de capteurs IoT, lecture par colonne','Colonnes'],['Profil utilisateur avec adresse et liste de contacts','Documents'],['Cache de pages web','Clé-valeur']];let i3=0,sc=0,done=false;
+function w3(){done=false;$('w3q').textContent=(i3+1)+'/'+S.length+' · '+S[i3][0];$('w3f').textContent='';$('w3s').textContent='Score : '+sc}
+$('w3b').onclick=e=>{if(e.target.tagName!='BUTTON'||done)return;done=true;const ok=e.target.textContent==S[i3][1];if(ok)sc++;$('w3f').textContent=ok?'✅ Correct !':'❌ Réponse : '+S[i3][1];$('w3s').textContent='Score : '+sc};
+$('w3n').onclick=()=>{i3=(i3+1)%S.length;if(!i3)sc=0;w3()};w3();
+// 4
+const T={Table:'Collection',Ligne:'Document (JSON/BSON)','Colonne':'Champ (clé du document)','Jointure':'Sous-documents et tableaux imbriqués','Schéma fixe':'Schéma flexible (+ $jsonSchema optionnel)','INSERT':'insertOne() / insertMany()','SELECT':'find() / findOne()','UPDATE':'updateOne() / updateMany() + $set','DELETE':'deleteOne() / deleteMany()','GROUP BY':'aggregate() avec $group'};
+$('w4b').innerHTML=Object.keys(T).map(k=>'<button>'+k+'</button>').join('');$('w4b').onclick=e=>{if(e.target.tagName=='BUTTON')$('w4o').innerHTML='<b>'+e.target.textContent+'</b> → '+T[e.target.textContent]};$('w4o').textContent='Cliquez un terme.';
+// 5
+const A=[['Le client (Compass, mongosh, application) envoie sa requête à mongos.',0],['mongos interroge les Config Servers : où se trouve la donnée ?',1],['Les Config Servers répondent avec les métadonnées de sharding.',2],['mongos dirige la requête vers le bon shard (un replica set : 1 primary + 2 secondary).',3],['Le résultat remonte au client, qui ignore la répartition.',0]];let a=-1;
+$('w5n').onclick=()=>{a=Math.min(a+1,A.length-1);$('w5t').textContent=(a+1)+'/5 · '+A[a][0];[...$('w5f').children].forEach((s,k)=>s.classList.toggle('on',k==A[a][1]))};
+$('w5r').onclick=()=>{a=-1;$('w5t').textContent='Cliquez pour démarrer.';[...$('w5f').children].forEach(s=>s.classList.remove('on'))};$('w5r').click();
+// 6
+const E=[['Amina',25,'A',14.5],['Ali',22,'B',12],['Sara',23,'A',17],['Yacine',24,'B',9.5],['Lina',22,'C',15],['Omar',26,'C',11]];
+$('w6d').innerHTML='<tr><th>nom</th><th>age</th><th>section</th><th>moyenne</th></tr>'+E.map(r=>'<tr>'+r.map(x=>'<td>'+x+'</td>').join('')+'</tr>').join('');
+function w6(){const m=+$('w6m').value,u=$('w6a').checked,g=$('w6g').checked,s=$('w6s').checked;$('w6v').textContent=m;let r=E.map(x=>({nom:x[0],section:x[2],moyenne:x[3]})),p=[];
+if(u){r=r.filter(x=>x.moyenne>=m);p.push(`{ $match: { moyenne: { $gte: ${m} } } }`)}
+if(g){const o={};r.forEach(x=>(o[x.section]=o[x.section]||[]).push(x.moyenne));r=Object.keys(o).map(k=>({_id:k,moyenneSection:+(o[k].reduce((a,b)=>a+b)/o[k].length).toFixed(2)}));p.push('{ $group: { _id: "$section", moyenneSection: { $avg: "$moyenne" } } }')}
+if(s){const k=g?'moyenneSection':'moyenne';r.sort((a,b)=>b[k]-a[k]);p.push(`{ $sort: { ${k}: -1 } }`)}
+$('w6p').textContent='db.etudiants.aggregate([\n  '+p.join(',\n  ')+'\n])';$('w6o').textContent=r.length?r.map(x=>JSON.stringify(x)).join('\n'):'(aucun résultat)'}
+['w6m','w6a','w6g','w6s'].forEach(i=>$(i).oninput=w6);w6();
+// 7
+$('w7b').onclick=()=>{const n=$('w7n').value.trim(),m=$('w7m').value.trim(),x=+m;let e='';if(!n)e='nom est obligatoire (required).';else if(m===''||isNaN(x))e='moyenne doit être un nombre (bsonType: double).';else if(x<0||x>20)e='La moyenne doit être entre 0 et 20.';$('w7o').textContent=`db.etudiants.insertOne({ nom: "${n}", moyenne: ${m} })\n`+(e?'❌ Document failed validation : '+e:'✅ { acknowledged: true, insertedId: ObjectId(…) }')};$('w7b').click();
+function w7(){const n=+$('w7r').value,i=$('w7i').checked;$('w7rv').textContent=n.toLocaleString('fr-FR')+' docs';$('w7x').innerHTML=i?'Avec index : <b>1 document</b> examiné (IXSCAN). ⚠️ Chaque insertion doit aussi mettre à jour l’index.':'Sans index : jusqu’à <b>'+n.toLocaleString('fr-FR')+' documents</b> examinés (COLLSCAN).'}
+$('w7r').oninput=$('w7i').oninput=w7;w7();
+// 8
+const P=[['Amina',25,'A'],['Ali',22,'D'],['Sara',23,'A'],['Yacine',24,'B'],['Lina',22,'C'],['Omar',26,'D']];
+$('w8d').innerHTML='<tr><th>nom</th><th>age</th><th>status</th></tr>'+P.map(r=>'<tr>'+r.map(x=>'<td>'+x+'</td>').join('')+'</tr>').join('');
+function w8(){const o=$('w8o').value,v=+$('w8v').value,f={$eq:a=>a==v,$ne:a=>a!=v,$gt:a=>a>v,$gte:a=>a>=v,$lt:a=>a<v,$lte:a=>a<=v}[o];$('w8q').textContent=`db.users.find({ age: { ${o}: ${v} } })`;const r=P.filter(x=>f(x[1]));$('w8r').textContent=r.length?'→ '+r.map(x=>x[0]+' ('+x[1]+')').join(', '):'→ aucun résultat'}
+$('w8o').onchange=$('w8v').oninput=w8;w8();
+const V=[['"Amina"','string'],['25','int'],['3000000000','long'],['14.5','double'],['true','bool'],['["a", "b"]','array'],['{ ville: "Alger" }','object'],['ISODate("2024-01-15")','date'],['ObjectId("65a1…")','objectId'],['null','null']];let i9=0;
+$('w9b').innerHTML=['object','string','int','long','double','bool','array','date','objectId','null'].map(t=>'<button>'+t+'</button>').join('');
+function w9(){$('w9v').textContent=V[i9][0];$('w9f').textContent=''}
+$('w9b').onclick=e=>{if(e.target.tagName=='BUTTON')$('w9f').textContent=e.target.textContent==V[i9][1]?'✅ Correct !':'❌ Réessayez.'};$('w9n').onclick=()=>{i9=(i9+1)%V.length;w9()};w9();
+
+
+})();</script>
+<script src="../../assets/annotate.js" defer></script>
+</body>
+</html>
