@@ -592,6 +592,18 @@ ${body}</body></html>`;
     document.addEventListener('visibilitychange', () => { if (!document.hidden) qPoll(); });
     ['rp-last', 'rp-grp'].forEach(i => document.getElementById(i).addEventListener('change', qPoll));
   }
+  // ---- live progress for the instructor's dashboard (sent when the work changes, and every 2 min) ----
+  let lastSnap = '', lastSent = 0;
+  function snap() {
+    return JSON.stringify([who(), [...DONE].sort(), ET.etapes.filter(e => W[e.id] && (W[e.id].code.trim() || W[e.id].imgs.length)).map(e => e.id), counts().caps]);
+  }
+  async function ping() {
+    const p = who(); if (!API || !p.group || !p.last) return;
+    const s = snap(); if (s === lastSnap && Date.now() - lastSent < 120000) return;
+    lastSnap = s; lastSent = Date.now(); const a = JSON.parse(s);
+    try { await fetch(API, { method: 'POST', body: JSON.stringify(Object.assign({ action: 'progress', done: a[1], work: a[2], caps: a[3], lang: LANG }, p)) }); } catch (e) { lastSnap = ''; }
+  }
+  function live() { if (!API) return; setTimeout(ping, 3000); setInterval(ping, 20000); }
   function mountReport() {
     const s = document.createElement('section'); s.id = 'report';
     s.innerHTML = `<h2>${T('My report', 'Mon rapport')}</h2>
@@ -618,7 +630,7 @@ ${body}</body></html>`;
     db = await idb();
     for (const e of ET.etapes) W[e.id] = { code: lsGet(CK + e.id) || '', imgs: await getImgs(e.id) };
     ET.etapes.filter(e => e.capture !== false).forEach(mount);
-    mountReport(); mountParts(); status(); quiz(); questions();
+    mountReport(); mountParts(); status(); quiz(); questions(); live();
   }
   function quiz() {
     if (!window.QcmCore) return;
