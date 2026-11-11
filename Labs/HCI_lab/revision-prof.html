@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Revision Lab – Teacher Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f5f1;--ink:#14231c;--mut:#4f6158;--g:#1f7a4d;--g2:#dcebe1;--am:#e6a92b;--line:#c9d8cf;--bad:#b3261e;--card:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Bricolage Grotesque",system-ui,sans-serif}
+.top{background:var(--g);color:#fff;padding:12px 20px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;position:sticky;top:0;z-index:5}
+.top h1{margin:0;font-size:20px}
+.top .sp{flex:1}
+.chip{background:rgba(255,255,255,.16);border-radius:999px;padding:3px 12px}
+.wrap{padding:16px 20px;max-width:1500px;margin:0 auto}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:0 0 14px}
+input,select{padding:7px 10px;border:1px solid var(--line);border-radius:9px;font:inherit}
+button{border:0;border-radius:10px;padding:8px 14px;font:700 14px inherit;cursor:pointer;background:var(--g);color:#fff}
+button.alt{background:var(--g2);color:var(--g)}
+button.am{background:var(--am);color:#1d1606}
+button.red{background:var(--bad)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.kpi b{display:block;font-size:28px}
+.kpi.bad{border-color:var(--bad);background:#fdf0ef}
+.grid{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(320px,1fr);gap:14px}
+@media(max-width:1100px){.grid{grid-template-columns:1fr}}
+table{border-collapse:collapse;width:100%;background:var(--card)}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;font-size:14px;vertical-align:top}
+th{background:var(--g2);position:sticky;top:56px;cursor:pointer}
+.st{display:inline-block;border-radius:999px;padding:1px 9px;font-weight:700;font-size:12.5px}
+.st.active{background:#d8f0e0;color:var(--g)}
+.st.away{background:#f9dedc;color:var(--bad)}
+.st.closed,.st.lost{background:#fde7c2;color:#7a4a00}
+.st.quit{background:#e3e7f2;color:#2c3a64}
+tr.alert td{background:#fdf0ef}
+.feed{max-height:70vh;overflow:auto}
+.ev{border-left:4px solid var(--line);padding:4px 10px;margin:4px 0;background:var(--card);border-radius:0 8px 8px 0}
+.ev.leave,.ev.offline,.ev.close{border-color:var(--bad);background:#fdf0ef}
+.ev.back{border-color:var(--am)}
+.ev.quit{border-color:#2c3a64}
+.ev small{color:var(--mut)}
+.toast{position:fixed;right:16px;bottom:16px;z-index:9;display:flex;flex-direction:column;gap:8px}
+.toast div{background:var(--bad);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:380px}
+.mut{color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="top"><h1>Revision lab · teacher dashboard</h1><span class="chip" id="t-state">not connected</span><span class="chip" id="t-code">code: –</span><span class="chip" id="t-time">–</span><span class="sp"></span>
+<button class="alt" type="button" id="b-notif">🔔 Allow notifications</button><button class="alt" type="button" id="b-sound">🔊 Sound on</button></div>
+<div class="wrap">
+<div class="box" id="login"><div class="row"><b>Teacher key</b><input id="key" type="password" placeholder="TEACHER_KEY of the Apps Script"><button type="button" id="b-key">Connect</button><span class="mut" id="k-msg"></span></div>
+<p class="mut" style="margin:6px 0 0">The key stays in this browser only. The server URL comes from <code>revision-config.js</code>.</p></div>
+<div class="box"><div class="row"><b>Session</b> code <input id="code" size="10" autocapitalize="characters"> <button type="button" id="b-open">Open the session</button><button class="am" type="button" id="b-close">Close the session</button>
+<span class="sp" style="flex:1"></span><button class="alt" type="button" id="b-csv">⬇ Export CSV</button><button class="red" type="button" id="b-reset">Clear all data…</button></div>
+<p class="mut" style="margin:6px 0 0">Write the code on the board and open the session: students cannot start before. Close it at the end of the 3 hours. Alerts (left the page, offline, page closed) ring and appear on the right.</p></div>
+<div class="cards"><div class="kpi"><span>Joined</span><b id="k-all">0</b></div><div class="kpi"><span>Working now</span><b id="k-act">0</b></div><div class="kpi" id="kp-away"><span>Away / no signal</span><b id="k-away">0</b></div><div class="kpi"><span>Quit the session</span><b id="k-quit">0</b></div><div class="kpi"><span>Average steps</span><b id="k-steps">0</b></div><div class="kpi"><span>Average quiz</span><b id="k-quiz">–</b></div></div>
+<div class="grid">
+<div><table id="tab"><thead><tr><th data-k="name">Student</th><th data-k="Status">Status</th><th data-k="Current step">Now on</th><th data-k="steps">Steps</th><th data-k="Checks">Checks</th><th data-k="Leaves">Left page</th><th data-k="Offline">Offline</th><th data-k="Quiz">Quiz</th><th data-k="seen">Last signal</th><th data-k="Quit at">Quit at</th></tr></thead><tbody></tbody></table></div>
+<div><div class="box"><b>Live events</b> <span class="mut">(newest first)</span><div class="row" style="margin-top:6px"><label><input type="checkbox" id="only-al"> alerts only</label></div></div><div class="feed" id="feed"></div></div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="revision-config.js"></script>
+<script>
+(function(){
+'use strict';
+const API=(window.REV_API||'').trim(), KK='hci-rev-prof-key';
+const $=s=>document.querySelector(s);
+let KEY='';try{KEY=localStorage.getItem(KK)||'';}catch(e){}
+let since=0,events=[],students=[],sortK='name',sortD=1,sound=true,first=true,serverOffset=0;
+const ALERT=['leave','offline','close'];
+const LABEL={join:'joined',rejoin:'reopened the page',leave:'LEFT THE PAGE',back:'came back',offline:'WAS OFFLINE',close:'CLOSED THE PAGE',step:'step',quiz:'final quiz',quizstart:'started the quiz',quit:'quit the session',help:'opened the help'};
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function call(b){const r=await fetch(API,{method:'POST',body:JSON.stringify(Object.assign({key:KEY},b))});return r.json();}
+function beep(){if(!sound)return;try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=880;o.connect(g);g.connect(a.destination);g.gain.setValueAtTime(.25,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.5);o.start();o.stop(a.currentTime+.5);}catch(e){}}
+function notify(ev){
+  const t=ev.name+' — '+(LABEL[ev.type]||ev.type);
+  const d=document.createElement('div');d.textContent='🔔 '+t+(ev.detail?' · '+ev.detail:'');$('#toast').prepend(d);setTimeout(()=>d.remove(),15000);
+  try{if('Notification' in window&&Notification.permission==='granted')new Notification('Revision lab: '+t,{body:ev.detail||'',tag:'rev'+ev.id});}catch(e){}
+}
+async function load(){
+  if(!API){$('#t-state').textContent='no server: fill revision-config.js';return;}
+  if(!KEY)return;
+  try{
+    const j=await call({action:'dash',since});
+    if(!j.ok){$('#k-msg').textContent=j.error==='wrong key'?'Wrong key.':j.error;$('#t-state').textContent='not connected';return;}
+    $('#login').hidden=true;$('#t-state').textContent=j.open?'● session OPEN':'○ session closed';$('#t-code').textContent='code: '+j.code;$('#t-time').textContent='server '+j.now;
+    serverOffset=j.serverTime-Date.now();
+    if(document.activeElement!==$('#code'))$('#code').value=j.code;
+    students=j.students;
+    const nw=j.events||[];
+    if(nw.length){if(!first)nw.filter(e=>ALERT.includes(e.type)).forEach(e=>{notify(e);beep();});events=events.concat(nw);since=Math.max(...nw.map(e=>+e.id),since);}
+    first=false;render();
+  }catch(e){$('#t-state').textContent='○ connection problem';}
+}
+function status(s){
+  if(s.Status==='quit')return'quit';
+  const age=(Date.now()+serverOffset-Number(s['Last seen']||0))/1000;
+  if(s.Status==='away')return'away';
+  if(s.Status==='closed')return'closed';
+  if(age>150)return'lost';
+  return'active';
+}
+const SN={active:'working',away:'away',closed:'page closed',lost:'no signal',quit:'quit'};
+function render(){
+  const rows=students.map(s=>({s,name:(s['Last name']+' '+s['First name']).trim(),st:status(s),steps:String(s['Steps done']||'').split(' ').filter(Boolean).length,seen:Number(s['Last seen']||0)}));
+  rows.sort((a,b)=>{let x,y;if(sortK==='name'){x=a.name;y=b.name;}else if(sortK==='steps'){x=a.steps;y=b.steps;}else if(sortK==='seen'){x=a.seen;y=b.seen;}else if(sortK==='Status'){x=a.st;y=b.st;}else{x=a.s[sortK];y=b.s[sortK];}return(x>y?1:x<y?-1:0)*sortD;});
+  $('#tab tbody').innerHTML=rows.map(r=>{const s=r.s,ago=r.seen?Math.round((Date.now()+serverOffset-r.seen)/1000):'';
+    return'<tr class="'+(['away','closed','lost'].includes(r.st)?'alert':'')+'"><td><b>'+esc(r.name)+'</b><br><small class="mut">'+esc(s.Email)+'</small></td><td><span class="st '+r.st+'">'+SN[r.st]+'</span></td><td>'+esc(s['Current step'])+'</td><td>'+r.steps+' / 7<br><small class="mut">'+esc(s['Steps done'])+'</small></td><td>'+esc(s.Checks)+'</td><td>'+esc(s.Leaves||0)+(s['Away (s)']?'<br><small class="mut">'+esc(s['Away (s)'])+' s</small>':'')+'</td><td>'+esc(s.Offline||0)+'</td><td>'+esc(s.Quiz)+'</td><td>'+(ago===''?'':ago<90?ago+' s ago':Math.round(ago/60)+' min ago')+'</td><td>'+esc(s['Quit at'])+'</td></tr>';}).join('')||'<tr><td colspan="10" class="mut">No student yet.</td></tr>';
+  const c=k=>rows.filter(r=>r.st===k).length;
+  $('#k-all').textContent=rows.length;$('#k-act').textContent=c('active');$('#k-away').textContent=c('away')+c('lost')+c('closed');$('#k-quit').textContent=c('quit');
+  $('#kp-away').classList.toggle('bad',c('away')+c('lost')+c('closed')>0);
+  $('#k-steps').textContent=rows.length?(rows.reduce((a,r)=>a+r.steps,0)/rows.length).toFixed(1):'0';
+  const qs=rows.map(r=>parseFloat(String(r.s.Quiz).split('/')[0])).filter(x=>!isNaN(x));$('#k-quiz').textContent=qs.length?(qs.reduce((a,b)=>a+b,0)/qs.length).toFixed(1)+' / 12':'–';
+  const only=$('#only-al').checked;
+  $('#feed').innerHTML=events.slice().reverse().filter(e=>!only||ALERT.includes(e.type)).slice(0,250).map(e=>'<div class="ev '+esc(e.type)+'"><small>'+esc(e.time)+'</small> <b>'+esc(e.name)+'</b> '+esc(LABEL[e.type]||e.type)+(e.detail?'<br><small>'+esc(e.detail)+'</small>':'')+'</div>').join('')||'<p class="mut">No event yet.</p>';
+}
+document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;sortD=sortK===k?-sortD:1;sortK=k;render();});
+$('#only-al').onchange=render;
+$('#b-key').onclick=()=>{KEY=$('#key').value.trim();try{localStorage.setItem(KK,KEY);}catch(e){}first=true;since=0;events=[];load();};
+$('#b-open').onclick=async()=>{await call({action:'config',code:$('#code').value.trim(),open:'yes'});load();};
+$('#b-close').onclick=async()=>{await call({action:'config',open:'no'});load();};
+$('#b-reset').onclick=async()=>{const w=prompt('This deletes all students and events of the revision lab. Type DELETE to confirm.');if(w==='DELETE'){await call({action:'reset'});since=0;events=[];first=true;load();}};
+$('#b-notif').onclick=()=>{try{Notification.requestPermission().then(p=>{$('#b-notif').textContent=p==='granted'?'🔔 Notifications on':'🔕 Notifications blocked';});}catch(e){}beep();};
+$('#b-sound').onclick=()=>{sound=!sound;$('#b-sound').textContent=sound?'🔊 Sound on':'🔇 Sound off';if(sound)beep();};
+$('#b-csv').onclick=()=>{const H=['Email','Last name','First name','Status','Steps done','Checks','Leaves','Away (s)','Offline','Quiz','Quiz details','Joined','Quit at','Summary'];
+  const csv=[H].concat(students.map(s=>H.map(h=>s[h]))).map(r=>r.map(v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));a.download='revision-lab-results.csv';a.click();};
+try{if('Notification' in window&&Notification.permission==='granted')$('#b-notif').textContent='🔔 Notifications on';}catch(e){}
+if(KEY){$('#key').value=KEY;load();}
+setInterval(load,8000);setInterval(render,15000);
+})();
+</script>
+</body>
+</html>
