@@ -75,8 +75,8 @@ const API=(window.REV_API||'').trim(), KK='hci-rev-prof-key';
 const $=s=>document.querySelector(s);
 let KEY='';try{KEY=localStorage.getItem(KK)||'';}catch(e){}
 let since=0,events=[],students=[],sortK='name',sortD=1,sound=true,first=true,serverOffset=0;
-const ALERT=['leave','offline','close'];
-const LABEL={join:'joined',rejoin:'reopened the page',leave:'LEFT THE QUIZ',back:'came back',offline:'WAS OFFLINE',close:'CLOSED THE PAGE',step:'step',quiz:'final quiz',quizstart:'started the quiz',quit:'quit the session',help:'opened the help'};
+const ALERT=['leave','offline','close','shot'];
+const LABEL={join:'joined',rejoin:'reopened the page',leave:'LEFT THE QUIZ',shot:'TRIED A SCREENSHOT',back:'came back',offline:'WAS OFFLINE',close:'CLOSED THE PAGE',step:'step',quiz:'final quiz',quizstart:'started the quiz',quit:'quit the session',help:'opened the help'};
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let busy=false;
 async function call(b){const r=await fetch(API,{method:'POST',body:JSON.stringify(Object.assign({key:KEY},b))});return r.json();}
