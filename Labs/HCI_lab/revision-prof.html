@@ -55,7 +55,7 @@ tr.alert td{background:#fdf0ef}
 <div class="top"><h1>Interface components (overview) · teacher dashboard</h1><span class="chip" id="t-state">not connected</span><span class="chip" id="t-code">code: –</span><span class="chip" id="t-time">–</span><span class="sp"></span>
 <button class="alt" type="button" id="b-notif">🔔 Allow notifications</button><button class="alt" type="button" id="b-sound">🔊 Sound on</button></div>
 <div class="wrap">
-<div class="box" id="login"><div class="row"><b>Teacher key</b><input id="key" type="password" placeholder="TEACHER_KEY of the Apps Script"><button type="button" id="b-key">Connect</button><span class="mut" id="k-msg"></span></div>
+<div class="box" id="login"><div class="row"><b>Teacher key</b><input id="key" type="text" autocomplete="off" spellcheck="false" placeholder="TEACHER_KEY of the Apps Script"><button type="button" id="b-key">Connect</button><span class="mut" id="k-msg"></span></div>
 <p class="mut" style="margin:6px 0 0">The key stays in this browser only. The server URL comes from <code>revision-config.js</code>.</p></div>
 <div class="box"><div class="row"><b>Session</b> code <input id="code" size="10" autocapitalize="characters"> <button type="button" id="b-open">Open the session</button><button class="am" type="button" id="b-close">Close the session</button> <span class="sess" id="sess" role="status" aria-live="polite">–</span>
 <span class="sp" style="flex:1"></span><button class="alt" type="button" id="b-csv">⬇ Export CSV</button><button class="red" type="button" id="b-reset">Clear all data…</button></div>
@@ -125,7 +125,8 @@ function render(){
 }
 document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;sortD=sortK===k?-sortD:1;sortK=k;render();});
 $('#only-al').onchange=render;
-$('#b-key').onclick=()=>{KEY=$('#key').value.trim();try{localStorage.setItem(KK,KEY);}catch(e){}first=true;since=0;events=[];load();};
+$('#key').addEventListener('keydown',e=>{if(e.key==='Enter')$('#b-key').click();});
+$('#b-key').onclick=()=>{KEY=$('#key').value.replace(/\s+/g,'').toUpperCase();$('#k-msg').textContent=KEY?'Connecting…':'Type the key.';if(!KEY)return;try{localStorage.setItem(KK,KEY);}catch(e){}first=true;since=0;events=[];load();};
 function say(t,good){const d=document.createElement('div');if(good)d.className='good';d.textContent=t;$('#toast').prepend(d);setTimeout(()=>d.remove(),8000);}
 async function setSession(open){
   const code=$('#code').value.trim(),s=$('#sess'),bo=$('#b-open'),bc=$('#b-close');
