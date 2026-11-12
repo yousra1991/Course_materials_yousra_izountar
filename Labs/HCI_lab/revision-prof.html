@@ -44,6 +44,9 @@ tr.alert td{background:#fdf0ef}
 .ev.quit{border-color:#2c3a64}
 .ev small{color:var(--mut)}
 .toast{position:fixed;right:16px;bottom:16px;z-index:9;display:flex;flex-direction:column;gap:8px}
+.toast div.good{background:#1f7a4d}
+.sess{display:inline-block;border-radius:999px;padding:5px 14px;font-weight:700;font-size:15px;background:#e6e9e7;color:#4b5a52}
+.sess.open{background:#1f7a4d;color:#fff}.sess.shut{background:#b3261e;color:#fff}.sess.err{background:#fff3cd;color:#7a5200}
 .toast div{background:var(--bad);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:380px}
 .mut{color:var(--mut)}
 </style>
@@ -54,7 +57,7 @@ tr.alert td{background:#fdf0ef}
 <div class="wrap">
 <div class="box" id="login"><div class="row"><b>Teacher key</b><input id="key" type="password" placeholder="TEACHER_KEY of the Apps Script"><button type="button" id="b-key">Connect</button><span class="mut" id="k-msg"></span></div>
 <p class="mut" style="margin:6px 0 0">The key stays in this browser only. The server URL comes from <code>revision-config.js</code>.</p></div>
-<div class="box"><div class="row"><b>Session</b> code <input id="code" size="10" autocapitalize="characters"> <button type="button" id="b-open">Open the session</button><button class="am" type="button" id="b-close">Close the session</button>
+<div class="box"><div class="row"><b>Session</b> code <input id="code" size="10" autocapitalize="characters"> <button type="button" id="b-open">Open the session</button><button class="am" type="button" id="b-close">Close the session</button> <span class="sess" id="sess" role="status" aria-live="polite">–</span>
 <span class="sp" style="flex:1"></span><button class="alt" type="button" id="b-csv">⬇ Export CSV</button><button class="red" type="button" id="b-reset">Clear all data…</button></div>
 <p class="mut" style="margin:6px 0 0">Write the code on the board and open the session: students cannot start before. Close it at the end of the 3 hours. Alerts (left the page, offline, page closed) ring and appear on the right.</p></div>
 <div class="cards"><div class="kpi"><span>Joined</span><b id="k-all">0</b></div><div class="kpi"><span>Working now</span><b id="k-act">0</b></div><div class="kpi" id="kp-away"><span>Away / no signal</span><b id="k-away">0</b></div><div class="kpi"><span>Quit the session</span><b id="k-quit">0</b></div><div class="kpi"><span>Average steps</span><b id="k-steps">0</b></div><div class="kpi"><span>Average quiz</span><b id="k-quiz">–</b></div></div>
@@ -75,6 +78,7 @@ let since=0,events=[],students=[],sortK='name',sortD=1,sound=true,first=true,ser
 const ALERT=['leave','offline','close'];
 const LABEL={join:'joined',rejoin:'reopened the page',leave:'LEFT THE QUIZ',back:'came back',offline:'WAS OFFLINE',close:'CLOSED THE PAGE',step:'step',quiz:'final quiz',quizstart:'started the quiz',quit:'quit the session',help:'opened the help'};
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let busy=false;
 async function call(b){const r=await fetch(API,{method:'POST',body:JSON.stringify(Object.assign({key:KEY},b))});return r.json();}
 function beep(){if(!sound)return;try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=880;o.connect(g);g.connect(a.destination);g.gain.setValueAtTime(.25,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.5);o.start();o.stop(a.currentTime+.5);}catch(e){}}
 function notify(ev){
@@ -88,7 +92,7 @@ async function load(){
   try{
     const j=await call({action:'dash',since});
     if(!j.ok){$('#k-msg').textContent=j.error==='wrong key'?'Wrong key.':j.error;$('#t-state').textContent='not connected';return;}
-    $('#login').hidden=true;$('#t-state').textContent=j.open?'● session OPEN':'○ session closed';$('#t-code').textContent='code: '+j.code;$('#t-time').textContent='server '+j.now;
+    $('#login').hidden=true;$('#t-state').textContent=j.open?'● session OPEN':'○ session closed';if(!busy){const s=$('#sess');s.className='sess '+(j.open?'open':'shut');s.textContent=j.open?'● OPEN · code '+j.code+' · students can enter':'○ CLOSED · students cannot enter';}$('#t-code').textContent='code: '+j.code;$('#t-time').textContent='server '+j.now;
     serverOffset=j.serverTime-Date.now();
     if(document.activeElement!==$('#code'))$('#code').value=j.code;
     students=j.students;
@@ -122,8 +126,21 @@ function render(){
 document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;sortD=sortK===k?-sortD:1;sortK=k;render();});
 $('#only-al').onchange=render;
 $('#b-key').onclick=()=>{KEY=$('#key').value.trim();try{localStorage.setItem(KK,KEY);}catch(e){}first=true;since=0;events=[];load();};
-$('#b-open').onclick=async()=>{await call({action:'config',code:$('#code').value.trim(),open:'yes'});load();};
-$('#b-close').onclick=async()=>{await call({action:'config',open:'no'});load();};
+function say(t,good){const d=document.createElement('div');if(good)d.className='good';d.textContent=t;$('#toast').prepend(d);setTimeout(()=>d.remove(),8000);}
+async function setSession(open){
+  const code=$('#code').value.trim(),s=$('#sess'),bo=$('#b-open'),bc=$('#b-close');
+  if(open&&!code){s.className='sess err';s.textContent='Type a session code first.';$('#code').focus();return;}
+  busy=true;bo.disabled=bc.disabled=true;s.className='sess';s.textContent=open?'Opening the session…':'Closing the session…';
+  try{
+    const j=await call(open?{action:'config',code:code,open:'yes'}:{action:'config',open:'no'});
+    if(!j.ok)throw new Error(j.error||'error');
+    busy=false;await load();
+    say(j.open?'✔ Session opened at '+j.now+' with the code '+j.code+'. Students can enter now.':'✔ Session closed at '+j.now+'. New students cannot enter.',true);
+  }catch(e){busy=false;s.className='sess err';s.textContent='⚠ Not done: '+(String(e.message)==='wrong key'?'wrong teacher key':'connection problem')+'. Try again.';}
+  bo.disabled=bc.disabled=false;
+}
+$('#b-open').onclick=()=>setSession(true);
+$('#b-close').onclick=()=>setSession(false);
 $('#b-reset').onclick=async()=>{const w=prompt('This deletes all students and events of this lab. Type DELETE to confirm.');if(w==='DELETE'){await call({action:'reset'});since=0;events=[];first=true;load();}};
 $('#b-notif').onclick=()=>{try{Notification.requestPermission().then(p=>{$('#b-notif').textContent=p==='granted'?'🔔 Notifications on':'🔕 Notifications blocked';});}catch(e){}beep();};
 $('#b-sound').onclick=()=>{sound=!sound;$('#b-sound').textContent=sound?'🔊 Sound on':'🔇 Sound off';if(sound)beep();};
