@@ -249,7 +249,7 @@ public class BookForm extends JFrame {
 <tr><td>The window freezes</td><td>Remove <code>Thread.sleep</code>; use <code>javax.swing.Timer</code>.</td></tr>
 <tr><td><code>';' expected</code> / <code>reached end of file</code></td><td>A <code>;</code>, <code>)</code> or <code>}</code> is missing on the line shown or just before.</td></tr></table></div></details></div></div>
 
-<script src="revision-config.js"></script>
+<script>document.write('<script src="revision-config.js?v=' + Date.now() + '"><\/script>');</script>
 <script>
 (function () {
 'use strict';
@@ -310,6 +310,8 @@ function startLab() {
   if (st.demo) setNet(false, 'practice: not followed'); else ping();
   restore(); refresh();
 }
+// a practice session never blocks the real one: once the teacher has activated the lab, start fresh
+if (API && st.demo) { try { localStorage.removeItem(LS); } catch (e) {} Object.keys(st).forEach(k => delete st[k]); st.done = []; st.checks = {}; st.leaves = 0; st.away = 0; }
 if (st.quit) { gate.hidden = true; lockPage(); }
 else if (st.joined && st.demo) startLab();
 else if (st.joined && API) {
