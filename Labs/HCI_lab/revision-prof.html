@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Revision Lab – Teacher Dashboard</title>
+<title>Interface Components Lab – Teacher Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f2f5f1;--ink:#14231c;--mut:#4f6158;--g:#1f7a4d;--g2:#dcebe1;--am:#e6a92b;--line:#c9d8cf;--bad:#b3261e;--card:#fff}
@@ -49,7 +49,7 @@ tr.alert td{background:#fdf0ef}
 </style>
 </head>
 <body>
-<div class="top"><h1>Revision lab · teacher dashboard</h1><span class="chip" id="t-state">not connected</span><span class="chip" id="t-code">code: –</span><span class="chip" id="t-time">–</span><span class="sp"></span>
+<div class="top"><h1>Interface components (overview) · teacher dashboard</h1><span class="chip" id="t-state">not connected</span><span class="chip" id="t-code">code: –</span><span class="chip" id="t-time">–</span><span class="sp"></span>
 <button class="alt" type="button" id="b-notif">🔔 Allow notifications</button><button class="alt" type="button" id="b-sound">🔊 Sound on</button></div>
 <div class="wrap">
 <div class="box" id="login"><div class="row"><b>Teacher key</b><input id="key" type="password" placeholder="TEACHER_KEY of the Apps Script"><button type="button" id="b-key">Connect</button><span class="mut" id="k-msg"></span></div>
@@ -59,7 +59,7 @@ tr.alert td{background:#fdf0ef}
 <p class="mut" style="margin:6px 0 0">Write the code on the board and open the session: students cannot start before. Close it at the end of the 3 hours. Alerts (left the page, offline, page closed) ring and appear on the right.</p></div>
 <div class="cards"><div class="kpi"><span>Joined</span><b id="k-all">0</b></div><div class="kpi"><span>Working now</span><b id="k-act">0</b></div><div class="kpi" id="kp-away"><span>Away / no signal</span><b id="k-away">0</b></div><div class="kpi"><span>Quit the session</span><b id="k-quit">0</b></div><div class="kpi"><span>Average steps</span><b id="k-steps">0</b></div><div class="kpi"><span>Average quiz</span><b id="k-quiz">–</b></div></div>
 <div class="grid">
-<div><table id="tab"><thead><tr><th data-k="name">Student</th><th data-k="Status">Status</th><th data-k="Current step">Now on</th><th data-k="steps">Steps</th><th data-k="Checks">Checks</th><th data-k="Leaves">Left page</th><th data-k="Offline">Offline</th><th data-k="Quiz">Quiz</th><th data-k="seen">Last signal</th><th data-k="Quit at">Quit at</th></tr></thead><tbody></tbody></table></div>
+<div><table id="tab"><thead><tr><th data-k="name">Student</th><th data-k="Status">Status</th><th data-k="Current step">Now on</th><th data-k="steps">Steps</th><th data-k="Checks">Checks</th><th data-k="Leaves">Left quiz</th><th data-k="Offline">Offline</th><th data-k="Quiz">Quiz</th><th data-k="seen">Last signal</th><th data-k="Quit at">Quit at</th></tr></thead><tbody></tbody></table></div>
 <div><div class="box"><b>Live events</b> <span class="mut">(newest first)</span><div class="row" style="margin-top:6px"><label><input type="checkbox" id="only-al"> alerts only</label></div></div><div class="feed" id="feed"></div></div>
 </div>
 </div>
@@ -73,14 +73,14 @@ const $=s=>document.querySelector(s);
 let KEY='';try{KEY=localStorage.getItem(KK)||'';}catch(e){}
 let since=0,events=[],students=[],sortK='name',sortD=1,sound=true,first=true,serverOffset=0;
 const ALERT=['leave','offline','close'];
-const LABEL={join:'joined',rejoin:'reopened the page',leave:'LEFT THE PAGE',back:'came back',offline:'WAS OFFLINE',close:'CLOSED THE PAGE',step:'step',quiz:'final quiz',quizstart:'started the quiz',quit:'quit the session',help:'opened the help'};
+const LABEL={join:'joined',rejoin:'reopened the page',leave:'LEFT THE QUIZ',back:'came back',offline:'WAS OFFLINE',close:'CLOSED THE PAGE',step:'step',quiz:'final quiz',quizstart:'started the quiz',quit:'quit the session',help:'opened the help'};
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 async function call(b){const r=await fetch(API,{method:'POST',body:JSON.stringify(Object.assign({key:KEY},b))});return r.json();}
 function beep(){if(!sound)return;try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=880;o.connect(g);g.connect(a.destination);g.gain.setValueAtTime(.25,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.5);o.start();o.stop(a.currentTime+.5);}catch(e){}}
 function notify(ev){
   const t=ev.name+' — '+(LABEL[ev.type]||ev.type);
   const d=document.createElement('div');d.textContent='🔔 '+t+(ev.detail?' · '+ev.detail:'');$('#toast').prepend(d);setTimeout(()=>d.remove(),15000);
-  try{if('Notification' in window&&Notification.permission==='granted')new Notification('Revision lab: '+t,{body:ev.detail||'',tag:'rev'+ev.id});}catch(e){}
+  try{if('Notification' in window&&Notification.permission==='granted')new Notification('Interface components lab: '+t,{body:ev.detail||'',tag:'rev'+ev.id});}catch(e){}
 }
 async function load(){
   if(!API){$('#t-state').textContent='no server: fill revision-config.js';return;}
@@ -110,7 +110,7 @@ function render(){
   const rows=students.map(s=>({s,name:(s['Last name']+' '+s['First name']).trim(),st:status(s),steps:String(s['Steps done']||'').split(' ').filter(Boolean).length,seen:Number(s['Last seen']||0)}));
   rows.sort((a,b)=>{let x,y;if(sortK==='name'){x=a.name;y=b.name;}else if(sortK==='steps'){x=a.steps;y=b.steps;}else if(sortK==='seen'){x=a.seen;y=b.seen;}else if(sortK==='Status'){x=a.st;y=b.st;}else{x=a.s[sortK];y=b.s[sortK];}return(x>y?1:x<y?-1:0)*sortD;});
   $('#tab tbody').innerHTML=rows.map(r=>{const s=r.s,ago=r.seen?Math.round((Date.now()+serverOffset-r.seen)/1000):'';
-    return'<tr class="'+(['away','closed','lost'].includes(r.st)?'alert':'')+'"><td><b>'+esc(r.name)+'</b><br><small class="mut">'+esc(s.Email)+'</small></td><td><span class="st '+r.st+'">'+SN[r.st]+'</span></td><td>'+esc(s['Current step'])+'</td><td>'+r.steps+' / 7<br><small class="mut">'+esc(s['Steps done'])+'</small></td><td>'+esc(s.Checks)+'</td><td>'+esc(s.Leaves||0)+(s['Away (s)']?'<br><small class="mut">'+esc(s['Away (s)'])+' s</small>':'')+'</td><td>'+esc(s.Offline||0)+'</td><td>'+esc(s.Quiz)+'</td><td>'+(ago===''?'':ago<90?ago+' s ago':Math.round(ago/60)+' min ago')+'</td><td>'+esc(s['Quit at'])+'</td></tr>';}).join('')||'<tr><td colspan="10" class="mut">No student yet.</td></tr>';
+    return'<tr class="'+(['away','closed','lost'].includes(r.st)?'alert':'')+'"><td><b>'+esc(r.name)+'</b><br><small class="mut">'+esc(s.Email)+'</small></td><td><span class="st '+r.st+'">'+SN[r.st]+'</span></td><td>'+esc(s['Current step'])+'</td><td>'+r.steps+' / 6<br><small class="mut">'+esc(s['Steps done'])+'</small></td><td>'+esc(s.Checks)+'</td><td>'+esc(s.Leaves||0)+(s['Away (s)']?'<br><small class="mut">'+esc(s['Away (s)'])+' s</small>':'')+'</td><td>'+esc(s.Offline||0)+'</td><td>'+esc(s.Quiz)+'</td><td>'+(ago===''?'':ago<90?ago+' s ago':Math.round(ago/60)+' min ago')+'</td><td>'+esc(s['Quit at'])+'</td></tr>';}).join('')||'<tr><td colspan="10" class="mut">No student yet.</td></tr>';
   const c=k=>rows.filter(r=>r.st===k).length;
   $('#k-all').textContent=rows.length;$('#k-act').textContent=c('active');$('#k-away').textContent=c('away')+c('lost')+c('closed');$('#k-quit').textContent=c('quit');
   $('#kp-away').classList.toggle('bad',c('away')+c('lost')+c('closed')>0);
@@ -124,12 +124,12 @@ $('#only-al').onchange=render;
 $('#b-key').onclick=()=>{KEY=$('#key').value.trim();try{localStorage.setItem(KK,KEY);}catch(e){}first=true;since=0;events=[];load();};
 $('#b-open').onclick=async()=>{await call({action:'config',code:$('#code').value.trim(),open:'yes'});load();};
 $('#b-close').onclick=async()=>{await call({action:'config',open:'no'});load();};
-$('#b-reset').onclick=async()=>{const w=prompt('This deletes all students and events of the revision lab. Type DELETE to confirm.');if(w==='DELETE'){await call({action:'reset'});since=0;events=[];first=true;load();}};
+$('#b-reset').onclick=async()=>{const w=prompt('This deletes all students and events of this lab. Type DELETE to confirm.');if(w==='DELETE'){await call({action:'reset'});since=0;events=[];first=true;load();}};
 $('#b-notif').onclick=()=>{try{Notification.requestPermission().then(p=>{$('#b-notif').textContent=p==='granted'?'🔔 Notifications on':'🔕 Notifications blocked';});}catch(e){}beep();};
 $('#b-sound').onclick=()=>{sound=!sound;$('#b-sound').textContent=sound?'🔊 Sound on':'🔇 Sound off';if(sound)beep();};
 $('#b-csv').onclick=()=>{const H=['Email','Last name','First name','Status','Steps done','Checks','Leaves','Away (s)','Offline','Quiz','Quiz details','Joined','Quit at','Summary'];
   const csv=[H].concat(students.map(s=>H.map(h=>s[h]))).map(r=>r.map(v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"').join(',')).join('\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));a.download='revision-lab-results.csv';a.click();};
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));a.download='interface-components-lab-results.csv';a.click();};
 try{if('Notification' in window&&Notification.permission==='granted')$('#b-notif').textContent='🔔 Notifications on';}catch(e){}
 if(KEY){$('#key').value=KEY;load();}
 setInterval(load,8000);setInterval(render,15000);
