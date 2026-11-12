@@ -189,10 +189,10 @@ th{background:var(--g2)}
 <div class="ov warn" id="away" hidden><div class="card"><h2>⚠ You left the quiz</h2><p id="away-t">Your teacher has been notified.</p><button class="btn" type="button" id="away-back">Back to the lab</button></div></div>
 
 <!-- quit confirmation -->
-<div class="ov" id="qc" hidden><div class="card"><h2>Quit the session?</h2><p>After this, the page is locked and you cannot change your work any more. Your summary is sent to your teacher.</p><div id="qc-sum"></div><p class="msg" id="qc-msg"></p><button class="btn am" type="button" id="qc-yes">Yes, quit the session</button> <button class="btn" type="button" id="qc-no">No, continue</button></div></div>
+<div class="ov" id="qc" hidden><div class="card"><h2>Quit the session?</h2><p>Your summary is sent to your teacher. The page is not locked: you can continue to work and send it again later.</p><div id="qc-sum"></div><p class="msg" id="qc-msg"></p><button class="btn am" type="button" id="qc-yes">Yes, quit the session</button> <button class="btn" type="button" id="qc-no">No, continue</button></div></div>
 
 <!-- locked -->
-<div class="ov" id="lock" hidden><div class="card lockmsg"><h2>✔ Session closed</h2><p id="lock-t">Your work has been sent to your teacher. You can close this tab.</p></div></div>
+<div class="ov" id="lock" hidden><div class="card lockmsg"><h2>✔ Summary sent</h2><p id="lock-t">Your work has been sent to your teacher.</p><button class="btn" type="button" id="lock-x">Continue to work</button></div></div>
 
 <!-- help -->
 <div class="ov help" id="help" hidden><div class="card"><button class="x" type="button" id="help-x" aria-label="Close">✕</button><h2>❓ Help: all the commands of this lab</h2><details open><summary>1 · Rules of this lab</summary><div><ul>
@@ -302,7 +302,7 @@ function checksScore() { let ok = 0, n = 0; Object.values(st.checks).forEach(v =
 function curStep() { let best = 'start'; for (const id of D.steps.concat(['final', 'quit'])) { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top < innerHeight * .4) best = id; } return best; }
 async function ping() {
   if (!tracked()) return;
-  try { const j = await call({ action: 'ping', step: curStep() + stageTxt(curStep()), done: st.done, checks: checksScore() }); setNet(true, 'teacher connected'); if (j && j.error === 'quit') lockPage(); }
+  try { const j = await call({ action: 'ping', step: curStep() + stageTxt(curStep()), done: st.done, checks: checksScore() }); setNet(true, 'teacher connected'); }
   catch (e) { setNet(false, 'no connection'); }
 }
 
@@ -334,14 +334,13 @@ function startLab() {
 }
 // a practice session never blocks the real one: once the teacher has activated the lab, start fresh
 if (API && st.demo) { try { localStorage.removeItem(LS); } catch (e) {} Object.keys(st).forEach(k => delete st[k]); st.done = []; st.checks = {}; st.leaves = 0; st.away = 0; }
-if (st.quit) { gate.hidden = true; lockPage(); }
-else if (st.joined && st.demo) startLab();
+if (st.quit) { st.quit = false; save(); }   // students are never locked out
+if (st.joined && st.demo) startLab();
 else if (st.joined && API) {
   // page reopened (reload, crash): join again with the saved code; the teacher sees a "rejoin"
   $('#g-msg').textContent = 'Reconnecting…';
   call({ action: 'join', code: st.code || '' }).then(j => {
     if (j.ok) startLab();
-    else if (j.error === 'quit') lockPage();
     else { $('#g-code').value = ''; $('#g-msg').className = 'msg bad'; $('#g-msg').textContent = 'Type the session code again to continue.'; }
   }).catch(() => { $('#g-msg').className = 'msg bad'; $('#g-msg').textContent = 'No connection: check the network, then click Start.'; });
 }
@@ -365,7 +364,6 @@ $('#away-back').onclick = () => { $('#away').hidden = true; if (quizRun) goFull(
 addEventListener('offline', () => { st.offAt = Date.now(); save(); setNet(false, 'offline'); });
 addEventListener('online', () => { if (st.offAt) { const s = Math.round((Date.now() - st.offAt) / 1000); st.offAt = 0; save(); beacon({ action: 'event', type: 'offline', detail: 'computer offline for ' + s + ' s (until ' + hhmm() + ')' }); } ping(); });
 addEventListener('pagehide', () => { if (tracked()) beacon({ action: 'event', type: 'close', detail: 'page closed or reloaded at ' + hhmm() + ' without quitting' }); });
-addEventListener('beforeunload', e => { if (tracked()) { e.preventDefault(); e.returnValue = ''; } });
 setInterval(ping, 60000);
 setInterval(() => { if (st.start) { const m = Math.floor((Date.now() - st.start) / 60000); $('#clock').textContent = '⏱ ' + Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0') + ' / 3:00'; } }, 15000);
 
@@ -505,19 +503,19 @@ function quizDone() {
 
 // ---------- quit the session ----------
 const openQuit = () => { $('#qc-sum').innerHTML = '<div class="box" style="background:#f6faf7">' + summaryHTML() + '</div>' + (st.quiz ? '' : '<p class="msg bad">You have not done the final quiz yet.</p>'); $('#qc').hidden = false; };
+$('#lock-x').onclick = () => $('#lock').hidden = true;
 $('#b-quit').onclick = openQuit; $('#b-quit2').onclick = openQuit;
 $('#qc-no').onclick = () => $('#qc').hidden = true;
 $('#qc-yes').onclick = async () => {
   const m = $('#qc-msg'); const summary = 'steps ' + st.done.length + '/' + D.steps.length + (D.nchecks ? ' · checks ' + checksScore() : '') + ' · quiz ' + (st.quiz ? st.quiz.score + '/' + st.quiz.total : 'not done') + (st.leaves ? ' · left the quiz ' + st.leaves + '×' : '');
-  if (st.demo || !API) { st.quit = true; save(); lockPage(); return; }
+  if (st.demo || !API) { lockPage(); return; }
   $('#qc-yes').disabled = true; m.className = 'msg'; m.textContent = 'Sending…';
-  try { const j = await call({ action: 'quit', done: st.done, summary }); if (!j.ok && j.error !== 'quit') throw new Error(j.error); st.quit = true; st.quitAt = hhmm(); save(); lockPage(); }
+  try { const j = await call({ action: 'quit', done: st.done, summary }); if (!j.ok && j.error !== 'quit') throw new Error(j.error); st.quitAt = hhmm(); save(); $('#qc-yes').disabled = false; m.textContent = ''; lockPage(); }
   catch (e) { m.className = 'msg bad'; m.textContent = 'Sending failed: check the network and click again.'; $('#qc-yes').disabled = false; }
 };
 function lockPage() {
-  st.quit = true; save();
-  ['#qc', '#away', '#help', '#gate'].forEach(s => $(s).hidden = true);
-  $('#lock-t').innerHTML = 'Your session is closed' + (st.quitAt ? ' (' + st.quitAt + ')' : '') + '. ' + (st.demo ? 'Practice mode: nothing was sent.' : 'Your summary has been sent to your teacher.') + ' You can close this tab.<br><br><small>' + summaryHTML() + '</small>';
+  ['#qc', '#away', '#help'].forEach(s => $(s).hidden = true);
+  $('#lock-t').innerHTML = (st.demo ? 'Practice mode: nothing was sent.' : 'Your summary has been sent to your teacher' + (st.quitAt ? ' (' + st.quitAt + ')' : '') + '.') + ' You can close this tab, or continue to work and send your summary again later.<br><br><small>' + summaryHTML() + '</small>';
   $('#lock').hidden = false;
 }
 
