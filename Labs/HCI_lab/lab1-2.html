@@ -226,7 +226,7 @@ function setStage(sid, k, jump) {
   for (let i = 1; i <= n; i++) { const c = document.getElementById('code-' + C + '-' + i); c.hidden = i !== k; c.querySelectorAll('.ln').forEach(l => l.classList.remove('hl', 'pick')); }
   const code = document.getElementById('code-' + C + '-' + k), first = code.querySelector('.ln.new');
   if (jump && first) code.scrollTop = Math.max(0, first.offsetTop - 60);
-  const shot = sec.querySelector('.shot'); shot.classList.toggle('mid', !last); shot.querySelector('img').src = 'img' + D.key.replace('.', '') + '/' + s.img;
+  const shot = sec.querySelector('.shot'); shot.classList.toggle('mid', !last); const im = shot.querySelector('img'); im.src = 'img' + D.key.replace('.', '') + '/' + s.img; im.width = s.w; im.height = s.h; shot.style.width = s.w + 'px';
   sec.querySelectorAll('.spot').forEach(b => b.classList.remove('on'));
   sec.querySelectorAll('.stg-c button').forEach((b, i) => { b.classList.toggle('cur', i + 1 === k); b.classList.toggle('ok', i + 1 < reached || (reached === n && DONE.has(sid))); b.disabled = i + 1 > reached; });
   document.getElementById('sl-' + C).textContent = n > 1 ? 'stage ' + k + ' of ' + n : '';
@@ -239,7 +239,7 @@ function setStage(sid, k, jump) {
            : '<p>1. In <code>' + cls + '.java</code>, type the <b style="color:#2e9e5b">green lines</b> (' + s.n + ' line' + (s.n > 1 ? 's' : '') + '), at the same place as in the code' + ((k > 1 || code.querySelector('.ln.old')) ? '. The grey lines are already in your file' : '') + '.</p>') +
     '<p>2. <span class="go">▶ Run</span> the program now.</p>' +
     '<p>3. <b>You must see:</b> ' + s.see + '</p><p>4. <b>Test:</b> ' + s.test + '</p>';
-  if (s.after) h += '<figure><img src="img' + D.key.replace('.', '') + '/' + s.after.img + '" alt="" draggable="false"><figcaption>' + s.after.cap + '</figcaption></figure>';
+  if (s.after) h += '<figure><img src="img' + D.key.replace('.', '') + '/' + s.after.img + '" alt="" draggable="false" style="width:' + s.w + 'px"><figcaption>' + s.after.cap + '</figcaption></figure>';
   if (!last) h += (k < reached ? '<button class="btn" type="button" data-next="1">Go to stage ' + (k + 1) + ' →</button>' : '<button class="btn" type="button" data-next="1">✔ I ran it and I see this window → stage ' + (k + 1) + '</button>') + '<p style="font-size:14px;color:var(--mut)">An error? Compare your lines with the green lines: a missing <code>;</code>, <code>)</code> or capital letter is the usual cause.</p>';
   else if (n > 1 || D.sections[sid].hot.length) h += '<p>✔ <b>Last stage.</b>' + (D.sections[sid].hot.length ? ' Click the numbers on the picture to name each component of Lecture 4.' : '') + '</p>';
   const run = document.getElementById('run-' + C); run.innerHTML = h;
