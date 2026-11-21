@@ -907,7 +907,9 @@ details.orig{margin:12px 0}
 .pz.sumn{background:radial-gradient(circle at 50% 120%,#c0392b 0 30%,transparent 31%),radial-gradient(circle at 20% 70%,#3f8f3f 0 4%,transparent 5%),radial-gradient(circle at 60% 60%,#222 0 3%,transparent 4%),linear-gradient(135deg,#d9a35f,#b86f2d)}
 .fid{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--surface2)}
 .fid.l0{background:#fbf6dd;font-family:'Comic Sans MS','Segoe Print',cursive;color:#2a2a55}
-.fid.l0 *{border-style:dashed!important}
+.fid.l0 .box,.fid.l0 .uin,.fid.l0 .uib{border:1.5px dashed #2a2a55!important;border-radius:6px!important;background:transparent!important;box-shadow:none!important;color:#2a2a55!important;font-family:inherit!important}
+.fid label{display:inline-block;white-space:nowrap;margin:2px 10px 2px 0}
+.fid #fd-s:empty{display:none}
 .fid.l1{background:#fff;color:#111;font-family:Arial,sans-serif}
 .fid .box{border:1.5px solid #555;border-radius:4px;padding:6px 10px;margin:6px 0;color:inherit}
 .fid.l1 .box{background:#e6e6e6;border-color:#888;border-radius:0}
@@ -1840,7 +1842,7 @@ const L=[['Paper mock-up','Hand-drawn paper + sticky notes','Layout of the scree
 host.innerHTML='<input type="range" id="fd-r" min="0" max="4" value="0" style="width:100%" aria-label="Mock-up definition"><div class="axis xaxis" style="max-width:none"><span>low definition</span><span>high definition</span></div><div class="x2"><div class="fid l0 ui" id="fd-m" style="font-size:.9rem"></div><div><h4 id="fd-t"></h4><div id="fd-i"></div></div></div>';
 const m=G('fd-m');let ordered=0,saved=[];
 function draw(){const l=+G('fd-r').value;m.className='fid ui l'+l;m.style.fontSize='.9rem';
- m.innerHTML='<div style="font-weight:800;font-size:1.05rem">Customise your pizza</div><div class="box">Base: <select class="uin" id="fd-b"><option>Tomato</option><option>Cream</option></select></div><div class="box">'+['Mushrooms','Peppers','Cheese'].map(t=>'<label style="margin-right:8px"><input type="checkbox" class="fd-c" value="'+t+'"> '+t+'</label>').join('')+'</div><div class="box">Delivery date: <input class="uin" type="date" id="fd-d" style="width:140px"></div><div class="rowf"><button class="uib prim" id="fd-v" type="button">Validate</button><span id="fd-s" style="font-weight:700"></span></div>';
+ m.innerHTML='<div style="font-weight:800;font-size:1.05rem">Customise your pizza</div><div class="box">Base: <select class="uin" id="fd-b"><option>Tomato</option><option>Cream</option></select></div><div class="box">'+['Mushrooms','Peppers','Cheese'].map(t=>'<label><input type="checkbox" class="fd-c" value="'+t+'"> '+t+'</label>').join('')+'</div><div class="box">Delivery date: <input class="uin" type="date" id="fd-d" style="width:140px"></div><div class="rowf"><button class="uib prim" id="fd-v" type="button">Validate</button><span id="fd-s" style="font-weight:700"></span></div>';
  G('fd-v').onclick=()=>{const s=G('fd-s');if(l<3){s.innerHTML='<span style="opacity:.9">(this is a picture: nothing happens)</span>';return}
   if(l===3){s.textContent='→ simulated summary screen shown';return}
   const n=$$('.fd-c',m).filter(c=>c.checked).length;s.textContent='Order #'+(++ordered)+' saved. Total: '+(8+n*1.5).toFixed(2)+' € (computed by real code)'};
