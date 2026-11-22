@@ -45,21 +45,57 @@ and the copies are on Google (Apps Script, Sheet, Drive). GitHub never sees the 
 
 ## Before each exam
 
-1. In the Sheet, tab **Questions**: write your questions.
+1. **Write the questions**, in the Sheet or, faster, in a CSV that you import from the dashboard
+   (**Questions → Download the CSV model**). Columns:
 
-   | Id | Question | A | B | C | D | E | Correct | Points |
-   | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-   | Q1 | Which widget makes one choice among n alternatives? | Check box | Radio button | Text field | Scrollbar | | B | 1 |
+   | Id | Theme | Type | Question | Code | A | B | C | D | E | Correct | Expect | Points |
+   | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+   | Q1 | Ch. 4 | single | Which widget makes one choice among n alternatives? | | Check box | Radio button | Text field | Scrollbar | | B | | 1 |
+   | Q2 | Ch. 4 | multi | Which of these are utility windows? | | Tooltip | Dialog box | Floating palette | Progress | | A,C,D | | 1 |
+   | Q3 | Ch. 4 | open | Write the Swing code of an empty window 600x400, centred. | | | | | | | | JFrame \| setTitle("*") \| setSize(600,400) | 3 |
 
-   Leave `E` empty if you only want four choices. `Correct` is the letter of the right answer.
+   - **Type**: `single` (one answer), `multi` (several), `open` (written answer).
+   - **Correct**: `B`, or `A,C,D` for several. Empty for a written answer.
+   - **Code**: an optional piece of code shown with the question.
+   - **Points**: used only when "same mark for every question" is off. The import turns it off
+     by itself when your questions do not all carry the same points.
+   - The import also reads a **.json** file in the format of your `questions.json`
+     (`{questions:[{id,theme,text,options,answer}]}`), so your three subjects go in directly.
 
-2. Open your dashboard, **Settings**: the title, the module, the number of minutes,
-   the list of groups, and `Shuffle = yes` if you want a different order of questions
-   for every student.
+2. **The settings** (dashboard → Settings): module, which exam, title, minutes, groups, shuffle,
+   **mark out of** (15 brings the total back to 15), same mark for every question or the Points
+   column, partial points for several answers, and the two limits of the analyser.
+   You can also write a **case study** that students read in the waiting room and keep during the exam.
 3. Press **1 · Open the waiting room** and give the students the link of `exam.html`.
 4. Accept the students, then **2 · Start the exam**.
 5. At the end, **3 · Stop and collect** closes every copy that is still open.
 6. Download the CSV of the results, and open the Drive folder for the PDF copies.
+
+## Written answers: the analyser
+
+For a question of type `open` you write, in **Expect**, the elements you expect, separated by `|`:
+
+```
+JFrame | setTitle("*") | setSize(600,400) | setLocationRelativeTo(null)
+       | setDefaultCloseOperation | setVisible(true) | addActionListener:2 | !System.exit
+```
+
+| You write | It means |
+| --- | --- |
+| `setSize(600,400)` | this Java code, spaces anywhere do not matter |
+| `setTitle("*")` | `*` stands for anything |
+| `addActionListener:2` | this element counts double |
+| `~feedback` | plain words, upper and lower case ignored |
+| `!System.exit` | must **not** be there; it takes points away |
+| `# ...` | a note for you, not read by the analyser |
+
+The server counts the share of the expected elements that are present:
+**complete** above `OpenComplete` (0.85 by default) gives all the points, **partial** above
+`OpenPartial` (0.40) gives points in proportion, below that it is **wrong**. A question with an
+empty `Expect` is left for you to mark by hand.
+
+Every written answer is listed in the dashboard under **Written answers** with the verdict, what
+is missing and the student's text. Change any mark there: the total of that student is computed again.
 
 ## Starting a new exam
 

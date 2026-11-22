@@ -40,6 +40,15 @@ button{font:inherit;font-weight:600;border:0;border-radius:10px;padding:13px 20p
 .opt:hover{border-color:#9db5e8}
 .opt.sel{border-color:var(--main);background:var(--soft)}
 .opt b{color:var(--main);min-width:22px}
+.ta{width:100%;min-height:220px;font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    font-size:14px;line-height:1.55;padding:14px;border:2px solid var(--line);border-radius:12px;
+    -webkit-user-select:text;user-select:text;resize:vertical;white-space:pre;overflow-wrap:normal;overflow-x:auto}
+.ta:focus{outline:2px solid var(--main);outline-offset:-2px}
+pre.code{background:#0f2238;color:#e6edf7;border-radius:10px;padding:12px 14px;overflow-x:auto;
+    font-family:ui-monospace,Consolas,monospace;font-size:13px;line-height:1.5}
+.tag{display:inline-block;background:var(--soft);color:var(--main);border-radius:999px;
+    padding:3px 10px;font-size:12px;font-weight:700;margin-right:6px}
+.uc{max-height:320px;overflow:auto;white-space:pre-wrap;line-height:1.6;font-size:14px}
 .nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);z-index:20}
 .nav .in{max-width:860px;margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:center}
 .grid{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 0}
@@ -80,6 +89,11 @@ ul{margin:8px 0;padding-left:20px;line-height:1.6;font-size:14px}
     <h2><span class="dot"></span>Waiting for the teacher</h2>
     <p class="mut" id="w-who"></p>
     <div class="note" id="w-note">Keep this page open. It starts by itself when the teacher lets you in.</div>
+    <div id="w-uc" class="note hide" style="margin-top:12px;background:#fff">
+      <b id="w-uct"></b>
+      <div class="uc" id="w-ucx"></div>
+      <p class="mut" style="margin-bottom:0">Read it now. You keep it during the exam.</p>
+    </div>
     <div id="w-rules" class="note" style="margin-top:12px;background:#fff7ed">
       <b>During the exam</b>
       <ul>
@@ -119,7 +133,12 @@ ul{margin:8px 0;padding-left:20px;line-height:1.6;font-size:14px}
     <div class="card">
       <div class="mut" id="e-num">Question 1</div>
       <p class="q" id="e-q"></p>
+      <pre class="code hide" id="e-code"></pre>
       <div id="e-opts"></div>
+    </div>
+    <div class="card hide" id="e-uc">
+      <div class="mut"><b id="e-uct"></b></div>
+      <div class="uc" id="e-ucx"></div>
     </div>
     <div class="card">
       <div class="mut">Your answers</div>
@@ -206,6 +225,16 @@ function poll(){
     drift=j.serverTime?(j.serverTime-Date.now()):0;
     $('w-max').textContent=maxW;
     $('j-title').textContent=EX.title||'Online exam';
+    if(EX.module||EX.examName) $('j-sub').textContent=
+      [EX.module,EX.examName].filter(Boolean).join(' · ')+' · University of Algiers 1';
+    if(EX.useCaseText){
+      $('w-uc').classList.remove('hide');
+      $('w-uct').textContent=EX.useCaseTitle||'Case study';
+      $('w-ucx').textContent=EX.useCaseText;
+      $('e-uc').classList.remove('hide');
+      $('e-uct').textContent=EX.useCaseTitle||'Case study';
+      $('e-ucx').textContent=EX.useCaseText;
+    }
     if(EX.groups&&EX.groups.length&&$('f-grp').options.length<2)fillGroups(EX.groups);
 
     if(j.status==='rejected'){ show('v-stop'); $('s-h').textContent='Access refused';
@@ -244,40 +273,86 @@ function startExam(){
 }
 
 /* ---------- questions ---------- */
+function letters(v){ return String(v||'').toUpperCase().replace(/[^A-E]/g,'').split('').filter(String); }
+
 function render(){
   if(!QS.length)return;
   if(cur<0)cur=0; if(cur>=QS.length)cur=QS.length-1;
   var q=QS[cur];
-  $('e-num').textContent='Question '+(cur+1)+' of '+QS.length;
+  var tag=q.type==='open'?'written answer':(q.type==='multi'?'several answers':'one answer');
+  $('e-num').innerHTML='<span class="tag">'+tag+'</span>'+
+    (q.theme?'<span class="tag" style="background:#eef2f7;color:#5a6b82"></span>':'')+
+    'Question '+(cur+1)+' of '+QS.length+' · '+q.points+' pt';
+  if(q.theme){ $('e-num').querySelectorAll('.tag')[1].textContent=q.theme; }
   $('e-q').textContent=q.text;
+  var cb=$('e-code'); cb.classList.toggle('hide',!q.code); if(q.code)cb.textContent=q.code;
+
   var box=$('e-opts'); box.innerHTML='';
-  q.choices.forEach(function(c){
-    var d=document.createElement('div');
-    d.className='opt'+(ANS[q.id]===c.k?' sel':'');
-    d.innerHTML='<b>'+c.k+'</b><span></span>';
-    d.lastChild.textContent=c.t;
-    d.onclick=function(){ choose(q.id,c.k); };
-    box.appendChild(d);
-  });
+  if(q.type==='open'){
+    var ta=document.createElement('textarea');
+    ta.className='ta'; ta.spellcheck=false; ta.value=ANS[q.id]||'';
+    ta.placeholder='Write your answer here. Type it: paste is off.';
+    ta.oninput=function(){ ANS[q.id]=ta.value; markGrid(); saveSoon(q.id,ta.value); };
+    ta.onblur=function(){ save(q.id,ta.value); };
+    box.appendChild(ta);
+    var hint=document.createElement('p');
+    hint.className='mut'; hint.style.margin='8px 0 0';
+    hint.textContent='Your answer is saved while you write.';
+    box.appendChild(hint);
+  } else {
+    var sel=letters(ANS[q.id]);
+    q.choices.forEach(function(c){
+      var d=document.createElement('div');
+      d.className='opt'+(sel.indexOf(c.k)>=0?' sel':'');
+      d.innerHTML='<b>'+c.k+'</b><span></span>';
+      d.lastChild.textContent=c.t;
+      d.onclick=function(){ choose(q,c.k); };
+      box.appendChild(d);
+    });
+    if(q.type==='multi'){
+      var m=document.createElement('p');
+      m.className='mut'; m.style.margin='8px 0 0';
+      m.textContent='Several answers are expected. Click again to remove one.';
+      box.appendChild(m);
+    }
+  }
+  markGrid();
+  $('e-prev').disabled=(cur===0);
+  $('e-next').textContent=(cur===QS.length-1)?'Last question':'Next';
+}
+
+function markGrid(){
   var g=$('e-grid'); g.innerHTML='';
   QS.forEach(function(x,i){
     var b=document.createElement('b');
     b.textContent=i+1;
-    b.className=(i===cur?'cur':(ANS[x.id]?'done':''));
+    b.className=(i===cur?'cur':(String(ANS[x.id]||'').trim()?'done':''));
     b.onclick=function(){cur=i;render();};
     g.appendChild(b);
   });
-  $('e-prev').disabled=(cur===0);
-  $('e-next').textContent=(cur===QS.length-1)?'Last question':'Next';
 }
-function choose(qid,k){
-  ANS[qid]=k; render();
-  post('answer',{token:T,qid:qid,choice:k});
+
+function choose(q,k){
+  if(q.type==='multi'){
+    var s=letters(ANS[q.id]), i=s.indexOf(k);
+    if(i>=0)s.splice(i,1); else s.push(k);
+    s.sort(); ANS[q.id]=s.join(',');
+  }else{
+    ANS[q.id]=k;
+  }
+  render(); save(q.id,ANS[q.id]);
 }
+
+var saveT={};
+function saveSoon(qid,v){
+  clearTimeout(saveT[qid]);
+  saveT[qid]=setTimeout(function(){ save(qid,v); },1200);
+}
+function save(qid,v){ post('answer',{token:T,qid:qid,answer:String(v==null?'':v)}); }
 $('e-prev').onclick=function(){cur--;render();};
 $('e-next').onclick=function(){if(cur<QS.length-1){cur++;render();}};
 $('e-send').onclick=function(){
-  var left=QS.filter(function(q){return !ANS[q.id];}).length;
+  var left=QS.filter(function(q){return !String(ANS[q.id]||'').trim();}).length;
   var msg=left?('You did not answer '+left+' question(s). Send anyway?'):'Send your copy now?';
   if(confirm(msg))send('sent by the student');
 };
@@ -309,9 +384,9 @@ function doneView(j){
   finished=true; show('v-done');
   try{me=JSON.parse(localStorage.getItem('hciexam-me')||'{}');}catch(e){}
   $('d-who').textContent=(me.name||'')+' · '+(me.matricule||'')+' · '+(me.group||'');
-  if(j.score!==null&&j.score!==undefined&&j.total){
-    $('d-score').textContent=j.score+' / '+j.total;
-    $('d-note').textContent='Your copy is saved. You can close this page.';
+  if(j.score!==null&&j.score!==undefined&&j.outOf){
+    $('d-score').textContent=j.score+' / '+j.outOf;
+    $('d-note').textContent='Your copy is saved. Written answers may be read again by the teacher.';
   }else{
     $('d-score').textContent='✓';
     $('d-note').textContent='Your copy is saved. The mark comes later.';
@@ -356,9 +431,12 @@ function guards(){
   window.addEventListener('beforeprint',function(){flag('print');});
   document.addEventListener('keydown',function(e){
     var k=e.key||'', c=e.ctrlKey||e.metaKey;
-    if(k==='F12'||(c&&e.shiftKey&&/^[IJCK]$/i.test(k))||(c&&/^[uspcvxa]$/i.test(k))){
+    var inText=/^(TEXTAREA|INPUT)$/.test((e.target||{}).tagName||'');
+    if(k==='F12'||(c&&e.shiftKey&&/^[IJCK]$/i.test(k))||(c&&/^[uspc]$/i.test(k))){
       e.preventDefault(); flag('devtools'); return false;
     }
+    if(c&&/^[vx]$/i.test(k)){ e.preventDefault(); flag(k.toLowerCase()==='v'?'paste':'cut'); return false; }
+    if(c&&/^a$/i.test(k)&&!inText){ e.preventDefault(); return false; }
     if(k==='Escape'){ e.preventDefault(); }
   },true);
   window.addEventListener('beforeunload',function(e){

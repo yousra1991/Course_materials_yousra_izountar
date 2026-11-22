@@ -80,17 +80,45 @@ th{font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--mut)
 
     <div id="settings" class="hide" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
       <div class="row">
-        <label>Title <input id="s-title" style="width:220px"></label>
-        <label>Module <input id="s-module" style="width:120px"></label>
-        <label>Minutes <input id="s-dur" type="number" min="1" style="width:90px"></label>
-        <label>Groups <input id="s-groups" style="width:200px" placeholder="G1,G2,G3"></label>
+        <label>Module <input id="s-module" style="width:120px" placeholder="HCI"></label>
+        <label>Which exam <input id="s-exam" style="width:150px" placeholder="Test 1"></label>
+        <label>Title shown <input id="s-title" style="width:220px"></label>
+        <label>Minutes <input id="s-dur" type="number" min="1" style="width:80px"></label>
+        <label>Groups <input id="s-groups" style="width:180px" placeholder="G1,G2,G3"></label>
         <label>Shuffle
           <select id="s-shuffle"><option value="no">no</option><option value="yes">yes</option></select>
         </label>
-        <button class="btn btn-sm" id="s-save">Save</button>
       </div>
-      <p class="mut">Questions and correct answers are in the <b>Questions</b> tab of the Sheet.
-         The key never leaves the server.</p>
+      <div class="row" style="margin-top:8px">
+        <label>Mark out of <input id="s-outof" type="number" min="0" step="0.5" style="width:80px"></label>
+        <label>Same mark for every question
+          <select id="s-same"><option value="yes">yes</option><option value="no">no</option></select>
+        </label>
+        <label>that mark <input id="s-per" type="number" min="0" step="0.25" style="width:80px"></label>
+        <label>Partial points, several answers
+          <select id="s-partial"><option value="yes">yes</option><option value="no">no</option></select>
+        </label>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <span class="mut">Written answers:</span>
+        <label>complete from <input id="s-ocomp" type="number" min="0" max="1" step="0.05" style="width:80px"></label>
+        <label>partial from <input id="s-opart" type="number" min="0" max="1" step="0.05" style="width:80px"></label>
+        <label>ignore case
+          <select id="s-ocase"><option value="no">no</option><option value="yes">yes</option></select>
+        </label>
+      </div>
+      <div class="row" style="margin-top:8px;align-items:flex-start">
+        <label style="flex:1">Case study title <input id="s-uct" style="width:100%" placeholder="(optional)"></label>
+      </div>
+      <div class="row" style="align-items:flex-start">
+        <label style="flex:1">Case study text, read in the waiting room
+          <textarea id="s-ucx" rows="4" style="width:100%;font:inherit;padding:9px 11px;
+            border:1.5px solid var(--line);border-radius:9px"></textarea></label>
+      </div>
+      <div class="row"><button class="btn btn-sm" id="s-save">Save the settings</button>
+        <span class="mut" id="s-msg"></span></div>
+      <p class="mut">"Same mark" uses the mark above for every question. Set it to <b>no</b> to use the
+        Points column of each question. "Mark out of" brings the total back to that scale (0 keeps the raw points).</p>
     </div>
 
     <div class="row" style="margin-top:14px">
@@ -102,6 +130,43 @@ th{font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--mut)
       <button class="btn2 btn-sm" data-min="5">+5 min</button>
       <button class="btn2 btn-sm" data-min="10">+10 min</button>
       <button class="btn2 btn-sm" data-min="-5">−5 min</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <h2 style="margin:0">Questions</h2>
+      <span class="mut" id="q-sum"></span>
+      <span style="margin-left:auto"></span>
+      <button class="btn2 btn-sm" id="q-tpl">Download the CSV model</button>
+      <button class="btn2 btn-sm" id="q-show">Show / hide</button>
+    </div>
+    <div id="q-panel" class="hide" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
+      <p class="mut">Paste a CSV, or choose a <b>.csv</b> or a <b>.json</b> file (the format of your
+        <code>questions.json</code> works too). Columns:
+        <code>Id, Theme, Type, Question, Code, A, B, C, D, E, Correct, Expect, Points</code>.
+        <b>Type</b> is <code>single</code>, <code>multi</code> or <code>open</code>.
+        <b>Correct</b> is one letter (<code>B</code>) or several (<code>A,C</code>).
+        <b>Expect</b> is only for written answers.</p>
+      <div class="row">
+        <input type="file" id="q-file" accept=".csv,.json,.txt">
+        <span class="mut">or paste below</span>
+      </div>
+      <textarea id="q-csv" rows="6" placeholder="Id,Theme,Type,Question,Code,A,B,C,D,E,Correct,Expect,Points"
+        style="width:100%;margin-top:8px;font:13px ui-monospace,Consolas,monospace;padding:10px;
+        border:1.5px solid var(--line);border-radius:9px"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="btn2 btn-sm" id="q-read">Read and check</button>
+        <button class="btn btn-sm" id="q-send" disabled>Replace the questions</button>
+        <span class="mut" id="q-msg"></span>
+      </div>
+      <div id="q-prev" style="overflow-x:auto;margin-top:10px"></div>
+      <div class="warnbox" style="margin-top:10px">
+        <b>Written answers.</b> In <code>Expect</code>, separate the expected elements with <code>|</code>:
+        <code>JFrame | setTitle("*") | setSize(600,400) | addActionListener:2 | ~feedback | !System.exit</code>.
+        <code>*</code> stands for anything, <code>:2</code> counts double, <code>~</code> is plain words
+        (case ignored), <code>!</code> must not appear. Spaces inside the code do not matter.
+      </div>
     </div>
   </div>
 
@@ -142,6 +207,11 @@ th{font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--mut)
       <div class="card">
         <h2>Cheating alerts</h2>
         <div id="evs"><p class="mut">Nothing for the moment.</p></div>
+      </div>
+      <div class="card">
+        <div class="row"><h2 style="margin:0">Written answers</h2>
+          <button class="btn2 btn-sm" id="o-load" style="margin-left:auto">Read them</button></div>
+        <div id="o-list"><p class="mut">The analyser gives complete, partial or wrong. You can change any mark.</p></div>
       </div>
       <div class="card">
         <h2>End of the exam</h2>
@@ -203,9 +273,19 @@ function paint(j){
   if(x.folder){ $('b-folder').href=x.folder; $('b-folder').classList.remove('hide'); }
   if(!$('settings').dataset.touched){
     $('s-title').value=x.title||''; $('s-module').value=x.module||'';
+    $('s-exam').value=x.examName||'';
     $('s-dur').value=x.duration||30; $('s-groups').value=x.groups||'';
     $('s-shuffle').value=x.shuffle||'no';
+    $('s-outof').value=x.scoreOutOf||0; $('s-same').value=x.sameMark||'yes';
+    $('s-per').value=x.markPerQuestion||1; $('s-partial').value=x.partialMulti||'yes';
+    $('s-ocomp').value=x.openComplete||0.85; $('s-opart').value=x.openPartial||0.4;
+    $('s-ocase').value=x.openIgnoreCase||'no';
+    $('s-uct').value=x.useCaseTitle||''; $('s-ucx').value=x.useCaseText||'';
   }
+  var k=x.kinds||{};
+  $('q-sum').textContent=x.questions+' questions ('+(k.single||0)+' one answer, '+(k.multi||0)+
+    ' several, '+(k.open||0)+' written) · '+x.totalPoints+' points'+
+    (x.scoreOutOf>0?' → mark out of '+x.scoreOutOf:'');
   var gs=$('f-group');
   if(gs.options.length<2 && x.groups){
     x.groups.split(',').forEach(function(g){ g=g.trim(); if(!g)return;
@@ -237,7 +317,7 @@ function paint(j){
       '<td><span class="pill p-'+s.status+'">'+s.status+'</span></td>'+
       '<td>'+left+'</td>'+
       '<td'+(s.warnings?' style="color:var(--bad);font-weight:700"':'')+'>'+(s.warnings||'')+'</td>'+
-      '<td>'+(s.score==null?'':s.score)+'</td><td></td>';
+      '<td>'+(s.score==null?'':(s.score+(s.outOf?' / '+s.outOf:'')))+'</td><td></td>';
     var cell=tr.lastChild;
     if(s.status==='waiting'){
       cell.appendChild(mk('Accept','btn-ok',function(){act('tapprove',{matricule:s.matricule});}));
@@ -271,13 +351,181 @@ function act(a,d){ post(a,d,function(){ loop(); }); }
 
 /* ---- controls ---- */
 $('b-settings').onclick=function(){ $('settings').classList.toggle('hide'); };
-['s-title','s-module','s-dur','s-groups','s-shuffle'].forEach(function(i){
+var SFIELDS=['s-title','s-module','s-exam','s-dur','s-groups','s-shuffle','s-outof','s-same',
+             's-per','s-partial','s-ocomp','s-opart','s-ocase','s-uct','s-ucx'];
+SFIELDS.forEach(function(i){
   $(i).addEventListener('input',function(){ $('settings').dataset.touched='1'; });
+  $(i).addEventListener('change',function(){ $('settings').dataset.touched='1'; });
 });
 $('s-save').onclick=function(){
-  post('tconfig',{Title:$('s-title').value,Module:$('s-module').value,
-    DurationMin:Number($('s-dur').value||30),Groups:$('s-groups').value,
-    Shuffle:$('s-shuffle').value},function(){ $('settings').dataset.touched=''; loop(); });
+  $('s-msg').textContent='Saving...';
+  post('tconfig',{Title:$('s-title').value,Module:$('s-module').value,ExamName:$('s-exam').value,
+    DurationMin:Number($('s-dur').value||30),Groups:$('s-groups').value,Shuffle:$('s-shuffle').value,
+    ScoreOutOf:Number($('s-outof').value||0),SameMark:$('s-same').value,
+    MarkPerQuestion:Number($('s-per').value||1),PartialMulti:$('s-partial').value,
+    OpenComplete:Number($('s-ocomp').value||0.85),OpenPartial:Number($('s-opart').value||0.4),
+    OpenIgnoreCase:$('s-ocase').value,UseCaseTitle:$('s-uct').value,UseCaseText:$('s-ucx').value},
+    function(j){ $('s-msg').textContent=j.ok?'Saved':(j.error||'Not saved');
+      $('settings').dataset.touched=''; loop();
+      setTimeout(function(){$('s-msg').textContent='';},2000); });
+};
+
+/* ---- questions: CSV / JSON ---- */
+var PARSED=[];
+var QCOLS=['Id','Theme','Type','Question','Code','A','B','C','D','E','Correct','Expect','Points'];
+$('q-show').onclick=function(){ $('q-panel').classList.toggle('hide'); };
+$('q-tpl').onclick=function(){
+  var rows=[QCOLS,
+   ['Q1','Ch. 4 · Interface','single','Which widget makes one choice among n alternatives?','',
+    'Check box','Radio button','Text field','Scrollbar','','B','',1],
+   ['Q2','Ch. 4 · Interface','multi','Which of these are utility windows?','',
+    'Tooltip','Dialog box','Floating palette','Progress indication','','A,C,D','',1],
+   ['Q3','Ch. 4 · Interface','open','Write the Swing code of an empty window "Campus Library", 600x400, centred.','',
+    '','','','','','',
+    'JFrame | setTitle("*") | setSize(600,400) | setLocationRelativeTo(null) | setDefaultCloseOperation | setVisible(true) | !System.exit',3]];
+  dl(rows.map(function(r){return r.map(function(c){
+    return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n'),'questions_model.csv');
+};
+function dl(text,name){
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(text);
+  a.download=name; a.click();
+}
+$('q-file').onchange=function(){
+  var f=this.files&&this.files[0]; if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){ $('q-csv').value=String(r.result||''); $('q-read').click(); };
+  r.readAsText(f,'utf-8');
+};
+
+function splitCsv(text){
+  var rows=[],row=[],cell='',q=false,i,c,d=text.indexOf(';')>=0&&
+      (text.split('\n')[0]||'').split(';').length>(text.split('\n')[0]||'').split(',').length?';':',';
+  for(i=0;i<text.length;i++){
+    c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){cell+='"';i++;} else q=false; } else cell+=c; }
+    else if(c==='"')q=true;
+    else if(c===d){row.push(cell);cell='';}
+    else if(c==='\n'){row.push(cell);cell='';rows.push(row);row=[];}
+    else if(c!=='\r')cell+=c;
+  }
+  if(cell.length||row.length){row.push(cell);rows.push(row);}
+  return rows.filter(function(r){return r.join('').trim().length;});
+}
+
+function fromJson(txt){
+  var j=JSON.parse(txt);
+  var list=Array.isArray(j)?j:(j.questions||[]);
+  return list.map(function(q,i){
+    var o={Id:String(q.id||('Q'+(i+1))),Theme:String(q.theme||''),Type:String(q.type||'single'),
+           Question:String(q.text||q.question||''),Code:String(q.code||''),
+           Correct:'',Expect:String(q.expect||''),Points:q.points==null?1:Number(q.points)};
+    var opts=q.options||q.choices||[];
+    ['A','B','C','D','E'].forEach(function(L,k){ o[L]=opts[k]==null?'':String(opts[k]); });
+    if(Array.isArray(q.answer)) o.Correct=q.answer.map(function(n){return 'ABCDE'[n];}).join(',');
+    else if(typeof q.answer==='number') o.Correct='ABCDE'[q.answer]||'';
+    else if(q.answer!=null) o.Correct=String(q.answer).toUpperCase();
+    if(o.Correct.indexOf(',')>=0&&o.Type==='single') o.Type='multi';
+    if(!opts.length&&!o.Correct) o.Type='open';
+    return o;
+  });
+}
+
+$('q-read').onclick=function(){
+  var txt=$('q-csv').value.trim();
+  $('q-send').disabled=true; PARSED=[];
+  if(!txt){ $('q-msg').textContent='Nothing to read.'; return; }
+  try{
+    if(txt.charAt(0)==='{'||txt.charAt(0)==='['){ PARSED=fromJson(txt); }
+    else{
+      var rows=splitCsv(txt), head=rows[0].map(function(h){return h.trim().toLowerCase();});
+      var idx={}; QCOLS.forEach(function(c){ idx[c]=head.indexOf(c.toLowerCase()); });
+      if(idx.Question<0){ $('q-msg').textContent='The header line must contain at least "Question".'; return; }
+      PARSED=rows.slice(1).map(function(r,i){
+        var o={};
+        QCOLS.forEach(function(c){ o[c]=idx[c]>=0?String(r[idx[c]]==null?'':r[idx[c]]).trim():''; });
+        if(!o.Id)o.Id='Q'+(i+1);
+        o.Type=(o.Type||'').toLowerCase();
+        if(o.Type!=='multi'&&o.Type!=='open')
+          o.Type=(String(o.Correct).replace(/[^A-Ea-e]/g,'').length>1)?'multi':
+                 ((!o.A&&!o.Correct)?'open':'single');
+        o.Correct=String(o.Correct).toUpperCase().replace(/[^A-E]/g,'').split('').join(',');
+        o.Points=Number(o.Points||1)||1;
+        return o;
+      });
+    }
+  }catch(e){ $('q-msg').textContent='Could not read it: '+e.message; return; }
+
+  var bad=[];
+  PARSED.forEach(function(q,i){
+    if(!q.Question) bad.push('line '+(i+1)+': no question');
+    else if(q.Type==='open'){ if(!q.Expect) bad.push(q.Id+': written answer with nothing expected (you will mark it by hand)'); }
+    else if(!q.Correct) bad.push(q.Id+': no correct answer');
+    else if(!q.A||!q.B) bad.push(q.Id+': fewer than two choices');
+  });
+  var n={single:0,multi:0,open:0},pts=0;
+  PARSED.forEach(function(q){ n[q.Type]++; pts+=Number(q.Points||1); });
+  $('q-msg').innerHTML=PARSED.length+' questions read ('+n.single+' / '+n.multi+' / '+n.open+
+    '), '+pts+' points'+(bad.length?' — <b style="color:var(--bad)">'+bad.length+' to check</b>':' — nothing to report');
+
+  var h='<table><tr><th>Id</th><th>Type</th><th>Question</th><th>Correct</th><th>Pts</th></tr>';
+  PARSED.slice(0,12).forEach(function(q){
+    h+='<tr><td>'+esc(q.Id)+'</td><td>'+esc(q.Type)+'</td><td>'+esc(q.Question.slice(0,90))+
+       '</td><td>'+esc(q.Correct||(q.Expect?'analyser':'—'))+'</td><td>'+esc(q.Points)+'</td></tr>';
+  });
+  h+='</table>';
+  if(PARSED.length>12)h+='<p class="mut">and '+(PARSED.length-12)+' more…</p>';
+  if(bad.length)h+='<div class="warnbox" style="margin-top:8px">'+bad.slice(0,8).map(esc).join('<br>')+'</div>';
+  $('q-prev').innerHTML=h;
+  $('q-send').disabled=!PARSED.length;
+};
+
+$('q-send').onclick=function(){
+  if(!PARSED.length)return;
+  if(!confirm('Replace every question of this exam by these '+PARSED.length+'?'))return;
+  $('q-send').disabled=true; $('q-msg').textContent='Sending...';
+  post('timport',{questions:PARSED},function(j){
+    $('q-msg').textContent=j.ok?(j.n+' questions are in place'+(j.note?' — '+j.note:'')):(j.error||'Not imported');
+    if(j.ok&&j.note){ $('settings').dataset.touched=''; }
+    $('q-send').disabled=false; loop();
+  });
+};
+
+/* ---- written answers ---- */
+$('o-load').onclick=function(){
+  $('o-list').innerHTML='<p class="mut">Loading...</p>';
+  post('topen',{},function(j){
+    if(!j.ok){ $('o-list').innerHTML='<p class="mut">'+esc(j.error||'Not possible')+'</p>'; return; }
+    if(!j.answers.length){ $('o-list').innerHTML='<p class="mut">No written answer yet.</p>'; return; }
+    var box=$('o-list'); box.innerHTML='';
+    j.answers.forEach(function(a){
+      var d=document.createElement('div');
+      d.style.cssText='border-bottom:1px solid var(--line);padding:10px 0';
+      var cls=a.verdict==='complete'?'p-running':(a.verdict==='partial'?'p-waiting':'p-rejected');
+      d.innerHTML='<div class="row"><b>'+esc(a.matricule)+'</b>'+
+        '<span class="pill '+cls+'">'+esc(a.verdict||'not marked')+'</span>'+
+        '<span class="mut">'+esc(a.qid)+'</span></div>'+
+        '<pre style="white-space:pre-wrap;background:#f8fafd;border:1px solid var(--line);'+
+        'border-radius:8px;padding:8px;font-size:12px;margin:6px 0">'+esc(a.answer||'(nothing)')+'</pre>'+
+        '<div class="mut" style="font-size:12px">'+esc(a.detail||'')+'</div>';
+      var r=document.createElement('div'); r.className='row'; r.style.marginTop='6px';
+      var inp=document.createElement('input');
+      inp.type='number'; inp.step='0.25'; inp.min='0'; inp.max=String(a.points);
+      inp.value=(a.mark==null?'':a.mark); inp.style.width='90px';
+      var lab=document.createElement('span'); lab.className='mut'; lab.textContent='/ '+a.points;
+      var b=document.createElement('button'); b.className='btn btn-sm'; b.textContent='Save this mark';
+      b.onclick=function(){
+        b.disabled=true;
+        post('tgrade',{row:a.row,matricule:a.matricule,mark:Number(inp.value||0),
+          verdict:'by the teacher'},function(res){
+          b.disabled=false; b.textContent=res.ok?'Saved':'Error'; loop();
+          setTimeout(function(){b.textContent='Save this mark';},1500);
+        });
+      };
+      r.appendChild(inp); r.appendChild(lab); r.appendChild(b);
+      d.appendChild(r); box.appendChild(d);
+    });
+  });
 };
 $('b-open').onclick=function(){ post('tconfig',{Status:'waiting'},loop); };
 $('b-start').onclick=function(){
