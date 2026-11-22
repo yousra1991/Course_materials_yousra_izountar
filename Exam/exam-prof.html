@@ -74,6 +74,10 @@ tbody tr{background:var(--card)}
 .modal.on{display:flex}
 .modal .in{background:var(--card);border-radius:14px;padding:20px;max-width:760px;width:92%;max-height:86vh;overflow:auto}
 .msg{font-weight:700;font-size:13px}
+.full-msg{flex-basis:100%;min-height:0}
+.full-msg.on{min-height:34px;background:var(--g2);border:1px solid var(--g);color:var(--g);
+   border-radius:9px;padding:7px 12px;font-weight:700;font-size:13.5px;margin-top:4px}
+.full-msg.bad.on{background:var(--bad2);border-color:var(--bad);color:#7a1c14}
 </style>
 </head>
 <body>
@@ -108,6 +112,7 @@ tbody tr{background:var(--card)}
     <button class="btn gh" id="bcsv">⬇ Results CSV</button>
     <a class="btn gh" id="bfolder" target="_blank" hidden>Drive folder</a>
     <button class="btn gh" id="breset">New exam…</button>
+    <div class="full-msg" id="toast"></div>
   </div>
 
   <div class="tiles" id="tiles"></div>
@@ -226,6 +231,13 @@ function api(a,d,cb){
     .then(function(r){return r.json();}).then(function(j){cb&&cb(j);})
     .catch(function(){cb&&cb({ok:false,error:'The server does not answer'});});
 }
+var toastT=null;
+function say(msg,bad){
+  var t=$('toast');
+  t.textContent=msg; t.className='full-msg on'+(bad?' bad':'');
+  clearTimeout(toastT);
+  toastT=setTimeout(function(){ t.className='full-msg'; t.textContent=''; },6000);
+}
 function mmss(ms){ms=Math.max(0,ms);var m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000);
   return ('0'+m).slice(-2)+':'+('0'+s).slice(-2);}
 
@@ -254,13 +266,16 @@ function paint(j){
   D=j; D.recv=Date.now();
   var x=j.exam||{}, S=j.students||[];
   $('ttl').textContent=[x.module,x.examName].filter(Boolean).join(' · ')||x.title||'Exam';
-  $('st').textContent=x.status; $('st').className='st '+x.status;
+  var SL={closed:'closed',waiting:'WAITING ROOM OPEN',running:'EXAM RUNNING',finished:'finished'};
+  $('st').textContent=SL[x.status]||x.status; $('st').className='st '+x.status;
   var k=x.kinds||{};
   $('info').textContent=x.questions+' questions ('+(k.single||0)+'/'+(k.multi||0)+'/'+(k.open||0)+
     ') · '+x.totalPoints+' pts'+(x.scoreOutOf>0?' → /'+x.scoreOutOf:'')+' · '+x.duration+' min';
   if(x.folder){ $('bfolder').href=x.folder; $('bfolder').hidden=false; }
-  $('bopen').disabled=(x.status==='running');
-  $('bgo').disabled=(x.status==='running'||x.status==='closed');
+  $('bopen').disabled=(x.status==='waiting'||x.status==='running');
+  $('bopen').textContent=(x.status==='waiting'||x.status==='running')
+    ? '1 · Waiting room is open ✔' : '1 · Open the waiting room';
+  $('bgo').disabled=(x.status!=='waiting');
   $('bstop').disabled=(x.status!=='running');
 
   if(!$('t-set').dataset.touched){
@@ -334,9 +349,10 @@ function renderStu(){
 }
 
 function act(a,m){
-  if(a==='ok')   api('tapprove',{matricule:m},loop);
-  if(a==='no')   api('treject',{matricule:m},loop);
-  if(a==='p5')   api('tminutes',{matricule:m,minutes:5},loop);
+  var done=function(msg){ return function(j){ say(j.ok?msg:(j.error||'Not possible'), !j.ok); loop(); }; };
+  if(a==='ok')   api('tapprove',{matricule:m},done(m+' accepted.'));
+  if(a==='no')   api('treject',{matricule:m},done(m+' refused.'));
+  if(a==='p5')   api('tminutes',{matricule:m,minutes:5},done('+5 minutes for '+m+'.'));
   if(a==='take'){ if(confirm('Collect the copy of this student now?')) api('tstop',{matricule:m},loop); }
 }
 
@@ -375,22 +391,47 @@ Array.prototype.forEach.call(document.querySelectorAll('.tabsx button'),function
 $('es').addEventListener('input',function(){ if(D)renderEv(); });
 
 /* ---------- controls ---------- */
-$('bopen').onclick=function(){ api('tconfig',{Status:'waiting'},loop); };
+$('bopen').onclick=function(){
+  say('Opening…');
+  api('tconfig',{Status:'waiting'},function(j){
+    say(j.ok?'Waiting room open. Give the students the address shown at the top right.'
+           :(j.error||'Not possible'), !j.ok);
+    loop();
+  });
+};
 $('bgo').onclick=function(){
   var n=(D.students||[]).filter(function(s){return s.status==='approved';}).length;
   if(!confirm('Start the exam for '+n+' accepted student(s)? The timer starts for everybody.'))return;
-  api('tstart',{minutes:Number($('s-dur').value||D.exam.duration||30)},loop);
+  say('Starting…');
+  api('tstart',{minutes:Number($('s-dur').value||D.exam.duration||30)},function(j){
+    say(j.ok?('Exam started for '+n+' student(s).'):(j.error||'Not possible'), !j.ok);
+    loop();
+  });
 };
 $('bstop').onclick=function(){
-  if(confirm('Stop the exam and collect every copy now?')) api('tstop',{},loop);
+  if(!confirm('Stop the exam and collect every copy now?'))return;
+  say('Collecting the copies…');
+  api('tstop',{},function(j){
+    say(j.ok?'Exam stopped. Every copy is marked and saved in Drive.':(j.error||'Not possible'), !j.ok);
+    loop();
+  });
 };
 Array.prototype.forEach.call(document.querySelectorAll('[data-min]'),function(b){
   b.onclick=function(){
     var g=$('fg').value;
-    api('tminutes',{minutes:Number(b.dataset.min),group:g||undefined},loop);
+    api('tminutes',{minutes:Number(b.dataset.min),group:g||undefined},function(j){
+      say(j.ok?(b.dataset.min+' minutes for '+(g||'everybody')):(j.error||'Not possible'), !j.ok);
+      loop();
+    });
   };
 });
-$('ball').onclick=function(){ var g=$('fg').value; api('tapprove',g?{group:g}:{},loop); };
+$('ball').onclick=function(){
+  var g=$('fg').value;
+  api('tapprove',g?{group:g}:{},function(j){
+    say(j.ok?('Waiting students accepted'+(g?' in '+g:'')+'.'):(j.error||'Not possible'), !j.ok);
+    loop();
+  });
+};
 $('bcsv').onclick=function(){
   var rows=[['Name','Matricule','Group','State','Warnings','Mark','OutOf','Copy']];
   (D.students||[]).forEach(function(s){
