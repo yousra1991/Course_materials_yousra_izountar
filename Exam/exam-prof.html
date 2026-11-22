@@ -74,6 +74,21 @@ tbody tr{background:var(--card)}
 .modal.on{display:flex}
 .modal .in{background:var(--card);border-radius:14px;padding:20px;max-width:760px;width:92%;max-height:86vh;overflow:auto}
 .msg{font-weight:700;font-size:13px}
+.qed{border:1px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px;background:var(--card)}
+.qed .hd{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.qed .num{font:800 16px Consolas,monospace;color:var(--g);min-width:34px}
+.qed textarea,.qed input,.qed select{border:1px solid var(--line);border-radius:9px;padding:7px 10px;background:#fff;color:var(--ink)}
+.qed .qt{width:100%;font-size:16px;font-weight:600;min-height:52px;resize:vertical}
+.oprow{display:flex;gap:10px;align-items:center;margin:8px 0}
+.oprow .l{flex:none;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);
+  display:grid;place-items:center;font-weight:800;color:var(--mut);cursor:pointer;background:#fff;font-size:14px}
+.oprow .l.sq{border-radius:8px}
+.oprow .l.on{background:var(--g);border-color:var(--g);color:#fff}
+.oprow input{flex:1}
+.oprow.on input{background:var(--g2);border-color:var(--g)}
+.qed .ft{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.qed .ft .n0{margin-left:auto}
+.imp{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
 .full-msg{flex-basis:100%;min-height:0}
 .full-msg.on{min-height:34px;background:var(--g2);border:1px solid var(--g);color:var(--g);
    border-radius:9px;padding:7px 12px;font-weight:700;font-size:13.5px;margin-top:4px}
@@ -120,7 +135,7 @@ tbody tr{background:var(--card)}
   <div class="tabsx">
     <button data-t="stu" class="on">Students</button>
     <button data-t="ev">Live log</button>
-    <button data-t="qs">Questions</button>
+    <button data-t="qs">Prepare the exam</button>
     <button data-t="op">Written answers</button>
     <button data-t="set">Settings</button>
   </div>
@@ -148,28 +163,39 @@ tbody tr{background:var(--card)}
     <div class="ev" id="evl"></div>
   </div>
 
-  <!-- questions -->
+  <!-- prepare the exam -->
   <div class="card" id="t-qs" hidden>
     <div class="flt">
-      <button class="btn gh sm" id="qtpl">⬇ CSV model</button>
-      <input type="file" id="qfile" accept=".csv,.json,.txt">
-      <span class="n0">or paste below</span>
-      <span class="sp" style="flex:1"></span>
-      <button class="btn gh sm" id="qread">Read and check</button>
-      <button class="btn sm" id="qsend" disabled>Replace the questions</button>
+      <button class="btn" id="qadd">+ Add a question</button>
+      <button class="btn gh" id="qsave">Save the questions</button>
+      <button class="btn gh sm" id="qreload">Reload from the sheet</button>
+      <span class="n0" id="qcount"></span>
+      <span style="flex:1"></span>
+      <button class="btn gh sm" id="qtoggle">Import a CSV / JSON file</button>
     </div>
     <div class="pad">
-      <textarea id="qcsv" rows="6" style="width:100%;font:13px Consolas,monospace"
-        placeholder="Id,Theme,Type,Question,Code,A,B,C,D,E,Correct,Expect,Points"></textarea>
-      <p class="msg" id="qmsg" style="color:var(--mut)"></p>
-      <div id="qprev" style="overflow:auto"></div>
-      <div class="hint">
-        <b>Type</b>: <code>single</code> one answer, <code>multi</code> several, <code>open</code> written answer.
-        <b>Correct</b>: <code>B</code> or <code>A,C</code>. A <code>.json</code> file in the format of your
-        <code>questions.json</code> is read too.<br>
-        <b>Expect</b> (written answers), elements separated by <code>|</code>:
-        <code>JFrame | setTitle("*") | setSize(600,400) | addActionListener:2 | ~feedback | !System.exit</code>
-        — <code>*</code> anything, <code>:2</code> counts double, <code>~</code> plain words, <code>!</code> forbidden.
+      <div id="qlist"></div>
+      <p class="msg" id="qmsg2" style="color:var(--g)"></p>
+
+      <div class="imp hide" id="qimp">
+        <div class="flt" style="padding-left:0;border:0">
+          <button class="btn gh sm" id="qtpl">⬇ CSV model</button>
+          <input type="file" id="qfile" accept=".csv,.json,.txt">
+          <span class="n0">or paste below</span>
+          <span style="flex:1"></span>
+          <button class="btn gh sm" id="qread">Read and check</button>
+          <button class="btn sm" id="qsend" disabled>Replace the questions</button>
+        </div>
+        <textarea id="qcsv" rows="5" style="width:100%;font:13px Consolas,monospace"
+          placeholder="Id,Theme,Type,Question,Code,A,B,C,D,E,Correct,Expect,Points"></textarea>
+        <p class="msg" id="qmsg" style="color:var(--mut)"></p>
+        <div id="qprev" style="overflow:auto"></div>
+        <div class="hint">
+          A <code>.json</code> file in the format of your <code>questions.json</code> is read too.
+          <b>Expect</b> (written answers), elements separated by <code>|</code>:
+          <code>JFrame | setTitle("*") | setSize(600,400) | addActionListener:2 | ~feedback | !System.exit</code>
+          — <code>*</code> anything, <code>:2</code> counts double, <code>~</code> plain words, <code>!</code> forbidden.
+        </div>
       </div>
     </div>
   </div>
@@ -385,6 +411,7 @@ Array.prototype.forEach.call(document.querySelectorAll('.tabsx button'),function
     Array.prototype.forEach.call(document.querySelectorAll('.tabsx button'),function(x){
       x.classList.toggle('on',x===b); });
     ['stu','ev','qs','op','set'].forEach(function(t){ $('t-'+t).hidden=(t!==tab); });
+    if(tab==='qs'&&!BANK.length)loadBank();
   };
 });
 ['fg','fs','fa'].forEach(function(i){ $(i).addEventListener('input',function(){ if(D)paint(D); }); });
@@ -474,7 +501,144 @@ $('s-save').onclick=function(){
     });
 };
 
-/* ---------- questions ---------- */
+
+/* ---------- the question editor ---------- */
+var BANK=[], LET=['A','B','C','D','E'];
+function blank(n){
+  return {Id:'Q'+n,Theme:'',Type:'single',Question:'',Code:'',
+          A:'',B:'',C:'',D:'',E:'',Correct:'',Expect:'',Points:1};
+}
+function corr(q){ return String(q.Correct||'').toUpperCase().replace(/[^A-E]/g,'').split('').filter(String); }
+function setCorr(q,arr){ arr.sort(); q.Correct=arr.join(','); }
+
+function loadBank(){
+  $('qmsg2').textContent='Loading…';
+  api('tbank',{},function(j){
+    if(!j.ok){ $('qmsg2').textContent=j.error||'Not possible'; return; }
+    BANK=j.questions||[]; $('qmsg2').textContent='';
+    drawBank();
+  });
+}
+
+function drawBank(){
+  var box=$('qlist'); box.innerHTML='';
+  $('qcount').textContent=BANK.length+' question(s)';
+  if(!BANK.length){
+    box.innerHTML='<p class="n0">No question yet. Press <b>+ Add a question</b>, '+
+      'or import a CSV file.</p>';
+    return;
+  }
+  BANK.forEach(function(q,i){ box.appendChild(card(q,i)); });
+}
+
+function card(q,i){
+  var d=document.createElement('div'); d.className='qed';
+
+  var hd=document.createElement('div'); hd.className='hd';
+  hd.innerHTML='<span class="num">'+(i+1)+'</span>';
+  var ty=document.createElement('select');
+  [['single','one answer'],['multi','several answers'],['open','written answer']]
+    .forEach(function(o){ var x=document.createElement('option'); x.value=o[0]; x.textContent=o[1];
+      if(q.Type===o[0])x.selected=true; ty.appendChild(x); });
+  ty.onchange=function(){
+    q.Type=ty.value;
+    if(q.Type==='single'&&corr(q).length>1)setCorr(q,[corr(q)[0]]);
+    if(q.Type==='open')q.Correct='';
+    drawBank();
+  };
+  var th=document.createElement('input'); th.placeholder='Theme (Ch. 4 · Interface)';
+  th.value=q.Theme||''; th.style.width='210px';
+  th.oninput=function(){ q.Theme=th.value; };
+  var pt=document.createElement('input'); pt.type='number'; pt.min='0'; pt.step='0.25';
+  pt.value=q.Points; pt.style.width='80px'; pt.title='Points';
+  pt.oninput=function(){ q.Points=Number(pt.value||1); };
+  var ptl=document.createElement('span'); ptl.className='n0'; ptl.textContent='points';
+  hd.appendChild(ty); hd.appendChild(th); hd.appendChild(pt); hd.appendChild(ptl);
+  d.appendChild(hd);
+
+  var qt=document.createElement('textarea'); qt.className='qt';
+  qt.placeholder='Write the question here'; qt.value=q.Question||'';
+  qt.oninput=function(){ q.Question=qt.value; };
+  d.appendChild(qt);
+
+  if(q.Type==='open'){
+    var ex=document.createElement('textarea');
+    ex.className='qt'; ex.style.fontFamily='Consolas,monospace'; ex.style.fontWeight='400';
+    ex.placeholder='Expected elements, separated by |   e.g. JFrame | setTitle("*") | setSize(600,400)';
+    ex.value=q.Expect||'';
+    ex.oninput=function(){ q.Expect=ex.value; };
+    d.appendChild(ex);
+  }else{
+    LET.slice(0,4).forEach(function(L){
+      var row=document.createElement('div'); row.className='oprow';
+      var b=document.createElement('button'); b.type='button';
+      b.className='l'+(q.Type==='multi'?' sq':'')+(corr(q).indexOf(L)>=0?' on':'');
+      b.textContent=L; b.title='Click to mark this answer as correct';
+      var inp=document.createElement('input'); inp.placeholder='Answer '+L; inp.value=q[L]||'';
+      inp.oninput=function(){ q[L]=inp.value; };
+      b.onclick=function(){
+        var c=corr(q), k=c.indexOf(L);
+        if(q.Type==='single'){ setCorr(q,k>=0?[]:[L]); }
+        else { if(k>=0)c.splice(k,1); else c.push(L); setCorr(q,c); }
+        drawBank();
+      };
+      if(corr(q).indexOf(L)>=0)row.className='oprow on';
+      row.appendChild(b); row.appendChild(inp); d.appendChild(row);
+    });
+    var hint=document.createElement('div'); hint.className='n0'; hint.style.fontSize='12.5px';
+    hint.textContent=q.Type==='multi'
+      ? 'Click every letter that is correct.'
+      : 'Click the letter of the correct answer.';
+    d.appendChild(hint);
+  }
+
+  var ft=document.createElement('div'); ft.className='ft';
+  function mk(txt,fn,cls){ var b=document.createElement('button');
+    b.className=(cls||'btn gh')+' sm'; b.textContent=txt; b.onclick=fn; return b; }
+  ft.appendChild(mk('↑',function(){ if(i>0){ var t=BANK[i-1];BANK[i-1]=BANK[i];BANK[i]=t; drawBank(); } }));
+  ft.appendChild(mk('↓',function(){ if(i<BANK.length-1){ var t=BANK[i+1];BANK[i+1]=BANK[i];BANK[i]=t; drawBank(); } }));
+  ft.appendChild(mk('Duplicate',function(){
+    var c=JSON.parse(JSON.stringify(q)); c.Id='Q'+(BANK.length+1);
+    BANK.splice(i+1,0,c); drawBank(); }));
+  ft.appendChild(mk('Delete',function(){
+    if(confirm('Delete this question?')){ BANK.splice(i,1); drawBank(); } },'btn red'));
+  var id=document.createElement('span'); id.className='n0';
+  id.textContent=q.Id; ft.appendChild(id);
+  d.appendChild(ft);
+  return d;
+}
+
+$('qadd').onclick=function(){ BANK.push(blank(BANK.length+1)); drawBank();
+  var l=$('qlist').lastChild; if(l)l.scrollIntoView({block:'center'}); };
+$('qreload').onclick=loadBank;
+$('qtoggle').onclick=function(){ $('qimp').classList.toggle('hide'); };
+
+$('qsave').onclick=function(){
+  var bad=[];
+  BANK.forEach(function(q,i){
+    q.Id=q.Id||('Q'+(i+1));
+    if(!String(q.Question).trim())bad.push('question '+(i+1)+': no text');
+    else if(q.Type==='open'){ if(!String(q.Expect).trim())bad.push(q.Id+': nothing expected, you will mark it by hand'); }
+    else{
+      if(!String(q.A).trim()||!String(q.B).trim())bad.push(q.Id+': fewer than two answers');
+      if(!corr(q).length)bad.push(q.Id+': no correct answer marked');
+    }
+  });
+  var stop=bad.filter(function(m){ return m.indexOf('mark it by hand')<0; });
+  if(stop.length){
+    $('qmsg2').style.color='var(--bad)';
+    $('qmsg2').innerHTML='Not saved — '+stop.slice(0,6).map(esc).join(' · ');
+    return;
+  }
+  $('qmsg2').style.color='var(--g)'; $('qmsg2').textContent='Saving…';
+  api('timport',{questions:BANK},function(j){
+    $('qmsg2').textContent=j.ok?(j.n+' question(s) saved'+(j.note?' — '+j.note:'')):(j.error||'Not saved');
+    if(j.ok){ say(j.n+' question(s) saved.'); loop(); loadBank(); }
+    else { $('qmsg2').style.color='var(--bad)'; }
+  });
+};
+
+/* ---------- import ---------- */
 function dl(text,name){
   var a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(text);
@@ -585,6 +749,7 @@ $('qsend').onclick=function(){
   api('timport',{questions:PARSED},function(j){
     $('qmsg').textContent=j.ok?(j.n+' questions are in place'+(j.note?' — '+j.note:'')):(j.error||'Not imported');
     if(j.ok&&j.note)$('t-set').dataset.touched='';
+    if(j.ok)loadBank();
     $('qsend').disabled=false; loop();
   });
 };

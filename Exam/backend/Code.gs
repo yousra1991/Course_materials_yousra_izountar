@@ -86,6 +86,7 @@ function route(b) {
     if (a === 'treset')    return tReset(b);
     if (a === 'timport')   return tImport(b);
     if (a === 'tquestions')return tQuestions(b);
+    if (a === 'tbank')     return tBank(b);
     if (a === 'topen')     return tOpen(b);
     if (a === 'tgrade')    return tGrade(b);
     if (a === 'tpdf')      return tPdfAll(b);
@@ -632,6 +633,20 @@ function tImport(b) {
     }
     return { ok: true, n: out.length, note: note };
   });
+}
+
+/* the questions as they are in the sheet, for the editor */
+function tBank(b) {
+  var out = rows(SH.Q).filter(function (q) { return String(q.Id || '').trim(); }).map(function (q) {
+    var o = {};
+    Q_COLS.forEach(function (c) { o[c] = q[c] === undefined ? '' : q[c]; });
+    o.Type = String(o.Type || 'single').toLowerCase();
+    if (o.Type !== 'multi' && o.Type !== 'open') o.Type = 'single';
+    o.Correct = String(o.Correct || '').toUpperCase().replace(/[^A-E]/g, '').split('').join(',');
+    o.Points = num(o.Points, 1);
+    return o;
+  });
+  return { ok: true, questions: out };
 }
 
 function tQuestions(b) {
