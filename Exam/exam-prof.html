@@ -89,6 +89,9 @@ tbody tr{background:var(--card)}
 .qed .ft{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}
 .qed .ft .n0{margin-left:auto}
 .imp{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.tgrp{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);
+  border-radius:10px;padding:4px 7px;background:var(--card)}
+.tgrp input{border:1px solid var(--line);border-radius:7px;padding:4px 7px}
 .full-msg{flex-basis:100%;min-height:0}
 .full-msg.on{min-height:34px;background:var(--g2);border:1px solid var(--g);color:var(--g);
    border-radius:9px;padding:7px 12px;font-weight:700;font-size:13.5px;margin-top:4px}
@@ -120,9 +123,19 @@ tbody tr{background:var(--card)}
     <button class="btn" id="bgo">2 · Start the exam</button>
     <button class="btn red" id="bstop">3 · Stop and collect</button>
     <span class="n0">|</span>
-    <button class="btn gh sm" data-min="5">+5 min</button>
-    <button class="btn gh sm" data-min="10">+10 min</button>
-    <button class="btn gh sm" data-min="-5">−5 min</button>
+    <span class="tgrp">
+      <input id="tmin" type="number" value="5" min="1" step="1" style="width:66px" title="Minutes">
+      <button class="btn gh sm" id="tadd">+ add</button>
+      <button class="btn gh sm" id="tsub">− remove</button>
+      <button class="btn gh sm" data-min="5">+5</button>
+      <button class="btn gh sm" data-min="10">+10</button>
+    </span>
+    <span class="tgrp">
+      <span class="n0">end at</span>
+      <input id="tend" type="time" style="width:116px">
+      <button class="btn gh sm" id="tendgo">set</button>
+    </span>
+    <span class="n0" id="tscope">everybody</span>
     <span style="flex:1"></span>
     <button class="btn gh" id="bcsv">⬇ Results CSV</button>
     <a class="btn gh" id="bfolder" target="_blank" hidden>Drive folder</a>
@@ -360,9 +373,11 @@ function renderStu(){
           '<button class="btn red sm" data-a="no" data-m="'+esc(s.matricule)+'">Refuse</button>';
     else if(s.status==='running')
       act='<button class="btn gh sm" data-a="p5" data-m="'+esc(s.matricule)+'">+5 min</button> '+
+          '<button class="btn gh sm" data-a="more" data-m="'+esc(s.matricule)+'">+ time…</button> '+
           '<button class="btn gh sm" data-a="take" data-m="'+esc(s.matricule)+'">Collect</button>';
-    else if(s.status==='submitted'&&s.copy)
-      act='<a class="btn gh sm" target="_blank" href="'+esc(s.copy)+'">PDF copy</a>';
+    else if(s.status==='submitted')
+      act=(s.copy?'<a class="btn gh sm" target="_blank" href="'+esc(s.copy)+'">PDF copy</a> ':'')+
+          '<button class="btn gh sm" data-a="open" data-m="'+esc(s.matricule)+'">Give more time…</button>';
     return '<tr class="'+cls+'"><td class="nm">'+esc(s.name)+'</td><td>'+esc(s.matricule)+'</td>'+
       '<td>'+esc(s.group)+'</td><td><span class="pill p-'+s.status+'">'+s.status+'</span></td>'+
       '<td>'+left+'</td><td>'+(s.warnings?'<span class="nb">'+s.warnings+'</span>':'<span class="n0">0</span>')+'</td>'+
@@ -379,6 +394,21 @@ function act(a,m){
   if(a==='ok')   api('tapprove',{matricule:m},done(m+' accepted.'));
   if(a==='no')   api('treject',{matricule:m},done(m+' refused.'));
   if(a==='p5')   api('tminutes',{matricule:m,minutes:5},done('+5 minutes for '+m+'.'));
+  if(a==='more'){
+    var v=prompt('How many minutes for '+m+'?','10');
+    if(v===null)return;
+    var n=Number(v);
+    if(!n){ say('Write a number of minutes.',true); return; }
+    api('tminutes',{matricule:m,minutes:n},done((n>0?'+':'−')+Math.abs(n)+' minutes for '+m+'.'));
+  }
+  if(a==='open'){
+    var w=prompt('Open the copy of '+m+' again, for how many minutes?\n'+
+                 'The answers are kept, the mark and the PDF are made again at the end.','10');
+    if(w===null)return;
+    var k=Number(w);
+    if(!k||k<=0){ say('Write a number of minutes.',true); return; }
+    api('treopen',{matricule:m,minutes:k},done(m+' can work again for '+k+' minutes.'));
+  }
   if(a==='take'){ if(confirm('Collect the copy of this student now?')) api('tstop',{matricule:m},loop); }
 }
 
@@ -400,7 +430,8 @@ setInterval(function(){
   if(x.status==='running'&&run.length){
     var end=Math.max.apply(null,run.map(function(s){return s.endsAt;}));
     $('clock').textContent=mmss(end-now);
-  }else $('clock').textContent=('0'+(x.duration||0)).slice(-2)+':00';
+  }else if(x.status==='finished') $('clock').textContent='00:00';
+  else $('clock').textContent=('0'+(x.duration||0)).slice(-2)+':00';
   renderStu();
 },1000);
 
@@ -415,6 +446,9 @@ Array.prototype.forEach.call(document.querySelectorAll('.tabsx button'),function
   };
 });
 ['fg','fs','fa'].forEach(function(i){ $(i).addEventListener('input',function(){ if(D)paint(D); }); });
+$('fg').addEventListener('change',scope);
+function scope(){ var g=$('fg').value; $('tscope').textContent=g?('group '+g):'everybody'; }
+scope();
 $('es').addEventListener('input',function(){ if(D)renderEv(); });
 
 /* ---------- controls ---------- */
@@ -443,15 +477,36 @@ $('bstop').onclick=function(){
     loop();
   });
 };
+function addTime(min){
+  var g=$('fg').value;
+  if(!min){ say('Write a number of minutes first.',true); return; }
+  say((min>0?'Adding ':'Removing ')+Math.abs(min)+' min…');
+  api('tminutes',{minutes:min,group:g||undefined},function(j){
+    say(j.ok?((min>0?'+':'−')+Math.abs(min)+' minutes for '+(j.n||0)+' student(s) '+
+              (g?('in '+g):'in the exam')+'.')
+           :(j.error||'Not possible'), !j.ok);
+    loop();
+  });
+}
+$('tadd').onclick=function(){ addTime(Math.abs(Number($('tmin').value||0))); };
+$('tsub').onclick=function(){ addTime(-Math.abs(Number($('tmin').value||0))); };
 Array.prototype.forEach.call(document.querySelectorAll('[data-min]'),function(b){
-  b.onclick=function(){
-    var g=$('fg').value;
-    api('tminutes',{minutes:Number(b.dataset.min),group:g||undefined},function(j){
-      say(j.ok?(b.dataset.min+' minutes for '+(g||'everybody')):(j.error||'Not possible'), !j.ok);
-      loop();
-    });
-  };
+  b.onclick=function(){ addTime(Number(b.dataset.min)); };
 });
+$('tendgo').onclick=function(){
+  var v=$('tend').value;
+  if(!v){ say('Choose a time first, for example 14:30.',true); return; }
+  var p=v.split(':'), d=new Date();
+  d.setHours(Number(p[0]),Number(p[1]),0,0);
+  if(d.getTime()<Date.now()) d.setDate(d.getDate()+1);
+  var g=$('fg').value;
+  say('Setting the end time…');
+  api('tsetend',{at:d.getTime(),group:g||undefined},function(j){
+    say(j.ok?('Everybody '+(g?('in '+g):'')+' now finishes at '+v+' ('+(j.n||0)+' student(s)).')
+           :(j.error||'Not possible'), !j.ok);
+    loop();
+  });
+};
 $('ball').onclick=function(){
   var g=$('fg').value;
   api('tapprove',g?{group:g}:{},function(j){

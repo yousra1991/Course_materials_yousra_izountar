@@ -82,6 +82,8 @@ function route(b) {
     if (a === 'tstart')    return tStart(b);
     if (a === 'tstop')     return tStop(b);
     if (a === 'tminutes')  return tMinutes(b);
+    if (a === 'tsetend')   return tSetEnd(b);
+    if (a === 'treopen')   return tReopen(b);
     if (a === 'tconfig')   return tConfig(b);
     if (a === 'treset')    return tReset(b);
     if (a === 'timport')   return tImport(b);
@@ -586,11 +588,42 @@ function tStop(b) {
 }
 
 function tMinutes(b) {
-  var add = num(b.minutes, 0) * 60000;
+  var add = num(b.minutes, 0) * 60000, n = 0;
   pick(b).forEach(function (s) {
-    if (String(s.Status) === 'running' && s.EndsAt) setCell(SH.ST, s._row, 'EndsAt', Number(s.EndsAt) + add);
+    if (String(s.Status) === 'running' && s.EndsAt) {
+      setCell(SH.ST, s._row, 'EndsAt', Number(s.EndsAt) + add); n++;
+    }
   });
-  return { ok: true };
+  return { ok: true, n: n };
+}
+
+/* give everybody (or a group, or one student) the same end time */
+function tSetEnd(b) {
+  var at = Number(b.at || 0);
+  if (!at) return { ok: false, error: 'Which time?' };
+  var n = 0;
+  pick(b).forEach(function (s) {
+    if (String(s.Status) === 'running') { setCell(SH.ST, s._row, 'EndsAt', at); n++; }
+  });
+  return { ok: true, n: n, at: at };
+}
+
+/* a copy came in too early, or the student ran out of time: open it again */
+function tReopen(b) {
+  var minutes = num(b.minutes, 10), n = 0;
+  pick(b).forEach(function (s) {
+    if (String(s.Status) === 'submitted' || String(s.Status) === 'running') {
+      setCell(SH.ST, s._row, 'Status', 'running');
+      setCell(SH.ST, s._row, 'EndsAt', now() + minutes * 60000);
+      setCell(SH.ST, s._row, 'SubmittedAt', '');
+      setCell(SH.ST, s._row, 'Score', '');
+      setCell(SH.ST, s._row, 'ScoreOutOf', '');
+      setCell(SH.ST, s._row, 'Copy', '');
+      n++;
+    }
+  });
+  if (n && String(cfg().Status) !== 'running') setCfg('Status', 'running');
+  return { ok: true, n: n };
 }
 
 function tConfig(b) {
