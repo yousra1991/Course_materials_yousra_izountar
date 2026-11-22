@@ -2,379 +2,444 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HCI – Exam dashboard (teacher)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Dashboard – Online exam</title>
 <style>
-:root{--main:#1d4ed8;--ink:#0f2238;--mut:#5a6b82;--line:#d6dfeb;--soft:#e8f0fe;
-      --bg:#f6f9fd;--ok:#16a34a;--bad:#dc2626;--warn:#d97706}
+:root{--bg:#f2f5f1;--ink:#14231c;--mut:#4f6158;--g:#1f7a4d;--g2:#dcebe1;--am:#c98a12;
+      --am2:#fbefd2;--card:#fff;--line:#c9d8cf;--bad:#b3261e;--bad2:#fbe3e0;--dk:#0f1d16}
 *{box-sizing:border-box}
-body{margin:0;font-family:Inter,system-ui,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
-.wrap{max-width:1180px;margin:0 auto;padding:16px}
-.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
-h1{font-size:20px;margin:0}h2{font-size:16px;margin:0 0 10px}
-.mut{color:var(--mut);font-size:13px}
-button{font:inherit;font-weight:600;border:0;border-radius:9px;padding:9px 14px;cursor:pointer}
-.btn{background:var(--main);color:#fff}
-.btn2{background:#fff;color:var(--main);border:1.5px solid var(--main)}
-.btn-ok{background:var(--ok);color:#fff}.btn-bad{background:var(--bad);color:#fff}
-.btn-sm{padding:6px 10px;font-size:13px;border-radius:8px}
-button:disabled{opacity:.45;cursor:not-allowed}
-input,select{font:inherit;padding:9px 11px;border:1.5px solid var(--line);border-radius:9px;background:#fff}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{border-bottom:1px solid var(--line);padding:9px 8px;text-align:left;vertical-align:middle}
-th{font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--mut);background:#f8fafd}
-.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
-.p-waiting{background:#fef3c7;color:#92400e}.p-approved{background:var(--soft);color:var(--main)}
-.p-running{background:#dcfce7;color:#166534}.p-submitted{background:#e2e8f0;color:#334155}
-.p-rejected{background:#fee2e2;color:#991b1b}
-.kpi{display:flex;gap:10px;flex-wrap:wrap}
-.kpi div{flex:1;min-width:120px;background:var(--soft);border-radius:12px;padding:12px 14px}
-.kpi b{display:block;font-size:26px;color:var(--main)}
-.ev{font-size:13px;border-bottom:1px solid var(--line);padding:7px 0;display:flex;gap:8px}
-.ev i{color:var(--bad);font-style:normal;font-weight:700}
-.grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:12px}
-.hide{display:none!important}
-.hd{background:var(--main);color:#fff;padding:14px 0}
-.hd .in{max-width:1180px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:12px}
-.dotlive{width:9px;height:9px;border-radius:50%;background:#4ade80;display:inline-block;animation:p 1.4s infinite}
-@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
-.warnbox{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:10px 12px;font-size:13px}
-@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Segoe UI",Roboto,Arial,sans-serif}
+h1,h2,h3{margin:0;line-height:1.2}
+button,input,select,textarea{font:inherit}
+code{font:13px Consolas,monospace;background:var(--g2);padding:1px 4px;border-radius:4px}
+.btn{background:var(--g);color:#fff;border:0;border-radius:9px;padding:8px 14px;font-weight:700;cursor:pointer}
+.btn.gh{background:transparent;color:var(--g);border:1.5px solid var(--g)}
+.btn.red{background:var(--bad)}
+.btn.sm{padding:3px 8px;font-size:12.5px;border-radius:7px}
+.btn:disabled{opacity:.4;cursor:default}
+#login{max-width:380px;margin:14vh auto;background:var(--card);border:1px solid var(--line);
+       border-radius:16px;padding:24px}
+#login form{display:flex;gap:8px;margin-top:14px}
+#login input{flex:1;padding:9px 11px;border:1px solid var(--line);border-radius:9px}
+header{background:var(--dk);color:#e6f2ea;padding:12px 18px;display:flex;align-items:center;gap:14px;
+       flex-wrap:wrap;position:sticky;top:0;z-index:5}
+header h1{font-size:19px}header .sp{flex:1}
+.st{border-radius:99px;padding:4px 12px;font-weight:800;font-size:13px;background:#ffffff1f}
+.st.waiting{background:var(--am);color:#111}.st.running{background:#2fb56a;color:#06210f}
+.st.finished{background:#9aa9a1;color:#111}.st.closed{background:#ffffff1f}
+.clock{font:800 26px Consolas,monospace;background:#ffffff1a;border-radius:9px;padding:1px 12px}
+.acc{font-size:13px;color:#b9d3c3}.acc b{font:800 15px Consolas,monospace;color:#fff}
+.wrap{padding:14px 18px 50px;max-width:1700px;margin:auto}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 12px}
+.tile b{display:block;font:800 26px Consolas,monospace;color:var(--g)}
+.tile span{color:var(--mut);font-size:13px}.tile.warn b{color:var(--bad)}
+.tabsx{display:flex;gap:4px;margin:6px 0 0;flex-wrap:wrap}
+.tabsx button{border:1px solid var(--line);border-bottom:0;background:var(--g2);padding:7px 14px;
+   border-radius:10px 10px 0 0;font-weight:700;color:var(--mut);cursor:pointer}
+.tabsx button.on{background:var(--card);color:var(--g)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:0 12px 12px 12px;overflow:hidden}
+.flt{display:flex;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap;align-items:center}
+.flt input,.flt select,.pad input,.pad select,.pad textarea{padding:6px 9px;border:1px solid var(--line);
+   border-radius:8px;background:#fff;color:var(--ink)}
+.pad{padding:12px 14px}
+.scroll{overflow:auto;max-height:68vh}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{position:sticky;top:0;background:var(--g2);z-index:1;text-align:left;padding:7px 8px;font-size:12px;
+   color:var(--mut);white-space:nowrap}
+td{padding:6px 8px;border-top:1px solid var(--line);vertical-align:middle;white-space:nowrap}
+tr.alert td{background:var(--bad2)}tr.warn td{background:var(--am2)}
+td.nm{position:sticky;left:0;background:inherit;font-weight:700}
+tbody tr{background:var(--card)}
+.pill{border-radius:99px;padding:2px 9px;font-size:12px;font-weight:800}
+.p-waiting{background:var(--am2);color:#7a5200}.p-approved{background:var(--g2);color:var(--g)}
+.p-running{background:#2fb56a;color:#06210f}.p-submitted{background:#e4e8e6;color:#333}
+.p-rejected{background:var(--bad2);color:#7a1c14}
+.pb{display:inline-block;width:70px;height:8px;border-radius:99px;background:#e4ebe6;overflow:hidden;
+    vertical-align:middle;margin-right:6px}.pb i{display:block;height:100%;background:var(--g)}
+.n0{color:#9aa9a1}.nb{color:var(--bad);font-weight:800}
+.ev{max-height:68vh;overflow:auto}
+.evr{display:grid;grid-template-columns:200px 1fr;gap:8px;padding:6px 12px;border-top:1px solid var(--line);font-size:13.5px}
+.evr.bad{background:var(--bad2)}
+.legend{color:var(--mut);font-size:12.5px;padding:8px 12px;border-top:1px solid var(--line)}
+.frm{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.frm label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--mut)}
+.frm .full{grid-column:1/-1}
+.hint{background:var(--am2);border:1px solid #ecd98a;border-radius:10px;padding:10px 12px;font-size:13px;margin-top:10px}
+.it{padding:10px 14px;border-top:1px solid var(--line)}
+.it pre{font:12.5px Consolas,monospace;background:#f3f6f2;border-radius:8px;padding:6px 10px;margin:6px 0;white-space:pre-wrap}
+.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;z-index:20}
+.modal.on{display:flex}
+.modal .in{background:var(--card);border-radius:14px;padding:20px;max-width:760px;width:92%;max-height:86vh;overflow:auto}
+.msg{font-weight:700;font-size:13px}
 </style>
 </head>
 <body>
 
-<div class="hd"><div class="in">
-  <h1>Exam dashboard</h1>
-  <span class="mut" style="color:#bfd3f7" id="hd-sub">Izountar Yousra · Université Alger 1</span>
-  <span style="margin-left:auto" id="hd-live" class="hide"><span class="dotlive"></span>
-    <span class="mut" style="color:#bfd3f7">live</span></span>
-</div></div>
-
-<!-- login -->
-<div class="wrap" id="v-login">
-  <div class="card" style="max-width:460px;margin:40px auto">
-    <h2>Teacher key</h2>
-    <p class="mut">This page is only for the teacher. Never give this key to a student.</p>
-    <div class="row" style="margin-top:10px">
-      <input id="k" type="password" placeholder="Your key" style="flex:1" autocomplete="off">
-      <button class="btn" id="k-go">Open</button>
-    </div>
-    <p class="mut" id="k-msg" style="color:var(--bad)"></p>
-  </div>
+<div id="login">
+  <h2>Teacher dashboard</h2>
+  <p style="color:var(--mut)">The key is set in the script (<code>TEACHER_KEY</code>). Never give it to a student.</p>
+  <form id="lf"><input id="pw" type="password" placeholder="Your key" autofocus><button class="btn">Open</button></form>
+  <p id="lm" style="color:var(--bad);font-weight:700"></p>
 </div>
 
-<!-- dashboard -->
-<div class="wrap hide" id="v-dash">
+<div id="app" hidden>
+<header>
+  <h1 id="ttl">Exam</h1>
+  <span class="st" id="st">closed</span>
+  <span class="acc" id="info"></span>
+  <span class="sp"></span>
+  <span class="acc">Student address: <b id="url"></b></span>
+  <span class="clock" id="clock">--:--</span>
+</header>
 
-  <div class="card">
-    <div class="row">
-      <h2 style="margin:0" id="x-title">Exam</h2>
-      <span class="pill" id="x-status">closed</span>
-      <span class="mut" id="x-info"></span>
-      <span style="margin-left:auto"></span>
-      <button class="btn2 btn-sm" id="b-settings">Settings</button>
-      <a id="b-folder" class="btn2 btn-sm hide" style="text-decoration:none" target="_blank">Drive folder</a>
+<div class="wrap">
+  <div class="ctl">
+    <button class="btn gh" id="bopen">1 · Open the waiting room</button>
+    <button class="btn" id="bgo">2 · Start the exam</button>
+    <button class="btn red" id="bstop">3 · Stop and collect</button>
+    <span class="n0">|</span>
+    <button class="btn gh sm" data-min="5">+5 min</button>
+    <button class="btn gh sm" data-min="10">+10 min</button>
+    <button class="btn gh sm" data-min="-5">−5 min</button>
+    <span style="flex:1"></span>
+    <button class="btn gh" id="bcsv">⬇ Results CSV</button>
+    <a class="btn gh" id="bfolder" target="_blank" hidden>Drive folder</a>
+    <button class="btn gh" id="breset">New exam…</button>
+  </div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="tabsx">
+    <button data-t="stu" class="on">Students</button>
+    <button data-t="ev">Live log</button>
+    <button data-t="qs">Questions</button>
+    <button data-t="op">Written answers</button>
+    <button data-t="set">Settings</button>
+  </div>
+
+  <!-- students -->
+  <div class="card" id="t-stu">
+    <div class="flt">
+      <select id="fg"><option value="">All groups</option></select>
+      <input id="fs" placeholder="Search a name or a matricule">
+      <label><input type="checkbox" id="fa"> Alerts only</label>
+      <button class="btn sm" id="ball">Accept all waiting</button>
+      <span id="cnt" style="color:var(--mut)"></span>
     </div>
+    <div class="scroll"><table><thead><tr>
+      <th>Student</th><th>Matricule</th><th>Group</th><th>State</th><th>Left</th>
+      <th>Warnings</th><th>Mark</th><th>Actions</th></tr></thead>
+      <tbody id="tb"></tbody></table></div>
+    <div class="legend">Red line: the student left full screen or the page. Orange: at least one warning.
+      Accept a student, then start the exam; a student accepted after the start begins at once.</div>
+  </div>
 
-    <div id="settings" class="hide" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
-      <div class="row">
-        <label>Module <input id="s-module" style="width:120px" placeholder="HCI"></label>
-        <label>Which exam <input id="s-exam" style="width:150px" placeholder="Test 1"></label>
-        <label>Title shown <input id="s-title" style="width:220px"></label>
-        <label>Minutes <input id="s-dur" type="number" min="1" style="width:80px"></label>
-        <label>Groups <input id="s-groups" style="width:180px" placeholder="G1,G2,G3"></label>
-        <label>Shuffle
-          <select id="s-shuffle"><option value="no">no</option><option value="yes">yes</option></select>
-        </label>
+  <!-- live log -->
+  <div class="card" id="t-ev" hidden>
+    <div class="flt"><input id="es" placeholder="Filter the log"></div>
+    <div class="ev" id="evl"></div>
+  </div>
+
+  <!-- questions -->
+  <div class="card" id="t-qs" hidden>
+    <div class="flt">
+      <button class="btn gh sm" id="qtpl">⬇ CSV model</button>
+      <input type="file" id="qfile" accept=".csv,.json,.txt">
+      <span class="n0">or paste below</span>
+      <span class="sp" style="flex:1"></span>
+      <button class="btn gh sm" id="qread">Read and check</button>
+      <button class="btn sm" id="qsend" disabled>Replace the questions</button>
+    </div>
+    <div class="pad">
+      <textarea id="qcsv" rows="6" style="width:100%;font:13px Consolas,monospace"
+        placeholder="Id,Theme,Type,Question,Code,A,B,C,D,E,Correct,Expect,Points"></textarea>
+      <p class="msg" id="qmsg" style="color:var(--mut)"></p>
+      <div id="qprev" style="overflow:auto"></div>
+      <div class="hint">
+        <b>Type</b>: <code>single</code> one answer, <code>multi</code> several, <code>open</code> written answer.
+        <b>Correct</b>: <code>B</code> or <code>A,C</code>. A <code>.json</code> file in the format of your
+        <code>questions.json</code> is read too.<br>
+        <b>Expect</b> (written answers), elements separated by <code>|</code>:
+        <code>JFrame | setTitle("*") | setSize(600,400) | addActionListener:2 | ~feedback | !System.exit</code>
+        — <code>*</code> anything, <code>:2</code> counts double, <code>~</code> plain words, <code>!</code> forbidden.
       </div>
-      <div class="row" style="margin-top:8px">
-        <label>Mark out of <input id="s-outof" type="number" min="0" step="0.5" style="width:80px"></label>
+    </div>
+  </div>
+
+  <!-- written answers -->
+  <div class="card" id="t-op" hidden>
+    <div class="flt"><button class="btn gh sm" id="oload">Read the written answers</button>
+      <span class="n0">the analyser says complete, partial or wrong; you can change any mark</span></div>
+    <div id="olist" class="pad"></div>
+  </div>
+
+  <!-- settings -->
+  <div class="card" id="t-set" hidden>
+    <div class="pad">
+      <div class="frm">
+        <label>Module <input id="s-module" placeholder="HCI"></label>
+        <label>Which exam <input id="s-exam" placeholder="Test 1"></label>
+        <label>Title shown to the students <input id="s-title"></label>
+        <label>Minutes <input id="s-dur" type="number" min="1"></label>
+        <label>Groups <input id="s-groups" placeholder="G1,G2,G3"></label>
+        <label>Shuffle the questions
+          <select id="s-shuffle"><option value="no">no</option><option value="yes">yes</option></select></label>
+        <label>Mark out of (0 = raw points) <input id="s-outof" type="number" min="0" step="0.5"></label>
         <label>Same mark for every question
-          <select id="s-same"><option value="yes">yes</option><option value="no">no</option></select>
-        </label>
-        <label>that mark <input id="s-per" type="number" min="0" step="0.25" style="width:80px"></label>
+          <select id="s-same"><option value="yes">yes</option><option value="no">no</option></select></label>
+        <label>That mark <input id="s-per" type="number" min="0" step="0.25"></label>
         <label>Partial points, several answers
-          <select id="s-partial"><option value="yes">yes</option><option value="no">no</option></select>
-        </label>
+          <select id="s-partial"><option value="yes">yes</option><option value="no">no</option></select></label>
+        <label>Written: complete from <input id="s-ocomp" type="number" min="0" max="1" step="0.05"></label>
+        <label>Written: partial from <input id="s-opart" type="number" min="0" max="1" step="0.05"></label>
+        <label>Written: ignore upper/lower case
+          <select id="s-ocase"><option value="no">no</option><option value="yes">yes</option></select></label>
+        <label class="full">Case study title <input id="s-uct" placeholder="(optional)"></label>
+        <label class="full">Case study text, read in the waiting room and kept during the exam
+          <textarea id="s-ucx" rows="5"></textarea></label>
       </div>
-      <div class="row" style="margin-top:8px">
-        <span class="mut">Written answers:</span>
-        <label>complete from <input id="s-ocomp" type="number" min="0" max="1" step="0.05" style="width:80px"></label>
-        <label>partial from <input id="s-opart" type="number" min="0" max="1" step="0.05" style="width:80px"></label>
-        <label>ignore case
-          <select id="s-ocase"><option value="no">no</option><option value="yes">yes</option></select>
-        </label>
-      </div>
-      <div class="row" style="margin-top:8px;align-items:flex-start">
-        <label style="flex:1">Case study title <input id="s-uct" style="width:100%" placeholder="(optional)"></label>
-      </div>
-      <div class="row" style="align-items:flex-start">
-        <label style="flex:1">Case study text, read in the waiting room
-          <textarea id="s-ucx" rows="4" style="width:100%;font:inherit;padding:9px 11px;
-            border:1.5px solid var(--line);border-radius:9px"></textarea></label>
-      </div>
-      <div class="row"><button class="btn btn-sm" id="s-save">Save the settings</button>
-        <span class="mut" id="s-msg"></span></div>
-      <p class="mut">"Same mark" uses the mark above for every question. Set it to <b>no</b> to use the
-        Points column of each question. "Mark out of" brings the total back to that scale (0 keeps the raw points).</p>
-    </div>
-
-    <div class="row" style="margin-top:14px">
-      <button class="btn2" id="b-open">1 · Open the waiting room</button>
-      <button class="btn btn-ok" id="b-start">2 · Start the exam</button>
-      <button class="btn btn-bad" id="b-stop">3 · Stop and collect</button>
-      <span style="margin-left:auto"></span>
-      <span class="mut">Add time:</span>
-      <button class="btn2 btn-sm" data-min="5">+5 min</button>
-      <button class="btn2 btn-sm" data-min="10">+10 min</button>
-      <button class="btn2 btn-sm" data-min="-5">−5 min</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="row">
-      <h2 style="margin:0">Questions</h2>
-      <span class="mut" id="q-sum"></span>
-      <span style="margin-left:auto"></span>
-      <button class="btn2 btn-sm" id="q-tpl">Download the CSV model</button>
-      <button class="btn2 btn-sm" id="q-show">Show / hide</button>
-    </div>
-    <div id="q-panel" class="hide" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
-      <p class="mut">Paste a CSV, or choose a <b>.csv</b> or a <b>.json</b> file (the format of your
-        <code>questions.json</code> works too). Columns:
-        <code>Id, Theme, Type, Question, Code, A, B, C, D, E, Correct, Expect, Points</code>.
-        <b>Type</b> is <code>single</code>, <code>multi</code> or <code>open</code>.
-        <b>Correct</b> is one letter (<code>B</code>) or several (<code>A,C</code>).
-        <b>Expect</b> is only for written answers.</p>
-      <div class="row">
-        <input type="file" id="q-file" accept=".csv,.json,.txt">
-        <span class="mut">or paste below</span>
-      </div>
-      <textarea id="q-csv" rows="6" placeholder="Id,Theme,Type,Question,Code,A,B,C,D,E,Correct,Expect,Points"
-        style="width:100%;margin-top:8px;font:13px ui-monospace,Consolas,monospace;padding:10px;
-        border:1.5px solid var(--line);border-radius:9px"></textarea>
-      <div class="row" style="margin-top:8px">
-        <button class="btn2 btn-sm" id="q-read">Read and check</button>
-        <button class="btn btn-sm" id="q-send" disabled>Replace the questions</button>
-        <span class="mut" id="q-msg"></span>
-      </div>
-      <div id="q-prev" style="overflow-x:auto;margin-top:10px"></div>
-      <div class="warnbox" style="margin-top:10px">
-        <b>Written answers.</b> In <code>Expect</code>, separate the expected elements with <code>|</code>:
-        <code>JFrame | setTitle("*") | setSize(600,400) | addActionListener:2 | ~feedback | !System.exit</code>.
-        <code>*</code> stands for anything, <code>:2</code> counts double, <code>~</code> is plain words
-        (case ignored), <code>!</code> must not appear. Spaces inside the code do not matter.
-      </div>
-    </div>
-  </div>
-
-  <div class="kpi">
-    <div><b id="n-wait">0</b>waiting</div>
-    <div><b id="n-run">0</b>in the exam</div>
-    <div><b id="n-sub">0</b>copies sent</div>
-    <div><b id="n-warn">0</b>warnings</div>
-    <div><b id="n-avg">–</b>average</div>
-  </div>
-
-  <div class="grid2">
-    <div class="card">
-      <div class="row">
-        <h2 style="margin:0">Students</h2>
-        <select id="f-group" style="margin-left:auto"><option value="">All groups</option></select>
-        <button class="btn btn-sm" id="b-all">Accept all waiting</button>
-      </div>
-      <div style="overflow-x:auto">
-        <table>
-          <thead><tr><th>Name</th><th>Matricule</th><th>Group</th><th>State</th>
-            <th>Left</th><th>⚠</th><th>Score</th><th></th></tr></thead>
-          <tbody id="tb"></tbody>
-        </table>
-      </div>
-      <p class="mut" id="empty">No student yet. Give them the exam link.</p>
-    </div>
-
-    <div>
-      <div class="card">
-        <h2>Student link</h2>
-        <div class="row">
-          <input id="lnk" readonly style="flex:1;font-size:12px">
-          <button class="btn2 btn-sm" id="b-copy">Copy</button>
-        </div>
-        <p class="mut">Give this address to the students, never this page.</p>
-      </div>
-      <div class="card">
-        <h2>Cheating alerts</h2>
-        <div id="evs"><p class="mut">Nothing for the moment.</p></div>
-      </div>
-      <div class="card">
-        <div class="row"><h2 style="margin:0">Written answers</h2>
-          <button class="btn2 btn-sm" id="o-load" style="margin-left:auto">Read them</button></div>
-        <div id="o-list"><p class="mut">The analyser gives complete, partial or wrong. You can change any mark.</p></div>
-      </div>
-      <div class="card">
-        <h2>End of the exam</h2>
-        <button class="btn2 btn-sm" id="b-csv">Download the results (CSV)</button>
-        <button class="btn2 btn-sm" id="b-pdf">Rebuild missing PDFs</button>
-        <p class="mut">Every copy is a PDF in the Drive folder of this exam.</p>
-        <div class="warnbox" style="margin-top:10px">
-          <b>New exam?</b> Change the questions in the Sheet, then
-          <button class="btn-bad btn-sm" id="b-reset">Clear the students</button>
-        </div>
-      </div>
+      <p><button class="btn" id="s-save">Save the settings</button>
+         <span class="msg" id="s-msg" style="color:var(--g)"></span></p>
+      <div class="hint">"Same mark" gives every question the mark above. Put <b>no</b> to use the Points
+        column of each question (the import does it for you when the points are different).</div>
     </div>
   </div>
 </div>
+</div>
 
-<script src="exam-config.js?v=3"></script>
+<div class="modal" id="md"><div class="in" id="mdi"></div></div>
+
+<script src="exam-config.js?v=4"></script>
 <script>
 (function(){
 'use strict';
-var API=window.EXAM_API||'', KEY='', ST={}, drift=0, timer=null;
+var API=window.EXAM_API||'', KEY='', D=null, tab='stu', PARSED=[], timer=null;
+var QCOLS=['Id','Theme','Type','Question','Code','A','B','C','D','E','Correct','Expect','Points'];
 function $(i){return document.getElementById(i);}
-function post(a,d,cb){
-  fetch(API,{method:'POST',body:JSON.stringify(Object.assign({action:a,key:KEY},d||{}))})
-   .then(function(r){return r.json();}).then(function(j){cb&&cb(j);})
-   .catch(function(){cb&&cb({ok:false,error:'network'});});
-}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){
   return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function api(a,d,cb){
+  fetch(API,{method:'POST',body:JSON.stringify(Object.assign({action:a,key:KEY},d||{}))})
+    .then(function(r){return r.json();}).then(function(j){cb&&cb(j);})
+    .catch(function(){cb&&cb({ok:false,error:'The server does not answer'});});
+}
+function mmss(ms){ms=Math.max(0,ms);var m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000);
+  return ('0'+m).slice(-2)+':'+('0'+s).slice(-2);}
 
-/* ---- login ---- */
-$('k-go').onclick=function(){
-  var v=$('k').value.trim();
-  if(!v){return;}
-  if(!API){$('k-msg').textContent='The server address is missing in exam-config.js';return;}
-  KEY=v; $('k-msg').textContent='Checking...';
-  post('tstate',{},function(j){
-    if(!j.ok){ $('k-msg').textContent=j.error||'Wrong key'; KEY=''; return; }
-    try{sessionStorage.setItem('hciexamkey',v);}catch(e){}
-    $('v-login').classList.add('hide'); $('v-dash').classList.remove('hide');
-    $('hd-live').classList.remove('hide');
-    $('lnk').value=location.href.replace(/exam-prof\.html.*$/,'exam.html');
+/* ---------- login ---------- */
+try{ var sv=sessionStorage.getItem('examkey'); if(sv)$('pw').value=sv; }catch(e){}
+$('lf').onsubmit=function(e){
+  e.preventDefault();
+  KEY=$('pw').value.trim();
+  if(!API){ $('lm').textContent='The server address is missing in exam-config.js'; return; }
+  $('lm').textContent='Checking…';
+  api('tstate',{},function(j){
+    if(!j.ok){ $('lm').textContent=j.error||'Wrong key'; KEY=''; return; }
+    try{ sessionStorage.setItem('examkey',KEY); }catch(x){}
+    $('login').hidden=true; $('app').hidden=false;
+    $('url').textContent=location.href.replace(/exam-prof\.html.*$/,'exam.html');
     paint(j); loop();
   });
 };
-$('k').addEventListener('keydown',function(e){ if(e.key==='Enter')$('k-go').click(); });
-try{ var saved=sessionStorage.getItem('hciexamkey'); if(saved){$('k').value=saved;$('k-go').click();} }catch(e){}
+try{ if(sessionStorage.getItem('examkey')) $('lf').dispatchEvent(new Event('submit')); }catch(e){}
 
-/* ---- loop ---- */
-function loop(){ clearTimeout(timer); post('tstate',{},function(j){ if(j.ok)paint(j); timer=setTimeout(loop,4000); }); }
+function loop(){ clearTimeout(timer);
+  api('tstate',{},function(j){ if(j.ok)paint(j); timer=setTimeout(loop,4000); }); }
 
-/* ---- paint ---- */
+/* ---------- paint ---------- */
 function paint(j){
-  ST=j; drift=j.serverTime-Date.now();
-  var x=j.exam||{};
-  $('x-title').textContent=x.title||'Exam';
-  $('x-status').textContent=x.status; $('x-status').className='pill p-'+
-    ({closed:'rejected',waiting:'waiting',running:'running',finished:'submitted'}[x.status]||'waiting');
-  $('x-info').textContent=x.questions+' questions · '+x.duration+' min · group(s) '+(x.groups||'-');
-  if(x.folder){ $('b-folder').href=x.folder; $('b-folder').classList.remove('hide'); }
-  if(!$('settings').dataset.touched){
-    $('s-title').value=x.title||''; $('s-module').value=x.module||'';
-    $('s-exam').value=x.examName||'';
-    $('s-dur').value=x.duration||30; $('s-groups').value=x.groups||'';
-    $('s-shuffle').value=x.shuffle||'no';
+  D=j; D.recv=Date.now();
+  var x=j.exam||{}, S=j.students||[];
+  $('ttl').textContent=[x.module,x.examName].filter(Boolean).join(' · ')||x.title||'Exam';
+  $('st').textContent=x.status; $('st').className='st '+x.status;
+  var k=x.kinds||{};
+  $('info').textContent=x.questions+' questions ('+(k.single||0)+'/'+(k.multi||0)+'/'+(k.open||0)+
+    ') · '+x.totalPoints+' pts'+(x.scoreOutOf>0?' → /'+x.scoreOutOf:'')+' · '+x.duration+' min';
+  if(x.folder){ $('bfolder').href=x.folder; $('bfolder').hidden=false; }
+  $('bopen').disabled=(x.status==='running');
+  $('bgo').disabled=(x.status==='running'||x.status==='closed');
+  $('bstop').disabled=(x.status!=='running');
+
+  if(!$('t-set').dataset.touched){
+    $('s-module').value=x.module||''; $('s-exam').value=x.examName||'';
+    $('s-title').value=x.title||''; $('s-dur').value=x.duration||30;
+    $('s-groups').value=x.groups||''; $('s-shuffle').value=x.shuffle||'no';
     $('s-outof').value=x.scoreOutOf||0; $('s-same').value=x.sameMark||'yes';
     $('s-per').value=x.markPerQuestion||1; $('s-partial').value=x.partialMulti||'yes';
     $('s-ocomp').value=x.openComplete||0.85; $('s-opart').value=x.openPartial||0.4;
     $('s-ocase').value=x.openIgnoreCase||'no';
     $('s-uct').value=x.useCaseTitle||''; $('s-ucx').value=x.useCaseText||'';
   }
-  var k=x.kinds||{};
-  $('q-sum').textContent=x.questions+' questions ('+(k.single||0)+' one answer, '+(k.multi||0)+
-    ' several, '+(k.open||0)+' written) · '+x.totalPoints+' points'+
-    (x.scoreOutOf>0?' → mark out of '+x.scoreOutOf:'');
-  var gs=$('f-group');
-  if(gs.options.length<2 && x.groups){
-    x.groups.split(',').forEach(function(g){ g=g.trim(); if(!g)return;
-      var o=document.createElement('option'); o.value=g; o.textContent=g; gs.appendChild(o); });
+  var G=(x.groups||'').split(',').map(function(g){return g.trim();}).filter(String);
+  if($('fg').options.length-1!==G.length){
+    var v=$('fg').value;
+    $('fg').innerHTML='<option value="">All groups</option>'+
+      G.map(function(g){return '<option>'+esc(g)+'</option>';}).join('');
+    $('fg').value=v;
   }
 
-  var list=j.students||[], f=gs.value;
-  var vis=f?list.filter(function(s){return s.group===f;}):list;
-  var nw=0,nr=0,ns=0,wn=0,sum=0,cnt=0;
-  list.forEach(function(s){
-    if(s.status==='waiting')nw++; if(s.status==='running')nr++;
-    if(s.status==='submitted'){ns++; if(s.score!=null){sum+=s.score;cnt++;}}
-    wn+=s.warnings||0;
+  var g=$('fg').value, L=g?S.filter(function(s){return s.group===g;}):S;
+  var wait=0,run=0,done=0,warn=0,sum=0,cnt=0;
+  L.forEach(function(s){
+    if(s.status==='waiting')wait++; if(s.status==='running')run++;
+    if(s.status==='submitted'){done++; if(s.score!=null){sum+=s.score;cnt++;}}
+    warn+=s.warnings||0;
   });
-  $('n-wait').textContent=nw; $('n-run').textContent=nr; $('n-sub').textContent=ns;
-  $('n-warn').textContent=wn; $('n-avg').textContent=cnt?(sum/cnt).toFixed(1):'–';
-  $('empty').classList.toggle('hide',list.length>0);
+  $('tiles').innerHTML=[[L.length,'students',0],[wait,'waiting',0],[run,'in the exam',0],
+    [done,'copies sent',0],[warn,'warnings',warn>0],
+    [cnt?(sum/cnt).toFixed(2):'—','average'+(x.scoreOutOf?' /'+x.scoreOutOf:''),0]]
+    .map(function(t){return '<div class="tile'+(t[2]?' warn':'')+'"><b>'+t[0]+'</b><span>'+t[1]+'</span></div>';})
+    .join('');
 
-  var tb=$('tb'); tb.innerHTML='';
-  vis.forEach(function(s){
-    var tr=document.createElement('tr');
-    var left='';
-    if(s.status==='running'&&s.endsAt){
-      var ms=Math.max(0,s.endsAt-(Date.now()+drift));
-      left=Math.floor(ms/60000)+':'+('0'+Math.floor(ms%60000/1000)).slice(-2);
-    }
-    tr.innerHTML=
-      '<td>'+esc(s.name)+'</td><td>'+esc(s.matricule)+'</td><td>'+esc(s.group)+'</td>'+
-      '<td><span class="pill p-'+s.status+'">'+s.status+'</span></td>'+
-      '<td>'+left+'</td>'+
-      '<td'+(s.warnings?' style="color:var(--bad);font-weight:700"':'')+'>'+(s.warnings||'')+'</td>'+
-      '<td>'+(s.score==null?'':(s.score+(s.outOf?' / '+s.outOf:'')))+'</td><td></td>';
-    var cell=tr.lastChild;
-    if(s.status==='waiting'){
-      cell.appendChild(mk('Accept','btn-ok',function(){act('tapprove',{matricule:s.matricule});}));
-      cell.appendChild(mk('Refuse','btn-bad',function(){act('treject',{matricule:s.matricule});}));
-    }else if(s.status==='running'){
-      cell.appendChild(mk('+5 min','btn2',function(){act('tminutes',{matricule:s.matricule,minutes:5});}));
-    }else if(s.status==='submitted'&&s.copy){
-      var a=document.createElement('a'); a.href=s.copy; a.target='_blank';
-      a.className='btn2 btn-sm'; a.style.textDecoration='none'; a.textContent='PDF';
-      cell.appendChild(a);
-    }
-    tb.appendChild(tr);
+  renderStu(); renderEv();
+}
+
+function renderStu(){
+  var S=(D.students||[]), g=$('fg').value, q=$('fs').value.trim().toLowerCase(), al=$('fa').checked;
+  var now=Date.now()+(D.serverTime-D.recv);
+  var L=S.filter(function(s){
+    return (!g||s.group===g) && (!q||(s.name+' '+s.matricule).toLowerCase().indexOf(q)>=0);
   });
-
-  var ev=$('evs');
-  if(!j.events||!j.events.length){ ev.innerHTML='<p class="mut">Nothing for the moment.</p>'; }
-  else{
-    ev.innerHTML='';
-    j.events.slice(0,12).forEach(function(e){
-      var d=document.createElement('div'); d.className='ev';
-      d.innerHTML='<i>⚠</i><span>'+esc(e.name)+' ('+esc(e.group)+') — '+esc(e.type)+'</span>';
-      ev.appendChild(d);
-    });
+  if(al)L=L.filter(function(s){return (s.warnings||0)>0;});
+  $('cnt').textContent=L.length+' shown';
+  if(!L.length){
+    $('tb').innerHTML='<tr><td colspan="8" style="padding:24px;color:var(--mut);text-align:center;'+
+      'white-space:normal">No student yet. Give them the address above.</td></tr>';
+    return;
   }
+  $('tb').innerHTML=L.map(function(s){
+    var left=(s.status==='running'&&s.endsAt)?mmss(s.endsAt-now):'—';
+    var cls=(s.warnings||0)>=3?'alert':((s.warnings||0)>0?'warn':'');
+    var act='';
+    if(s.status==='waiting')
+      act='<button class="btn sm" data-a="ok" data-m="'+esc(s.matricule)+'">Accept</button> '+
+          '<button class="btn red sm" data-a="no" data-m="'+esc(s.matricule)+'">Refuse</button>';
+    else if(s.status==='running')
+      act='<button class="btn gh sm" data-a="p5" data-m="'+esc(s.matricule)+'">+5 min</button> '+
+          '<button class="btn gh sm" data-a="take" data-m="'+esc(s.matricule)+'">Collect</button>';
+    else if(s.status==='submitted'&&s.copy)
+      act='<a class="btn gh sm" target="_blank" href="'+esc(s.copy)+'">PDF copy</a>';
+    return '<tr class="'+cls+'"><td class="nm">'+esc(s.name)+'</td><td>'+esc(s.matricule)+'</td>'+
+      '<td>'+esc(s.group)+'</td><td><span class="pill p-'+s.status+'">'+s.status+'</span></td>'+
+      '<td>'+left+'</td><td>'+(s.warnings?'<span class="nb">'+s.warnings+'</span>':'<span class="n0">0</span>')+'</td>'+
+      '<td>'+(s.score==null?'—':'<b>'+s.score+'</b>'+(s.outOf?' <span class="n0">/'+s.outOf+'</span>':''))+'</td>'+
+      '<td>'+act+'</td></tr>';
+  }).join('');
+  Array.prototype.forEach.call($('tb').querySelectorAll('button'),function(b){
+    b.onclick=function(){ act(b.dataset.a,b.dataset.m); };
+  });
 }
-function mk(txt,cls,fn){
-  var b=document.createElement('button'); b.textContent=txt;
-  b.className=cls+' btn-sm'; b.style.marginRight='6px'; b.onclick=fn; return b;
-}
-function act(a,d){ post(a,d,function(){ loop(); }); }
 
-/* ---- controls ---- */
-$('b-settings').onclick=function(){ $('settings').classList.toggle('hide'); };
-var SFIELDS=['s-title','s-module','s-exam','s-dur','s-groups','s-shuffle','s-outof','s-same',
-             's-per','s-partial','s-ocomp','s-opart','s-ocase','s-uct','s-ucx'];
-SFIELDS.forEach(function(i){
-  $(i).addEventListener('input',function(){ $('settings').dataset.touched='1'; });
-  $(i).addEventListener('change',function(){ $('settings').dataset.touched='1'; });
+function act(a,m){
+  if(a==='ok')   api('tapprove',{matricule:m},loop);
+  if(a==='no')   api('treject',{matricule:m},loop);
+  if(a==='p5')   api('tminutes',{matricule:m,minutes:5},loop);
+  if(a==='take'){ if(confirm('Collect the copy of this student now?')) api('tstop',{matricule:m},loop); }
+}
+
+function renderEv(){
+  var q=$('es').value.trim().toLowerCase();
+  var L=(D.events||[]).filter(function(e){
+    return !q||(e.name+' '+e.matricule+' '+e.type).toLowerCase().indexOf(q)>=0; });
+  $('evl').innerHTML=L.length?L.map(function(e){
+    return '<div class="evr bad"><b>'+esc(e.name)+' <span class="n0">'+esc(e.group)+'</span></b>'+
+           '<span>'+esc(e.type)+'</span></div>'; }).join('')
+    :'<p style="padding:14px;color:var(--mut)">Nothing for the moment.</p>';
+}
+
+/* clock */
+setInterval(function(){
+  if(!D)return;
+  var x=D.exam||{}, now=Date.now()+(D.serverTime-D.recv);
+  var run=(D.students||[]).filter(function(s){return s.status==='running'&&s.endsAt;});
+  if(x.status==='running'&&run.length){
+    var end=Math.max.apply(null,run.map(function(s){return s.endsAt;}));
+    $('clock').textContent=mmss(end-now);
+  }else $('clock').textContent=('0'+(x.duration||0)).slice(-2)+':00';
+  renderStu();
+},1000);
+
+/* ---------- tabs ---------- */
+Array.prototype.forEach.call(document.querySelectorAll('.tabsx button'),function(b){
+  b.onclick=function(){
+    tab=b.dataset.t;
+    Array.prototype.forEach.call(document.querySelectorAll('.tabsx button'),function(x){
+      x.classList.toggle('on',x===b); });
+    ['stu','ev','qs','op','set'].forEach(function(t){ $('t-'+t).hidden=(t!==tab); });
+  };
+});
+['fg','fs','fa'].forEach(function(i){ $(i).addEventListener('input',function(){ if(D)paint(D); }); });
+$('es').addEventListener('input',function(){ if(D)renderEv(); });
+
+/* ---------- controls ---------- */
+$('bopen').onclick=function(){ api('tconfig',{Status:'waiting'},loop); };
+$('bgo').onclick=function(){
+  var n=(D.students||[]).filter(function(s){return s.status==='approved';}).length;
+  if(!confirm('Start the exam for '+n+' accepted student(s)? The timer starts for everybody.'))return;
+  api('tstart',{minutes:Number($('s-dur').value||D.exam.duration||30)},loop);
+};
+$('bstop').onclick=function(){
+  if(confirm('Stop the exam and collect every copy now?')) api('tstop',{},loop);
+};
+Array.prototype.forEach.call(document.querySelectorAll('[data-min]'),function(b){
+  b.onclick=function(){
+    var g=$('fg').value;
+    api('tminutes',{minutes:Number(b.dataset.min),group:g||undefined},loop);
+  };
+});
+$('ball').onclick=function(){ var g=$('fg').value; api('tapprove',g?{group:g}:{},loop); };
+$('bcsv').onclick=function(){
+  var rows=[['Name','Matricule','Group','State','Warnings','Mark','OutOf','Copy']];
+  (D.students||[]).forEach(function(s){
+    rows.push([s.name,s.matricule,s.group,s.status,s.warnings||0,
+               s.score==null?'':s.score,s.outOf||'',s.copy||'']);
+  });
+  dl(rows.map(function(r){return r.map(function(c){
+    return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n'),
+    ((D.exam.module||'exam')+'_'+(D.exam.examName||'')).replace(/\W+/g,'_')+'_results.csv');
+};
+$('breset').onclick=function(){
+  $('mdi').innerHTML='<h3>New exam</h3><p>The students, the answers and the log of this exam are '+
+    'cleared. The questions and the settings stay. The copies already in Drive are not touched.</p>'+
+    '<p><button class="btn red" id="rgo">Clear the students</button> '+
+    '<button class="btn gh" id="rno">Cancel</button></p>';
+  $('md').classList.add('on');
+  $('rno').onclick=function(){ $('md').classList.remove('on'); };
+  $('rgo').onclick=function(){ api('treset',{},function(){ $('md').classList.remove('on'); loop(); }); };
+};
+$('md').onclick=function(e){ if(e.target.id==='md')$('md').classList.remove('on'); };
+
+/* ---------- settings ---------- */
+['s-module','s-exam','s-title','s-dur','s-groups','s-shuffle','s-outof','s-same','s-per',
+ 's-partial','s-ocomp','s-opart','s-ocase','s-uct','s-ucx'].forEach(function(i){
+  $(i).addEventListener('input',function(){ $('t-set').dataset.touched='1'; });
+  $(i).addEventListener('change',function(){ $('t-set').dataset.touched='1'; });
 });
 $('s-save').onclick=function(){
-  $('s-msg').textContent='Saving...';
-  post('tconfig',{Title:$('s-title').value,Module:$('s-module').value,ExamName:$('s-exam').value,
+  $('s-msg').textContent='Saving…';
+  api('tconfig',{Module:$('s-module').value,ExamName:$('s-exam').value,Title:$('s-title').value,
     DurationMin:Number($('s-dur').value||30),Groups:$('s-groups').value,Shuffle:$('s-shuffle').value,
     ScoreOutOf:Number($('s-outof').value||0),SameMark:$('s-same').value,
     MarkPerQuestion:Number($('s-per').value||1),PartialMulti:$('s-partial').value,
     OpenComplete:Number($('s-ocomp').value||0.85),OpenPartial:Number($('s-opart').value||0.4),
     OpenIgnoreCase:$('s-ocase').value,UseCaseTitle:$('s-uct').value,UseCaseText:$('s-ucx').value},
-    function(j){ $('s-msg').textContent=j.ok?'Saved':(j.error||'Not saved');
-      $('settings').dataset.touched=''; loop();
-      setTimeout(function(){$('s-msg').textContent='';},2000); });
+    function(j){
+      $('s-msg').textContent=j.ok?'Saved ✔':(j.error||'Not saved');
+      $('t-set').dataset.touched=''; loop();
+      setTimeout(function(){ $('s-msg').textContent=''; },2200);
+    });
 };
 
-/* ---- questions: CSV / JSON ---- */
-var PARSED=[];
-var QCOLS=['Id','Theme','Type','Question','Code','A','B','C','D','E','Correct','Expect','Points'];
-$('q-show').onclick=function(){ $('q-panel').classList.toggle('hide'); };
-$('q-tpl').onclick=function(){
+/* ---------- questions ---------- */
+function dl(text,name){
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(text);
+  a.download=name; a.click();
+}
+$('qtpl').onclick=function(){
   var rows=[QCOLS,
    ['Q1','Ch. 4 · Interface','single','Which widget makes one choice among n alternatives?','',
     'Check box','Radio button','Text field','Scrollbar','','B','',1],
@@ -386,21 +451,16 @@ $('q-tpl').onclick=function(){
   dl(rows.map(function(r){return r.map(function(c){
     return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n'),'questions_model.csv');
 };
-function dl(text,name){
-  var a=document.createElement('a');
-  a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(text);
-  a.download=name; a.click();
-}
-$('q-file').onchange=function(){
+$('qfile').onchange=function(){
   var f=this.files&&this.files[0]; if(!f)return;
   var r=new FileReader();
-  r.onload=function(){ $('q-csv').value=String(r.result||''); $('q-read').click(); };
+  r.onload=function(){ $('qcsv').value=String(r.result||''); $('qread').click(); };
   r.readAsText(f,'utf-8');
 };
-
 function splitCsv(text){
-  var rows=[],row=[],cell='',q=false,i,c,d=text.indexOf(';')>=0&&
-      (text.split('\n')[0]||'').split(';').length>(text.split('\n')[0]||'').split(',').length?';':',';
+  var first=(text.split('\n')[0]||'');
+  var d=first.split(';').length>first.split(',').length?';':',';
+  var rows=[],row=[],cell='',q=false,i,c;
   for(i=0;i<text.length;i++){
     c=text[i];
     if(q){ if(c==='"'){ if(text[i+1]==='"'){cell+='"';i++;} else q=false; } else cell+=c; }
@@ -412,35 +472,33 @@ function splitCsv(text){
   if(cell.length||row.length){row.push(cell);rows.push(row);}
   return rows.filter(function(r){return r.join('').trim().length;});
 }
-
 function fromJson(txt){
-  var j=JSON.parse(txt);
-  var list=Array.isArray(j)?j:(j.questions||[]);
+  var j=JSON.parse(txt), list=Array.isArray(j)?j:(j.questions||[]);
   return list.map(function(q,i){
     var o={Id:String(q.id||('Q'+(i+1))),Theme:String(q.theme||''),Type:String(q.type||'single'),
-           Question:String(q.text||q.question||''),Code:String(q.code||''),
-           Correct:'',Expect:String(q.expect||''),Points:q.points==null?1:Number(q.points)};
+           Question:String(q.text||q.question||''),Code:String(q.code||''),Correct:'',
+           Expect:String(q.expect||''),Points:q.points==null?1:Number(q.points)};
     var opts=q.options||q.choices||[];
     ['A','B','C','D','E'].forEach(function(L,k){ o[L]=opts[k]==null?'':String(opts[k]); });
-    if(Array.isArray(q.answer)) o.Correct=q.answer.map(function(n){return 'ABCDE'[n];}).join(',');
+    if(Object.prototype.toString.call(q.answer)==='[object Array]')
+      o.Correct=q.answer.map(function(n){return 'ABCDE'[n];}).join(',');
     else if(typeof q.answer==='number') o.Correct='ABCDE'[q.answer]||'';
     else if(q.answer!=null) o.Correct=String(q.answer).toUpperCase();
-    if(o.Correct.indexOf(',')>=0&&o.Type==='single') o.Type='multi';
-    if(!opts.length&&!o.Correct) o.Type='open';
+    if(o.Correct.indexOf(',')>=0&&o.Type==='single')o.Type='multi';
+    if(!opts.length&&!o.Correct)o.Type='open';
     return o;
   });
 }
-
-$('q-read').onclick=function(){
-  var txt=$('q-csv').value.trim();
-  $('q-send').disabled=true; PARSED=[];
-  if(!txt){ $('q-msg').textContent='Nothing to read.'; return; }
+$('qread').onclick=function(){
+  var txt=$('qcsv').value.trim();
+  $('qsend').disabled=true; PARSED=[];
+  if(!txt){ $('qmsg').textContent='Nothing to read.'; return; }
   try{
     if(txt.charAt(0)==='{'||txt.charAt(0)==='['){ PARSED=fromJson(txt); }
     else{
-      var rows=splitCsv(txt), head=rows[0].map(function(h){return h.trim().toLowerCase();});
-      var idx={}; QCOLS.forEach(function(c){ idx[c]=head.indexOf(c.toLowerCase()); });
-      if(idx.Question<0){ $('q-msg').textContent='The header line must contain at least "Question".'; return; }
+      var rows=splitCsv(txt), head=rows[0].map(function(h){return h.trim().toLowerCase();}), idx={};
+      QCOLS.forEach(function(c){ idx[c]=head.indexOf(c.toLowerCase()); });
+      if(idx.Question<0){ $('qmsg').textContent='The header line must contain at least "Question".'; return; }
       PARSED=rows.slice(1).map(function(r,i){
         var o={};
         QCOLS.forEach(function(c){ o[c]=idx[c]>=0?String(r[idx[c]]==null?'':r[idx[c]]).trim():''; });
@@ -454,118 +512,76 @@ $('q-read').onclick=function(){
         return o;
       });
     }
-  }catch(e){ $('q-msg').textContent='Could not read it: '+e.message; return; }
+  }catch(e){ $('qmsg').textContent='Could not read it: '+e.message; return; }
 
-  var bad=[];
+  var bad=[], n={single:0,multi:0,open:0}, pts=0;
   PARSED.forEach(function(q,i){
-    if(!q.Question) bad.push('line '+(i+1)+': no question');
-    else if(q.Type==='open'){ if(!q.Expect) bad.push(q.Id+': written answer with nothing expected (you will mark it by hand)'); }
-    else if(!q.Correct) bad.push(q.Id+': no correct answer');
-    else if(!q.A||!q.B) bad.push(q.Id+': fewer than two choices');
+    n[q.Type]++; pts+=Number(q.Points||1);
+    if(!q.Question)bad.push('line '+(i+1)+': no question');
+    else if(q.Type==='open'){ if(!q.Expect)bad.push(q.Id+': written answer with nothing expected (marked by hand)'); }
+    else if(!q.Correct)bad.push(q.Id+': no correct answer');
+    else if(!q.A||!q.B)bad.push(q.Id+': fewer than two choices');
   });
-  var n={single:0,multi:0,open:0},pts=0;
-  PARSED.forEach(function(q){ n[q.Type]++; pts+=Number(q.Points||1); });
-  $('q-msg').innerHTML=PARSED.length+' questions read ('+n.single+' / '+n.multi+' / '+n.open+
-    '), '+pts+' points'+(bad.length?' — <b style="color:var(--bad)">'+bad.length+' to check</b>':' — nothing to report');
-
-  var h='<table><tr><th>Id</th><th>Type</th><th>Question</th><th>Correct</th><th>Pts</th></tr>';
+  $('qmsg').innerHTML=PARSED.length+' questions read ('+n.single+' one answer, '+n.multi+
+    ' several, '+n.open+' written), '+pts+' points'+
+    (bad.length?' — <b style="color:var(--bad)">'+bad.length+' to check</b>':' — nothing to report');
+  var h='<table><thead><tr><th>Id</th><th>Type</th><th>Question</th><th>Correct</th><th>Pts</th></tr></thead><tbody>';
   PARSED.slice(0,12).forEach(function(q){
-    h+='<tr><td>'+esc(q.Id)+'</td><td>'+esc(q.Type)+'</td><td>'+esc(q.Question.slice(0,90))+
-       '</td><td>'+esc(q.Correct||(q.Expect?'analyser':'—'))+'</td><td>'+esc(q.Points)+'</td></tr>';
+    h+='<tr><td>'+esc(q.Id)+'</td><td>'+esc(q.Type)+'</td><td style="white-space:normal">'+
+       esc(q.Question.slice(0,90))+'</td><td>'+esc(q.Correct||(q.Expect?'analyser':'—'))+
+       '</td><td>'+esc(q.Points)+'</td></tr>';
   });
-  h+='</table>';
-  if(PARSED.length>12)h+='<p class="mut">and '+(PARSED.length-12)+' more…</p>';
-  if(bad.length)h+='<div class="warnbox" style="margin-top:8px">'+bad.slice(0,8).map(esc).join('<br>')+'</div>';
-  $('q-prev').innerHTML=h;
-  $('q-send').disabled=!PARSED.length;
+  h+='</tbody></table>';
+  if(PARSED.length>12)h+='<p class="n0">and '+(PARSED.length-12)+' more…</p>';
+  if(bad.length)h+='<div class="hint">'+bad.slice(0,8).map(esc).join('<br>')+'</div>';
+  $('qprev').innerHTML=h;
+  $('qsend').disabled=!PARSED.length;
 };
-
-$('q-send').onclick=function(){
+$('qsend').onclick=function(){
   if(!PARSED.length)return;
   if(!confirm('Replace every question of this exam by these '+PARSED.length+'?'))return;
-  $('q-send').disabled=true; $('q-msg').textContent='Sending...';
-  post('timport',{questions:PARSED},function(j){
-    $('q-msg').textContent=j.ok?(j.n+' questions are in place'+(j.note?' — '+j.note:'')):(j.error||'Not imported');
-    if(j.ok&&j.note){ $('settings').dataset.touched=''; }
-    $('q-send').disabled=false; loop();
+  $('qsend').disabled=true; $('qmsg').textContent='Sending…';
+  api('timport',{questions:PARSED},function(j){
+    $('qmsg').textContent=j.ok?(j.n+' questions are in place'+(j.note?' — '+j.note:'')):(j.error||'Not imported');
+    if(j.ok&&j.note)$('t-set').dataset.touched='';
+    $('qsend').disabled=false; loop();
   });
 };
 
-/* ---- written answers ---- */
-$('o-load').onclick=function(){
-  $('o-list').innerHTML='<p class="mut">Loading...</p>';
-  post('topen',{},function(j){
-    if(!j.ok){ $('o-list').innerHTML='<p class="mut">'+esc(j.error||'Not possible')+'</p>'; return; }
-    if(!j.answers.length){ $('o-list').innerHTML='<p class="mut">No written answer yet.</p>'; return; }
-    var box=$('o-list'); box.innerHTML='';
+/* ---------- written answers ---------- */
+$('oload').onclick=function(){
+  $('olist').innerHTML='<p class="n0">Loading…</p>';
+  api('topen',{},function(j){
+    if(!j.ok){ $('olist').innerHTML='<p class="n0">'+esc(j.error||'Not possible')+'</p>'; return; }
+    if(!j.answers.length){ $('olist').innerHTML='<p class="n0">No written answer yet.</p>'; return; }
+    var box=$('olist'); box.innerHTML='';
     j.answers.forEach(function(a){
-      var d=document.createElement('div');
-      d.style.cssText='border-bottom:1px solid var(--line);padding:10px 0';
-      var cls=a.verdict==='complete'?'p-running':(a.verdict==='partial'?'p-waiting':'p-rejected');
-      d.innerHTML='<div class="row"><b>'+esc(a.matricule)+'</b>'+
-        '<span class="pill '+cls+'">'+esc(a.verdict||'not marked')+'</span>'+
-        '<span class="mut">'+esc(a.qid)+'</span></div>'+
-        '<pre style="white-space:pre-wrap;background:#f8fafd;border:1px solid var(--line);'+
-        'border-radius:8px;padding:8px;font-size:12px;margin:6px 0">'+esc(a.answer||'(nothing)')+'</pre>'+
-        '<div class="mut" style="font-size:12px">'+esc(a.detail||'')+'</div>';
-      var r=document.createElement('div'); r.className='row'; r.style.marginTop='6px';
+      var pill=a.verdict==='complete'?'p-running':(a.verdict==='partial'?'p-waiting':'p-rejected');
+      var d=document.createElement('div'); d.className='it';
+      d.innerHTML='<div class="h"><b>'+esc(a.matricule)+'</b> <code>'+esc(a.qid)+'</code> '+
+        '<span class="pill '+pill+'">'+esc(a.verdict||'not marked')+'</span></div>'+
+        '<div class="n0" style="font-size:12.5px;white-space:normal">'+esc(a.question)+'</div>'+
+        '<pre>'+esc(a.answer||'(nothing)')+'</pre>'+
+        '<div class="n0" style="font-size:12.5px;white-space:normal">'+esc(a.detail||'')+'</div>';
+      var r=document.createElement('p'); r.style.margin='8px 0 0';
       var inp=document.createElement('input');
       inp.type='number'; inp.step='0.25'; inp.min='0'; inp.max=String(a.points);
-      inp.value=(a.mark==null?'':a.mark); inp.style.width='90px';
-      var lab=document.createElement('span'); lab.className='mut'; lab.textContent='/ '+a.points;
-      var b=document.createElement('button'); b.className='btn btn-sm'; b.textContent='Save this mark';
+      inp.value=(a.mark==null?'':a.mark);
+      inp.style.cssText='width:90px;padding:6px 9px;border:1px solid var(--line);border-radius:8px';
+      var lab=document.createElement('span'); lab.className='n0'; lab.textContent=' / '+a.points+'  ';
+      var b=document.createElement('button'); b.className='btn sm'; b.textContent='Save this mark';
       b.onclick=function(){
         b.disabled=true;
-        post('tgrade',{row:a.row,matricule:a.matricule,mark:Number(inp.value||0),
+        api('tgrade',{row:a.row,matricule:a.matricule,mark:Number(inp.value||0),
           verdict:'by the teacher'},function(res){
-          b.disabled=false; b.textContent=res.ok?'Saved':'Error'; loop();
-          setTimeout(function(){b.textContent='Save this mark';},1500);
+          b.disabled=false; b.textContent=res.ok?'Saved ✔':'Error'; loop();
+          setTimeout(function(){ b.textContent='Save this mark'; },1600);
         });
       };
       r.appendChild(inp); r.appendChild(lab); r.appendChild(b);
       d.appendChild(r); box.appendChild(d);
     });
   });
-};
-$('b-open').onclick=function(){ post('tconfig',{Status:'waiting'},loop); };
-$('b-start').onclick=function(){
-  var n=(ST.students||[]).filter(function(s){return s.status==='approved';}).length;
-  if(!n&&!confirm('No student is accepted yet. Start anyway?'))return;
-  post('tstart',{minutes:Number($('s-dur').value||ST.exam.duration||30)},loop);
-};
-$('b-stop').onclick=function(){
-  if(confirm('Stop the exam and collect every copy?')) post('tstop',{},loop);
-};
-document.querySelectorAll('[data-min]').forEach(function(b){
-  b.onclick=function(){
-    var g=$('f-group').value;
-    post('tminutes',{minutes:Number(b.dataset.min),group:g||undefined},loop);
-  };
-});
-$('b-all').onclick=function(){
-  var g=$('f-group').value;
-  post('tapprove',g?{group:g}:{},loop);
-};
-$('f-group').onchange=function(){ paint(ST); };
-$('b-copy').onclick=function(){
-  $('lnk').select(); try{document.execCommand('copy');}catch(e){}
-  $('b-copy').textContent='Copied'; setTimeout(function(){$('b-copy').textContent='Copy';},1200);
-};
-$('b-pdf').onclick=function(){ post('tpdf',{},function(j){ alert((j.n||0)+' copy/copies rebuilt'); loop(); }); };
-$('b-reset').onclick=function(){
-  if(confirm('Clear the students, the answers and the alerts of this exam?')) post('treset',{},loop);
-};
-$('b-csv').onclick=function(){
-  var rows=[['Name','Matricule','Group','State','Warnings','Score','Copy']];
-  (ST.students||[]).forEach(function(s){
-    rows.push([s.name,s.matricule,s.group,s.status,s.warnings||0,s.score==null?'':s.score,s.copy||'']);
-  });
-  var csv=rows.map(function(r){return r.map(function(c){
-    return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var a=document.createElement('a');
-  a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(csv);
-  a.download=(ST.exam&&ST.exam.title||'exam').replace(/\W+/g,'_')+'_results.csv';
-  a.click();
 };
 })();
 </script>

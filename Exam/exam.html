@@ -3,220 +3,265 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>HCI – Online exam</title>
+<title>Online exam</title>
 <style>
-:root{--main:#1d4ed8;--ink:#0f2238;--mut:#5a6b82;--line:#d6dfeb;--soft:#e8f0fe;
-      --bg:#f6f9fd;--ok:#16a34a;--bad:#dc2626;--warn:#d97706}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;height:100%}
-body{font-family:Inter,system-ui,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink);
+:root{--bg:#f2f5f1;--ink:#14231c;--mut:#4f6158;--g:#1f7a4d;--g2:#dcebe1;--am:#c98a12;
+      --am2:#fbefd2;--card:#fff;--line:#c9d8cf;--bad:#b3261e;--bad2:#fbe3e0;--code:#0f1d16}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",Roboto,Arial,sans-serif;
      -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-.wrap{max-width:860px;margin:0 auto;padding:18px 16px 110px}
-.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin:14px 0}
-h1{font-size:22px;margin:0 0 4px}h2{font-size:18px;margin:0 0 10px}
-.mut{color:var(--mut);font-size:14px}
-label{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}
-input,select{width:100%;padding:12px 14px;font:inherit;border:1.5px solid var(--line);border-radius:10px;background:#fff}
-input:focus,select:focus{outline:2px solid var(--main);outline-offset:-2px}
-button{font:inherit;font-weight:600;border:0;border-radius:10px;padding:13px 20px;cursor:pointer}
-.btn{background:var(--main);color:#fff}
-.btn:disabled{background:#9db5e8;cursor:not-allowed}
-.btn2{background:#fff;color:var(--main);border:1.5px solid var(--main)}
-.btn-big{width:100%;font-size:17px;padding:16px}
-.hide{display:none!important}
-.center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
-.center .card{max-width:520px;width:100%;margin:0}
-.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--warn);margin-right:7px;
-     animation:p 1.2s infinite}
-@keyframes p{0%,100%{opacity:1}50%{opacity:.25}}
-.bar{position:fixed;left:0;right:0;top:0;background:#fff;border-bottom:1px solid var(--line);z-index:20}
-.bar .in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
-.time{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:700;font-size:20px;color:var(--main)}
-.time.low{color:var(--bad)}
-.prog{height:5px;background:#e6ecf5}.prog i{display:block;height:5px;background:var(--main);width:0;transition:width .2s}
-.q{font-size:18px;font-weight:600;margin:0 0 14px;line-height:1.45}
-.opt{display:flex;gap:12px;align-items:flex-start;border:2px solid var(--line);border-radius:12px;
-     padding:14px 16px;margin:10px 0;cursor:pointer;background:#fff}
-.opt:hover{border-color:#9db5e8}
-.opt.sel{border-color:var(--main);background:var(--soft)}
-.opt b{color:var(--main);min-width:22px}
-.ta{width:100%;min-height:220px;font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
-    font-size:14px;line-height:1.55;padding:14px;border:2px solid var(--line);border-radius:12px;
-    -webkit-user-select:text;user-select:text;resize:vertical;white-space:pre;overflow-wrap:normal;overflow-x:auto}
-.ta:focus{outline:2px solid var(--main);outline-offset:-2px}
-pre.code{background:#0f2238;color:#e6edf7;border-radius:10px;padding:12px 14px;overflow-x:auto;
-    font-family:ui-monospace,Consolas,monospace;font-size:13px;line-height:1.5}
-.tag{display:inline-block;background:var(--soft);color:var(--main);border-radius:999px;
-    padding:3px 10px;font-size:12px;font-weight:700;margin-right:6px}
-.uc{max-height:320px;overflow:auto;white-space:pre-wrap;line-height:1.6;font-size:14px}
-.nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);z-index:20}
-.nav .in{max-width:860px;margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:center}
-.grid{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 0}
-.grid b{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;
-        border:1.5px solid var(--line);font-size:13px;cursor:pointer;font-weight:600;background:#fff}
-.grid b.done{background:var(--soft);border-color:var(--main);color:var(--main)}
-.grid b.cur{background:var(--main);border-color:var(--main);color:#fff}
-.alert{background:#fef2f2;border:1.5px solid #fecaca;color:#991b1b;border-radius:12px;padding:14px;margin:12px 0;font-weight:600}
-.note{background:var(--soft);border-radius:12px;padding:14px;font-size:14px;line-height:1.5}
-.big{font-size:40px;font-weight:800;color:var(--main);margin:8px 0}
-ul{margin:8px 0;padding-left:20px;line-height:1.6;font-size:14px}
-@media(max-width:560px){.wrap{padding:12px 12px 120px}.q{font-size:17px}}
+input,select,textarea{-webkit-user-select:text;user-select:text}
+h1,h2,h3{margin:0 0 8px;line-height:1.2}
+code{font:14px Consolas,"Courier New",monospace;background:var(--g2);padding:1px 5px;border-radius:5px}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--g);color:#fff;border:0;border-radius:10px;padding:11px 20px;font-weight:700;font-size:16px}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.gh{background:transparent;color:var(--g);border:1.5px solid var(--g)}
+.btn.red{background:var(--bad)}
+.screen{display:none}.screen.on{display:block}
+
+/* ---- identity / waiting / result ---- */
+.box{max-width:620px;margin:6vh auto;background:var(--card);border:1px solid var(--line);
+     border-radius:18px;padding:28px;box-shadow:0 10px 30px rgba(20,35,28,.08)}
+.box .sub{color:var(--mut);margin:0 0 18px}
+.wbox{max-width:1040px;margin:3vh auto}
+.wcase{border:1px solid var(--line);border-radius:12px;margin-top:14px;overflow:hidden}
+.wch{background:var(--am2);padding:8px 14px;font-size:15px;font-weight:700}
+#wuc{max-height:60vh;overflow:auto;padding:14px 16px;white-space:pre-wrap;background:var(--card)}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form label{display:flex;flex-direction:column;font-weight:600;font-size:14px;color:var(--mut);gap:5px}
+.form .full{grid-column:1/-1}
+.form input,.form select{font:16px inherit;padding:10px 12px;border:1px solid var(--line);
+     border-radius:10px;background:#fff;color:var(--ink)}
+.rules{background:var(--g2);border-radius:12px;padding:12px 16px 12px 34px;margin:18px 0;font-size:15px}
+.rules li{margin:3px 0}
+.msg{min-height:24px;margin-top:10px;font-weight:600}.msg.bad{color:var(--bad)}.msg.ok{color:var(--g)}
+.idc{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;background:var(--bg);
+     border-radius:12px;padding:12px 16px;margin:14px 0}
+.idc b{color:var(--mut);font-weight:600}
+.pulse{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--am);
+       margin-right:8px;animation:p 1.4s infinite}@keyframes p{50%{opacity:.25}}
+
+/* ---- exam ---- */
+#exam.on{display:flex;flex-direction:column;height:100vh}
+.top{display:flex;align-items:center;gap:16px;padding:8px 16px;background:var(--code);
+     color:#e6f2ea;flex-wrap:wrap}
+.top .t{font-weight:700}.top .who{color:#b9d3c3;font-size:14px}.top .sp{flex:1}
+.chip{background:#ffffff1a;border-radius:99px;padding:4px 12px;font-size:14px;font-weight:600;white-space:nowrap}
+.timer{font:800 24px Consolas,monospace;background:#ffffff1a;border-radius:10px;padding:2px 12px}
+.timer.warn{background:var(--am);color:#111}.timer.end{background:var(--bad);color:#fff}
+.main{flex:1;display:grid;grid-template-columns:minmax(0,46fr) minmax(0,54fr);min-height:0}
+.main.one{grid-template-columns:minmax(0,1fr)}
+.left{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:var(--card)}
+.left.hide{display:none}
+.lh{background:var(--am2);padding:8px 14px;font-weight:700;font-size:15px;border-bottom:1px solid var(--line)}
+.uc{flex:1;overflow:auto;padding:14px 16px;white-space:pre-wrap;font-size:15px}
+.right{display:flex;flex-direction:column;min-height:0}
+.qwrap{flex:1;overflow:auto;padding:20px 26px}
+.qhead{display:flex;align-items:center;gap:10px;color:var(--mut);font-weight:700;margin-bottom:8px;flex-wrap:wrap}
+.qhead .th{background:var(--g2);color:var(--g);border-radius:99px;padding:2px 10px;font-size:13px}
+.qhead .ty{background:var(--am2);color:#7a5200;border-radius:99px;padding:2px 10px;font-size:13px}
+.qtext{font-size:19px;font-weight:600;margin:0 0 12px}
+.qcode{font:15px/1.5 Consolas,monospace;background:var(--code);color:#d9eadf;border-radius:12px;
+       padding:12px 16px;white-space:pre-wrap;margin:0 0 16px}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:var(--card);
+     border:2px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 10px;font-size:16px;color:var(--ink)}
+.opt:hover{border-color:var(--g)}
+.opt .l{flex:none;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);
+        display:grid;place-items:center;font-weight:800;color:var(--mut)}
+.opt.sel{border-color:var(--g);background:var(--g2)}
+.opt.sel .l{background:var(--g);border-color:var(--g);color:#fff}
+.opt.multi .l{border-radius:8px}
+.ta{width:100%;min-height:260px;font:15px/1.55 Consolas,"Courier New",monospace;padding:14px;
+    border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);
+    resize:vertical;white-space:pre;overflow-wrap:normal;overflow-x:auto}
+.ta:focus{outline:0;border-color:var(--g)}
+.bar{display:flex;gap:10px;align-items:center;padding:10px 26px;border-top:1px solid var(--line);
+     background:var(--card);flex-wrap:wrap}
+.bar .sp{flex:1}
+.grid{display:grid;grid-template-columns:repeat(20,1fr);gap:4px;padding:8px 26px 12px;background:var(--card)}
+.grid button{border:1.5px solid var(--line);background:#fff;border-radius:6px;padding:4px 0;
+             font:700 12px inherit;color:var(--mut)}
+.grid button.a{background:var(--g);border-color:var(--g);color:#fff}
+.grid button.c{outline:2.5px solid var(--ink);outline-offset:1px}
+.save{font-size:13px;color:var(--mut)}
+.warnline{background:var(--bad2);border:1px solid #f1b0a9;color:#7a1c14;border-radius:10px;
+          padding:9px 14px;margin:0 26px 10px;font-weight:600;font-size:15px}
+
+/* ---- overlays ---- */
+.ov{position:fixed;inset:0;background:rgba(15,29,22,.93);color:#fff;display:none;align-items:center;
+    justify-content:center;z-index:50;text-align:center;padding:20px}
+.ov.on{display:flex}.ov .in{max-width:560px}.ov h2{font-size:28px}.ov p{font-size:18px;color:#d5e6dc}
+
+/* ---- result ---- */
+.score{font:800 64px Consolas,monospace;color:var(--g);margin:6px 0}
+.score small{font-size:28px;color:var(--mut)}
+@media(max-width:860px){.main{grid-template-columns:minmax(0,1fr)}.left{max-height:34vh;border-right:0;
+  border-bottom:1px solid var(--line)}.grid{grid-template-columns:repeat(10,1fr)}.qwrap{padding:16px}}
 </style>
 </head>
 <body oncontextmenu="return false">
 
-<!-- 1. identification ------------------------------------------------>
-<div id="v-join" class="center">
-  <div class="card">
+<!-- 1. identity -->
+<div id="join" class="screen on">
+  <div class="box">
     <h1 id="j-title">Online exam</h1>
-    <p class="mut" id="j-sub">University of Algiers 1 &middot; Computer Science Department</p>
-    <div id="j-err" class="alert hide"></div>
-    <label for="f-name">Full name</label>
-    <input id="f-name" autocomplete="off" placeholder="Family name and first name">
-    <label for="f-mat">Matricule</label>
-    <input id="f-mat" autocomplete="off" inputmode="numeric" placeholder="Your registration number">
-    <label for="f-grp">Group</label>
-    <select id="f-grp"></select>
-    <p></p>
-    <button id="f-go" class="btn btn-big">Ask to enter the exam</button>
-    <p class="mut" style="margin-top:14px">Your teacher sees your request and lets you in.</p>
+    <p class="sub" id="j-sub">University of Algiers 1 &middot; Computer Science Department</p>
+    <div class="form">
+      <label class="full">Full name
+        <input id="f-name" autocomplete="off" placeholder="Family name and first name"></label>
+      <label>Matricule
+        <input id="f-mat" autocomplete="off" placeholder="Your number"></label>
+      <label>Group <select id="f-grp"></select></label>
+    </div>
+    <div class="msg bad" id="j-err"></div>
+    <button id="f-go" class="btn" style="width:100%">Ask to enter the exam</button>
+    <p class="sub" style="margin:14px 0 0">Your teacher sees your request and lets you in.</p>
   </div>
 </div>
 
-<!-- 2. waiting room --------------------------------------------------->
-<div id="v-wait" class="center hide">
-  <div class="card">
-    <h2><span class="dot"></span>Waiting for the teacher</h2>
-    <p class="mut" id="w-who"></p>
-    <div class="note" id="w-note">Keep this page open. It starts by itself when the teacher lets you in.</div>
-    <div id="w-uc" class="note hide" style="margin-top:12px;background:#fff">
-      <b id="w-uct"></b>
-      <div class="uc" id="w-ucx"></div>
-      <p class="mut" style="margin-bottom:0">Read it now. You keep it during the exam.</p>
-    </div>
-    <div id="w-rules" class="note" style="margin-top:12px;background:#fff7ed">
-      <b>During the exam</b>
-      <ul>
-        <li>The exam opens in full screen. Do not leave it.</li>
-        <li>Copy, paste and the right click are turned off.</li>
-        <li>Do not change tab or open another window.</li>
-        <li>After <b id="w-max">3</b> warnings your copy is sent automatically.</li>
-      </ul>
+<!-- 2. waiting room -->
+<div id="wait" class="screen">
+  <div class="box wbox">
+    <h2><span class="pulse"></span>Waiting for the teacher</h2>
+    <div class="idc" id="w-id"></div>
+    <p class="sub" id="w-note">Keep this page open. It starts by itself when the teacher lets you in.</p>
+    <ul class="rules">
+      <li>The exam opens in <b>full screen</b>. Do not leave it.</li>
+      <li>Copy, paste and the right click are off.</li>
+      <li>Do not change tab or open another window.</li>
+      <li>After <b id="w-max">3</b> warnings your copy is sent by itself.</li>
+    </ul>
+    <div class="wcase" id="w-case" style="display:none">
+      <div class="wch" id="w-ct">Case study</div>
+      <div id="wuc"></div>
     </div>
   </div>
 </div>
 
-<!-- 3. ready: enter full screen --------------------------------------->
-<div id="v-ready" class="center hide">
-  <div class="card" style="text-align:center">
+<!-- 3. ready -->
+<div id="ready" class="screen">
+  <div class="box" style="text-align:center">
     <h2>You may begin</h2>
-    <p class="mut">The exam opens in full screen. Your time starts now.</p>
-    <p class="big" id="r-min">30 min</p>
-    <button id="r-go" class="btn btn-big">Enter full screen and start</button>
+    <p class="sub">The exam opens in full screen and your time starts now.</p>
+    <div class="score" id="r-min">30<small> min</small></div>
+    <button id="r-go" class="btn" style="width:100%">Enter full screen and start</button>
   </div>
 </div>
 
-<!-- 4. exam ----------------------------------------------------------->
-<div id="v-exam" class="hide">
-  <div class="bar">
-    <div class="in">
-      <div>
-        <b id="e-title">Exam</b>
-        <div class="mut" id="e-who"></div>
+<!-- 4. exam -->
+<div id="exam" class="screen">
+  <div class="top">
+    <div>
+      <div class="t" id="e-title">Exam</div>
+      <div class="who" id="e-who"></div>
+    </div>
+    <span class="chip" id="e-pos">1 / 1</span>
+    <span class="chip" id="e-pts">1 pt</span>
+    <span class="chip" id="e-cnt">0 answered</span>
+    <div class="sp"></div>
+    <div class="timer" id="e-time">--:--</div>
+  </div>
+  <div class="main" id="e-main">
+    <div class="left hide" id="e-left">
+      <div class="lh" id="e-ct">Case study</div>
+      <div class="uc" id="e-uc"></div>
+    </div>
+    <div class="right">
+      <div class="warnline" id="e-warn" style="display:none"></div>
+      <div class="qwrap">
+        <div class="qhead" id="e-head"></div>
+        <p class="qtext" id="e-q"></p>
+        <pre class="qcode" id="e-code" style="display:none"></pre>
+        <div id="e-opts"></div>
       </div>
-      <div class="time" id="e-time">--:--</div>
-    </div>
-    <div class="prog"><i id="e-prog"></i></div>
-  </div>
-  <div class="wrap" style="padding-top:88px">
-    <div id="e-warn" class="alert hide"></div>
-    <div class="card">
-      <div class="mut" id="e-num">Question 1</div>
-      <p class="q" id="e-q"></p>
-      <pre class="code hide" id="e-code"></pre>
-      <div id="e-opts"></div>
-    </div>
-    <div class="card hide" id="e-uc">
-      <div class="mut"><b id="e-uct"></b></div>
-      <div class="uc" id="e-ucx"></div>
-    </div>
-    <div class="card">
-      <div class="mut">Your answers</div>
       <div class="grid" id="e-grid"></div>
-    </div>
-  </div>
-  <div class="nav">
-    <div class="in">
-      <button id="e-prev" class="btn2">Previous</button>
-      <button id="e-next" class="btn">Next</button>
-      <button id="e-send" class="btn" style="margin-left:auto;background:var(--ok)">Send my copy</button>
+      <div class="bar">
+        <button class="btn gh" id="e-prev">Previous</button>
+        <button class="btn gh" id="e-next">Next</button>
+        <button class="btn gh" id="e-clear">Clear</button>
+        <span class="save" id="e-save"></span>
+        <div class="sp"></div>
+        <button class="btn" id="e-send">Send my copy</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- 5. done ----------------------------------------------------------->
-<div id="v-done" class="center hide">
-  <div class="card" style="text-align:center">
+<!-- 5. done -->
+<div id="done" class="screen">
+  <div class="box" style="text-align:center">
     <h2>Your copy is sent</h2>
-    <p class="mut" id="d-who"></p>
-    <p class="big" id="d-score">&nbsp;</p>
-    <p class="mut" id="d-note">You can close this page.</p>
+    <div class="idc" id="d-id" style="text-align:left"></div>
+    <div class="score" id="d-score">&nbsp;</div>
+    <p class="sub" id="d-note">Your copy is saved. You can close this page.</p>
   </div>
 </div>
 
-<!-- 6. blocked -------------------------------------------------------->
-<div id="v-stop" class="center hide">
-  <div class="card" style="text-align:center">
+<!-- 6. blocked -->
+<div id="stop" class="screen">
+  <div class="box" style="text-align:center">
     <h2 id="s-h">Exam closed</h2>
-    <p class="mut" id="s-p"></p>
+    <p class="sub" id="s-p"></p>
   </div>
 </div>
 
-<script src="exam-config.js?v=3"></script>
+<div class="ov" id="ovfs"><div class="in">
+  <h2>You left full screen</h2>
+  <p>This is recorded. Go back to full screen to carry on with your exam.</p>
+  <p><button class="btn" id="ov-go">Back to full screen</button></p>
+</div></div>
+
+<script src="exam-config.js?v=4"></script>
 <script>
 (function(){
 'use strict';
 var API=window.EXAM_API||'';
-var K='hciexam-token', T=localStorage.getItem(K)||'';
-var me={}, EX={}, QS=[], ANS={}, cur=0, endsAt=0, drift=0, warns=0, maxW=3, finished=false, started=false;
+var KT='hciexam-token', KM='hciexam-me';
+var T=localStorage.getItem(KT)||'', me={}, EX={}, QS=[], ANS={}, cur=0;
+var endsAt=0, drift=0, warns=0, maxW=3, finished=false, started=false;
 
-function $(id){return document.getElementById(id);}
-function show(v){['v-join','v-wait','v-ready','v-exam','v-done','v-stop'].forEach(function(x){
-  $(x).classList.toggle('hide',x!==v);});}
-function post(action,data,cb){
-  var body=Object.assign({action:action},data||{});
-  fetch(API,{method:'POST',body:JSON.stringify(body)})
-   .then(function(r){return r.json();})
-   .then(function(j){cb&&cb(j);})
-   .catch(function(){cb&&cb({ok:false,error:'network'});});
+function $(i){return document.getElementById(i);}
+function show(id){
+  ['join','wait','ready','exam','done','stop'].forEach(function(s){
+    $(s).classList.toggle('on',s===id);});
 }
-function err(m){var e=$('j-err');e.textContent=m;e.classList.remove('hide');}
+function post(a,d,cb){
+  fetch(API,{method:'POST',body:JSON.stringify(Object.assign({action:a},d||{}))})
+    .then(function(r){return r.json();}).then(function(j){cb&&cb(j);})
+    .catch(function(){cb&&cb({ok:false,error:'network'});});
+}
+function idCard(el){
+  $(el).innerHTML='<b>Name</b><span></span><b>Matricule</b><span></span><b>Group</b><span></span>';
+  var v=$(el).querySelectorAll('span');
+  v[0].textContent=me.name||''; v[1].textContent=me.matricule||''; v[2].textContent=me.group||'';
+}
+try{ me=JSON.parse(localStorage.getItem(KM)||'{}'); }catch(e){}
 
-/* ---------- join ---------- */
-function fillGroups(list){
+/* ---------- identity ---------- */
+function groups(list){
   var s=$('f-grp'); s.innerHTML='';
-  (list&&list.length?list:['G1','G2','G3','G4','G5']).forEach(function(g){
+  (list&&list.length?list:['G1','G2','G3']).forEach(function(g){
     var o=document.createElement('option'); o.value=g; o.textContent=g; s.appendChild(o);});
 }
-fillGroups(null);
+groups(null);
 
 $('f-go').onclick=function(){
   var n=$('f-name').value.trim(), m=$('f-mat').value.trim(), g=$('f-grp').value;
-  if(!n||!m){err('Write your name and your matricule.');return;}
-  if(!API){err('The exam address is missing. Tell your teacher.');return;}
+  if(!n||!m){ $('j-err').textContent='Write your name and your matricule.'; return; }
+  if(!API){ $('j-err').textContent='The exam address is missing. Tell your teacher.'; return; }
   $('f-go').disabled=true; $('f-go').textContent='Sending...';
   post('join',{name:n,matricule:m,group:g},function(j){
     $('f-go').disabled=false; $('f-go').textContent='Ask to enter the exam';
-    if(!j.ok){err(j.error||'Not possible right now.');return;}
-    T=j.token; localStorage.setItem(K,T);
-    me={name:n,matricule:m,group:g};
-    localStorage.setItem('hciexam-me',JSON.stringify(me));
-    show('v-wait'); $('w-who').textContent=n+' · '+m+' · '+g;
-    poll();
+    if(!j.ok){ $('j-err').textContent=j.error||'Not possible right now.'; return; }
+    T=j.token; localStorage.setItem(KT,T);
+    me={name:n,matricule:m,group:g}; localStorage.setItem(KM,JSON.stringify(me));
+    idCard('w-id'); show('wait'); poll();
   });
 };
 
 /* ---------- polling ---------- */
+function serverNow(){ return Date.now()+drift; }
 function poll(){
   if(!T||finished)return;
   post('poll',{token:T},function(j){
@@ -225,32 +270,33 @@ function poll(){
     drift=j.serverTime?(j.serverTime-Date.now()):0;
     $('w-max').textContent=maxW;
     $('j-title').textContent=EX.title||'Online exam';
-    if(EX.module||EX.examName) $('j-sub').textContent=
-      [EX.module,EX.examName].filter(Boolean).join(' · ')+' · University of Algiers 1';
+    if(EX.module||EX.examName)
+      $('j-sub').textContent=[EX.module,EX.examName].filter(Boolean).join(' · ')+
+        ' · University of Algiers 1';
+    if(EX.groups&&EX.groups.length&&$('f-grp').options.length<2)groups(EX.groups);
     if(EX.useCaseText){
-      $('w-uc').classList.remove('hide');
-      $('w-uct').textContent=EX.useCaseTitle||'Case study';
-      $('w-ucx').textContent=EX.useCaseText;
-      $('e-uc').classList.remove('hide');
-      $('e-uct').textContent=EX.useCaseTitle||'Case study';
-      $('e-ucx').textContent=EX.useCaseText;
-    }
-    if(EX.groups&&EX.groups.length&&$('f-grp').options.length<2)fillGroups(EX.groups);
+      $('w-case').style.display=''; $('w-ct').textContent=EX.useCaseTitle||'Case study';
+      $('wuc').textContent=EX.useCaseText;
+      $('e-left').classList.remove('hide'); $('e-main').classList.remove('one');
+      $('e-ct').textContent=EX.useCaseTitle||'Case study'; $('e-uc').textContent=EX.useCaseText;
+    }else{ $('e-main').classList.add('one'); }
 
-    if(j.status==='rejected'){ show('v-stop'); $('s-h').textContent='Access refused';
+    if(j.status==='rejected'){ show('stop'); $('s-h').textContent='Access refused';
       $('s-p').textContent='Your teacher did not accept this request.'; return; }
-    if(j.status==='submitted'){ finished=true; doneView(j); return; }
+    if(j.status==='submitted'){ doneView(j); return; }
     if(j.status==='running'){
       endsAt=j.endsAt||0;
-      if(!started){ $('r-min').textContent=Math.max(0,Math.round((endsAt-serverNow())/60000))+' min';
-                    show('v-ready'); }
-    } else if(j.status==='approved'){
-      show('v-wait'); $('w-note').textContent='You are accepted. The exam starts when the teacher launches it.';
-    } else { show('v-wait'); }
+      if(!started){
+        $('r-min').innerHTML=Math.max(0,Math.round((endsAt-serverNow())/60000))+'<small> min</small>';
+        show('ready');
+      }
+    }else if(j.status==='approved'){
+      show('wait');
+      $('w-note').textContent='You are accepted. The exam starts when the teacher launches it.';
+    }else{ show('wait'); }
     setTimeout(poll, started?6000:3000);
   });
 }
-function serverNow(){return Date.now()+drift;}
 
 /* ---------- start ---------- */
 $('r-go').onclick=function(){
@@ -261,14 +307,12 @@ $('r-go').onclick=function(){
 };
 function startExam(){
   if(started)return; started=true;
-  try{me=JSON.parse(localStorage.getItem('hciexam-me')||'{}');}catch(e){}
   $('e-title').textContent=EX.title||'Exam';
-  $('e-who').textContent=(me.name||'')+' · '+(me.matricule||'')+' · '+(me.group||'');
+  $('e-who').textContent=[me.name,me.matricule,me.group].filter(Boolean).join(' · ');
   post('questions',{token:T},function(j){
-    if(!j.ok){started=false;alert(j.error||'Not possible');return;}
+    if(!j.ok){ started=false; alert(j.error||'Not possible'); return; }
     QS=j.questions||[]; ANS=j.saved||{};
-    show('v-exam'); render(); tick();
-    guards();
+    show('exam'); render(); tick(); guards();
   });
 }
 
@@ -279,55 +323,57 @@ function render(){
   if(!QS.length)return;
   if(cur<0)cur=0; if(cur>=QS.length)cur=QS.length-1;
   var q=QS[cur];
-  var tag=q.type==='open'?'written answer':(q.type==='multi'?'several answers':'one answer');
-  $('e-num').innerHTML='<span class="tag">'+tag+'</span>'+
-    (q.theme?'<span class="tag" style="background:#eef2f7;color:#5a6b82"></span>':'')+
-    'Question '+(cur+1)+' of '+QS.length+' · '+q.points+' pt';
-  if(q.theme){ $('e-num').querySelectorAll('.tag')[1].textContent=q.theme; }
+  var kind=q.type==='open'?'written answer':(q.type==='multi'?'several answers':'one answer');
+  $('e-pos').textContent=(cur+1)+' / '+QS.length;
+  $('e-pts').textContent=q.points+' pt';
+  var h='<span class="ty">'+kind+'</span>';
+  if(q.theme)h+='<span class="th"></span>';
+  h+='<span>Question '+(cur+1)+'</span>';
+  $('e-head').innerHTML=h;
+  if(q.theme)$('e-head').querySelector('.th').textContent=q.theme;
   $('e-q').textContent=q.text;
-  var cb=$('e-code'); cb.classList.toggle('hide',!q.code); if(q.code)cb.textContent=q.code;
+  var cb=$('e-code'); cb.style.display=q.code?'':'none'; if(q.code)cb.textContent=q.code;
 
   var box=$('e-opts'); box.innerHTML='';
   if(q.type==='open'){
     var ta=document.createElement('textarea');
     ta.className='ta'; ta.spellcheck=false; ta.value=ANS[q.id]||'';
     ta.placeholder='Write your answer here. Type it: paste is off.';
-    ta.oninput=function(){ ANS[q.id]=ta.value; markGrid(); saveSoon(q.id,ta.value); };
+    ta.oninput=function(){ ANS[q.id]=ta.value; grid(); later(q.id,ta.value); };
     ta.onblur=function(){ save(q.id,ta.value); };
     box.appendChild(ta);
-    var hint=document.createElement('p');
-    hint.className='mut'; hint.style.margin='8px 0 0';
-    hint.textContent='Your answer is saved while you write.';
-    box.appendChild(hint);
-  } else {
+  }else{
     var sel=letters(ANS[q.id]);
     q.choices.forEach(function(c){
-      var d=document.createElement('div');
-      d.className='opt'+(sel.indexOf(c.k)>=0?' sel':'');
-      d.innerHTML='<b>'+c.k+'</b><span></span>';
-      d.lastChild.textContent=c.t;
-      d.onclick=function(){ choose(q,c.k); };
-      box.appendChild(d);
+      var b=document.createElement('button');
+      b.className='opt'+(q.type==='multi'?' multi':'')+(sel.indexOf(c.k)>=0?' sel':'');
+      b.type='button';
+      b.innerHTML='<span class="l">'+c.k+'</span><span></span>';
+      b.lastChild.textContent=c.t;
+      b.onclick=function(){ choose(q,c.k); };
+      box.appendChild(b);
     });
     if(q.type==='multi'){
-      var m=document.createElement('p');
-      m.className='mut'; m.style.margin='8px 0 0';
-      m.textContent='Several answers are expected. Click again to remove one.';
-      box.appendChild(m);
+      var p=document.createElement('p');
+      p.className='save'; p.style.margin='4px 0 0';
+      p.textContent='Several answers are expected. Click again to remove one.';
+      box.appendChild(p);
     }
   }
-  markGrid();
+  grid();
+  var done=QS.filter(function(x){return String(ANS[x.id]||'').trim();}).length;
+  $('e-cnt').textContent=done+' / '+QS.length+' answered';
+  $('e-clear').style.display=(q.type==='open')?'none':'';
   $('e-prev').disabled=(cur===0);
-  $('e-next').textContent=(cur===QS.length-1)?'Last question':'Next';
+  $('e-next').disabled=(cur===QS.length-1);
 }
 
-function markGrid(){
+function grid(){
   var g=$('e-grid'); g.innerHTML='';
   QS.forEach(function(x,i){
-    var b=document.createElement('b');
-    b.textContent=i+1;
-    b.className=(i===cur?'cur':(String(ANS[x.id]||'').trim()?'done':''));
-    b.onclick=function(){cur=i;render();};
+    var b=document.createElement('button'); b.type='button'; b.textContent=i+1;
+    b.className=(String(ANS[x.id]||'').trim()?'a':'')+(i===cur?' c':'');
+    b.onclick=function(){ cur=i; render(); };
     g.appendChild(b);
   });
 }
@@ -337,24 +383,27 @@ function choose(q,k){
     var s=letters(ANS[q.id]), i=s.indexOf(k);
     if(i>=0)s.splice(i,1); else s.push(k);
     s.sort(); ANS[q.id]=s.join(',');
-  }else{
-    ANS[q.id]=k;
-  }
+  }else{ ANS[q.id]=k; }
   render(); save(q.id,ANS[q.id]);
 }
 
-var saveT={};
-function saveSoon(qid,v){
-  clearTimeout(saveT[qid]);
-  saveT[qid]=setTimeout(function(){ save(qid,v); },1200);
+var tmr={};
+function later(qid,v){ clearTimeout(tmr[qid]); tmr[qid]=setTimeout(function(){save(qid,v);},1200); }
+function save(qid,v){
+  $('e-save').textContent='saving...';
+  post('answer',{token:T,qid:qid,answer:String(v==null?'':v)},function(){
+    $('e-save').textContent='saved';
+    setTimeout(function(){ $('e-save').textContent=''; },1500);
+  });
 }
-function save(qid,v){ post('answer',{token:T,qid:qid,answer:String(v==null?'':v)}); }
-$('e-prev').onclick=function(){cur--;render();};
-$('e-next').onclick=function(){if(cur<QS.length-1){cur++;render();}};
+
+$('e-clear').onclick=function(){ var q=QS[cur]; ANS[q.id]=''; render(); save(q.id,''); };
+$('e-prev').onclick=function(){ cur--; render(); };
+$('e-next').onclick=function(){ if(cur<QS.length-1){cur++;render();} };
 $('e-send').onclick=function(){
   var left=QS.filter(function(q){return !String(ANS[q.id]||'').trim();}).length;
-  var msg=left?('You did not answer '+left+' question(s). Send anyway?'):'Send your copy now?';
-  if(confirm(msg))send('sent by the student');
+  if(confirm(left?('You did not answer '+left+' question(s). Send anyway?'):'Send your copy now?'))
+    send('sent by the student');
 };
 
 /* ---------- timer ---------- */
@@ -364,10 +413,8 @@ function tick(){
   var m=Math.floor(ms/60000), s=Math.floor(ms%60000/1000);
   var el=$('e-time');
   el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
-  el.classList.toggle('low',ms<120000);
-  var tot=(EX.duration||30)*60000;
-  $('e-prog').style.width=Math.max(0,Math.min(100,100-ms/tot*100))+'%';
-  if(ms<=0){send('time over');return;}
+  el.className='timer'+(ms<60000?' end':(ms<300000?' warn':''));
+  if(ms<=0){ send('time over'); return; }
   setTimeout(tick,500);
 }
 
@@ -375,23 +422,17 @@ function tick(){
 function send(why){
   if(finished)return; finished=true;
   $('e-send').disabled=true; $('e-send').textContent='Sending...';
-  post('submit',{token:T,answers:ANS},function(j){
-    exitFs();
-    doneView(j.ok?j:{score:null});
-  });
+  post('submit',{token:T,answers:ANS},function(j){ doneView(j.ok?j:{score:null}); });
 }
 function doneView(j){
-  finished=true; show('v-done');
-  try{me=JSON.parse(localStorage.getItem('hciexam-me')||'{}');}catch(e){}
-  $('d-who').textContent=(me.name||'')+' · '+(me.matricule||'')+' · '+(me.group||'');
+  finished=true; show('done'); idCard('d-id'); exitFs();
   if(j.score!==null&&j.score!==undefined&&j.outOf){
-    $('d-score').textContent=j.score+' / '+j.outOf;
+    $('d-score').innerHTML=j.score+'<small> / '+j.outOf+'</small>';
     $('d-note').textContent='Your copy is saved. Written answers may be read again by the teacher.';
   }else{
     $('d-score').textContent='✓';
     $('d-note').textContent='Your copy is saved. The mark comes later.';
   }
-  exitFs();
 }
 function exitFs(){ try{ if(document.fullscreenElement)document.exitFullscreen(); }catch(e){} }
 
@@ -403,9 +444,9 @@ function flag(type){
     warns=j.warnings||warns;
     if(j.forceSubmit){ finished=false; send('too many warnings'); return; }
     var box=$('e-warn');
-    box.classList.remove('hide');
+    box.style.display='';
     box.textContent='Warning '+warns+' of '+maxW+': '+label(type)+
-      '. After '+maxW+' warnings your copy is sent automatically.';
+      '. After '+maxW+' warnings your copy is sent by itself.';
   });
 }
 function label(t){
@@ -415,59 +456,49 @@ function label(t){
           'contextmenu':'the right click is off','devtools':'this shortcut is off',
           'print':'printing is off'}[t]||t;
 }
+$('ov-go').onclick=function(){
+  var el=document.documentElement;
+  var p=el.requestFullscreen?el.requestFullscreen():null;
+  Promise.resolve(p).catch(function(){}).then(function(){ $('ovfs').classList.remove('on'); });
+};
 function guards(){
   ['copy','paste','cut'].forEach(function(ev){
-    document.addEventListener(ev,function(e){e.preventDefault();flag(ev);});
+    document.addEventListener(ev,function(e){ e.preventDefault(); flag(ev); });
   });
-  document.addEventListener('contextmenu',function(e){e.preventDefault();flag('contextmenu');});
+  document.addEventListener('contextmenu',function(e){ e.preventDefault(); flag('contextmenu'); });
   document.addEventListener('selectstart',function(e){
-    if(!/^(INPUT|TEXTAREA)$/.test(e.target.tagName))e.preventDefault();});
-  document.addEventListener('dragstart',function(e){e.preventDefault();});
+    if(!/^(INPUT|TEXTAREA)$/.test(e.target.tagName))e.preventDefault(); });
+  document.addEventListener('dragstart',function(e){ e.preventDefault(); });
   document.addEventListener('visibilitychange',function(){ if(document.hidden)flag('tab-hidden'); });
   window.addEventListener('blur',function(){ flag('window-blur'); });
   document.addEventListener('fullscreenchange',function(){
-    if(!document.fullscreenElement&&!finished){ flag('exit-fullscreen'); askBack(); }
+    if(!document.fullscreenElement&&!finished){ flag('exit-fullscreen'); $('ovfs').classList.add('on'); }
   });
-  window.addEventListener('beforeprint',function(){flag('print');});
+  window.addEventListener('beforeprint',function(){ flag('print'); });
   document.addEventListener('keydown',function(e){
     var k=e.key||'', c=e.ctrlKey||e.metaKey;
     var inText=/^(TEXTAREA|INPUT)$/.test((e.target||{}).tagName||'');
     if(k==='F12'||(c&&e.shiftKey&&/^[IJCK]$/i.test(k))||(c&&/^[uspc]$/i.test(k))){
-      e.preventDefault(); flag('devtools'); return false;
-    }
+      e.preventDefault(); flag('devtools'); return false; }
     if(c&&/^[vx]$/i.test(k)){ e.preventDefault(); flag(k.toLowerCase()==='v'?'paste':'cut'); return false; }
     if(c&&/^a$/i.test(k)&&!inText){ e.preventDefault(); return false; }
     if(k==='Escape'){ e.preventDefault(); }
+    if(inText)return;
+    if(k==='ArrowRight'&&cur<QS.length-1){ cur++; render(); }
+    if(k==='ArrowLeft'&&cur>0){ cur--; render(); }
+    var q=QS[cur];
+    if(q&&q.type!=='open'&&/^[a-eA-E1-5]$/.test(k)){
+      var i=/[1-5]/.test(k)?(+k-1):'abcde'.indexOf(k.toLowerCase());
+      if(q.choices[i])choose(q,q.choices[i].k);
+    }
   },true);
   window.addEventListener('beforeunload',function(e){
     if(!finished){ e.preventDefault(); e.returnValue=''; }
   });
 }
-function askBack(){
-  if(finished)return;
-  var d=document.createElement('div');
-  d.style.cssText='position:fixed;inset:0;background:rgba(10,25,47,.96);color:#fff;z-index:99;'+
-    'display:flex;align-items:center;justify-content:center;text-align:center;padding:24px';
-  d.innerHTML='<div><h2 style="font-size:24px">You left full screen</h2>'+
-    '<p style="opacity:.8;max-width:420px;margin:12px auto 20px">This is recorded. '+
-    'Go back to full screen to carry on with your exam.</p>'+
-    '<button class="btn" style="font-size:17px;padding:14px 26px">Back to full screen</button></div>';
-  d.querySelector('button').onclick=function(){
-    var el=document.documentElement;
-    var p=el.requestFullscreen?el.requestFullscreen():null;
-    Promise.resolve(p).catch(function(){}).then(function(){d.remove();});
-  };
-  document.body.appendChild(d);
-}
 
-/* ---------- restart after a reload ---------- */
-if(T){
-  try{me=JSON.parse(localStorage.getItem('hciexam-me')||'{}');}catch(e){}
-  show('v-wait'); $('w-who').textContent=(me.name||'')+' · '+(me.matricule||'')+' · '+(me.group||'');
-  poll();
-}else if(API){
-  post('poll',{token:''},function(){});
-}
+/* ---------- after a reload ---------- */
+if(T){ idCard('w-id'); show('wait'); poll(); }
 })();
 </script>
 </body>
