@@ -70,6 +70,10 @@ function route(b) {
   if (a === 'event')     return sEvent(b);
   if (a === 'submit')    return sSubmit(b);
   if (a.charAt(0) === 't') {
+    /* the key shipped with the code is public: it must be changed before any exam */
+    if (TEACHER_KEY.replace(/\s/g, '').toUpperCase() === 'CHANGE-THIS-KEY') {
+      return { ok: false, error: 'Set your own TEACHER_KEY at the top of Code.gs, then deploy a new version.' };
+    }
     if (String(b.key || '').replace(/\s/g, '').toUpperCase() !==
         TEACHER_KEY.replace(/\s/g, '').toUpperCase()) return { ok: false, error: 'Wrong teacher key' };
     if (a === 'tstate')    return tState(b);

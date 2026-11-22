@@ -31,7 +31,9 @@ and the copies are on Google (Apps Script, Sheet, Drive). GitHub never sees the 
 2. In the Sheet: **Extensions → Apps Script**. Delete the example code,
    paste everything from `backend/Code.gs`, and save.
 3. At the top of the code, replace `CHANGE-THIS-KEY` with your own key.
-   **Never give this key to a student.**
+   **Never give this key to a student.** The placeholder is written in this public repository,
+   so the server refuses every teacher action until you have changed it. Choose something only
+   you know, for example four words joined by dashes, and keep it out of the repository.
 4. Run the function `setupSheets` once (choose it in the list, press Run).
    Google asks for an authorisation: accept it with your own account.
    This creates the tabs **Settings, Questions, Students, Answers, Events**.
