@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>HCI Lab 4 (II) – Teacher solution and marking guide</title><style>
+@page{size:A4;margin:12mm}
+*{box-sizing:border-box}
+body{font:13px/1.5 "Segoe UI",Arial,sans-serif;color:#1f2937;max-width:860px;margin:0 auto;padding:16px}
+.warn{background:#b91c1c;color:#fff;padding:7px 12px;border-radius:8px;font-weight:700;margin-bottom:12px;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+.hd{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;font-size:11.5px;text-align:center}
+.hd .ar{direction:rtl;font-size:13px}
+.logo{font-weight:800;font-size:26px;color:#1e3a8a;line-height:1}.logo small{display:block;font-size:9px;color:#f97316;font-weight:700}
+.bar{background:#f97316;height:22px;margin:10px 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.meta{display:flex;justify-content:space-between;font-weight:700;font-size:13px}
+h1{font-size:19px;margin:10px 0;text-align:center;border-top:1px solid #111;padding-top:8px}
+h2{font-size:14px;color:#fff;background:#f97316;padding:3px 10px;margin:22px 0 8px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+h3{font-size:13.5px;margin:14px 0 4px;color:#9a3412}
+table{border-collapse:collapse;width:100%;margin:6px 0}
+th,td{border:1px solid #cbd5e1;padding:5px 7px;vertical-align:top;font-size:12px}
+th{background:#fff7ed;text-align:left}
+td.k{background:#f8fafc;font-weight:600;width:22%}
+.good{background:#f0fdf4;border-left:3px solid #16a34a;padding:7px 11px;margin:7px 0}
+.bad{background:#fef2f2;border-left:3px solid #b91c1c;padding:7px 11px;margin:7px 0}
+.note{background:#fff7ed;border-left:3px solid #f97316;padding:7px 11px;margin:7px 0}
+ul{margin:5px 0 5px 18px;padding:0}li{margin:2px 0}
+.ft{margin-top:22px;font-size:11px;color:#64748b;border-top:1px solid #111;padding-top:6px;display:flex;justify-content:space-between;font-style:italic}
+.pb{position:fixed;right:12px;top:12px;background:#f97316;color:#fff;border:0;border-radius:8px;padding:9px 14px;font-weight:700;cursor:pointer}
+@media print{.pb{display:none}}
+</style></head><body>
+<button class="pb" onclick="window.print()">Print / save as PDF</button>
+
+<div class="warn">Teachers only — do not put this file on the students' machines.</div>
+
+<div class="hd">
+<div>PEOPLE'S DEMOCRATIC REPUBLIC OF ALGERIA<br>Ministry of Higher Education and Scientific Research<br>The National School of Artificial Intelligence<br><b>Intelligent Systems Engineering Department</b></div>
+<div class="logo">ensia<small>The National School of<br>Artificial Intelligence</small></div>
+<div class="ar">الجمهورية الجزائرية الديمقراطية الشعبية<br>وزارة التعليم العالي والبحث العلمي<br>المدرسة الوطنية العليا للذكاء الاصطناعي<br>قسم هندسة الأنظمة الذكية</div>
+</div>
+<div class="bar"></div>
+<div class="meta"><span>Human Computer Interaction Labs</span><span>4<sup>th</sup> Year 2026/2027</span></div>
+<div class="meta"><span>Lab 4 (II) Semester: S7</span><span>Solution and marking guide</span></div>
+<h1>From Users to Interfaces - part II:<br>Building the Blueprint - Low &amp; Med-Fidelity Prototyping</h1>
+<div class="bar"></div>
+
+<div class="note"><b>There is no single right answer.</b> The students design their own prototype, so this guide
+says what a good answer contains, what to accept, and what to refuse. Mark the <b>reasoning</b>, not the drawing
+skill: a clean sketch with no link to the personas is worth less than a rough sketch that answers a real need.</div>
+
+<h2>What the lab is really testing</h2>
+<ol>
+<li>Can they choose a fidelity, and say why? (Lecture 6: stage, goals, resources.)</li>
+<li>Does the prototype come from the personas and scenarios of Lab 4 (I), or was it invented from nothing?</li>
+<li>Can they move the same concept from desktop to mobile without just shrinking it?</li>
+<li>Can they test as a persona and give feedback about a <b>need</b>, not about taste?</li>
+</ol>
+
+<h2>Activity 1 — From Ideas to Wireframes</h2>
+
+<h3>A. Fidelity and tools</h3>
+<div class="good"><b>Accept:</b> low fidelity on paper for the first ideas, then a mid-fidelity clickable
+wireframe in Balsamiq. The justification should name the stage ("the flow is not fixed yet"), the goal
+("we want to know if they find the comparison") and the resources ("one session").</div>
+<div class="bad"><b>Refuse, or ask again:</b> "we chose high fidelity because it is more beautiful". Colours and
+real photos at this stage attract comments on the look and hide the problems of the flow. This is the mistake
+the Amar Darek case was made for.</div>
+
+<h3>B. The screens</h3>
+<p>A workable set for the Car Showroom case is <b>five to seven screens</b>. Typically:</p>
+<table>
+<tr><th style="width:26%">Screen</th><th>What it must contain</th></tr>
+<tr><td>Home</td><td>Search field, two or three shortcuts (new, used, by budget), one clear entry per persona.</td></tr>
+<tr><td>Browse / results</td><td>Filters (price, year, fuel, power), sorting, the list of cars with the information that matters, not just a photo.</td></tr>
+<tr><td>Car detail</td><td>Photos, specifications, price, availability, the main action (book a test drive, contact the seller).</td></tr>
+<tr><td>Compare</td><td>Two or three cars side by side, the same rows for each.</td></tr>
+<tr><td>Test drive / contact</td><td>Short form: date, place, phone. Confirmation screen after it.</td></tr>
+<tr><td>Saved / favourites</td><td>What the student kept, so they can come back.</td></tr>
+</table>
+<div class="good">A good sheet says, for each screen, <b>what the user can do</b> and <b>where it leads</b>.
+That is what makes it a prototype and not a drawing.</div>
+
+<h3>C. Desktop to mobile</h3>
+<p>Expect real adaptation decisions, not "the same but smaller":</p>
+<table>
+<tr><th style="width:24%">Element</th><th style="width:34%">Website</th><th>Mobile, and the reason</th></tr>
+<tr><td>Navigation</td><td>Horizontal menu, everything visible</td><td>Bottom bar with 3 to 5 items, or a burger menu; the thumb reaches the bottom of the screen.</td></tr>
+<tr><td>Filters</td><td>Side panel, always open</td><td>A "Filter" button that opens a sheet; the screen is too narrow to keep them visible.</td></tr>
+<tr><td>Comparison</td><td>Three cars side by side</td><td>Two cars at most, or swipe between them; three columns are unreadable at 375 px.</td></tr>
+<tr><td>Main action</td><td>Button in the page</td><td>Button fixed at the bottom, full width, near the thumb (Lecture 4, screen 2 of CampusBus).</td></tr>
+<tr><td>Images</td><td>Large gallery</td><td>One image plus swipe; the data pack matters.</td></tr>
+</table>
+
+<h3>D. Information structure</h3>
+<div class="good"><b>Accept:</b> 4 to 7 top-level items, at most 3 levels, names in the users' words
+("Find a car", "Compare", "Book a test drive"), not in the showroom's words ("Stock management", "CRM").</div>
+<div class="bad"><b>Refuse:</b> a flat menu of 12 items, or names taken from the database tables.</div>
+
+<h3>E. Personas</h3>
+<p>Each persona must reach their goal, and the number of taps should be reasonable (three is the usual target).</p>
+<table>
+<tr><th style="width:26%">Persona</th><th style="width:34%">Goal</th><th>What the prototype must show</th></tr>
+<tr><td>Road Trip Enthusiast</td><td>A reliable car with range and boot space</td><td>Filters on consumption, boot volume, range; comparison of two cars on those rows.</td></tr>
+<tr><td>Weekend Racer (Tifosi)</td><td>Power, feeling, the brand</td><td>Performance figures in front, photos and video, test-drive booking in one or two taps.</td></tr>
+<tr><td>Student on a Budget</td><td>The cheapest car that still works</td><td>Price filter first, total cost (insurance, consumption), used cars, monthly payment.</td></tr>
+<tr><td>Negative persona</td><td>(not a user we design for)</td><td>The sheet should say what they deliberately did <b>not</b> build, and why. This is the part most groups forget.</td></tr>
+</table>
+
+<h2>Activity 3 — Peer testing and feedback loop</h2>
+<div class="good"><b>A good finding has four parts:</b> what happened (a fact), why it is a problem for that
+persona, how serious it is, and a precise suggestion. Example: "Playing the Student on a Budget, I could not
+find the price filter on the mobile home screen; I went back twice and gave up. High. Put a 'Budget' shortcut
+on the home screen."</div>
+<div class="bad"><b>Refuse:</b> "it is nice", "I like the colours", "add more photos". These are tastes, not
+findings, and the lab asks for feedback about <b>user needs</b>.</div>
+<p>Check that part D is filled: a group that received four remarks and changed nothing has not done the loop.
+They may keep a remark, but then they must say why.</p>
+
+<h2>Activity 4 — Reflection circle: expected answers</h2>
+
+<h3>A. How did the personas influence your design decisions?</h3>
+<p>Expected: the personas decided <b>what comes first on the screen</b> and <b>what was left out</b>. Concrete
+examples are required: the budget filter on the home page because of the student, the performance figures in
+front because of the Tifosi. An answer with no example is incomplete.</p>
+
+<h3>B. Desktop and mobile</h3>
+<p>Expected: space and attention. On the website everything can stay visible; on mobile you choose, you hide
+behind buttons, you put the main action near the thumb, you reduce the number of items per screen, and you keep
+the network and the screen size in mind. A good answer says that the <b>content priority</b> changes, not only the size.</p>
+
+<h3>C. What was easier, what was harder</h3>
+<p>Expected easier: drawing fast, changing an idea, throwing a screen away without regret, discussing with the
+group around a sheet of paper. Expected harder: deciding what to leave out, keeping the whole flow coherent,
+making the wireframe clickable, and accepting that it looks unfinished when you show it. Accept the honest
+answer "people commented on the look instead of the flow", which is exactly the lesson of Lecture 6.</p>
+
+<h2>Marking guide (on 20)</h2>
+<table>
+<tr><th>Criterion</th><th style="width:12%">Points</th></tr>
+<tr><td>Website and mobile prototypes exist, both of them, at a stated fidelity that is justified</td><td>4</td></tr>
+<tr><td>The screens are listed with what the user can do and where it leads (a real flow, not loose drawings)</td><td>3</td></tr>
+<tr><td>Desktop to mobile: at least three real adaptation decisions, each with a reason</td><td>3</td></tr>
+<tr><td>Information structure: 4 to 7 items, 3 levels at most, users' words</td><td>2</td></tr>
+<tr><td>Every persona reaches their goal; the negative persona is handled</td><td>3</td></tr>
+<tr><td>Peer testing: findings with fact, reason, severity and suggestion</td><td>3</td></tr>
+<tr><td>Feedback loop: the remarks received are turned into named changes</td><td>1</td></tr>
+<tr><td>Reflection: answered with examples from their own work</td><td>1</td></tr>
+</table>
+
+<h2>Common mistakes to watch for</h2>
+<ul>
+<li>A beautiful high-fidelity screen made in one hour, with no flow behind it.</li>
+<li>The mobile version is the website shrunk, with no decision taken.</li>
+<li>Personas from Lab 4 (I) never mentioned again: the prototype could be anybody's.</li>
+<li>Feedback about taste rather than about a user need.</li>
+<li>Remarks received and never used: no loop, so the next lab starts from the wrong prototype.</li>
+<li>The negative persona forgotten: nothing says what the team refused to build.</li>
+</ul>
+
+<div class="note"><b>Note on the lab sheet.</b> The activities are numbered 1, 3 and 4 in the PDF; there is no
+Activity 2. The answer sheet keeps your numbering so the students are not lost, but you may want to renumber
+them 1, 2, 3 in the next version.</div>
+
+<div class="ft"><span>Human Computer Interaction: Lab 4 (II)</span><span>Teacher solution</span><span>Semester 7, 2026/2027</span></div>
+</body></html>

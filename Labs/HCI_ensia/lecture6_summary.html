@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HCI Lecture 6 – Prototyping: summary</title><style>
+@page{size:A4;margin:12mm}
+*{box-sizing:border-box}
+body{font:13px/1.55 "Segoe UI",Arial,sans-serif;color:#1f2937;max-width:900px;margin:0 auto;padding:16px}
+.hd{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;font-size:11.5px;text-align:center}
+.hd .ar{direction:rtl;font-size:13px}
+.logo{font-weight:800;font-size:26px;color:#1e3a8a;line-height:1}
+.logo small{display:block;font-size:9px;color:#f97316;font-weight:700}
+.bar{background:#f97316;height:22px;margin:10px 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.meta{display:flex;justify-content:space-between;font-weight:700;font-size:13px}
+h1{font-size:20px;margin:10px 0;text-align:center;border-top:1px solid #111;padding-top:8px}
+h2{font-size:14px;color:#fff;background:#f97316;padding:3px 10px;margin:22px 0 8px;
+   -webkit-print-color-adjust:exact;print-color-adjust:exact}
+h3{font-size:13.5px;margin:14px 0 4px;color:#9a3412}
+table{border-collapse:collapse;width:100%;margin:6px 0}
+th,td{border:1px solid #cbd5e1;padding:5px 7px;vertical-align:top;font-size:12px}
+th{background:#fff7ed;text-align:left}
+td.k{background:#f8fafc;font-weight:600;width:22%}
+.key{background:#fff7ed;border-left:3px solid #f97316;padding:7px 11px;margin:8px 0;font-size:12.5px}
+.case{border:1px solid #fdba74;border-radius:10px;padding:10px 13px;margin:12px 0;break-inside:avoid-page}
+.case h3{margin-top:0}
+ul{margin:5px 0 5px 18px;padding:0}li{margin:2px 0}
+.ft{margin-top:24px;font-size:11px;color:#64748b;border-top:1px solid #111;padding-top:6px;
+    display:flex;justify-content:space-between;font-style:italic}
+.pb{position:fixed;right:12px;top:12px;background:#f97316;color:#fff;border:0;border-radius:8px;
+    padding:9px 14px;font-weight:700;cursor:pointer}
+@media print{.pb{display:none}}
+.small{font-size:11.5px;color:#64748b}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){.two{grid-template-columns:1fr}}
+</style></head><body>
+<button class="pb" onclick="window.print()">Print / save as PDF</button>
+
+<div class="hd">
+<div>PEOPLE'S DEMOCRATIC REPUBLIC OF ALGERIA<br>Ministry of Higher Education and Scientific Research<br>
+The National School of Artificial Intelligence<br><b>Intelligent Systems Engineering Department</b></div>
+<div class="logo">ensia<small>The National School of<br>Artificial Intelligence</small></div>
+<div class="ar">الجمهورية الجزائرية الديمقراطية الشعبية<br>وزارة التعليم العالي والبحث العلمي<br>
+المدرسة الوطنية العليا للذكاء الاصطناعي<br>قسم هندسة الأنظمة الذكية</div>
+</div>
+<div class="bar"></div>
+<div class="meta"><span>Human Computer Interaction</span><span>4<sup>th</sup> Year 2026/2027</span></div>
+<div class="meta"><span>Unit III · Lecture 6 · Semester S7</span><span>Course summary</span></div>
+<h1>Prototyping: Low, Mid and High Fidelity</h1>
+<div class="bar"></div>
+
+<div class="key"><b>Learning goals.</b> Tell low, mid and high fidelity apart and choose the right level for a
+given stage, question and cost. Build a simple prototype from a persona and a scenario, and use it to test a
+design idea with users.</div>
+
+<!-- opening case -->
+<h2>0. Opening case: which one do you show first?</h2>
+<div class="case">
+<h3>Amar Darek — a mobile app for buying home furniture</h3>
+<p>Your team wants to test the first design with <b>five customers</b>, and you have <b>one afternoon</b> to
+prepare the prototype and run the test. Three versions exist: a paper sketch (low), a clickable wireframe (mid)
+and a finished-looking screen (high). Which one do you show?</p>
+<p class="key" style="margin:8px 0">The question is not which prototype is best. It is
+<b>what you need to learn from the user, in the cheapest way</b>.</p>
+<p><b>Answer for this case.</b> The question to answer is: can customers add a sofa to their cart without help?
+That is about <b>flow and navigation</b>, so a <b>clickable wireframe (mid fidelity)</b> fits. Use the paper
+sketch (low) if the flow itself is still unclear.</p>
+<p><b>Why not high fidelity?</b></p>
+<ul>
+<li><b>Time:</b> you cannot build it in one afternoon.</li>
+<li><b>Wrong feedback:</b> people comment on colours and fonts instead of the flow.</li>
+<li><b>Avoidance of criticism:</b> users hesitate to criticise something that looks finished.</li>
+<li><b>Cost of change:</b> it is expensive to drop or redo.</li>
+</ul>
+<p class="small">Link with Lecture 5: the scenario joins a <b>persona</b> (the customer), a <b>goal</b>
+(buy furniture) and a <b>context</b> (using Amar Darek).</p>
+</div>
+
+<!-- 1 -->
+<h2>1. What a prototype is</h2>
+<ul>
+<li>An <b>early sample, model or release</b> of a system, built to test and evaluate a concept or an interaction.</li>
+<li>A tool that <b>bridges the gap</b> between a design on paper and a real, working product.</li>
+<li>It lets you explore ideas and show the intention behind a feature <b>before spending time and money</b> on development.</li>
+<li>It can give the <b>look and feel</b> of the product without necessarily having the working parts.</li>
+</ul>
+
+<!-- 2 -->
+<h2>2. Why prototyping matters</h2>
+<table>
+<tr><td class="k">Finds usability problems early</td><td>User testing shows the problems before the final development.</td></tr>
+<tr><td class="k">Communicates the design</td><td>A tangible idea for clients, developers and the rest of the team.</td></tr>
+<tr><td class="k">Tests design choices</td><td>Several approaches are compared and refined.</td></tr>
+<tr><td class="k">Gathers user feedback</td><td>An iterative loop that keeps the product user-centred.</td></tr>
+<tr><td class="k">Saves time later</td><td>The prototyping phase costs a little now and avoids delays later.</td></tr>
+<tr><td class="k">Reduces cost</td><td>Solving a problem early avoids expensive rework.</td></tr>
+</table>
+
+<!-- 3 -->
+<h2>3. Prototyping, HCD and UCD</h2>
+<p>Prototyping is the step where human-centred design becomes visible. In HCD and UCD the user is involved
+all along, and the prototype is the object that carries the question to the user: it is built, shown, evaluated,
+then changed. Without a prototype there is nothing concrete to evaluate, and the design stays an opinion.</p>
+
+<!-- 4 -->
+<h2>4. Creation and co-creation</h2>
+<div class="two">
+<div>
+<h3>Prototype creation — designing <u>based on</u> users' needs</h3>
+<ol>
+<li><b>Creation sessions:</b> generate ideas and concepts for the design.</li>
+<li><b>Design workshops:</b> the team works together on the prototype.</li>
+<li><b>Card sorting / affinity diagramming:</b> organise the information.</li>
+<li><b>Personas and journey mapping:</b> find the pain points and the opportunities.</li>
+<li><b>Task mapping:</b> design the prototype around the users' tasks.</li>
+</ol>
+</div>
+<div>
+<h3>Prototype co-creation — designing <u>with</u> users</h3>
+<ol>
+<li><b>Co-creation sessions:</b> users generate ideas with the team.</li>
+<li><b>Participatory design workshops:</b> users design with their hands.</li>
+<li><b>Card sorting and affinity diagramming</b> done by the users themselves.</li>
+<li><b>Journey mapping:</b> users describe their own steps and pain points.</li>
+</ol>
+</div>
+</div>
+<div class="case" style="margin-top:10px">
+<h3>Example: a university mobile application</h3>
+<p><b>Creation:</b> the team studies the students' needs, identifies the main tasks (checking grades, viewing
+schedules, accessing courses) and builds a prototype.<br>
+<b>Co-creation:</b> students take part in workshops, suggest features, organise the information and help
+design the navigation and the workflows.</p>
+</div>
+
+<!-- 5 -->
+<h2>5. The three types of prototype</h2>
+<table>
+<tr><th style="width:14%">Fidelity</th><th style="width:24%">Purpose</th><th style="width:26%">Characteristics</th><th>Examples</th></tr>
+<tr>
+  <td><b>Low</b></td>
+  <td>Early visualisation, exploring the concept, brainstorming.</td>
+  <td>Simple, quick, cheap, easy to change.</td>
+  <td>Hand-drawn sketches (layouts, elements, user flows) · paper prototypes (cut-outs of screens the user can
+      move) · storyboards, like a comic strip of the interaction over time.</td>
+</tr>
+<tr>
+  <td><b>Mid</b></td>
+  <td>Refining the design, testing the basic interactions, early feedback.</td>
+  <td>More detailed and interactive than low, but still abstract: no real colours, no real content.</td>
+  <td>Wireframes, the digital skeleton showing structure and layout · interactive mock-ups in Figma or Adobe XD
+      that simulate the main flows.</td>
+</tr>
+<tr>
+  <td><b>High</b></td>
+  <td>Simulating the final product, testing complex interactions, detailed feedback.</td>
+  <td>Highly interactive, visually finished, realistic content and animations.</td>
+  <td>Functional prototypes partly coded · coded prototypes in HTML, CSS and JavaScript · interactive design
+      prototypes in Figma with real navigation and transitions.</td>
+</tr>
+</table>
+
+<!-- 6 -->
+<h2>6. Choosing the right fidelity</h2>
+<table>
+<tr><td class="k">Project stage</td><td>Early stages benefit from low fidelity; later stages need higher fidelity.</td></tr>
+<tr><td class="k">Goals</td><td>Exploring concepts → low fidelity. Testing a precise interaction → higher fidelity.</td></tr>
+<tr><td class="k">Resources</td><td>Time, budget and skills decide what is actually feasible.</td></tr>
+</table>
+<p class="small">Effort grows with fidelity: sketches → wireframes (can be clickable) → mock-ups → software
+prototypes. The curve is steep at the end, so the last level costs much more than the first.</p>
+
+<!-- 7 -->
+<h2>7. Stakeholders</h2>
+<p>A <b>stakeholder</b> is any group or individual who can affect, or is affected by, the achievement of the
+organisation's objectives (Freeman, 1984). In app design: anyone who can influence the app or is affected by it.</p>
+
+<h3>Internal stakeholders</h3>
+<table>
+<tr><th style="width:26%">Group</th><th style="width:34%">Who</th><th>What they need from the prototype</th></tr>
+<tr><td>Owners and investors</td><td>Founders, shareholders, funders</td><td>A polished view of the idea, to approve the budget</td></tr>
+<tr><td>Product managers</td><td>Product owner, project lead</td><td>Scope, priorities, cost</td></tr>
+<tr><td>Design and development team</td><td>UX/UI designers, researchers, developers, testers</td><td>Flows to test, feasibility</td></tr>
+<tr><td>Marketing and sales</td><td>Campaign and sales teams</td><td>How the app looks and sounds</td></tr>
+<tr><td>Support and operations</td><td>Customer service, logistics</td><td>The problems the app may create</td></tr>
+</table>
+
+<h3>External stakeholders</h3>
+<table>
+<tr><th style="width:26%">Group</th><th style="width:34%">Who</th><th>What they need from the prototype</th></tr>
+<tr><td>Users and customers</td><td>People who use or buy through the app</td><td>A clear flow to reach their goal</td></tr>
+<tr><td>Partners and suppliers</td><td>Suppliers, payment providers, delivery companies</td><td>Integration points</td></tr>
+<tr><td>Regulators and legal</td><td>Consumer-protection and data-protection authorities</td><td>Compliance: prices, returns, personal data</td></tr>
+<tr><td>Society</td><td>Communities, people with accessibility needs</td><td>Accessibility and inclusion</td></tr>
+</table>
+
+<h3>Amar Darek: which fidelity for which stakeholder</h3>
+<table>
+<tr><th style="width:17%">Group</th><th style="width:33%">Example</th><th style="width:22%">What they need</th><th>Suitable fidelity</th></tr>
+<tr><td>Users and customers</td><td>Families furnishing a home, first-time online buyers</td><td>A clear flow: browse, cart, checkout</td><td>Mid: clickable wireframe</td></tr>
+<tr><td>Sellers and brands</td><td>Furniture makers, suppliers</td><td>How their products are displayed</td><td>Mid to high: mock-up</td></tr>
+<tr><td>Partners</td><td>Delivery companies, payment providers</td><td>Integration points</td><td>Mid: wireframe with the flow (high if a real integration is tested)</td></tr>
+<tr><td>Regulators and legal</td><td>Checkout showing the full price with delivery, a "Return within X days" line, a consent checkbox</td><td>Compliance: prices, returns, personal data</td><td>Mid to high: mock-up with the real wording</td></tr>
+<tr><td>Society</td><td>Older users, people with low digital skills, Arabic-speaking users</td><td>Accessibility and inclusion</td><td>Low early (sketch), high later (text size, right-to-left layout)</td></tr>
+</table>
+
+<!-- 8 -->
+<h2>8. AI and prototyping</h2>
+<p class="small">From the case study on rapid UI prototyping with "vibe coding" (Li, Maheshwari and Voelker, 2025).</p>
+<table>
+<tr><td class="k">Results</td><td>AI layouts gave diverse alternatives and one new idea (users build filters by choosing
+  fields, operators and values). Interactive prototypes improved the feedback: users held back on sketches and
+  low-fidelity designs, but engaged and found real issues with interactive ones.</td></tr>
+<tr><td class="k">Weaknesses</td><td>Repeated prompting in one session produced cumulative errors, and code
+  generated from screenshots reproduced the visuals but not the interactions.</td></tr>
+<tr><td class="k">Conclusions</td><td>Generative UI speeds up communication and feedback, but brings code errors,
+  security concerns, and a risk of converging on conventional patterns. When to bring AI in depends on the team's
+  experience; prompt writing and domain knowledge are both needed.</td></tr>
+<tr><td class="k">Limits</td><td>One case study, one team, no quantitative results.</td></tr>
+</table>
+
+<h2>Key takeaways</h2>
+<ol>
+<li><b>Design → Prototype → Evaluate → Refine.</b> The goal is not a perfect prototype at once, but a design that
+improves step by step with user feedback.</li>
+<li>Whether the prototype is made by hand or with AI tools, the objective is the same: <b>design solutions that
+meet users' needs</b>. AI can speed up the work; it cannot replace understanding users and evaluating usability.</li>
+</ol>
+
+<h2>References</h2>
+<ol class="small">
+<li>Freeman, R. E. (1984). <i>Strategic Management: A Stakeholder Approach.</i> Boston: Pitman.</li>
+<li>HCI Lecture and Exercises. https://hci-studies.org/hci-lecture-and-exercises/</li>
+<li>Li, T., Maheshwari, T., Voelker, A. (2025). <i>User-Centered Design with AI in the Loop: A Case Study of
+Rapid User Interface Prototyping with "Vibe Coding".</i> ACM Collective Intelligence 2025, arXiv:2507.21012.</li>
+</ol>
+
+<div class="ft"><span>Human Computer Interaction · Unit III · Lecture 6</span><span>Course summary</span>
+<span>Semester 7, 2026/2027</span></div>
+</body></html>
