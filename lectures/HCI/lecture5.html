@@ -153,6 +153,34 @@ h1,h2,.lvt,.mt,.v,.lead,.cap{overflow-wrap:break-word}
 .kbd span{display:inline-block;border:1px solid var(--line);border-radius:calc(var(--u)*.6);
   padding:0 calc(var(--u)*.8);background:var(--surface);font-family:Consolas,monospace}
 
+/* divider slide */
+.divider{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:calc(var(--u)*1.8)}
+.dn{font-size:calc(var(--u)*2);font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)}
+ol.dsubs{list-style:none;counter-reset:d;display:flex;flex-wrap:wrap;gap:calc(var(--u)*1.2)}
+ol.dsubs li{counter-increment:d;background:var(--surface);border:1px solid var(--line);
+  border-left:calc(var(--u)*.6) solid var(--teal);border-radius:calc(var(--u)*1.1);
+  padding:calc(var(--u)*1.1) calc(var(--u)*1.8);font-size:calc(var(--u)*2.2);font-weight:700}
+ol.dsubs li::before{content:counter(d) " · ";color:var(--teal);font-weight:800}
+/* mini widgets used in the examples */
+.cols2{columns:2;font-size:calc(var(--u)*1.95);line-height:1.6}
+.cols2 span{display:block;break-inside:avoid}
+.grp{border:1px solid var(--line);border-radius:calc(var(--u)*.8);padding:calc(var(--u)*.8) calc(var(--u)*1.2);
+  font-size:calc(var(--u)*1.95)}
+.grp b{display:block;font-size:calc(var(--u)*1.6);color:var(--teal);text-transform:uppercase;letter-spacing:.06em}
+.pbar{height:calc(var(--u)*1.4);border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2)}
+.pbar i{display:block;height:100%;background:var(--blue)}
+.steps{display:flex;gap:calc(var(--u)*.8)}
+.steps i{display:grid;place-items:center;width:calc(var(--u)*3.4);height:calc(var(--u)*3.4);border-radius:50%;
+  background:var(--blue-soft);color:var(--blue);font-style:normal;font-weight:800;font-size:calc(var(--u)*1.8)}
+.dense{display:grid;grid-template-columns:repeat(7,1fr);gap:calc(var(--u)*.6)}
+.dense u{display:block;height:calc(var(--u)*1.4);background:var(--line);border-radius:calc(var(--u)*.3)}
+.win{border:1px solid var(--line);border-radius:calc(var(--u)*.8);overflow:hidden;display:flex;flex-direction:column;gap:0}
+.winbar{background:var(--surface2);padding:calc(var(--u)*.7) calc(var(--u)*1.1);font-size:calc(var(--u)*1.6);color:var(--muted)}
+.wintabs{display:flex;gap:calc(var(--u)*.6);padding:calc(var(--u)*.7) calc(var(--u)*1.1);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.wintabs span{background:var(--blue-soft);color:var(--blue);border-radius:calc(var(--u)*.6);
+  padding:calc(var(--u)*.4) calc(var(--u)*1);font-size:calc(var(--u)*1.7);font-weight:700}
+.win .note{padding:calc(var(--u)*.7) calc(var(--u)*1.1)}
+
 /* overview */
 #ov{position:fixed;inset:0;background:var(--paper);z-index:50;display:none;
   grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;padding:18px;
@@ -191,223 +219,363 @@ h1,h2,.lvt,.mt,.v,.lead,.cap{overflow-wrap:break-word}
 
 <script>
 /* ============ CONTENT ============ */
+/* 8 criteria, 18 sub-criteria. Each sub-criterion: an explanation and an example. */
 var CRIT = [
- { n:1, name:"Guidance", sub:["Prompting","Grouping / distinction","Immediate feedback","Legibility"],
-   when:"On every screen where the user must act, type or read: forms, menus, empty pages, first use.",
-   ask:"Does the user know what to do now, in which format, and what happened after they acted?",
-   fail:"The user hesitates, types in the wrong format, clicks the wrong item, or does not know if the action worked.",
-   goal:"Advise, orient, inform and lead the user: hints and examples, named groups, an answer to every action, readable text.",
-   ex:{
-     cap0:"A date field with no hint",
-     ui0:'<div class="lbl">Date</div><div class="fld">&nbsp;</div>'+
-         '<div class="row"><span class="bt">Continue</span></div>'+
-         '<div class="note" style="color:var(--coral)">The user types 10/11 &rarr; error, with no explanation.</div>',
-     why0:"<b>No prompting:</b> no format, no example, no feedback. The user guesses.",
-     cap1:"Label, format and example",
-     ui1:'<div class="lbl">Date of birth</div><div class="fld">dd / mm / yyyy</div>'+
-         '<div class="note">Example: 25/03/2001</div>'+
-         '<div class="row"><span class="bt">Continue</span><span class="note" style="color:var(--green)">&#10003; saved</span></div>',
-     why1:"<b>Guidance:</b> the format is visible before the error, and the action is confirmed."
-   }},
- { n:2, name:"Workload", sub:["Concision","Minimal actions","Information density"],
-   when:"On every screen that carries text, inputs or a lot of information: labels, buttons, dashboards, tables.",
-   ask:"Is anything here that the user does not need to read, type or remember?",
-   fail:"The user reads too much, clicks too much, or cannot find what matters, and abandons the task.",
-   goal:"Reduce the perceptual and memory load: short texts, fewest possible actions, only the useful information.",
-   ex:{
-     cap0:"Verbose, and nothing is usable",
-     ui0:'<div class="note" style="font-size:calc(var(--u)*1.95);line-height:1.35">'+
-         '&ldquo;An error has unfortunately occurred while the system was attempting to carry out '+
-         'the operation that you requested, and as a result we are not able to proceed with saving '+
-         'your document at this time.&rdquo;</div>'+
-         '<div class="row"><span class="bt">Click here in order to validate your registration</span></div>',
-     why0:"<b>Too much:</b> 40 words to say two things, and the button repeats the sentence.",
-     cap1:"Short, and says what to do",
-     ui1:'<div class="v"><b>Save failed.</b> The disk is full.<br>Free some space and try again.</div>'+
-         '<div class="row"><span class="bt">Save</span><span class="bt grey">Cancel</span></div>',
-     why1:"<b>Concision:</b> cause then solution. Short labels. Nothing to re-read."
-   }},
- { n:3, name:"Explicit control", sub:["Explicit actions","User control"],
-   when:"When the system does something that matters: send, save, delete, pay, change a setting.",
-   ask:"Does the system do only what the user asked, and can the user stop it?",
-   fail:"The system acts on its own, the user is surprised, feels trapped, and loses work.",
-   goal:"Run an action only when it is asked for, and keep cancel, pause, undo and go back available.",
-     ex:{
-     cap0:"The list acts by itself",
-     ui0:'<div class="lbl">Country</div><div class="fld">Algeria &#9662;</div>'+
-         '<div class="note" style="color:var(--coral)">Page reloaded. The form was sent.</div>'+
-         '<div class="note">Auto-save every 30 s. No way to go back to the old version.</div>',
-     why0:"<b>Implicit action:</b> choosing is not asking. The user cannot undo.",
-     cap1:"The user asks, the user decides",
-     ui1:'<div class="lbl">Country</div><div class="row"><span class="fld" style="flex:1">Algeria &#9662;</span>'+
-         '<span class="bt">Go</span></div>'+
-         '<div class="row"><span class="bt">Save</span><span class="bt grey">Cancel</span></div>'+
-         '<div class="note">Auto-save only if you turn it on &mdash; with version history.</div>',
-     why1:"<b>Explicit control:</b> one clear button starts the action, and it can be cancelled."
-   }},
- { n:4, name:"Adaptability", sub:["Flexibility","Taking the user's experience into account"],
-   when:"When users differ: habits, devices, languages, and beginners next to experts.",
-   ask:"Can the user reach the same goal in several ways, and does the interface fit their level?",
-   fail:"Users who do not fit the single way are blocked; experts are slowed by steps meant for beginners.",
-   goal:"Several routes to the same action, settings the user controls, guidance for beginners and shortcuts for experts.",
-   ex:{
-     cap0:"One way only, for everyone",
-     ui0:'<div class="v">Copy is available <b>only</b> by right-click &rarr; menu.</div>'+
-         '<div class="note strike">Ctrl + C</div>'+
-         '<div class="note" style="color:var(--coral)">The welcome tutorial opens at every launch.</div>',
-     why0:"<b>Rigid:</b> no keyboard route, and the expert repeats the beginner's path every day.",
-     cap1:"Several routes, user in charge",
-     ui1:'<div class="v">Copy: menu, right-click, toolbar, or <span class="mono">Ctrl + C</span>.</div>'+
-         '<div class="row"><span class="bt">Show tips</span><span class="bt grey">Don\'t show again</span></div>'+
-         '<div class="note">Layout, language and theme are in Settings.</div>',
-     why1:"<b>Adaptability:</b> the user chooses the route and controls the change &mdash; propose, do not impose."
-   }},
- { n:5, name:"Error management", sub:["Protection against errors","Quality of error messages","Error correction"],
-   when:"Before every risky action, and every time something goes wrong.",
-   ask:"Is the error prevented? If not, is it explained? If not, can it be corrected without starting again?",
-   fail:"The user makes an avoidable error, cannot understand the message, and loses all the work.",
-   goal:"Prevent what can be prevented, explain cause and solution in the user's words, and keep what was already typed.",
-   ex:{
-     cap0:"Blocked, and sent back to the start",
-     ui0:'<div class="v mono" style="font-size:calc(var(--u)*2.2)">Error 0x80070057</div>'+
-         '<div class="note" style="color:var(--coral)">All fields cleared. Please fill the form again.</div>'+
-         '<div class="row"><span class="bt red">Delete account</span>'+
-         '<span class="note">one click, no warning</span></div>',
-     why0:"<b>No protection, no meaning, no correction:</b> the three sub-criteria fail at once.",
-     cap1:"Caught early, explained, recoverable",
-     ui1:'<div class="lbl">Phone</div><div class="fld" style="border-color:var(--coral)">06 12 34</div>'+
-         '<div class="note" style="color:var(--coral)">Too short: a phone number has 10 digits.</div>'+
-         '<div class="note">All your other answers are kept.</div>'+
-         '<div class="row"><span class="bt red">Delete account</span><span class="note">asks to confirm</span></div>',
-     why1:"<b>Managed:</b> the message sits on the field, names the cause and the fix, and nothing is lost."
-   }},
- { n:6, name:"Consistency", sub:["Homogeneity of codes, names, formats and procedures"],
-   when:"Across all screens of the same application, and between its website and its mobile app.",
-   ask:"Are the same things placed, named and styled the same way everywhere?",
-   fail:"The user has to relearn every screen, hesitates, and clicks the wrong button.",
-   goal:"Keep the same design choices for the same context &mdash; and change them only when the context really differs.",
-   ex:{
-     cap0:"Three screens, three habits",
-     ui0:'<div class="note">Page 1</div><div class="row"><span class="bt">Valider</span><span class="bt grey">Annuler</span></div>'+
-         '<div class="note">Page 2</div><div class="row"><span class="bt grey">Cancel</span><span class="bt">OK</span></div>'+
-         '<div class="note">Page 3</div><div class="row"><span class="bt">Save</span><span class="bt grey">Quit</span></div>',
-     why0:"<b>Inconsistent:</b> wording, order and language change. The user must read every time.",
-     cap1:"One rule, everywhere",
-     ui1:'<div class="note">Page 1</div><div class="row" style="justify-content:flex-end"><span class="bt grey">Cancel</span><span class="bt">OK</span></div>'+
-         '<div class="note">Page 2</div><div class="row" style="justify-content:flex-end"><span class="bt grey">Cancel</span><span class="bt">OK</span></div>'+
-         '<div class="note">Same words, same order, same place: bottom right.</div>',
-     why1:"<b>Consistent:</b> the user learns once and recognises it everywhere."
-   }},
- { n:7, name:"Meaning of codes and names", sub:["Codes: icons, colours, abbreviations","Names: terms and vocabulary"],
-   when:"For every label, icon, colour or code the user has to interpret.",
-   ask:"Does this name, icon or colour mean to the user what it means to us?",
-   fail:"The user misreads the screen and chooses the wrong action, confidently.",
-   goal:"Make the sign match what it refers to: familiar words, recognisable icons, logical colours.",
-   ex:{
-     cap0:"Codes only the developer knows",
-     ui0:'<div class="row"><span class="bt">⌧</span><span class="bt">⌸</span><span class="bt">⍟</span></div>'+
-         '<div class="note mono">F3 = Delete &nbsp; F7 = Save</div>'+
-         '<div class="row"><span class="bt" style="background:var(--green)">Delete</span>'+
-         '<span class="bt red">Keep</span></div>',
-     why0:"<b>No meaning:</b> unreadable icons, arbitrary keys, and colours that say the opposite.",
-     cap1:"Words and colours that match",
-     ui1:'<div class="row"><span class="bt">🗑 Delete</span><span class="bt grey">💾 Save</span></div>'+
-         '<div class="note mono">Del = Delete &nbsp; Ctrl+S = Save</div>'+
-         '<div class="row"><span class="bt red">Delete</span>'+
-         '<span class="bt" style="background:var(--green)">Keep</span></div>',
-     why1:"<b>Meaningful:</b> icon plus word, the usual keys, red for destroy and green for safe."
-   }},
- { n:8, name:"Compatibility", sub:["Adaptation to the users and the task","Compatibility between applications"],
-   when:"When the interface meets the real users, their language, their habits and their real work.",
-   ask:"Does the user have to translate between their world and this interface?",
-   fail:"The user converts dates, reverses text, or invents a procedure the software did not plan.",
-   goal:"Match the users and the task: their vocabulary, reading direction, formats, documents and real procedures.",
-   ex:{
-     cap0:"The user adapts to the software",
-     ui0:'<div class="lbl">الاسم</div><div class="fld" dir="ltr" style="text-align:left">دمحأ</div>'+
-         '<div class="note mono">Date: 03/25/2001 (MM/DD/YYYY)</div>'+
-         '<div class="note" style="color:var(--coral)">Paper form: Name, then ID. Screen: ID, then name.</div>',
-     why0:"<b>Incompatible:</b> wrong writing direction, foreign date format, order that fights the paper form.",
-     cap1:"The software adapts to the user",
-     ui1:'<div class="lbl">الاسم</div><div class="fld" dir="rtl" style="text-align:right">أحمد</div>'+
-         '<div class="note mono">Date: 25/03/2001 (JJ/MM/AAAA)</div>'+
-         '<div class="note">Same order as the paper form the office already uses.</div>',
-     why1:"<b>Compatible:</b> their script, their format, their procedure. Nothing to translate."
-   }}
+{n:1, name:"Guidance", one:"Advise, orient, inform and lead the user.", subs:[
+ {t:"Prompting",
+  when:"On every screen where the user must act or type: forms, search boxes, empty pages, the first use of an app.",
+  ask:"Does the user know what to do now, and in which format?",
+  fail:"The user hesitates, types in the wrong format, or does not see the next step.",
+  goal:"Lead the user to the right action with format hints, examples and default values &mdash; without manipulating them.",
+  cap0:"A field with no hint",
+  ui0:'<div class="lbl">Date</div><div class="fld">&nbsp;</div><div class="row"><span class="bt">Continue</span></div>'+
+      '<div class="note" style="color:var(--coral)">The user types 10/11 &rarr; error, with no explanation.</div>',
+  why0:"No format, no example. The user guesses, then is punished for guessing wrong.",
+  cap1:"Label, format and example",
+  ui1:'<div class="lbl">Date of birth</div><div class="fld">dd / mm / yyyy</div>'+
+      '<div class="note">Example: 25/03/2001</div><div class="row"><span class="bt">Continue</span></div>',
+  why1:"The format is visible <b>before</b> the error, so the error does not happen."},
+ {t:"Grouping and distinction between items",
+  when:"When a screen shows many items: forms, menus, toolbars, settings pages, dashboards.",
+  ask:"Can the user see which items belong together, and which are different?",
+  fail:"Items are mixed, so the user searches for a long time or clicks the wrong one.",
+  goal:"Group related items by position and by format (boxes, spacing, colour) so the structure is visible at a glance. Groups must be named.",
+  cap0:"One flat list of ten fields",
+  ui0:'<div class="cols2"><span>Name</span><span>Expiry</span><span>Surname</span><span>Phone</span>'+
+      '<span>Street</span><span>Email</span><span>City</span><span>Postcode</span>'+
+      '<span>Card number</span><span>Country</span></div>',
+  why0:"Nothing shows that the card number is not part of the address. The eye has no structure to follow.",
+  cap1:"Three named groups",
+  ui1:'<div class="grp"><b>Identity</b> Name, Surname</div>'+
+      '<div class="grp"><b>Address</b> Street, City, Postcode, Country</div>'+
+      '<div class="grp"><b>Payment</b> Card number, Expiry</div>',
+  why1:"Position and format carry the meaning, and each group is correctly named."},
+ {t:"Immediate feedback",
+  when:"After every user action: a click, a key press, a submit, a long operation (upload, payment, download).",
+  ask:"After I act, does the system show at once that it received my action, and what is happening?",
+  fail:"The user does not know whether the action worked, so they click again or leave.",
+  goal:"Answer every action quickly: a state change, a message, a progress bar. Short wait &rarr; change the cursor. Long wait (&gt; 5 s) &rarr; show progress.",
+  cap0:"Nothing happens",
+  ui0:'<div class="row"><span class="bt">Pay 4 500 DA</span></div><div class="note">&nbsp;</div>'+
+      '<div class="note" style="color:var(--coral)">No message, no change. The user clicks again &mdash; and pays twice.</div>',
+  why0:"Silence is read as failure. The user repeats the action.",
+  cap1:"Received, in progress, done",
+  ui1:'<div class="row"><span class="bt grey">Paying&hellip;</span></div>'+
+      '<div class="pbar"><i style="width:64%"></i></div>'+
+      '<div class="note" style="color:var(--green)">&#10003; Paid. Receipt sent to your email.</div>',
+  why1:"The button changes state, the bar shows progress, a message confirms the end."},
+ {t:"Legibility",
+  when:"Wherever there is text to read: body text, labels, buttons, messages, small screens.",
+  ask:"Can every user read this easily &mdash; size, contrast, font, line length?",
+  fail:"The user strains to read, misreads, or gives up.",
+  goal:"Normal case, enough size, enough contrast (WCAG: at least 4.5:1 for normal text), clear sans-serif fonts, short lines.",
+  cap0:"Light grey, small, all capitals",
+  ui0:'<div style="color:#b9c2c9;font-size:calc(var(--u)*1.5);text-transform:uppercase;line-height:1.25">'+
+      'PLEASE READ THESE CONDITIONS CAREFULLY BEFORE YOU CONFIRM YOUR ORDER BECAUSE THEY APPLY TO EVERY PURCHASE</div>',
+  why0:"Capitals remove the word shape, the contrast is far below 4.5:1, and the line is too long.",
+  cap1:"Normal case, strong contrast",
+  ui1:'<div style="line-height:1.4">Please read these conditions before you confirm your order. '+
+      'They apply to every purchase.</div>',
+  why1:"Same message, read in one glance, by everyone."}
+]},
+{n:2, name:"Workload", one:"Reduce the perceptual and memory load; make the dialogue efficient.", subs:[
+ {t:"Brevity: concision",
+  when:"In all short texts and inputs: labels, menu items, buttons, codes the user must type.",
+  ask:"Are the texts and the inputs as short as possible while staying clear?",
+  fail:"The user reads too much or types too much, and misses what matters.",
+  goal:"Short labels, abbreviations only if they are already known, default values the user does not have to retype.",
+  cap0:"Forty words to say two things",
+  ui0:'<div class="note" style="font-size:calc(var(--u)*1.9);line-height:1.35">&ldquo;An error has unfortunately '+
+      'occurred while the system was attempting to carry out the operation that you requested, and as a result '+
+      'we are not able to proceed with saving your document at this time.&rdquo;</div>'+
+      '<div class="row"><span class="bt">Click here in order to validate your registration</span></div>',
+  why0:"A tooltip shows for about half a second. Nobody finishes this sentence.",
+  cap1:"Cause, then solution",
+  ui1:'<div class="v"><b>Save failed.</b> The disk is full.<br>Free some space and try again.</div>'+
+      '<div class="row"><span class="bt">Register</span></div>',
+  why1:"Eleven words, and the button says what it does."},
+ {t:"Brevity: minimal actions",
+  when:"For the frequent tasks the user repeats: search, buy, send, log in, change a setting.",
+  ask:"How many steps, clicks or screens are needed to reach the goal? Can we remove some?",
+  fail:"The task takes too long, the user is tired, and abandons before the end.",
+  goal:"Reduce the number of actions to the minimum the goal really needs, and offer shortcuts.",
+  cap0:"Six screens to change a password",
+  ui0:'<div class="steps"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i></div>'+
+      '<div class="note">Menu &rarr; Account &rarr; Security &rarr; Password &rarr; Confirm identity &rarr; New password</div>',
+  why0:"Five of the six screens carry no decision. They only exist because of the menu structure.",
+  cap1:"Two steps, from anywhere",
+  ui1:'<div class="steps"><i>1</i><i>2</i></div>'+
+      '<div class="note">Account &rarr; Change password (and the same link in the settings search)</div>',
+  why1:"Count the actions for the same task. Fewer actions, same result."},
+ {t:"Information density",
+  when:"On screens with a lot of information: dashboards, home pages, tables, admin panels.",
+  ask:"Is there too much, or too little, on this screen? Is only the useful information shown?",
+  fail:"The user is overloaded and cannot find what matters, or has to open many screens to gather it.",
+  goal:"Show only what the task needs, close to where it is used. Limit the quantity, structure it, display it just in time.",
+  cap0:"Forty links and five banners",
+  ui0:'<div class="dense">'+Array(28).join(0).split('').map(function(){return '<u></u>';}).join('')+'</div>'+
+      '<div class="note" style="color:var(--coral)">Everything has the same weight, so nothing stands out.</div>',
+  why0:"Quantity without structure. The user scans, gives up, and uses the search box instead.",
+  cap1:"One task in front, the rest one click away",
+  ui1:'<div class="row"><span class="bt">Find a car</span></div>'+
+      '<div class="note">Three shortcuts: New &middot; Used &middot; By budget</div>'+
+      '<div class="note">Everything else lives in the menu, shown when it is needed.</div>',
+  why1:"Reduced and organised. The memory load drops with the number of items."}
+]},
+{n:3, name:"Explicit control", one:"The system processes only what the user asked for, and the user stays in charge.", subs:[
+ {t:"Explicit user actions",
+  when:"When the system does something that matters: send, save, delete, pay, change a setting.",
+  ask:"Does the system do only what the user explicitly asked, and nothing behind their back?",
+  fail:"The system acts on its own and surprises the user.",
+  goal:"Run an action only when it is explicitly asked for, through a clear Validate or Send button.",
+  cap0:"Choosing is treated as asking",
+  ui0:'<div class="lbl">Country</div><div class="fld">Algeria &#9662;</div>'+
+      '<div class="note" style="color:var(--coral)">The page reloaded and the form was sent.</div>',
+  why0:"The user was still reading the list. Pressing Enter in the first field sends everything.",
+  cap1:"One clear button starts it",
+  ui1:'<div class="lbl">Country</div><div class="row"><span class="fld" style="flex:1">Algeria &#9662;</span>'+
+      '<span class="bt">Search</span></div>'+
+      '<div class="note">Nothing happens until the user presses Search.</div>',
+  why1:"Selecting is not validating. The user decides when the action starts."},
+ {t:"User control",
+  when:"In long or important tasks: downloads, installations, forms in several steps, automatic processes.",
+  ask:"Can the user stop, pause, cancel, go back, or move to another task?",
+  fail:"The user feels trapped, and loses work or time.",
+  goal:"Keep cancel, pause, undo and go back available &mdash; and never save automatically without permission.",
+  cap0:"No way out",
+  ui0:'<div class="v">Updating. Do not turn off your computer.</div><div class="pbar"><i style="width:35%"></i></div>'+
+      '<div class="note" style="color:var(--coral)">No Cancel. No Later. Auto-save overwrites your file every 30 s.</div>',
+  why0:"The machine decided. The user waits, and cannot return to the previous version.",
+  cap1:"The user decides",
+  ui1:'<div class="v">Updating.</div><div class="pbar"><i style="width:35%"></i></div>'+
+      '<div class="row"><span class="bt grey">Pause</span><span class="bt grey">Install tonight</span></div>'+
+      '<div class="note">Auto-save only if you turn it on &mdash; with version history.</div>',
+  why1:"Stop, postpone, switch task, go back: the user keeps control of their own machine."}
+]},
+{n:4, name:"Adaptability", one:"React to the context, and to the needs and the preferences of the users.", subs:[
+ {t:"Flexibility",
+  when:"When users differ in habits, devices, or ways of working.",
+  ask:"Can the user reach the same goal in several ways, and adapt the interface to themselves?",
+  fail:"Users who do not fit the single planned way are blocked or slowed.",
+  goal:"Offer several routes to the same action (menu, right-click, toolbar, keyboard) and let users personalise layout, language and theme.",
+  cap0:"One route only",
+  ui0:'<div class="v">Copy is available <b>only</b> by right-click &rarr; menu.</div>'+
+      '<div class="note strike">Ctrl + C</div>'+
+      '<div class="note" style="color:var(--coral)">Fixed 1200 px layout: unusable on a phone.</div>',
+  why0:"A user without a mouse, or on a small screen, simply cannot do it.",
+  cap1:"Several routes, one goal",
+  ui1:'<div class="v">Copy: menu, right-click, toolbar, drag and drop, or <span class="mono">Ctrl + C</span>.</div>'+
+      '<div class="note">Responsive layout; colours, size and language in Settings.</div>',
+  why1:"Adapt to the audience, the screen and the taste. Several ways to do the same action."},
+ {t:"Taking the user's experience into account",
+  when:"When the application has both beginners and experts &mdash; and when a beginner slowly becomes an expert.",
+  ask:"Does the interface help a beginner and still let an expert go fast?",
+  fail:"Beginners are lost, or experts are slowed by steps and messages meant for beginners.",
+  goal:"Guidance for beginners, shortcuts and advanced modes for experts. Adaptation = adaptability (the user controls the change) + adaptivity (the system controls it). Propose, do not impose.",
+  cap0:"The same path for everyone, for ever",
+  ui0:'<div class="v">The welcome tutorial opens at every launch.</div>'+
+      '<div class="note strike">Don\'t show again</div>'+
+      '<div class="note" style="color:var(--coral)">The menu rearranges itself to show &ldquo;what you use most&rdquo;.</div>',
+  why0:"The expert pays the beginner\'s price daily, and a menu that moves on its own destroys learning.",
+  cap1:"Grows with the user",
+  ui1:'<div class="row"><span class="bt">Show tips</span><span class="bt grey">Don\'t show again</span></div>'+
+      '<div class="note">Every menu entry displays its keyboard shortcut, so the beginner learns the expert route.</div>',
+  why1:"Adaptability, not adaptivity: the user controls the change, and the interface stays predictable."}
+]},
+{n:5, name:"Error management", one:"Avoid errors, reduce them, and let the user correct them.", subs:[
+ {t:"Protection against errors",
+  when:"Before risky or irreversible actions, and in every data input: deleting, paying, typing dates or numbers.",
+  ask:"Which errors can the user make here, and does the design prevent them before they happen?",
+  fail:"The user makes an error that the design could have avoided.",
+  goal:"Constrain the input, disable impossible commands, announce irreversible ones. Match the level of protection to the danger: do not under-protect, do not over-protect.",
+  cap0:"Both at once",
+  ui0:'<div class="row"><span class="bt red">Delete account</span><span class="note">one click, no warning</span></div>'+
+      '<div class="note" style="color:var(--coral)">Rename a file: &ldquo;Are you sure? &mdash; Are you really sure?&rdquo;</div>',
+  why0:"Under-protected where it is dangerous, over-protected where it is harmless. Users stop reading warnings.",
+  cap1:"Protection matches the danger",
+  ui1:'<div class="note">Rename: instant, and can be undone.</div>'+
+      '<div class="row"><span class="bt red">Delete account</span><span class="note">type the account name to confirm</span></div>'+
+      '<div class="lbl">Phone</div><div class="fld">digits only, 10 maximum</div>',
+  why1:"Inform in advance, disable what is unavailable, limit the input, check it."},
+ {t:"Quality of error messages",
+  when:"Every time an error message is shown.",
+  ask:"Does the message say what is wrong, where, and how to fix it &mdash; in the user's words, politely?",
+  fail:"The user does not understand the error, so cannot fix it, and blames themselves or the software.",
+  goal:"Short, polite, precise, in the user's language, naming the cause and proposing the solution.",
+  cap0:"A code, and nothing else",
+  ui0:'<div class="v mono" style="font-size:calc(var(--u)*2.4)">Error 0x80070057</div>'+
+      '<div class="note" style="color:var(--coral)">&ldquo;Invalid input.&rdquo; &mdash; Which field? Why? What now?</div>',
+  why0:"The message is written for the developer, not for the person sitting in front of the screen.",
+  cap1:"Cause and solution, in their words",
+  ui1:'<div class="v">The date must be in the past.</div>'+
+      '<div class="note">You typed 25/03/2031. Did you mean 2001?</div>'+
+      '<div class="row"><span class="bt">Use 2001</span><span class="bt grey">Edit</span></div>',
+  why1:"Informative, constructive, understandable, friendly &mdash; and it offers the fix."},
+ {t:"Error correction",
+  when:"After an error has happened.",
+  ask:"Can the user correct it easily, without starting again?",
+  fail:"The user loses the work already done and has to redo everything.",
+  goal:"Signal the error early, in the area concerned, with the cursor on the faulty input; keep the data already entered; allow undo.",
+  cap0:"Everything cleared",
+  ui0:'<div class="note" style="color:var(--coral)">One field was wrong, so the form was emptied.</div>'+
+      '<div class="fld">&nbsp;</div><div class="fld">&nbsp;</div><div class="fld">&nbsp;</div>'+
+      '<div class="note">Twelve answers lost. The user leaves.</div>',
+  why0:"The cost of a small mistake is the whole task.",
+  cap1:"Only the faulty field",
+  ui1:'<div class="fld">Ahmed Benali</div>'+
+      '<div class="lbl">Phone</div><div class="fld" style="border-color:var(--coral)">06 12 34</div>'+
+      '<div class="note" style="color:var(--coral)">Too short: a phone number has 10 digits.</div>'+
+      '<div class="note">Everything else is kept. <span class="mono">Ctrl + Z</span> undoes the last change.</div>',
+  why1:"Marked, placed on the field, corrected in one gesture, and nothing else is lost."}
+]},
+{n:6, name:"Consistency", one:"The same design choices in the same contexts &mdash; different ones only when the context differs.", subs:[
+ {t:"Consistency (homogeneity)",
+  when:"Across all screens of the same application, between the applications of a suite, and between versions.",
+  ask:"Are the same things placed, named and styled the same way everywhere?",
+  fail:"The user has to relearn every screen, hesitates, and clicks the wrong button.",
+  goal:"Keep codes, names, formats and procedures identical in identical contexts &mdash; appearance, position, wording, and behaviour. Follow the style guides, and be careful when a version moves a command.",
+  cap0:"Three screens, three habits",
+  ui0:'<div class="note">Page 1</div><div class="row"><span class="bt">Valider</span><span class="bt grey">Annuler</span></div>'+
+      '<div class="note">Page 2</div><div class="row"><span class="bt grey">Cancel</span><span class="bt">OK</span></div>'+
+      '<div class="note">Page 3</div><div class="row"><span class="bt">Save</span><span class="bt grey">Quit</span></div>',
+  why0:"Wording, order and language all change. Labels are also aligned differently in each form.",
+  cap1:"One rule, every screen",
+  ui1:'<div class="note">Page 1</div><div class="row" style="justify-content:flex-end"><span class="bt grey">Cancel</span><span class="bt">OK</span></div>'+
+      '<div class="note">Page 2</div><div class="row" style="justify-content:flex-end"><span class="bt grey">Cancel</span><span class="bt">OK</span></div>'+
+      '<div class="note">Same words, same order, bottom right &mdash; and the same grid, spacing and alignment.</div>',
+  why1:"The user learns once. Homogeneity is between several elements; coherence is between one thing and another."}
+]},
+{n:7, name:"Significance of codes and names", one:"The sign must match what it refers to, for the user.", subs:[
+ {t:"Significance of codes and names",
+  when:"For every name, icon, colour, abbreviation or code the user has to interpret.",
+  ask:"Does this name, icon or colour mean to the user what it means to us?",
+  fail:"The user misreads the screen and chooses the wrong action, confidently.",
+  goal:"Use the users' own vocabulary, recognisable icons and logical colours &mdash; codes (icons, illustrations, abbreviations, colours) and names (terms, vocabulary) must match their referent.",
+  cap0:"Codes only the developer knows",
+  ui0:'<div class="row"><span class="bt">&#9003;</span><span class="bt">&#8862;</span><span class="bt">&#9784;</span></div>'+
+      '<div class="note mono">F3 = Delete &nbsp;&nbsp; F7 = Save</div>'+
+      '<div class="row"><span class="bt" style="background:var(--green)">Delete</span><span class="bt red">Keep</span></div>',
+  why0:"Unreadable icons, arbitrary keys, and colours that say the opposite of the action.",
+  cap1:"Words and colours that match",
+  ui1:'<div class="row"><span class="bt">Delete</span><span class="bt grey">Save</span></div>'+
+      '<div class="note mono">Del = Delete &nbsp;&nbsp; Ctrl + S = Save</div>'+
+      '<div class="row"><span class="bt red">Delete</span><span class="bt" style="background:var(--green)">Keep</span></div>',
+  why1:"An icon with its word, the usual keys, red to destroy and green to keep."}
+]},
+{n:8, name:"Compatibility", one:"Agreement between the users, their task, and the application.", subs:[
+ {t:"Adaptation to the users and the task",
+  when:"When the interface meets the real users: their language, their culture, their habits, their real work.",
+  ask:"Does the user have to translate between their world and this interface?",
+  fail:"The user converts dates, reverses text, or invents a procedure the software did not plan.",
+  goal:"Match memory, perception, habits, skills, age and expectations: their vocabulary, reading direction, formats, documents and real procedures. Consider age, disability, level of technology and language.",
+  cap0:"The user adapts to the software",
+  ui0:'<div class="lbl">&#1575;&#1604;&#1575;&#1587;&#1605;</div>'+
+      '<div class="fld" dir="ltr" style="text-align:left">&#1583;&#1605;&#1581;&#1571;</div>'+
+      '<div class="note mono">Date: 03/25/2001 (MM/DD/YYYY)</div>'+
+      '<div class="note" style="color:var(--coral)">The paper form asks Name then ID. The screen asks ID then Name.</div>',
+  why0:"Wrong writing direction, foreign date format, and an order that fights the procedure already in use.",
+  cap1:"The software adapts to the user",
+  ui1:'<div class="lbl">&#1575;&#1604;&#1575;&#1587;&#1605;</div>'+
+      '<div class="fld" dir="rtl" style="text-align:right">&#1571;&#1581;&#1605;&#1583;</div>'+
+      '<div class="note mono">Date: 25/03/2001 (JJ/MM/AAAA)</div>'+
+      '<div class="note">Same order as the paper form the office already uses.</div>',
+  why1:"Their script, their format, their procedure. Nothing to translate."},
+ {t:"Compatibility between applications",
+  when:"When your application lives next to the others the user already knows.",
+  ask:"Does it behave like the other software on this machine, and like its own previous version?",
+  fail:"The user applies a habit learned elsewhere, and it fails here.",
+  goal:"Follow the platform style guides: same place for the same thing, same shortcuts, same order of buttons, same vocabulary.",
+  cap0:"Its own private rules",
+  ui0:'<div class="win"><div class="winbar">Status: ready &mdash; 1248 x 860</div>'+
+      '<div class="wintabs"><span>File</span><span>Edit</span><span>Image</span></div>'+
+      '<div class="note">Save = <span class="mono">Ctrl + G</span></div></div>',
+  why0:"The status bar sits above the tools, and Save is on an invented shortcut.",
+  cap1:"Like every other application",
+  ui1:'<div class="win"><div class="wintabs"><span>File</span><span>Edit</span><span>Image</span></div>'+
+      '<div class="note">Save = <span class="mono">Ctrl + S</span></div>'+
+      '<div class="winbar">Status: ready &mdash; 1248 x 860</div></div>',
+  why1:"Status bar at the bottom, full width; the standard shortcut. Theory, style guide and criterion all agree."}
+]}
 ];
 
 /* ============ SLIDE BUILDING ============ */
-function esc(s){return s}
-var S=[]; /* {part, crit, sub, html} */
+var S=[];   /* {part, num, crit, sub, html} */
+var TOTSUB=0; CRIT.forEach(function(c){TOTSUB+=c.subs.length;});
 
-S.push({part:"Opening", num:"", crit:"Bastien and Scapin", sub:"8 criteria to audit any interface",
+S.push({part:"Opening", num:"", crit:"Bastien and Scapin", sub:"8 criteria, 18 sub-criteria",
  html:'<div class="title">'+
    '<h1>The 8 ergonomic criteria<br>of Bastien and Scapin</h1>'+
    '<div class="lead">A synthesis of more than 800 ergonomic recommendations (INRIA). '+
    'We use them to judge an interface with criteria instead of personal taste.</div>'+
    '<div class="by">Human Computer Interaction &middot; Universit&eacute; Alger 1 &middot; Prof. Izountar Yousra</div>'+
    '<div class="kbd"><span>&larr;</span> <span>&rarr;</span> move &middot; <span>Esc</span> all slides &middot; '+
-   '<span>F</span> full screen</div>'+
- '</div>'});
+   '<span>F</span> full screen</div></div>'});
 
 S.push({part:"Where they come from", num:"", crit:"From science to the screen",
- sub:"The criteria sit between the research and your daily design work",
+ sub:"How the criteria relate to the general ergonomic theories",
  html:'<h2>Why criteria, and where do they come from?</h2>'+
   '<div class="lead">Research is true but too far from the screen. A list of 800 recommendations is right but '+
   'unusable. The 8 criteria are the usable middle: short enough to remember, precise enough to prove a problem.</div>'+
   '<div class="levels">'+
    '<div class="lv"><div class="lvn">Level 1</div><div class="lvt">Theories</div>'+
-    '<div class="lvd">How people perceive, remember and act. The source of every rule &mdash; but it does not tell you '+
-    'where to put a button.</div></div>'+
+    '<div class="lvd">How people perceive, remember and act. The source of every rule &mdash; but it does not tell '+
+    'you where to put a button.</div></div>'+
    '<div class="lv"><div class="lvn">Level 2</div><div class="lvt">800 recommendations</div>'+
     '<div class="lvd">The theories turned into concrete rules. Too many to hold in your head, and they sometimes '+
     'contradict each other.</div></div>'+
-   '<div class="lv hi"><div class="lvn">Level 3</div>'+
-    '<div class="lvt">The 8 criteria</div>'+
+   '<div class="lv hi"><div class="lvn">Level 3</div><div class="lvt">The 8 criteria</div>'+
     '<div class="lvd">Bastien and Scapin group and arbitrate those rules. This is the level we work at: a compact, '+
     'usable, shared vocabulary.</div></div>'+
    '<div class="lv"><div class="lvn">Level 4</div><div class="lvt">The risk</div>'+
     '<div class="lvd">What happens when they are ignored (Meinadier): confusion, errors, frustration, stress, '+
-    'and rejection of the system.</div></div>'+
-  '</div>'+
-  '<div class="note" style="font-size:calc(var(--u)*2);color:var(--muted)">In one sentence: the criteria are the '+
-  'ergonomic theories made short enough to use, and precise enough to name the fault in a report.</div>'});
+    'and rejection of the system.</div></div></div>'+
+  '<div class="note" style="font-size:calc(var(--u)*2)">In one sentence: the criteria are the ergonomic theories '+
+  'made short enough to use, and precise enough to name the fault in a report.</div>'});
 
-S.push({part:"Map", num:"", crit:"The 8 criteria at a glance", sub:"8 criteria, 18 sub-criteria",
- html:'<h2>The 8 criteria &mdash; 18 sub-criteria</h2><div class="map">'+
+S.push({part:"Map", num:"", crit:"The 8 criteria at a glance", sub:"8 criteria, "+TOTSUB+" sub-criteria",
+ html:'<h2>The 8 criteria &mdash; '+TOTSUB+' sub-criteria</h2><div class="map">'+
   CRIT.map(function(c){return '<div class="mc"><div class="mn">CRITERION '+c.n+'</div>'+
-    '<div class="mt">'+c.name+'</div><div class="md">'+c.sub.join(' &middot; ')+'</div></div>';}).join('')+
- '</div>'});
+    '<div class="mt">'+c.name+'</div><div class="md">'+
+    c.subs.map(function(s){return s.t;}).join(' &middot; ')+'</div></div>';}).join('')+'</div>'});
 
 CRIT.forEach(function(c){
-  S.push({part:"Criterion "+c.n, num:c.n, crit:c.name, sub:c.sub.join(" · "),
-   html:'<div class="chips">'+c.sub.map(function(s){return '<span class="chip">'+s+'</span>';}).join('')+'</div>'+
-     '<div class="q4">'+
-      '<div class="cell"><div class="k">When it applies</div><div class="v">'+c.when+'</div></div>'+
-      '<div class="cell ask"><div class="k">Question to ask</div><div class="v"><em>'+c.ask+'</em></div></div>'+
-      '<div class="cell bad"><div class="k">If it fails</div><div class="v">'+c.fail+'</div></div>'+
-      '<div class="cell goal"><div class="k">Goal</div><div class="v">'+c.goal+'</div></div>'+
-     '</div>'});
-  S.push({part:"Criterion "+c.n, num:c.n, crit:c.name, sub:"Bad example and good example",
-   html:'<div class="two">'+
-     '<div class="pane no"><span class="tag">DON\'T</span><div class="cap">'+c.ex.cap0+'</div>'+
-       '<div class="ui">'+c.ex.ui0+'</div><div class="why">'+c.ex.why0+'</div></div>'+
-     '<div class="pane yes"><span class="tag">DO</span><div class="cap">'+c.ex.cap1+'</div>'+
-       '<div class="ui">'+c.ex.ui1+'</div><div class="why">'+c.ex.why1+'</div></div>'+
-   '</div>'});
+  var m=c.subs.length;
+  /* section divider */
+  S.push({part:"Criterion "+c.n, num:c.n, crit:c.name,
+   sub:(m>1? m+" sub-criteria" : "1 sub-criterion"),
+   html:'<div class="divider"><div class="dn">Criterion '+c.n+' of 8</div>'+
+     '<h1 style="font-size:calc(var(--u)*6)">'+c.name+'</h1>'+
+     '<div class="lead">'+c.one+'</div>'+
+     '<ol class="dsubs">'+c.subs.map(function(s){return '<li>'+s.t+'</li>';}).join('')+'</ol></div>'});
+
+  c.subs.forEach(function(s,j){
+    var tag = m>1 ? (c.n+'.'+(j+1)) : String(c.n);
+    var pos = m>1 ? ('Criterion '+c.n+' &middot; sub-criterion '+(j+1)+' of '+m) : ('Criterion '+c.n);
+    S.push({part:"Criterion "+c.n+(m>1?' · '+(j+1)+'/'+m:''), num:tag, crit:s.t, sub:c.name+' — '+pos.replace(/&middot;/g,'·').replace(/&mdash;/g,'—'),
+     html:'<div class="q4">'+
+       '<div class="cell"><div class="k">1 &middot; When it applies</div><div class="v">'+s.when+'</div></div>'+
+       '<div class="cell ask"><div class="k">2 &middot; Question to ask</div><div class="v"><em>'+s.ask+'</em></div></div>'+
+       '<div class="cell bad"><div class="k">3 &middot; If it fails</div><div class="v">'+s.fail+'</div></div>'+
+       '<div class="cell goal"><div class="k">4 &middot; Goal</div><div class="v">'+s.goal+'</div></div></div>'});
+    S.push({part:"Criterion "+c.n+(m>1?' · '+(j+1)+'/'+m:''), num:tag, crit:s.t, sub:'Bad example and good example',
+     html:'<div class="two">'+
+       '<div class="pane no"><span class="tag">DON\'T</span><div class="cap">'+s.cap0+'</div>'+
+         '<div class="ui">'+s.ui0+'</div><div class="why"><b>Why it fails.</b> '+s.why0+'</div></div>'+
+       '<div class="pane yes"><span class="tag">DO</span><div class="cap">'+s.cap1+'</div>'+
+         '<div class="ui">'+s.ui1+'</div><div class="why"><b>Why it works.</b> '+s.why1+'</div></div></div>'});
+  });
 });
 
 S.push({part:"Closing", num:"", crit:"Using the criteria", sub:"How to write an ergonomic finding",
  html:'<h2>In an audit, name the criterion</h2>'+
   '<div class="lead">A finding is not &ldquo;I don\'t like it&rdquo;. It has five parts, and the criterion is what '+
-  'makes it an argument instead of an opinion.</div>'+
+  'turns an opinion into an argument.</div>'+
   '<div class="q4">'+
    '<div class="cell"><div class="k">1 &middot; Situation</div><div class="v">Which screen, which user, which task.</div></div>'+
-   '<div class="cell bad"><div class="k">2 &middot; Problem</div><div class="v">What the user sees or does, as a fact.</div></div>'+
-   '<div class="cell ask"><div class="k">3 &middot; Criterion</div><div class="v"><em>Which of the 8 is broken, and which sub-criterion.</em></div></div>'+
+   '<div class="cell bad"><div class="k">2 &middot; Problem</div><div class="v">What the user sees or does, stated as a fact.</div></div>'+
+   '<div class="cell ask"><div class="k">3 &middot; Criterion</div><div class="v"><em>Which of the 8, and which sub-criterion.</em></div></div>'+
    '<div class="cell goal"><div class="k">4 &middot; Risk, then 5 &middot; Solution</div>'+
-    '<div class="v">What it costs the user (Meinadier), then one concrete change to the interface.</div></div>'+
-  '</div>'});
+    '<div class="v">What it costs the user (Meinadier), then one concrete change to the interface.</div></div></div>'});
 
 /* ============ ENGINE ============ */
 var stage=document.getElementById('stage'), i=0;
@@ -424,7 +592,7 @@ var hNum=document.getElementById('h-num'), hCrit=document.getElementById('h-crit
 function fit(el){
   /* set the vertical unit so the slide fills the screen without ever scrolling */
   var MIN=0.45, MAX=2.00, STEP=0.04;
-  var kids=el.querySelectorAll('.cell,.ui,.mc,.lv,.pane,.lvt,.mt,.v,.lead,.cap,.why,h1,h2');
+  var kids=el.querySelectorAll('.cell,.ui,.mc,.lv,.pane,.win,.grp,.lvt,.mt,.v,.lead,.cap,.why,h1,h2');
   function over(){
     if(el.scrollHeight>el.clientHeight+2 || el.scrollWidth>el.clientWidth+2) return true;
     for(var n=0;n<kids.length;n++){                 /* catch text clipped inside a box */
