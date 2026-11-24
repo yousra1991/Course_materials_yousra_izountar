@@ -154,13 +154,21 @@ h1,h2,.lvt,.mt,.v,.lead,.cap{overflow-wrap:break-word}
   padding:0 calc(var(--u)*.8);background:var(--surface);font-family:Consolas,monospace}
 
 /* divider slide */
-.divider{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:calc(var(--u)*1.8)}
+.divider{flex:1;min-height:0;display:flex;flex-direction:column;gap:calc(var(--u)*2.2)}
+.dtop{flex:none;display:flex;flex-direction:column;gap:calc(var(--u)*1.2)}
 .dn{font-size:calc(var(--u)*2);font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)}
-ol.dsubs{list-style:none;counter-reset:d;display:flex;flex-wrap:wrap;gap:calc(var(--u)*1.2)}
-ol.dsubs li{counter-increment:d;background:var(--surface);border:1px solid var(--line);
-  border-left:calc(var(--u)*.6) solid var(--teal);border-radius:calc(var(--u)*1.1);
-  padding:calc(var(--u)*1.1) calc(var(--u)*1.8);font-size:calc(var(--u)*2.2);font-weight:700}
-ol.dsubs li::before{content:counter(d) " · ";color:var(--teal);font-weight:800}
+ol.dsubs{flex:1;min-height:0;list-style:none;display:grid;gap:calc(var(--u)*1.4);
+  grid-template-columns:repeat(3,1fr)}
+ol.dsubs.n1{grid-template-columns:1fr}
+ol.dsubs.n2{grid-template-columns:repeat(2,1fr)}
+ol.dsubs.n4{grid-template-columns:repeat(2,1fr)}
+ol.dsubs li{min-height:0;overflow:hidden;background:var(--surface);border:1px solid var(--line);
+  border-left:calc(var(--u)*.7) solid var(--teal);border-radius:calc(var(--u)*1.4);
+  padding:calc(var(--u)*1.6) calc(var(--u)*2);display:flex;flex-direction:column;
+  justify-content:center;gap:calc(var(--u)*.8)}
+ol.dsubs li b{flex:none;font-size:calc(var(--u)*2.4);font-weight:800;line-height:1.15}
+ol.dsubs li span{flex:none;font-size:calc(var(--u)*2);line-height:1.3;color:var(--muted)}
+.dcov{font-size:calc(var(--u)*1.8);font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--teal)}
 /* mini widgets used in the examples */
 .cols2{columns:2;font-size:calc(var(--u)*1.95);line-height:1.6}
 .cols2 span{display:block;break-inside:avoid}
@@ -223,6 +231,7 @@ ol.dsubs li::before{content:counter(d) " · ";color:var(--teal);font-weight:800}
 var CRIT = [
 {n:1, name:"Guidance", one:"Advise, orient, inform and lead the user.", subs:[
  {t:"Prompting",
+  one:"Tell the user what to do now, and in which format.",
   when:"On every screen where the user must act or type: forms, search boxes, empty pages, the first use of an app.",
   ask:"Does the user know what to do now, and in which format?",
   fail:"The user hesitates, types in the wrong format, or does not see the next step.",
@@ -236,6 +245,7 @@ var CRIT = [
       '<div class="note">Example: 25/03/2001</div><div class="row"><span class="bt">Continue</span></div>',
   why1:"The format is visible <b>before</b> the error, so the error does not happen."},
  {t:"Grouping and distinction between items",
+  one:"Show at a glance what belongs together, and what does not.",
   when:"When a screen shows many items: forms, menus, toolbars, settings pages, dashboards.",
   ask:"Can the user see which items belong together, and which are different?",
   fail:"Items are mixed, so the user searches for a long time or clicks the wrong one.",
@@ -251,6 +261,7 @@ var CRIT = [
       '<div class="grp"><b>Payment</b> Card number, Expiry</div>',
   why1:"Position and format carry the meaning, and each group is correctly named."},
  {t:"Immediate feedback",
+  one:"Answer every action, at once.",
   when:"After every user action: a click, a key press, a submit, a long operation (upload, payment, download).",
   ask:"After I act, does the system show at once that it received my action, and what is happening?",
   fail:"The user does not know whether the action worked, so they click again or leave.",
@@ -265,6 +276,7 @@ var CRIT = [
       '<div class="note" style="color:var(--green)">&#10003; Paid. Receipt sent to your email.</div>',
   why1:"The button changes state, the bar shows progress, a message confirms the end."},
  {t:"Legibility",
+  one:"Make the text easy to read for everyone.",
   when:"Wherever there is text to read: body text, labels, buttons, messages, small screens.",
   ask:"Can every user read this easily &mdash; size, contrast, font, line length?",
   fail:"The user strains to read, misreads, or gives up.",
@@ -280,6 +292,7 @@ var CRIT = [
 ]},
 {n:2, name:"Workload", one:"Reduce the perceptual and memory load; make the dialogue efficient.", subs:[
  {t:"Brevity: concision",
+  one:"Say it in fewer words, and type fewer characters.",
   when:"In all short texts and inputs: labels, menu items, buttons, codes the user must type.",
   ask:"Are the texts and the inputs as short as possible while staying clear?",
   fail:"The user reads too much or types too much, and misses what matters.",
@@ -295,6 +308,7 @@ var CRIT = [
       '<div class="row"><span class="bt">Register</span></div>',
   why1:"Eleven words, and the button says what it does."},
  {t:"Brevity: minimal actions",
+  one:"Reach the same goal in fewer steps.",
   when:"For the frequent tasks the user repeats: search, buy, send, log in, change a setting.",
   ask:"How many steps, clicks or screens are needed to reach the goal? Can we remove some?",
   fail:"The task takes too long, the user is tired, and abandons before the end.",
@@ -308,6 +322,7 @@ var CRIT = [
       '<div class="note">Account &rarr; Change password (and the same link in the settings search)</div>',
   why1:"Count the actions for the same task. Fewer actions, same result."},
  {t:"Information density",
+  one:"Show only what the task needs, where it is needed.",
   when:"On screens with a lot of information: dashboards, home pages, tables, admin panels.",
   ask:"Is there too much, or too little, on this screen? Is only the useful information shown?",
   fail:"The user is overloaded and cannot find what matters, or has to open many screens to gather it.",
@@ -324,6 +339,7 @@ var CRIT = [
 ]},
 {n:3, name:"Explicit control", one:"The system processes only what the user asked for, and the user stays in charge.", subs:[
  {t:"Explicit user actions",
+  one:"The system acts only when the user asks.",
   when:"When the system does something that matters: send, save, delete, pay, change a setting.",
   ask:"Does the system do only what the user explicitly asked, and nothing behind their back?",
   fail:"The system acts on its own and surprises the user.",
@@ -338,6 +354,7 @@ var CRIT = [
       '<div class="note">Nothing happens until the user presses Search.</div>',
   why1:"Selecting is not validating. The user decides when the action starts."},
  {t:"User control",
+  one:"The user can stop, cancel, undo, go back.",
   when:"In long or important tasks: downloads, installations, forms in several steps, automatic processes.",
   ask:"Can the user stop, pause, cancel, go back, or move to another task?",
   fail:"The user feels trapped, and loses work or time.",
@@ -354,6 +371,7 @@ var CRIT = [
 ]},
 {n:4, name:"Adaptability", one:"React to the context, and to the needs and the preferences of the users.", subs:[
  {t:"Flexibility",
+  one:"Several routes to the same goal, and settings the user owns.",
   when:"When users differ in habits, devices, or ways of working.",
   ask:"Can the user reach the same goal in several ways, and adapt the interface to themselves?",
   fail:"Users who do not fit the single planned way are blocked or slowed.",
@@ -368,6 +386,7 @@ var CRIT = [
       '<div class="note">Responsive layout; colours, size and language in Settings.</div>',
   why1:"Adapt to the audience, the screen and the taste. Several ways to do the same action."},
  {t:"Taking the user's experience into account",
+  one:"Help the beginner, and let the expert go fast.",
   when:"When the application has both beginners and experts &mdash; and when a beginner slowly becomes an expert.",
   ask:"Does the interface help a beginner and still let an expert go fast?",
   fail:"Beginners are lost, or experts are slowed by steps and messages meant for beginners.",
@@ -384,6 +403,7 @@ var CRIT = [
 ]},
 {n:5, name:"Error management", one:"Avoid errors, reduce them, and let the user correct them.", subs:[
  {t:"Protection against errors",
+  one:"Prevent the error before it can happen.",
   when:"Before risky or irreversible actions, and in every data input: deleting, paying, typing dates or numbers.",
   ask:"Which errors can the user make here, and does the design prevent them before they happen?",
   fail:"The user makes an error that the design could have avoided.",
@@ -398,6 +418,7 @@ var CRIT = [
       '<div class="lbl">Phone</div><div class="fld">digits only, 10 maximum</div>',
   why1:"Inform in advance, disable what is unavailable, limit the input, check it."},
  {t:"Quality of error messages",
+  one:"Name the cause, and propose the fix.",
   when:"Every time an error message is shown.",
   ask:"Does the message say what is wrong, where, and how to fix it &mdash; in the user's words, politely?",
   fail:"The user does not understand the error, so cannot fix it, and blames themselves or the software.",
@@ -412,6 +433,7 @@ var CRIT = [
       '<div class="row"><span class="bt">Use 2001</span><span class="bt grey">Edit</span></div>',
   why1:"Informative, constructive, understandable, friendly &mdash; and it offers the fix."},
  {t:"Error correction",
+  one:"Keep the work; repair only the fault.",
   when:"After an error has happened.",
   ask:"Can the user correct it easily, without starting again?",
   fail:"The user loses the work already done and has to redo everything.",
@@ -428,8 +450,14 @@ var CRIT = [
       '<div class="note">Everything else is kept. <span class="mono">Ctrl + Z</span> undoes the last change.</div>',
   why1:"Marked, placed on the field, corrected in one gesture, and nothing else is lost."}
 ]},
-{n:6, name:"Consistency", one:"The same design choices in the same contexts &mdash; different ones only when the context differs.", subs:[
+{n:6, name:"Consistency", one:"The same design choices in the same contexts &mdash; different ones only when the context differs.",
+ parts:[{t:"Interface",one:"Appearance, position and wording of the components."},
+        {t:"Interaction",one:"The way the elements behave when you use them."},
+        {t:"Between applications",one:"Inside a suite, and with the other software: follow the style guides."},
+        {t:"Between versions",one:"Support the change, and be careful when a command moves."}],
+ subs:[
  {t:"Consistency (homogeneity)",
+  one:"Same context, same choices &mdash; everywhere, every version.",
   when:"Across all screens of the same application, between the applications of a suite, and between versions.",
   ask:"Are the same things placed, named and styled the same way everywhere?",
   fail:"The user has to relearn every screen, hesitates, and clicks the wrong button.",
@@ -445,8 +473,12 @@ var CRIT = [
       '<div class="note">Same words, same order, bottom right &mdash; and the same grid, spacing and alignment.</div>',
   why1:"The user learns once. Homogeneity is between several elements; coherence is between one thing and another."}
 ]},
-{n:7, name:"Significance of codes and names", one:"The sign must match what it refers to, for the user.", subs:[
+{n:7, name:"Significance of codes and names", one:"The sign must match what it refers to, for the user.",
+ parts:[{t:"Codes",one:"Icons, illustrations, abbreviations, colours."},
+        {t:"Names",one:"Terms and vocabulary, in the users' own language."}],
+ subs:[
  {t:"Significance of codes and names",
+  one:"The sign must mean what it does, for the user.",
   when:"For every name, icon, colour, abbreviation or code the user has to interpret.",
   ask:"Does this name, icon or colour mean to the user what it means to us?",
   fail:"The user misreads the screen and chooses the wrong action, confidently.",
@@ -464,6 +496,7 @@ var CRIT = [
 ]},
 {n:8, name:"Compatibility", one:"Agreement between the users, their task, and the application.", subs:[
  {t:"Adaptation to the users and the task",
+  one:"Their words, their formats, their real procedure.",
   when:"When the interface meets the real users: their language, their culture, their habits, their real work.",
   ask:"Does the user have to translate between their world and this interface?",
   fail:"The user converts dates, reverses text, or invents a procedure the software did not plan.",
@@ -481,6 +514,7 @@ var CRIT = [
       '<div class="note">Same order as the paper form the office already uses.</div>',
   why1:"Their script, their format, their procedure. Nothing to translate."},
  {t:"Compatibility between applications",
+  one:"Behave like the software sitting next to it.",
   when:"When your application lives next to the others the user already knows.",
   ask:"Does it behave like the other software on this machine, and like its own previous version?",
   fail:"The user applies a habit learned elsewhere, and it fails here.",
@@ -543,10 +577,16 @@ CRIT.forEach(function(c){
   /* section divider */
   S.push({part:"Criterion "+c.n, num:c.n, crit:c.name,
    sub:(m>1? m+" sub-criteria" : "1 sub-criterion"),
-   html:'<div class="divider"><div class="dn">Criterion '+c.n+' of 8</div>'+
-     '<h1 style="font-size:calc(var(--u)*6)">'+c.name+'</h1>'+
-     '<div class="lead">'+c.one+'</div>'+
-     '<ol class="dsubs">'+c.subs.map(function(s){return '<li>'+s.t+'</li>';}).join('')+'</ol></div>'});
+   html:(function(){
+     var list = c.parts || c.subs, numbered = !c.parts && list.length>1;
+     return '<div class="divider"><div class="dtop"><div class="dn">Criterion '+c.n+' of 8</div>'+
+       '<h1 style="font-size:calc(var(--u)*5.6)">'+c.name+'</h1>'+
+       '<div class="lead">'+c.one+'</div>'+
+       (c.parts?'<div class="dcov">What this criterion covers</div>':'')+'</div>'+
+       '<ol class="dsubs n'+list.length+'">'+list.map(function(s,j){
+          return '<li><b>'+(numbered?(j+1)+' &middot; ':'')+s.t+'</b><span>'+s.one+'</span></li>';
+        }).join('')+'</ol></div>';
+   })()});
 
   c.subs.forEach(function(s,j){
     var tag = m>1 ? (c.n+'.'+(j+1)) : String(c.n);
@@ -591,8 +631,8 @@ var hNum=document.getElementById('h-num'), hCrit=document.getElementById('h-crit
 
 function fit(el){
   /* set the vertical unit so the slide fills the screen without ever scrolling */
-  var MIN=0.45, MAX=2.00, STEP=0.04;
-  var kids=el.querySelectorAll('.cell,.ui,.mc,.lv,.pane,.win,.grp,.lvt,.mt,.v,.lead,.cap,.why,h1,h2');
+  var MIN=0.45, MAX=2.60, STEP=0.04;
+  var kids=el.querySelectorAll('.cell,.ui,.mc,.lv,.pane,.win,.grp,.dsubs li,.lvt,.mt,.v,.lead,.cap,.why,h1,h2');
   function over(){
     if(el.scrollHeight>el.clientHeight+2 || el.scrollWidth>el.clientWidth+2) return true;
     for(var n=0;n<kids.length;n++){                 /* catch text clipped inside a box */
