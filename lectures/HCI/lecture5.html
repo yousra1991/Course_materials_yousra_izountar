@@ -630,28 +630,25 @@ var hNum=document.getElementById('h-num'), hCrit=document.getElementById('h-crit
     hPart=document.getElementById('h-part'), bar=document.getElementById('bar');
 
 function fit(el){
-  /* set the vertical unit so the slide fills the screen without ever scrolling */
-  var MIN=0.45, MAX=2.60, STEP=0.04;
-  var kids=el.querySelectorAll('.cell,.ui,.mc,.lv,.pane,.win,.grp,.dsubs li,.lvt,.mt,.v,.lead,.cap,.why,h1,h2');
+  /* Largest type size at which the slide still fits. Scanning down from the top
+     matters: a text block can report a phantom 1-3px overflow at one size and
+     none at the next, so growing upward used to stop at the first false alarm. */
+  var MIN=0.45, MAX=2.80, STEP=0.04;
+  /* only the boxes that really clip (overflow:hidden); text overflow shows up on them */
+  var kids=el.querySelectorAll('.cell,.ui,.mc,.lv,.pane,.win,.grp,.dsubs li');
   function over(){
     if(el.scrollHeight>el.clientHeight+2 || el.scrollWidth>el.clientWidth+2) return true;
-    for(var n=0;n<kids.length;n++){                 /* catch text clipped inside a box */
+    for(var n=0;n<kids.length;n++){
       if(kids[n].scrollHeight>kids[n].clientHeight+2) return true;
       if(kids[n].scrollWidth >kids[n].clientWidth +2) return true;
     }
     return false;
   }
-  var u=1.0, t=0;
+  var u=MAX, t=0;
   el.style.setProperty('--u', u+'vh');
-  if(over()){                                   /* too big: shrink until it fits */
-    while(t<60 && u>MIN && over()){ u-=STEP; el.style.setProperty('--u', u+'vh'); t++; }
-  } else {                                      /* room left: grow until it would overflow */
-    while(t<60 && u<MAX){
-      u+=STEP; el.style.setProperty('--u', u+'vh'); t++;
-      if(over()){ u-=STEP; el.style.setProperty('--u', u+'vh'); break; }
-    }
-  }
+  while(t<70 && u>MIN && over()){ u-=STEP; el.style.setProperty('--u', u+'vh'); t++; }
 }
+
 function show(k){
   i=Math.max(0, Math.min(S.length-1, k));
   EL.forEach(function(e,n){ e.classList.toggle('on', n===i); });
