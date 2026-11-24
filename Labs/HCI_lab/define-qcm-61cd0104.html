@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>HCI – Quiz · The Define phase</title><script>(function(){var L='en';try{var p=new URLSearchParams(location.search).get('lang');if(p==='fr'||p==='en'){localStorage.setItem('nosqllang',p);L=p}else if(localStorage.getItem('nosqllang')==='fr')L='fr'}catch(x){var m=location.search.match(/lang=(fr|en)/);if(m)L=m[1]}window.__L=L;document.documentElement.lang=L})();</script><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"><style>
+<html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>HCI – Quiz · Audit an interface (Bastien and Scapin)</title><script>(function(){var L='en';try{var p=new URLSearchParams(location.search).get('lang');if(p==='fr'||p==='en'){localStorage.setItem('nosqllang',p);L=p}else if(localStorage.getItem('nosqllang')==='fr')L='fr'}catch(x){var m=location.search.match(/lang=(fr|en)/);if(m)L=m[1]}window.__L=L;document.documentElement.lang=L})();</script><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"><style>
 :root{--bg:#f2f5f1;--ink:#14231c;--mut:#4f6158;--g:#1f7a4d;--g2:#dcebe1;--am:#e6a92b;--card:#fff;--line:#c9d8cf;--sh:0 8px 28px rgba(20,35,28,.12);--bad:#b3261e}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1a15;--ink:#e8f0eb;--mut:#a3b5aa;--g:#5fcf94;--g2:#183226;--card:#16261e;--line:#2b4237;--sh:0 8px 28px rgba(0,0,0,.5);--bad:#ff8a80}}
 :root[data-theme=dark]{--bg:#0f1a15;--ink:#e8f0eb;--mut:#a3b5aa;--g:#5fcf94;--g2:#183226;--card:#16261e;--line:#2b4237;--sh:0 8px 28px rgba(0,0,0,.5);--bad:#ff8a80}
@@ -158,11 +158,78 @@ button.go{background:var(--g);color:#fff}button.go:disabled{opacity:.6}
 .qz-warn{position:fixed;inset:0;z-index:100;background:#7a140f;display:grid;place-items:center;padding:24px;text-align:center}
 .qz-warn[hidden]{display:none}.qz-warn>div{max-width:560px;background:var(--card);border-radius:16px;padding:26px;box-shadow:var(--sh)}
 .qz-warn p{font:700 19px "Bricolage Grotesque",sans-serif;color:var(--bad);margin:0 0 16px}
+/* ---- interface under audit ---- */
+main{max-width:1240px!important}
+.au{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:28px;align-items:start;margin:18px 0 10px}
+@media(max-width:900px){.au{grid-template-columns:1fr}}
+.ui-card{position:sticky;top:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;
+  box-shadow:var(--sh);font-family:"Segoe UI",Arial,sans-serif;font-size:14px;line-height:1.45}
+@media(max-width:900px){.ui-card{position:static}}
+.ui-top{background:var(--g);color:#fff;padding:10px 14px;font-weight:700;font-size:15px;border-radius:15px 15px 0 0}
+.ui-body{padding:14px;display:grid;gap:11px}
+.ui-f{display:grid;gap:4px;position:relative}
+.ui-f>label{font-size:12px;color:var(--mut);font-weight:700}
+.ui-in{border:1px solid var(--line);border-radius:7px;padding:7px 9px;background:var(--bg);color:var(--mut);min-height:34px}
+.ui-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;position:relative}
+.ui-b{border:0;border-radius:7px;padding:8px 14px;font-weight:700;font-size:13px;background:var(--g);color:#fff;font-family:inherit}
+.ui-b.red{background:var(--bad)}
+.ui-err{background:#fbe3e0;color:var(--bad);border-radius:7px;padding:7px 10px;font-family:Consolas,monospace;
+  font-size:13px;position:relative}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .ui-err{background:#3a1c19}}
+:root[data-theme=dark] .ui-err{background:#3a1c19}
+.ui-tiny{color:#b9c2c9;font-size:9.5px;text-transform:uppercase;line-height:1.35;position:relative}
+.ui-wide{font-size:12px}
+/* zone markers */
+.z{position:absolute;z-index:3;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;
+  background:var(--am);color:#1b1b1b;font-weight:800;font-size:14px;font-family:"Bricolage Grotesque",Arial,sans-serif;
+  box-shadow:0 2px 6px rgba(0,0,0,.3);left:-29px;top:-2px}
+.au>div:first-child{padding-left:34px}
+.zleg{margin-top:12px;display:grid;gap:6px;font-size:13px}
+.zleg>div{display:flex;gap:8px;align-items:flex-start;line-height:1.45}
+.zleg>div>b{flex:none;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;
+  background:var(--am);color:#1b1b1b;font-size:12px;font-family:"Bricolage Grotesque",Arial,sans-serif}
+
 </style></head><body><main style="max-width:900px;margin:auto;padding:0 20px 70px"><div class="lang top"><button type="button" data-l="en">English</button><button type="button" data-l="fr">Français</button></div>
-<div class="brand"><img class="logo" src="logo.png" alt="Université d'Alger 1 logo" onerror="this.style.display='none'"><div class="bi"><h2>Université d'Alger 1 – Benyoucef Benkhedda</h2><p class="bs"><span class="l-en">Faculty of Sciences · Computer Science Department</span><span class="l-fr">Faculté des Sciences · Département d&#39;Informatique</span></p><dl><dt>Module</dt><dd><span class="l-en">Human-Computer Interaction (HCI)</span><span class="l-fr">Interaction Homme-Machine (IHM)</span></dd><dt><span class="l-en">Level</span><span class="l-fr">Niveau</span></dt><dd>L3 – <span class="l-en">Semester 5</span><span class="l-fr">Semestre 5</span> (ISIL, SI)</dd><dt><span class="l-en">Instructor</span><span class="l-fr">Enseignant(e)</span></dt><dd>Dr. Izountar Yousra</dd><dt><span class="l-en">Academic year</span><span class="l-fr">Année universitaire</span></dt><dd>2026 / 2027</dd><dt>Document</dt><dd><span class="l-en">Quiz (QCM) – The Define phase of the Double Diamond</span><span class="l-fr">Quiz (QCM) – La phase Define du Double Diamant</span></dd><dt><span class="l-en">Duration</span><span class="l-fr">Durée</span></dt><dd>15 min</dd><dt>Questions</dt><dd><span class="l-en">15, one correct answer each</span><span class="l-fr">15, une seule bonne réponse chacune</span></dd></dl></div></div>
-<h1 style="font-size:clamp(28px,4.4vw,46px);margin:26px 0 8px"><span class="l-en">Quiz · The Define phase</span><span class="l-fr">Quiz · La phase Define</span></h1>
-<div class="key"><span class="l-en"><b>Instructions:</b> type the <b>session code</b> given by your instructor. You have <b>15 minutes</b> from the moment you open the quiz, in <b>full screen</b>, and you can send your answers <b>only once</b>. Leaving the quiz (other tab, other window, leaving full screen, reloading the page) is counted and seen by your instructor; after 3 exits your answers are sent automatically. When the time is up, they are sent automatically too.</span><span class="l-fr"><b>Consignes :</b> tapez le <b>code de séance</b> donné par votre enseignant(e). Vous avez <b>15 minutes</b> à partir de l&#39;ouverture du quiz, en <b>plein écran</b>, et vous ne pouvez envoyer vos réponses <b>qu&#39;une seule fois</b>. Quitter le quiz (autre onglet, autre fenêtre, sortie du plein écran, rechargement de la page) est compté et visible par votre enseignant(e) ; après 3 sorties, vos réponses sont envoyées automatiquement. À la fin du temps, elles sont aussi envoyées automatiquement.</span></div>
+<div class="brand"><img class="logo" src="logo.png" alt="Université d'Alger 1 logo" onerror="this.style.display='none'"><div class="bi"><h2>Université d'Alger 1 – Benyoucef Benkhedda</h2><p class="bs"><span class="l-en">Faculty of Sciences · Computer Science Department</span><span class="l-fr">Faculté des Sciences · Département d&#39;Informatique</span></p><dl><dt>Module</dt><dd><span class="l-en">Human-Computer Interaction (HCI)</span><span class="l-fr">Interaction Homme-Machine (IHM)</span></dd><dt><span class="l-en">Level</span><span class="l-fr">Niveau</span></dt><dd>L3 – <span class="l-en">Semester 5</span><span class="l-fr">Semestre 5</span> (ISIL, SI)</dd><dt><span class="l-en">Instructor</span><span class="l-fr">Enseignant(e)</span></dt><dd>Dr. Izountar Yousra</dd><dt><span class="l-en">Academic year</span><span class="l-fr">Année universitaire</span></dt><dd>2026 / 2027</dd><dt>Document</dt><dd><span class="l-en">Quiz (QCM) – Auditing an interface with the Bastien and Scapin criteria</span><span class="l-fr">Quiz (QCM) – Auditer une interface avec les critères de Bastien et Scapin</span></dd><dt><span class="l-en">Duration</span><span class="l-fr">Durée</span></dt><dd>15 min</dd><dt>Questions</dt><dd><span class="l-en">5, one correct answer each</span><span class="l-fr">5, une seule bonne réponse chacune</span></dd></dl></div></div>
+<h1 style="font-size:clamp(28px,4.4vw,46px);margin:26px 0 8px"><span class="l-en">Quiz · Audit an interface with Bastien and Scapin</span><span class="l-fr">Quiz · Auditer une interface avec Bastien et Scapin</span></h1>
+<div class="key"><span class="l-en"><b>What to do:</b> the interface on the left has <b>five numbered zones</b>. Each one breaks <b>one</b> ergonomic criterion of Bastien and Scapin. For every zone, choose the <b>criterion and the sub-criterion</b> that it breaks.<br><b>Instructions:</b> type the <b>session code</b> given by your instructor. You have <b>15 minutes</b> from the moment you open the quiz, in <b>full screen</b>, and you can send your answers <b>only once</b>. Leaving the quiz (other tab, other window, leaving full screen, reloading the page) is counted and seen by your instructor. When the time is up, your answers are sent automatically.</span><span class="l-fr"><b>Travail demand&eacute; :</b> l&#39;interface &agrave; gauche comporte <b>cinq zones num&eacute;rot&eacute;es</b>. Chacune enfreint <b>un</b> crit&egrave;re ergonomique de Bastien et Scapin. Pour chaque zone, choisissez le <b>crit&egrave;re et le sous-crit&egrave;re</b> enfreint.<br><b>Consignes :</b> tapez le <b>code de s&eacute;ance</b> donn&eacute; par votre enseignant(e). Vous avez <b>15 minutes</b> &agrave; partir de l&#39;ouverture du quiz, en <b>plein &eacute;cran</b>, et vous ne pouvez envoyer vos r&eacute;ponses qu&#39;<b>une seule fois</b>. Quitter le quiz (autre onglet, autre fen&ecirc;tre, sortie du plein &eacute;cran, rechargement) est compt&eacute; et vu par votre enseignant(e). &Agrave; la fin du temps, vos r&eacute;ponses sont envoy&eacute;es automatiquement.</span></div>
+<div class="au">
+<div>
+<div class="ui-card">
+  <div class="ui-top">AutoPlus &mdash; <span class="l-en">Book a test drive</span><span class="l-fr">R&eacute;server un essai</span></div>
+  <div class="ui-body">
+    <div class="ui-f"><span class="z">1</span><label><span class="l-en">Date</span><span class="l-fr">Date</span></label>
+      <div class="ui-in">&nbsp;</div></div>
+
+    <div class="ui-f"><label><span class="l-en">Full name</span><span class="l-fr">Nom complet</span></label>
+      <div class="ui-in">&nbsp;</div></div>
+
+    <div class="ui-f"><label><span class="l-en">Phone</span><span class="l-fr">T&eacute;l&eacute;phone</span></label>
+      <div class="ui-in">06 12 34</div></div>
+
+    <div class="ui-err"><span class="z">3</span>Error 0x80070057</div>
+
+    <div class="ui-tiny"><span class="z">2</span><span class="l-en">BY SENDING THIS FORM YOU ACCEPT THE GENERAL CONDITIONS OF SALE AND THE PROCESSING OF YOUR PERSONAL DATA BY AUTOPLUS AND ITS PARTNERS FOR THE WHOLE DURATION OF THE COMMERCIAL RELATIONSHIP</span><span class="l-fr">EN ENVOYANT CE FORMULAIRE VOUS ACCEPTEZ LES CONDITIONS G&Eacute;N&Eacute;RALES DE VENTE ET LE TRAITEMENT DE VOS DONN&Eacute;ES PERSONNELLES PAR AUTOPLUS ET SES PARTENAIRES PENDANT TOUTE LA DUR&Eacute;E DE LA RELATION COMMERCIALE</span></div>
+
+    <div class="ui-row"><span class="z">5</span>
+      <button type="button" class="ui-b ui-wide"><span class="l-en">Click here in order to validate and confirm your reservation request now</span><span class="l-fr">Cliquez ici afin de valider et confirmer votre demande de r&eacute;servation maintenant</span></button></div>
+
+    <div class="ui-row"><span class="z">4</span>
+      <button type="button" class="ui-b"><span class="l-en">Save</span><span class="l-fr">Enregistrer</span></button>
+      <button type="button" class="ui-b red"><span class="l-en">Delete my account</span><span class="l-fr">Supprimer mon compte</span></button></div>
+  </div>
+</div>
+<div class="zleg">
+  <div><b>1</b><span class="l-en">The <b>Date</b> field.</span><span class="l-fr">Le champ <b>Date</b>.</span></div>
+  <div><b>2</b><span class="l-en">The conditions text at the bottom of the form.</span><span class="l-fr">Le texte des conditions en bas du formulaire.</span></div>
+  <div><b>3</b><span class="l-en">The message shown after sending.</span><span class="l-fr">Le message affich&eacute; apr&egrave;s l&#39;envoi.</span></div>
+  <div><b>4</b><span class="l-en">The <b>Delete my account</b> button: one click and everything is deleted at once.</span><span class="l-fr">Le bouton <b>Supprimer mon compte</b> : un clic et tout est supprim&eacute; imm&eacute;diatement.</span></div>
+  <div><b>5</b><span class="l-en">The green validation button.</span><span class="l-fr">Le bouton vert de validation.</span></div>
+</div>
+</div>
 <div id="qz"></div>
+</div>
+
 <p style="margin-top:30px"><a href="../../index.html"><span class="l-en">← Back to the course materials</span><span class="l-fr">← Retour aux supports de cours</span></a></p>
 </main>
 <script src="../nosql/lab4-config.js"></script><script>/* ===== Lab 4 QCM: opens with the session code, full screen, exits counted (shared by the lab page and the quiz page) ===== */
