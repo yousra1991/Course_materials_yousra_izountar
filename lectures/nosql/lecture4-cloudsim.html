@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chapitre 4 – Simuler le cloud : CloudSim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef2f6; --panel:#ffffff; --panel2:#e7edf3; --line:#cdd9e4; --ink:#0f1e30;
+  --mut:#51677f; --accent:#b96e0a; --accent2:#0a83ab; --good:#177a44; --bad:#b8362c;
+  --good2:#dcf3e6; --bad2:#fbe4e1; --acc2soft:#dbeefa; --accsoft:#fdeed6;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme=light]){
+  --bg:#0a1220; --panel:#101c2e; --panel2:#152740; --line:#24384f; --ink:#e9f1fb;
+  --mut:#9db2cb; --accent:#ffb454; --accent2:#5fd2ff; --good:#6fd18f; --bad:#ff6f65;
+  --good2:#13331f; --bad2:#3a1a17; --acc2soft:#10303f; --accsoft:#3a2a10; } }
+:root[data-theme=dark]{
+  --bg:#0a1220; --panel:#101c2e; --panel2:#152740; --line:#24384f; --ink:#e9f1fb;
+  --mut:#9db2cb; --accent:#ffb454; --accent2:#5fd2ff; --good:#6fd18f; --bad:#ff6f65;
+  --good2:#13331f; --bad2:#3a1a17; --acc2soft:#10303f; --accsoft:#3a2a10; }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:17px/1.65 "IBM Plex Sans",system-ui,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:0 20px 90px}
+h1,h2,h3,h4,.kicker,th{font-family:"Space Grotesk","IBM Plex Sans",sans-serif}
+header.top{background:var(--panel);border-bottom:1px solid var(--line);padding:26px 0 22px;margin-bottom:26px}
+header.top .wrap{padding-bottom:0}
+.kicker{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+h1{font-size:clamp(28px,4.6vw,44px);line-height:1.08;margin:8px 0 10px;letter-spacing:-.02em}
+.lead{font-size:clamp(17px,2.1vw,20px);color:var(--mut);max-width:70ch;margin:0}
+.meta{margin-top:14px;font-size:14px;color:var(--mut)}
+.theme{position:absolute;right:20px;top:18px;background:var(--panel2);color:var(--mut);
+  border:1px solid var(--line);border-radius:9px;padding:7px 12px;font:600 13px inherit;cursor:pointer}
+header.top{position:relative}
+h2{font-size:clamp(21px,2.8vw,27px);margin:46px 0 12px;padding-top:14px;border-top:2px solid var(--line);letter-spacing:-.01em}
+h3{font-size:19px;margin:28px 0 8px;color:var(--accent2)}
+p{margin:0 0 14px}
+a{color:var(--accent2)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:18px 0}
+.note{border-left:4px solid var(--accent);background:var(--accsoft);border-radius:0 12px 12px 0;
+  padding:14px 18px;margin:18px 0}
+.warn{border-left:4px solid var(--bad);background:var(--bad2);border-radius:0 12px 12px 0;padding:14px 18px;margin:18px 0}
+.ok{border-left:4px solid var(--good);background:var(--good2);border-radius:0 12px 12px 0;padding:14px 18px;margin:18px 0}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:15.5px}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:14px}
+tbody tr:nth-child(odd) td{background:var(--panel)}
+code,kbd{font-family:"IBM Plex Mono",Consolas,monospace;font-size:.92em;background:var(--panel2);
+  border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+pre{background:var(--panel2);border:1px solid var(--line);border-left:4px solid var(--accent2);
+  border-radius:10px;padding:14px 16px;overflow:auto;font-family:"IBM Plex Mono",monospace;
+  font-size:14px;line-height:1.6;margin:14px 0}
+pre code{background:none;border:0;padding:0}
+ul,ol{margin:0 0 14px;padding-left:22px}li{margin:5px 0}
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 20px}
+.toc ol{counter-reset:t;list-style:none;padding:0;margin:0;columns:2;column-gap:28px}
+.toc li{counter-increment:t;margin:5px 0;break-inside:avoid}
+.toc li::before{content:counter(t) ". ";color:var(--accent);font-weight:700}
+.toc a{text-decoration:none}.toc a:hover{text-decoration:underline}
+@media(max-width:620px){.toc ol{columns:1}}
+/* entity diagram */
+.ent{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;margin:16px 0}
+.ent .e{background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--accent2);
+  border-radius:12px;padding:12px 14px}
+.ent .e b{display:block;font-family:"IBM Plex Mono",monospace;color:var(--accent2);font-size:15px}
+.ent .e span{font-size:14.5px;color:var(--mut)}
+/* nesting diagram */
+.nest{margin:18px 0;font-size:14.5px}
+.nest div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:7px 0 0 0}
+.nest .dc{background:var(--panel)}
+.nest .ho{background:var(--panel2);margin-left:16px}
+.nest .vm{background:var(--acc2soft);margin-left:32px}
+.nest .cl{background:var(--accsoft);margin-left:48px}
+.nest b{font-family:"IBM Plex Mono",monospace}
+/* interactive blocks */
+.demo{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);
+  border-radius:0 14px 14px 0;padding:16px 20px;margin:20px 0}
+.demo h4{margin:0 0 4px;font-size:17px}
+.demo .hint{font-size:14px;color:var(--mut);margin:0 0 12px}
+.row{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:10px 0}
+.row label{font-size:14px;color:var(--mut);display:flex;flex-direction:column;gap:4px;flex:1;min-width:190px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.val{font-family:"IBM Plex Mono",monospace;color:var(--ink);font-weight:600;font-size:15px}
+.out{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;
+  font-family:"IBM Plex Mono",monospace;font-size:15px;margin-top:10px}
+.out b{color:var(--accent);font-size:19px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:4px 0 10px}
+.seg button{background:var(--panel2);color:var(--mut);border:0;padding:9px 16px;
+  font:600 14px "IBM Plex Sans",sans-serif;cursor:pointer}
+.seg button.on{background:var(--accent2);color:#042331}
+:root[data-theme=dark] .seg button.on,
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .seg button.on{color:#042331}}
+.tl{margin:12px 0}
+.tl .lane{display:flex;align-items:center;gap:10px;margin:7px 0}
+.tl .nm{width:58px;font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--mut);flex:none}
+.tl .bar{flex:1;height:30px;background:var(--panel2);border:1px solid var(--line);
+  border-radius:7px;position:relative;overflow:hidden}
+.tl .seg2{position:absolute;top:0;bottom:0;display:grid;place-items:center;
+  font:600 12.5px "IBM Plex Mono",monospace;color:#042331;border-right:1px solid rgba(0,0,0,.25)}
+.tl .axis{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);
+  margin-left:68px;margin-top:2px;font-family:"IBM Plex Mono",monospace}
+.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:14px;color:var(--mut)}
+@media(max-width:620px){
+  body{font-size:16px}
+  .wrap{padding:0 15px 70px}
+  table{font-size:14px;display:block;overflow-x:auto}
+  .theme{position:static;margin-bottom:10px}
+}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <button class="theme" type="button" id="th">Clair / sombre</button>
+  <div class="kicker">BDD NoSQL et Cloud Computing &middot; M2 ASD &middot; Chapitre 4</div>
+  <h1>Simuler le cloud : CloudSim</h1>
+  <p class="lead">Pourquoi on simule un datacenter au lieu d'en louer un, comment CloudSim représente
+  l'infrastructure, et ce que l'on mesure &mdash; placement des VM, ordonnancement, énergie, coût.</p>
+  <div class="meta">Universit&eacute; d'Alger 1 &middot; Pr. Izountar Yousra &middot; cours + TP</div>
+</div></header>
+
+<div class="wrap">
+
+<div class="toc">
+  <b>Plan du chapitre</b>
+  <ol>
+    <li><a href="#pourquoi">Pourquoi simuler</a></li>
+    <li><a href="#outils">Quel simulateur choisir</a></li>
+    <li><a href="#modele">Le modèle CloudSim</a></li>
+    <li><a href="#mips">MI, MIPS et temps d'exécution</a></li>
+    <li><a href="#sched">Time-shared ou space-shared</a></li>
+    <li><a href="#placement">Le placement des VM</a></li>
+    <li><a href="#mesures">Ce que l'on mesure</a></li>
+    <li><a href="#code">Une simulation complète</a></li>
+    <li><a href="#tp">Le TP, séance par séance</a></li>
+    <li><a href="#install">Installation et pièges</a></li>
+    <li><a href="#eval">Évaluation</a></li>
+    <li><a href="#refs">Références</a></li>
+  </ol>
+</div>
+
+<h2 id="pourquoi">1 · Pourquoi simuler</h2>
+
+<p>La question se pose : pourquoi ne pas simplement ouvrir un compte AWS et travailler sur une vraie
+infrastructure ? Trois raisons rendent l'expérimentation réelle impraticable pour étudier les
+algorithmes du cloud.</p>
+
+<p><b>Le coût.</b> Évaluer une politique de consolidation demande des dizaines de machines pendant des
+heures, répétées pour chaque variante d'algorithme. La facture dépasse vite le budget d'un laboratoire
+de recherche, et à plus forte raison celui d'un TP.</p>
+
+<p><b>La reproductibilité.</b> C'est l'argument décisif. Sur une infrastructure réelle, deux exécutions
+du même test ne donnent jamais le même résultat : la charge des voisins, le réseau et les pannes
+varient. Impossible, alors, d'affirmer que l'algorithme A bat l'algorithme B &mdash; l'écart mesuré peut
+venir du bruit. Le simulateur est <b>déterministe</b> : même entrée, même sortie, toujours.</p>
+
+<p><b>L'observabilité.</b> Un fournisseur cloud ne vous dira pas sur quel serveur physique vos VM sont
+placées, ni combien d'énergie elles consomment. Or c'est précisément ce que l'on veut étudier. Dans le
+simulateur, toutes ces variables sont accessibles.</p>
+
+<div class="note"><b>À dire aux étudiants.</b> La simulation ne remplace pas le réel : elle remplace le
+réel <i>pour comparer des algorithmes</i>. Un résultat de simulation dit « cette politique place mieux
+les VM que l'autre sur cette charge », pas « votre application ira deux fois plus vite en production ».</div>
+
+<h2 id="outils">2 · Quel simulateur choisir</h2>
+
+<table>
+<tr><th style="width:22%">Outil</th><th style="width:40%">Domaine</th><th>Pour ce cours</th></tr>
+<tr><td><b>CloudSim 7.0.1</b></td><td>IaaS généraliste : datacenters, VM, tâches, énergie, coût</td>
+    <td><b>Le choix retenu.</b> Stable, Java 11+, très documenté, utilisé par la majorité des publications</td></tr>
+<tr><td>CloudSim Plus</td><td>Fork modernisé de CloudSim, code plus propre</td>
+    <td>Exige un JDK très récent (24+) : risqué en salle machine</td></tr>
+<tr><td>iFogSim2</td><td>Fog computing, Edge, IoT</td><td>Si vous ajoutez un chapitre Edge</td></tr>
+<tr><td>CloudAnalyst</td><td>Interface graphique, répartition géographique des requêtes</td>
+    <td>Bon pour une démonstration en cours, trop limité pour un TP</td></tr>
+<tr><td>GreenCloud</td><td>Consommation énergétique fine, basé sur NS2</td><td>Installation lourde</td></tr>
+<tr><td>SimGrid</td><td>HPC et systèmes distribués, C et Python</td><td>Autre philosophie, autre module</td></tr>
+<tr><td>WorkflowSim</td><td>Workflows scientifiques (graphes de tâches)</td><td>Extension possible du mini-projet</td></tr>
+</table>
+
+<div class="ok"><b>Décision.</b> <b>CloudSim 7.0.1</b>, en Java avec Maven. Vos étudiants connaissent déjà
+Java, l'obstacle technique est donc nul, et ils retrouveront cet outil dans les articles qu'ils liront
+en recherche.</div>
+
+<h2 id="modele">3 · Le modèle CloudSim</h2>
+
+<p>Tout CloudSim tient en huit objets. Les comprendre, c'est comprendre comment fonctionne une
+infrastructure IaaS &mdash; le simulateur n'est qu'une mise en équation de la réalité.</p>
+
+<div class="ent">
+  <div class="e"><b>Datacenter</b><span>Le centre de données. Porte les coûts : par seconde, par Mo de
+    mémoire, par Go de stockage, par Mo transféré.</span></div>
+  <div class="e"><b>Host</b><span>Une machine physique : une liste de cœurs, de la RAM, du stockage,
+    de la bande passante.</span></div>
+  <div class="e"><b>Pe</b><span><i>Processing Element</i> : un cœur, caractérisé par sa puissance
+    en <b style="display:inline">MIPS</b>.</span></div>
+  <div class="e"><b>Vm</b><span>Une machine virtuelle : MIPS demandés, nombre de cœurs, RAM, taille
+    disque, hyperviseur.</span></div>
+  <div class="e"><b>Cloudlet</b><span>Une tâche à exécuter : sa <b style="display:inline">longueur en
+    MI</b>, la taille de ses fichiers d'entrée et de sortie.</span></div>
+  <div class="e"><b>DatacenterBroker</b><span>Le client. Il demande des VM, soumet les tâches, et
+    décide quelle tâche va sur quelle VM.</span></div>
+  <div class="e"><b>VmAllocationPolicy</b><span>Quel <i>host</i> physique reçoit quelle VM. C'est ici
+    que se joue la consolidation.</span></div>
+  <div class="e"><b>VmScheduler<br>CloudletScheduler</b><span>Le partage de la puissance : host vers VM,
+    puis VM vers tâches.</span></div>
+</div>
+
+<h3>Comment ils s'emboîtent</h3>
+
+<div class="nest">
+  <div class="dc"><b>Datacenter</b> &mdash; coûts, politique d'allocation
+    <div class="ho"><b>Host</b> &mdash; 2 cœurs à 1000 MIPS, 8 Go RAM
+      <div class="vm"><b>Vm</b> &mdash; 1 cœur, 1000 MIPS demandés
+        <div class="cl"><b>Cloudlet</b> &mdash; 20 000 MI à exécuter</div>
+        <div class="cl"><b>Cloudlet</b> &mdash; 20 000 MI à exécuter</div>
+      </div>
+      <div class="vm"><b>Vm</b> &mdash; 1 cœur, 1000 MIPS demandés
+        <div class="cl"><b>Cloudlet</b> &mdash; 20 000 MI à exécuter</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>Deux décisions d'ordonnancement se superposent, et c'est la source principale de confusion :
+le <code>VmScheduler</code> partage les cœurs du <i>host</i> entre les <b>VM</b>, puis
+le <code>CloudletScheduler</code> partage la puissance de la VM entre ses <b>tâches</b>.</p>
+
+<h2 id="mips">4 · MI, MIPS et temps d'exécution</h2>
+
+<p>C'est la première chose à faire comprendre, et la plus souvent ratée. Une tâche a une
+<b>longueur</b>, exprimée en <b>MI</b> (millions d'instructions). Un cœur a une <b>vitesse</b>,
+exprimée en <b>MIPS</b> (millions d'instructions par seconde). Le temps d'exécution en découle :</p>
+
+<pre><code>temps (s)  =  longueur de la tâche (MI)  /  puissance allouée (MIPS)</code></pre>
+
+<div class="demo">
+  <h4>Essayez</h4>
+  <p class="hint">Déplacez les curseurs : le temps simulé se recalcule. C'est toute l'arithmétique de CloudSim.</p>
+  <div class="row">
+    <label>Longueur de la tâche — <span class="val" id="v-mi">40 000</span> MI
+      <input type="range" id="r-mi" min="1000" max="200000" step="1000" value="40000"></label>
+    <label>Puissance du cœur — <span class="val" id="v-mips">1 000</span> MIPS
+      <input type="range" id="r-mips" min="250" max="5000" step="250" value="1000"></label>
+  </div>
+  <div class="out">temps d'exécution = <b id="v-t">40</b> secondes simulées</div>
+  <p class="hint" id="v-note" style="margin-top:10px"></p>
+</div>
+
+<div class="warn"><b>Le piège classique.</b> Un étudiant écrit une tâche de 400 000 MI sur un cœur à
+1000 MIPS : la simulation couvre 400 secondes de temps <i>simulé</i>. Elle s'exécute pourtant en
+quelques millisecondes de temps réel, puisque rien n'est réellement calculé. L'étudiant croit
+souvent que le programme a planté. Rappelez que l'horloge de CloudSim est <b>virtuelle</b> : elle
+n'avance que d'événement en événement.</div>
+
+<h2 id="sched">5 · Time-shared ou space-shared</h2>
+
+<p>Deux politiques, un seul paramètre à changer dans le code &mdash; et des résultats complètement
+différents. C'est la plus belle expérience du TP.</p>
+
+<p><b>Space-shared</b> : une tâche occupe le cœur jusqu'à la fin ; les suivantes attendent leur tour.
+C'est une file d'attente. <b>Time-shared</b> : toutes les tâches avancent en même temps, en se
+partageant la puissance. Chacune va donc moins vite.</p>
+
+<div class="demo">
+  <h4>Deux tâches de 10 000 MI sur une VM à 1 000 MIPS</h4>
+  <p class="hint">Même charge, même machine. Seule la politique change.</p>
+  <div class="seg">
+    <button type="button" id="b-ss" class="on">space-shared</button>
+    <button type="button" id="b-ts">time-shared</button>
+  </div>
+  <div class="tl" id="tl"></div>
+  <div class="out" id="sched-out"></div>
+</div>
+
+<div class="note"><b>La leçon.</b> Le <i>makespan</i> &mdash; la date de fin de la dernière tâche &mdash;
+est <b>identique</b> dans les deux cas : 20 secondes. Mais le <b>temps de réponse moyen</b> ne l'est
+pas : 15 s en space-shared, 20 s en time-shared. Conclusion à faire formuler par les étudiants :
+<b>le choix d'une métrique décide du vainqueur</b>. Un article qui ne compare que le makespan cache
+la moitié du problème.</div>
+
+<h2 id="placement">6 · Le placement des VM</h2>
+
+<p>Le <code>VmAllocationPolicy</code> répond à une question : <i>sur quel serveur physique poser cette
+VM ?</i> C'est un problème de <b>bin packing</b>, NP-difficile, que l'on traite par heuristiques.</p>
+
+<table>
+<tr><th style="width:22%">Politique</th><th style="width:40%">Règle</th><th>Conséquence</th></tr>
+<tr><td><b>First-fit</b></td><td>Le premier host qui a la place</td><td>Rapide, résultat moyen</td></tr>
+<tr><td><b>Best-fit</b></td><td>L'host dont la capacité restante est la plus <b>faible</b></td>
+    <td>Tasse les VM : moins de serveurs allumés, donc moins d'énergie, mais risque de saturation</td></tr>
+<tr><td><b>Worst-fit</b></td><td>L'host dont la capacité restante est la plus <b>grande</b></td>
+    <td>Étale la charge : performance plus stable, mais tous les serveurs restent allumés</td></tr>
+</table>
+
+<p>L'opposition best-fit / worst-fit résume tout le compromis du cloud : <b>consolider pour
+économiser de l'énergie</b>, ou <b>étaler pour garantir la performance</b>. Un serveur allumé mais
+inactif consomme déjà environ 60 % de sa puissance maximale : éteindre un serveur vaut mieux que de
+l'alléger. C'est ce qui justifie la consolidation et la migration à chaud.</p>
+
+<h2 id="mesures">7 · Ce que l'on mesure</h2>
+
+<table>
+<tr><th style="width:26%">Métrique</th><th>Définition</th><th style="width:26%">Ce qu'elle révèle</th></tr>
+<tr><td><b>Makespan</b></td><td>Date de fin de la dernière tâche</td><td>Débit global</td></tr>
+<tr><td><b>Temps de réponse moyen</b></td><td>Moyenne des durées par tâche</td><td>Qualité perçue par l'utilisateur</td></tr>
+<tr><td><b>Temps d'attente</b></td><td>Entre soumission et début d'exécution</td><td>Saturation</td></tr>
+<tr><td><b>Taux d'utilisation</b></td><td>Part de la capacité réellement employée</td><td>Gaspillage</td></tr>
+<tr><td><b>Nombre d'hosts actifs</b></td><td>Serveurs allumés</td><td>Qualité de la consolidation</td></tr>
+<tr><td><b>Énergie (kWh)</b></td><td>Intégrale de la puissance sur la durée</td><td>Coût écologique et financier</td></tr>
+<tr><td><b>Violations de SLA</b></td><td>Tâches servies en deçà de ce qui était promis</td><td>Limite de la consolidation</td></tr>
+<tr><td><b>Coût</b></td><td>Facturation : temps, mémoire, stockage, transfert</td><td>Le point de vue du client</td></tr>
+</table>
+
+<h2 id="code">8 · Une simulation complète</h2>
+
+<p>Le squelette minimal. L'ordre des étapes n'est pas permutable : rien n'existe avant
+<code>CloudSim.init</code>, et rien ne se passe avant <code>startSimulation</code>.</p>
+
+<pre><code>// 1. initialiser le noyau de simulation
+CloudSim.init(1, Calendar.getInstance(), false);
+
+// 2. l'infrastructure physique
+List&lt;Pe&gt; pes = new ArrayList&lt;&gt;();
+pes.add(new Pe(0, new PeProvisionerSimple(1000)));   // un cœur à 1000 MIPS
+pes.add(new Pe(1, new PeProvisionerSimple(1000)));
+
+Host host = new Host(0,
+    new RamProvisionerSimple(8192), new BwProvisionerSimple(10000),
+    1_000_000, pes, new VmSchedulerTimeShared(pes));
+
+Datacenter dc = createDatacenter("DC_1", List.of(host));
+
+// 3. le client
+DatacenterBroker broker = new DatacenterBroker("Broker");
+
+// 4. les machines virtuelles
+Vm vm = new Vm(0, broker.getId(), 1000, 1, 2048, 1000, 10000,
+               "Xen", new CloudletSchedulerSpaceShared());
+broker.submitVmList(List.of(vm));
+
+// 5. les tâches
+UtilizationModel full = new UtilizationModelFull();
+Cloudlet c = new Cloudlet(0, 40000, 1, 300, 300, full, full, full);  // 40 000 MI
+c.setUserId(broker.getId());
+broker.submitCloudletList(List.of(c));
+
+// 6. exécuter, puis lire les résultats
+CloudSim.startSimulation();
+CloudSim.stopSimulation();
+printResults(broker.getCloudletReceivedList());</code></pre>
+
+<p>La sortie est un tableau : identifiant de la tâche, statut, VM, durée, date de début, date de fin.
+<b>Tout le TP consiste à faire varier un paramètre et à expliquer la variation de ce tableau.</b></p>
+
+<h2 id="tp">9 · Le TP, séance par séance</h2>
+
+<table>
+<tr><th style="width:10%">Séance</th><th style="width:34%">Sujet</th><th>Ce que l'étudiant produit</th></tr>
+<tr><td><b>TP 1</b></td><td>Première simulation</td>
+    <td>Un datacenter, un host, une VM, une tâche. Il modifie les MIPS et vérifie que le temps varie
+    comme la formule le prédit. Objectif : savoir lire le tableau de sortie.</td></tr>
+<tr><td><b>TP 2</b></td><td>Passer à l'échelle, et comparer les ordonnanceurs</td>
+    <td>4 VM, 20 tâches. Même charge en space-shared puis en time-shared. Tableau comparatif :
+    makespan, temps moyen, temps d'attente. Il explique l'écart.</td></tr>
+<tr><td><b>TP 3</b></td><td>Écrire sa politique de placement</td>
+    <td>Il hérite de <code>VmAllocationPolicySimple</code> et implémente best-fit puis worst-fit.
+    Mesure : nombre d'hosts allumés et taux d'utilisation.</td></tr>
+<tr><td><b>TP 4</b></td><td>Écrire son ordonnanceur</td>
+    <td>Il étend le broker : round-robin, puis Min-Min. Comparaison des makespans sur la même charge.</td></tr>
+<tr><td><b>TP 5</b></td><td>Mini-projet</td>
+    <td>Deux algorithmes, une charge réaliste, un rapport : tableau de mesures, graphiques, conclusion
+    argumentée.</td></tr>
+</table>
+
+<h3>Les charges de travail</h3>
+<p>Trois niveaux de réalisme, à introduire progressivement : des tâches <b>synthétiques</b> que
+l'étudiant écrit lui-même (TP 1 et 2) ; les traces <b>PlanetLab</b> livrées avec les exemples de
+CloudSim, qui donnent des profils d'utilisation CPU réels (TP 3 et 4) ; et le <b>Parallel Workloads
+Archive</b> au format SWF, lu par <code>WorkloadFileReader</code>, pour le mini-projet.</p>
+
+<h2 id="install">10 · Installation et pièges</h2>
+
+<p>JDK 17 LTS, Maven, et IntelliJ IDEA Community. La dépendance tient en six lignes :</p>
+
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;org.cloudsimplus&lt;/groupId&gt;
+  &lt;artifactId&gt;cloudsim&lt;/artifactId&gt;
+  &lt;version&gt;7.0.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+
+<div class="warn"><b>Le piège organisationnel.</b> Si trente étudiants téléchargent les dépendances
+Maven en même temps sur le réseau de la faculté, la séance est perdue. Faites installer <b>avant</b>
+la séance, ou préparez un dossier <code>.m2</code> pré-rempli sur clé USB.</div>
+
+<h3>Les erreurs que vous verrez</h3>
+<ul>
+<li><b>« Il ne se passe rien. »</b> L'étudiant a oublié <code>CloudSim.startSimulation()</code>, ou
+soumis les tâches après l'avoir appelé.</li>
+<li><b>Une tâche reste à l'état <code>FAILED</code>.</b> Aucune VM ne satisfait sa demande : RAM ou
+nombre de cœurs insuffisants. Faire afficher la liste des VM créées, qui est souvent plus courte que
+la liste demandée.</li>
+<li><b>Les résultats changent à chaque exécution.</b> Un <code>UtilizationModelStochastic</code> sans
+graine fixée. Toute comparaison d'algorithmes devient alors invalide &mdash; insistez sur ce point,
+c'est une faute de méthode scientifique, pas une faute de programmation.</li>
+<li><b><code>bindCloudletToVm</code> utilisé partout.</b> Cela force le mapping et désactive le broker :
+l'étudiant croit tester son algorithme alors qu'il a court-circuité l'algorithme.</li>
+</ul>
+
+<h2 id="eval">11 · Évaluation</h2>
+
+<p>Le risque de ce TP est l'étudiant qui exécute l'exemple fourni et rend la sortie console. Trois
+exigences l'évitent :</p>
+
+<ol>
+<li><b>Un tableau de mesures</b> : au moins deux configurations comparées sur les mêmes métriques.</li>
+<li><b>Un graphique</b> : la variation d'une métrique en fonction du paramètre modifié.</li>
+<li><b>Une phrase qui explique <i>pourquoi</i></b> l'algorithme A bat l'algorithme B sur cette charge
+&mdash; et dans quel cas il perdrait.</li>
+</ol>
+
+<div class="ok">C'est le même principe que le barème d'IHM : <b>on note le raisonnement, pas
+l'exécution</b>. Un code qui tourne sans analyse vaut moins qu'une analyse juste sur un code imparfait.</div>
+
+<h2 id="refs">12 · Références</h2>
+<ul>
+<li>CloudSim, dépôt officiel — <a href="https://github.com/Cloudslab/cloudsim">github.com/Cloudslab/cloudsim</a></li>
+<li>CloudSim 7G: An Integrated Toolkit for Modeling and Simulation of Future Generation Cloud Computing Environments — <a href="https://arxiv.org/abs/2408.13386">arXiv:2408.13386</a></li>
+<li>CloudSim Plus — <a href="https://cloudsimplus.org/">cloudsimplus.org</a></li>
+<li>Page du projet, CLOUDS Lab, Université de Melbourne — <a href="https://clouds.cis.unimelb.edu.au/cloudsim">clouds.cis.unimelb.edu.au/cloudsim</a></li>
+<li>Calheiros, Ranjan, Beloglazov, De Rose, Buyya, <i>CloudSim: a toolkit for modeling and simulation of
+cloud computing environments and evaluation of resource provisioning algorithms</i>,
+Software: Practice and Experience, 41(1), 2011.</li>
+</ul>
+
+<div class="foot">BDD NoSQL et Cloud Computing &middot; M2 ASD &middot; Université d'Alger 1 &mdash;
+Benyoucef Benkhedda &middot; 2026/2027</div>
+
+</div>
+
+<script>
+(function(){
+  var r=document.documentElement, b=document.getElementById('th');
+  b.onclick=function(){ r.setAttribute('data-theme', r.getAttribute('data-theme')==='dark'?'light':'dark'); };
+
+  /* --- MI / MIPS --- */
+  var mi=document.getElementById('r-mi'), mips=document.getElementById('r-mips'),
+      vmi=document.getElementById('v-mi'), vmips=document.getElementById('v-mips'),
+      vt=document.getElementById('v-t'), note=document.getElementById('v-note');
+  var fmt=function(n){ return n.toLocaleString('fr-FR').replace(/ | /g,' '); };
+  function calc(){
+    var L=+mi.value, S=+mips.value, t=L/S;
+    vmi.textContent=fmt(L); vmips.textContent=fmt(S);
+    vt.textContent = t>=10 ? Math.round(t) : Math.round(t*10)/10;
+    note.textContent = t>120
+      ? 'Plus de deux minutes simulées : correct, mais pensez que le temps réel d’exécution, lui, reste de quelques millisecondes.'
+      : (t<1 ? 'Moins d’une seconde : la tâche est trop courte pour que les écarts entre algorithmes soient visibles.'
+             : 'Bon ordre de grandeur pour un TP.');
+  }
+  mi.oninput=mips.oninput=calc; calc();
+
+  /* --- space-shared vs time-shared --- */
+  var tl=document.getElementById('tl'), out=document.getElementById('sched-out'),
+      bss=document.getElementById('b-ss'), bts=document.getElementById('b-ts'), mode='ss';
+  var TOTAL=20, COL=['#0a83ab','#b96e0a'];
+  function draw(){
+    var runs = mode==='ss'
+      ? [[{s:0,e:10,l:'T1'}],[{s:10,e:20,l:'T2'}]]
+      : [[{s:0,e:20,l:'T1 (500 MIPS)'}],[{s:0,e:20,l:'T2 (500 MIPS)'}]];
+    var html='';
+    runs.forEach(function(lane,i){
+      html+='<div class="lane"><span class="nm">T'+(i+1)+'</span><div class="bar">';
+      lane.forEach(function(s){
+        html+='<span class="seg2" style="left:'+(s.s/TOTAL*100)+'%;width:'+((s.e-s.s)/TOTAL*100)+
+              '%;background:'+COL[i]+'">'+s.l+'</span>';
+      });
+      html+='</div></div>';
+    });
+    html+='<div class="axis"><span>0 s</span><span>10 s</span><span>20 s</span></div>';
+    tl.innerHTML=html;
+    var fin = mode==='ss' ? [10,20] : [20,20];
+    var moy = (fin[0]+fin[1])/2;
+    out.innerHTML = 'fin T1 = <b>'+fin[0]+' s</b> &nbsp; fin T2 = <b>'+fin[1]+' s</b><br>'+
+      'makespan = <b>20 s</b> &nbsp;&middot;&nbsp; temps de réponse moyen = <b>'+moy+' s</b>';
+    bss.className = mode==='ss'?'on':''; bts.className = mode==='ts'?'on':'';
+  }
+  bss.onclick=function(){mode='ss';draw();};
+  bts.onclick=function(){mode='ts';draw();};
+  draw();
+})();
+</script>
+</body>
+</html>
