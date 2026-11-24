@@ -232,16 +232,31 @@ main{max-width:1240px!important}
 
 <p style="margin-top:30px"><a href="../../index.html"><span class="l-en">← Back to the course materials</span><span class="l-fr">← Retour aux supports de cours</span></a></p>
 </main>
-<script src="../nosql/lab4-config.js"></script><script>/* ===== Lab 4 QCM: opens with the session code, full screen, exits counted (shared by the lab page and the quiz page) ===== */
+<script src="../nosql/lab4-config.js?v=4"></script><script>/* ===== Lab 4 QCM: opens with the session code, full screen, exits counted (shared by the lab page and the quiz page) ===== */
 window.QcmCore = function (o) {
   const API = window.LAB_API || '', FR = o.fr, T = (a, b) => FR ? b : a, QZ = o.quiz || 'lab4', SK = QZ === 'lab4' ? 'nosqllab4-qcm' : 'qcm-' + QZ, IK = o.idKey || 'nosqllab-4-id', POLL = 30000;
   const root = o.mount, esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const ls = { get(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
-  let S = null, ANS = [], END = 0, TICK = null, SENT = false, RUN = false, STATE = 'off', BUSY = false, EXITS = 0, MAX = 0, AWAY = false, MUTE = false;
+  let LASTERR = null, S = null, ANS = [], END = 0, TICK = null, SENT = false, RUN = false, STATE = 'off', BUSY = false, EXITS = 0, MAX = 0, AWAY = false, MUTE = false;
   const FS = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
   const goFull = () => { try { const d = document.documentElement; (d.requestFullscreen || d.webkitRequestFullscreen).call(d).catch(() => {}); } catch (e) {} };
   const isFull = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
-  const call = async b => (await fetch(API, { method: 'POST', body: JSON.stringify(Object.assign({ quiz: QZ }, b)) })).json();
+  const call = async b => {
+    if (!API) { const e = new Error('noapi'); e.kind = 'noapi'; throw e; }
+    let res, txt;
+    try { res = await fetch(API, { method: 'POST', body: JSON.stringify(Object.assign({ quiz: QZ }, b)) }); txt = await res.text(); }
+    catch (x) { const e = new Error('network'); e.kind = 'network'; throw e; }
+    try { return JSON.parse(txt); }
+    catch (x) {
+      const e = new Error('badjson'); e.kind = 'badjson'; e.http = res.status;
+      e.body = txt.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 170);
+      throw e;
+    }
+  };
+  const why = e => e && e.kind === 'noapi'  ? T('The server address is missing (lab4-config.js did not load).', "L'adresse du serveur est absente (lab4-config.js ne s'est pas chargé).")
+              : e && e.kind === 'network'   ? T('The server could not be reached. The deployment may be closed, or this page is using a cached old address — reload with Ctrl+F5.', "Serveur injoignable. Le déploiement est peut-être fermé, ou cette page utilise une ancienne adresse en cache — rechargez avec Ctrl+F5.")
+              : e && e.kind === 'badjson'   ? T('The server answered, but not with an answer the quiz understands (HTTP ' + e.http + '): ' + e.body, 'Le serveur a répondu, mais pas dans le format attendu (HTTP ' + e.http + ') : ' + e.body)
+              : T('Connection problem, try again.', 'Problème de connexion, réessayez.');
   root.innerHTML = `<div class="qz-wait"><p class="qz-st" id="qz-st"></p>
 <div class="qz-id"><label>${T('Last name', 'Nom')}<input id="qz-ln" autocomplete="family-name"></label><label>${T('First name', 'Prénom')}<input id="qz-fn" autocomplete="given-name"></label>
 <label>${T('Student ID', 'Matricule')}<input id="qz-mt" inputmode="numeric"></label><label>${T('Group', 'Groupe')}<select id="qz-gp"><option value="">—</option><option>G1</option><option>G2</option></select></label><label>${T('Session code', 'Code de séance')}<input id="qz-cd" autocomplete="off" autocapitalize="characters" spellcheck="false"></label></div>
@@ -280,7 +295,7 @@ window.QcmCore = function (o) {
       MAX = j.maxExits || 0; EXITS = resumed ? (old.exits || 0) : 0;   // a reload or a closed tab was already counted when the page was hidden
       S = { key: j.key, p }; ls.set(SK, { key: j.key, p, ans: ANS, exits: EXITS, code: code() }); END = Date.now() + j.remaining; render(j.questions);
       if (resumed && MAX && EXITS >= MAX) submit(true);
-    } catch (e) { m.className = 'qz-msg bad'; m.textContent = T('Connection problem, try again.', 'Problème de connexion, réessayez.'); }
+    } catch (e) { m.className = 'qz-msg bad'; m.textContent = why(e); }
     finally { BUSY = false; }
   }
   function render(Q) {
@@ -305,10 +320,10 @@ window.QcmCore = function (o) {
     root.querySelectorAll('#qz-qs input').forEach(i => i.disabled = true);
     for (let t = 0; t < 4; t++) {
       try { const j = await call({ action: 'qcmSubmit', key: S.key, answers: ANS, exits: EXITS }); if (j.ok || j.error === 'done') { ls.set(SK, { key: S.key, p: S.p, sent: true }); showDone(j); return; } }
-      catch (e) {}
+      catch (e) { LASTERR = e; }
       await new Promise(r => setTimeout(r, 2000));
     }
-    SENT = false; $('#qz-sb').disabled = false; m.className = 'qz-msg bad'; m.textContent = T('Sending failed: check your connection and click again.', "Échec de l'envoi : vérifiez votre connexion et cliquez de nouveau.");
+    SENT = false; $('#qz-sb').disabled = false; m.className = 'qz-msg bad'; m.textContent = (LASTERR ? why(LASTERR) : T('Sending failed: check your connection and click again.', "Échec de l'envoi : vérifiez votre connexion et cliquez de nouveau."));
   }
   async function poll() {   // only while answering: server clock, and closing of the quiz (B2 emptied)
     if (!RUN || SENT || !S) return;
