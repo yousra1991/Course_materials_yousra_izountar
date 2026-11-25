@@ -3,494 +3,1220 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Chapitre 4 – Simuler le cloud : CloudSim</title>
+<title>Chapitre 3 – Traitement de données dans les systèmes clouds</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#eef2f6; --panel:#ffffff; --panel2:#e7edf3; --line:#cdd9e4; --ink:#0f1e30;
-  --mut:#51677f; --accent:#b96e0a; --accent2:#0a83ab; --good:#177a44; --bad:#b8362c;
-  --good2:#dcf3e6; --bad2:#fbe4e1; --acc2soft:#dbeefa; --accsoft:#fdeed6;
+  --bg:#0a1220; --panel:#101c2e; --panel2:#152740; --line:#24384f;
+  --ink:#e9f1fb; --ink-dim:#8aa0bf; --accent:#ffb454; --accent2:#5fd2ff;
+  --good:#6fd18f; --bad:#ff6f65; --accent-ink:#1a1206;
+  --sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --display:'Space Grotesk',var(--sans);
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --radius:7px; box-sizing:border-box;
 }
-@media (prefers-color-scheme:dark){ :root:not([data-theme=light]){
-  --bg:#0a1220; --panel:#101c2e; --panel2:#152740; --line:#24384f; --ink:#e9f1fb;
-  --mut:#9db2cb; --accent:#ffb454; --accent2:#5fd2ff; --good:#6fd18f; --bad:#ff6f65;
-  --good2:#13331f; --bad2:#3a1a17; --acc2soft:#10303f; --accsoft:#3a2a10; } }
-:root[data-theme=dark]{
-  --bg:#0a1220; --panel:#101c2e; --panel2:#152740; --line:#24384f; --ink:#e9f1fb;
-  --mut:#9db2cb; --accent:#ffb454; --accent2:#5fd2ff; --good:#6fd18f; --bad:#ff6f65;
-  --good2:#13331f; --bad2:#3a1a17; --acc2soft:#10303f; --accsoft:#3a2a10; }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);
-  font:17px/1.65 "IBM Plex Sans",system-ui,Arial,sans-serif;-webkit-font-smoothing:antialiased}
-.wrap{max-width:980px;margin:0 auto;padding:0 20px 90px}
-h1,h2,h3,h4,.kicker,th{font-family:"Space Grotesk","IBM Plex Sans",sans-serif}
-header.top{background:var(--panel);border-bottom:1px solid var(--line);padding:26px 0 22px;margin-bottom:26px}
-header.top .wrap{padding-bottom:0}
-.kicker{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
-h1{font-size:clamp(28px,4.6vw,44px);line-height:1.08;margin:8px 0 10px;letter-spacing:-.02em}
-.lead{font-size:clamp(17px,2.1vw,20px);color:var(--mut);max-width:70ch;margin:0}
-.meta{margin-top:14px;font-size:14px;color:var(--mut)}
-.theme{position:absolute;right:20px;top:18px;background:var(--panel2);color:var(--mut);
-  border:1px solid var(--line);border-radius:9px;padding:7px 12px;font:600 13px inherit;cursor:pointer}
-header.top{position:relative}
-h2{font-size:clamp(21px,2.8vw,27px);margin:46px 0 12px;padding-top:14px;border-top:2px solid var(--line);letter-spacing:-.01em}
-h3{font-size:19px;margin:28px 0 8px;color:var(--accent2)}
-p{margin:0 0 14px}
-a{color:var(--accent2)}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:18px 0}
-.note{border-left:4px solid var(--accent);background:var(--accsoft);border-radius:0 12px 12px 0;
-  padding:14px 18px;margin:18px 0}
-.warn{border-left:4px solid var(--bad);background:var(--bad2);border-radius:0 12px 12px 0;padding:14px 18px;margin:18px 0}
-.ok{border-left:4px solid var(--good);background:var(--good2);border-radius:0 12px 12px 0;padding:14px 18px;margin:18px 0}
-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:15.5px}
-th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
-th{background:var(--panel2);font-size:14px}
-tbody tr:nth-child(odd) td{background:var(--panel)}
-code,kbd{font-family:"IBM Plex Mono",Consolas,monospace;font-size:.92em;background:var(--panel2);
-  border:1px solid var(--line);border-radius:5px;padding:1px 5px}
-pre{background:var(--panel2);border:1px solid var(--line);border-left:4px solid var(--accent2);
-  border-radius:10px;padding:14px 16px;overflow:auto;font-family:"IBM Plex Mono",monospace;
-  font-size:14px;line-height:1.6;margin:14px 0}
-pre code{background:none;border:0;padding:0}
-ul,ol{margin:0 0 14px;padding-left:22px}li{margin:5px 0}
-.toc{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 20px}
-.toc ol{counter-reset:t;list-style:none;padding:0;margin:0;columns:2;column-gap:28px}
-.toc li{counter-increment:t;margin:5px 0;break-inside:avoid}
-.toc li::before{content:counter(t) ". ";color:var(--accent);font-weight:700}
-.toc a{text-decoration:none}.toc a:hover{text-decoration:underline}
-@media(max-width:620px){.toc ol{columns:1}}
-/* entity diagram */
-.ent{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;margin:16px 0}
-.ent .e{background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--accent2);
-  border-radius:12px;padding:12px 14px}
-.ent .e b{display:block;font-family:"IBM Plex Mono",monospace;color:var(--accent2);font-size:15px}
-.ent .e span{font-size:14.5px;color:var(--mut)}
-/* nesting diagram */
-.nest{margin:18px 0;font-size:14.5px}
-.nest div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:7px 0 0 0}
-.nest .dc{background:var(--panel)}
-.nest .ho{background:var(--panel2);margin-left:16px}
-.nest .vm{background:var(--acc2soft);margin-left:32px}
-.nest .cl{background:var(--accsoft);margin-left:48px}
-.nest b{font-family:"IBM Plex Mono",monospace}
-/* interactive blocks */
-.demo{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);
-  border-radius:0 14px 14px 0;padding:16px 20px;margin:20px 0}
-.demo h4{margin:0 0 4px;font-size:17px}
-.demo .hint{font-size:14px;color:var(--mut);margin:0 0 12px}
-.row{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:10px 0}
-.row label{font-size:14px;color:var(--mut);display:flex;flex-direction:column;gap:4px;flex:1;min-width:190px}
-input[type=range]{width:100%;accent-color:var(--accent)}
-.val{font-family:"IBM Plex Mono",monospace;color:var(--ink);font-weight:600;font-size:15px}
-.out{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;
-  font-family:"IBM Plex Mono",monospace;font-size:15px;margin-top:10px}
-.out b{color:var(--accent);font-size:19px}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:4px 0 10px}
-.seg button{background:var(--panel2);color:var(--mut);border:0;padding:9px 16px;
-  font:600 14px "IBM Plex Sans",sans-serif;cursor:pointer}
-.seg button.on{background:var(--accent2);color:#042331}
-:root[data-theme=dark] .seg button.on,
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .seg button.on{color:#042331}}
-.tl{margin:12px 0}
-.tl .lane{display:flex;align-items:center;gap:10px;margin:7px 0}
-.tl .nm{width:58px;font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--mut);flex:none}
-.tl .bar{flex:1;height:30px;background:var(--panel2);border:1px solid var(--line);
-  border-radius:7px;position:relative;overflow:hidden}
-.tl .seg2{position:absolute;top:0;bottom:0;display:grid;place-items:center;
-  font:600 12.5px "IBM Plex Mono",monospace;color:#042331;border-right:1px solid rgba(0,0,0,.25)}
-.tl .axis{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);
-  margin-left:68px;margin-top:2px;font-family:"IBM Plex Mono",monospace}
-.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:14px;color:var(--mut)}
-@media(max-width:620px){
-  body{font-size:16px}
-  .wrap{padding:0 15px 70px}
-  table{font-size:14px;display:block;overflow-x:auto}
-  .theme{position:static;margin-bottom:10px}
+:root[data-theme="light"]{
+  --bg:#eef2f6; --panel:#ffffff; --panel2:#e7edf3;
+  --line:#cdd9e4; --ink:#0f1e30; --ink-dim:#4c6178;
+  --accent:#b96e0a; --accent2:#0a83ab; --good:#177a44; --bad:#b8362c; --accent-ink:#fff9f0;
 }
+*{box-sizing:border-box;}
+html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%;}
+body{
+  height:100%; margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans);
+  overflow:hidden; transition:background .2s,color .2s;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  background-image:radial-gradient(var(--line) 1px, transparent 1px);
+  background-size:28px 28px;
+  background-position:-4px -4px;
+}
+:root[data-theme="light"] body{background-image:radial-gradient(var(--line) 1px, transparent 1px);}
+.deck{position:relative; height:100%; width:100%;}
+.slide{
+  position:absolute; inset:0; display:none; flex-direction:column;
+  padding:clamp(24px,5vw,64px) clamp(20px,7vw,100px);
+  padding-top:calc(clamp(24px,5vw,64px) + env(safe-area-inset-top,0px));
+  overflow-y:auto;
+}
+.slide.active{display:flex;}
+.slide > *{flex-shrink:0;}
+.kicker{
+  font-family:var(--mono); font-size:12px; color:var(--ink-dim); font-weight:500;
+  margin-bottom:14px; display:inline-flex; align-items:center; gap:8px;
+}
+.kicker::before{content:''; width:7px; height:7px; background:var(--accent2); border-radius:1px; transform:rotate(45deg); flex:0 0 auto;}
+h1{font-family:var(--display); font-size:clamp(28px,4.2vw,52px); line-height:1.06; margin:0 0 14px; font-weight:700; letter-spacing:-0.015em;}
+h2{font-family:var(--display); font-size:clamp(21px,2.8vw,32px); line-height:1.15; margin:0 0 16px; font-weight:700; letter-spacing:-0.01em;}
+h3{font-family:var(--display); font-size:17px; margin:0 0 8px; font-weight:600;}
+p{font-size:15.5px; line-height:1.6; color:var(--ink-dim); max-width:74ch; margin:0 0 10px;}
+.lead{font-size:18px; color:var(--ink); max-width:68ch;}
+.example{border-left:2px dashed var(--accent); background:var(--panel); padding:11px 15px; border-radius:0 6px 6px 0; margin-top:6px; position:relative;}
+.example b{color:var(--accent); font-weight:600; font-family:var(--mono); font-size:.93em;}
+.grid{display:grid; gap:14px; margin-top:12px;}
+.grid.cols-2{grid-template-columns:1fr 1fr;}
+.grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.grid.cols-5{grid-template-columns:repeat(5,1fr);}
+@media (max-width:800px){.grid.cols-2,.grid.cols-3,.grid.cols-5{grid-template-columns:1fr;}}
+.card{background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--accent2); border-radius:var(--radius); padding:15px 17px;}
+.card .n{color:var(--accent2); font-size:12px; font-weight:600; margin-bottom:6px; font-family:var(--mono); letter-spacing:.02em;}
+table{border-collapse:collapse; width:100%; margin-top:8px; font-size:14px;}
+th,td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top; line-height:1.5;}
+th{background:var(--panel2); color:var(--accent2); font-weight:600; font-size:12px; font-family:var(--mono); letter-spacing:.01em;}
+td{color:var(--ink-dim);}
+tr:nth-child(even) td{background:rgba(127,127,127,.05);}
+.proscons{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:8px;}
+@media (max-width:700px){.proscons{grid-template-columns:1fr;}}
+.proscons .box{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px;}
+.proscons .box.pro{border-left:3px solid var(--good);}
+.proscons .box.con{border-left:3px solid var(--bad);}
+.proscons ul{margin:0; padding-left:18px; font-size:14px; color:var(--ink-dim); line-height:1.6;}
+.proscons li{margin-bottom:6px;}
+.pillrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+.pill{background:var(--panel2); border:1px solid var(--line); border-radius:5px; padding:6px 13px; font-size:13px; color:var(--ink); font-family:var(--mono);}
+.footer{margin-top:auto; display:flex; align-items:center; justify-content:space-between; padding-top:14px; font-size:12px; color:var(--ink-dim); font-family:var(--mono); border-top:1px solid var(--line);}
+.num{position:fixed; top:calc(16px + env(safe-area-inset-top,0px) + 9px); right:100px; font-size:12px; color:var(--ink-dim); z-index:10; font-family:var(--mono);}
+.num::before{content:'// ';}
+.topbtns{position:fixed; top:calc(14px + env(safe-area-inset-top,0px)); right:16px; display:flex; gap:8px; z-index:20;}
+.iconbtn{background:var(--panel2); border:1px solid var(--line); color:var(--ink); width:34px; height:34px; border-radius:6px; cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center;}
+.iconbtn:hover{border-color:var(--accent2); color:var(--accent2);}
+.nav{position:fixed; bottom:calc(18px + env(safe-area-inset-bottom,0px)); right:24px; display:flex; gap:8px; z-index:10;}
+.nav button{background:var(--panel2); border:1px solid var(--line); color:var(--ink); width:38px; height:38px; border-radius:6px; cursor:pointer; font-size:16px;}
+.nav button:hover{border-color:var(--accent2); color:var(--accent2);}
+.progress{position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg,var(--accent2),var(--accent)); z-index:15; transition:width .25s;}
+.menu-overlay{position:fixed; inset:0; background:rgba(4,8,14,.7); display:none; align-items:center; justify-content:center; z-index:30;}
+.menu-overlay.open{display:flex;}
+.menu-panel{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px; width:min(440px,90vw); max-height:80vh; overflow-y:auto;}
+.menu-panel h4{margin:0 0 12px; font-size:12px; color:var(--ink-dim); letter-spacing:.04em; font-family:var(--mono); font-weight:500;}
+.menu-item{display:flex; gap:10px; align-items:center; padding:9px 10px; border-radius:6px; cursor:pointer; font-size:14px; border-left:2px solid transparent;}
+.menu-item:hover{background:var(--panel2); border-left-color:var(--line);}
+.menu-item.current{background:var(--panel2); color:var(--accent2); border-left-color:var(--accent2);}
+.menu-item .mi-n{color:var(--ink-dim); font-size:11px; width:30px; font-family:var(--mono);}
+::-webkit-scrollbar{width:8px;} ::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
+
+/* ---- Interactive widgets ---- */
+.demo{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; margin-top:14px; position:relative;}
+.demo::before{content:''; position:absolute; left:0; top:14px; bottom:14px; width:3px; background:var(--accent2); border-radius:0 2px 2px 0;}
+.demo h4{margin:0 0 4px; font-size:12.5px; color:var(--ink); letter-spacing:.02em; font-family:var(--mono); font-weight:600;}
+.demo .hint{font-size:13px; color:var(--ink-dim); margin-bottom:12px;}
+.btn{background:var(--accent); color:var(--accent-ink); border:none; padding:9px 18px; border-radius:6px; font-size:14px; font-weight:600; font-family:var(--sans); cursor:pointer;}
+.btn:hover{filter:brightness(1.08);}
+.btn.ghost{background:transparent; color:var(--accent2); border:1px solid var(--accent2);}
+.btnrow{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px;}
+.switch{display:inline-flex; border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+.switch button{background:var(--panel2); color:var(--ink-dim); border:none; padding:7px 14px; font-size:13px; cursor:pointer; font-family:var(--mono);}
+.switch button.on{background:var(--accent); color:var(--accent-ink); font-weight:700;}
+.slider-row{display:flex; align-items:center; gap:14px; margin-bottom:14px;}
+.slider-row input[type=range]{flex:1; accent-color:var(--accent2);}
+.slider-row .val{min-width:120px; text-align:right; font-weight:600; color:var(--accent2); font-size:13.5px; font-family:var(--mono);}
+.queue{display:flex; flex-direction:column; gap:6px;}
+.qline{display:flex; align-items:center; gap:10px;}
+.qline .lbl{width:74px; font-size:12px; color:var(--ink-dim); font-family:var(--mono);}
+.track{flex:1; height:16px; background:var(--panel2); border-radius:4px; overflow:hidden; position:relative; border:1px solid var(--line);}
+.fill{height:100%; width:0%; background:var(--accent2); border-radius:3px; transition:width .12s linear;}
+.qline .time{width:56px; font-size:12px; color:var(--ink-dim); text-align:right; font-family:var(--mono);}
+.barchart{display:flex; align-items:flex-end; gap:10px; height:150px; margin-top:8px; padding:0 4px;}
+.barchart .bwrap{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%;}
+.barchart .bar{width:100%; background:var(--accent2); border-radius:4px 4px 0 0; display:flex; align-items:flex-start; justify-content:center; color:var(--accent-ink); font-size:11.5px; font-weight:700; font-family:var(--mono); padding-top:5px; transition:height .35s ease;}
+.barchart .blabel{margin-top:6px; font-size:11px; color:var(--ink-dim); font-family:var(--mono);}
+.nodeflow{display:flex; align-items:center; justify-content:center; gap:14px; margin:14px 0; flex-wrap:wrap;}
+.node{width:58px; height:58px; border-radius:50%; background:var(--panel2); border:1.5px solid var(--accent2); display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--accent2); font-weight:600; font-family:var(--mono); cursor:pointer; transition:all .2s; text-align:center; line-height:1.15;}
+.node:hover{border-color:var(--accent); box-shadow:0 0 0 3px rgba(255,180,84,.15);}
+.node.down{background:rgba(255,111,101,.12); border-color:var(--bad); color:var(--bad); opacity:.6; text-decoration:line-through;}
+.node.active-pulse{animation:pulse 1s ease infinite;}
+.node.master{border-color:var(--accent); color:var(--accent); border-width:2px;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,180,84,.5);}70%{box-shadow:0 0 0 12px rgba(255,180,84,0);}100%{box-shadow:0 0 0 0 rgba(255,180,84,0);}}
+.arrow{color:var(--ink-dim); font-size:20px;}
+.status{font-size:13px; margin-top:10px; color:var(--ink); min-height:18px;}
+.status b{color:var(--accent2);}
+.arch-tabs{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;}
+.arch-tabs button{background:var(--panel2); border:1px solid var(--line); color:var(--ink-dim); padding:8px 14px; border-radius:6px; font-size:13px; cursor:pointer; font-family:var(--mono);}
+.arch-tabs button.on{background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:700;}
+.arch-box{border:1px solid var(--line); border-radius:var(--radius); background:var(--panel2); padding:16px; display:flex; flex-direction:column; gap:10px; align-items:center;}
+.arch-box .net{background:var(--panel); color:var(--accent2); font-size:11px; letter-spacing:.04em; padding:6px 10px; border-radius:4px; width:100%; text-align:center; font-family:var(--mono);
+  background-image:repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 12px); background-size:100% 1px; background-repeat:no-repeat; background-position:center;}
+.arch-box .row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
+.chip{border:1px solid var(--line); border-radius:5px; padding:8px 12px; font-size:12px; text-align:center; min-width:52px; transition:all .2s; font-family:var(--mono);}
+.chip.cpu{background:#1c2a3d;}
+.chip.disk{background:#2a2013; border-color:#4a3a1c; color:var(--accent);}
+.chip.mem{background:#132a38; border-color:#1f4a58; color:var(--accent2);}
+:root[data-theme="light"] .chip.cpu{background:#e4ecf7;}
+:root[data-theme="light"] .chip.disk{background:#f6ecd8;}
+:root[data-theme="light"] .chip.mem{background:#dcf3ec;}
+.chip.hot{box-shadow:0 0 0 3px var(--bad); border-color:var(--bad);}
+.unit{display:flex; flex-direction:column; gap:6px; align-items:center; padding:6px; border:1px dashed var(--line); border-radius:6px;}
+.shardline{display:flex; gap:2px; margin:14px 0; border-radius:6px; overflow:hidden; height:34px;}
+.shardline .seg{flex:1; display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:700; color:var(--accent-ink); transition:opacity .2s; font-family:var(--mono);}
+.shardmark{position:relative; height:20px; margin-top:-4px;}
+.shardmark .flag{position:absolute; top:0; transform:translateX(-50%); font-size:16px; transition:left .25s ease;}
+.numinput{background:var(--panel2); border:1px solid var(--line); color:var(--ink); padding:8px 12px; border-radius:6px; font-size:14px; width:160px; font-family:var(--mono);}
+.quiz-q{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin-bottom:12px;}
+.quiz-q .qt{font-size:14.5px; color:var(--ink); margin-bottom:10px; font-weight:600; font-family:var(--display);}
+.quiz-opts{display:flex; flex-direction:column; gap:7px; counter-reset:opt;}
+.quiz-opt{background:var(--panel2); border:1px solid var(--line); border-radius:6px; padding:9px 12px 9px 38px; font-size:13.5px; cursor:pointer; color:var(--ink-dim); position:relative;}
+.quiz-opt::before{counter-increment:opt; content:counter(opt,lower-alpha); position:absolute; left:12px; top:9px; font-family:var(--mono); color:var(--ink-dim); font-size:12px;}
+.quiz-opt:hover{border-color:var(--accent2);}
+.quiz-opt.correct{border-color:var(--good); color:var(--good); background:rgba(111,209,143,.1); font-weight:600;}
+.quiz-opt.correct::before{color:var(--good);}
+.quiz-opt.wrong{border-color:var(--bad); color:var(--bad); background:rgba(255,111,101,.1);}
+.quiz-opt.wrong::before{color:var(--bad);}
+.quiz-opt.disabled{pointer-events:none;}
+.scorebox{position:sticky; top:0; background:var(--panel2); border:1px solid var(--line); border-radius:var(--radius); padding:10px 16px; margin-bottom:14px; font-size:14px; display:flex; justify-content:space-between; align-items:center; font-family:var(--mono);}
+.timeline{display:flex; align-items:center; margin-top:20px; gap:0;}
+.tl-step{flex:1; text-align:center; position:relative;}
+.tl-step .dot2{width:11px; height:11px; background:var(--accent2); margin:0 auto 10px; border:2px solid var(--panel); box-shadow:0 0 0 1px var(--accent2); transform:rotate(45deg);}
+.tl-step .line{position:absolute; top:5px; left:50%; width:100%; height:1px; background-image:repeating-linear-gradient(90deg, var(--line) 0 5px, transparent 5px 10px); z-index:-1;}
+.tl-step:last-child .line{display:none;}
+.tl-step h5{font-size:13px; margin:0 0 4px; color:var(--ink); font-family:var(--mono); font-weight:600;}
+.tl-step p{font-size:12px; margin:0; max-width:none;}
+.mg .tl3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 20px}
+.mg .tl3 div{background:var(--card);border-top:5px solid var(--am);padding:14px;border-radius:10px;font-size:16px;box-shadow:var(--sh)}
+.mg .tl3 b{display:block;font:700 19px "Bricolage Grotesque",sans-serif;color:var(--g);margin-bottom:4px}
+.mg pre{background:#14231c;color:#e8f0eb;padding:16px;border-radius:12px;overflow-x:auto;font:14px/1.5 "Courier New",monospace;margin:0;align-self:start}
+.mg code{font:.85em "Courier New",monospace;background:var(--g2);padding:1px 6px;border-radius:5px}
+.mg details code{color:var(--ink)}
+.mg details p code{color:var(--g)}
+.mg h3.sub{font-size:26px;color:var(--g);margin:24px 0 6px}
+.mg .lab{background:var(--card);border:2px dashed var(--g);border-radius:16px;padding:18px 22px;margin:22px 0}
+.mg .lab h4{margin:14px 0 8px;font:700 17px "Bricolage Grotesque",sans-serif;color:var(--g)}
+.mg .lab h4:first-child{margin-top:0}
+.mg .bt{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0;font-size:16px}
+.mg .lab button{font:600 15px "Bricolage Grotesque",sans-serif;padding:7px 14px;border-radius:8px;border:2px solid var(--g);background:var(--g);color:#fff;cursor:pointer}
+.mg .lab button.gh{background:none;color:var(--g)}
+.mg .lab input[type=text],.mg .lab input:not([type]),.mg .lab select{font:inherit;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.mg .lab pre{margin:8px 0;white-space:pre-wrap;font-size:13px}
+.mg .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mg .q{font-weight:600;margin:6px 0}
+.mg .bar{height:14px;background:var(--g2);border-radius:8px;overflow:hidden}
+.mg .bar i{display:block;height:100%;transition:width .2s}
+.mg .flow{display:flex;flex-wrap:wrap;gap:8px}
+.mg .flow span{flex:1;min-width:110px;text-align:center;padding:12px 6px;border:2px solid var(--line);border-radius:10px;font:600 14px "Bricolage Grotesque",sans-serif;transition:.2s}
+.mg .flow span.on{background:var(--am);border-color:var(--am);color:#14231c;transform:scale(1.05)}
+.mg .fig{background:var(--card);border-radius:18px;padding:18px 20px 12px;margin:0 0 26px;box-shadow:var(--sh)}
+.mg .fig svg{width:100%;height:auto;display:block}
+.mg .fig figcaption{text-align:center;font-size:14px;color:var(--mut);margin-top:8px}
+.mg .fig text{fill:var(--ink);font:600 13px "Bricolage Grotesque","Segoe UI",Arial,sans-serif}
+.mg .fig .t2{font-size:11px;font-weight:500;fill:var(--mut)}
+.mg .fig .tt{font-size:16px;font-weight:800;fill:var(--g)}
+.mg .fig .bx{fill:var(--card);stroke:var(--g);stroke-width:2}
+.mg .fig .b2{fill:var(--g2);stroke:var(--g);stroke-width:1.5}
+.mg .fig .pn{fill:none;stroke:var(--g);stroke-width:2;stroke-dasharray:6 4}
+.mg .fig .am{fill:var(--am);stroke:var(--am)}
+.mg .fig .c1{fill:var(--g)}
+.mg .fig .c2{fill:var(--g2);stroke:var(--g);stroke-width:1}
+.mg .fig .c3{fill:var(--card);stroke:var(--mut);stroke-width:1}
+.mg .fig .ar{stroke:var(--mut);stroke-width:2;fill:none}
+.mg .fig .wt{fill:#fff}
+.mg table.cm td:first-child{font:13px/1.5 "Courier New",monospace;background:#14231c;color:#e8f0eb;white-space:pre-wrap;width:48%;border-bottom:1px solid #2b4237}
+.mg table.cm td:last-child{font-size:15px}
+.mg table.cm th{font-size:14px}
+.mg .use{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:6px 0 10px}
+.mg .use div{background:var(--g2);border-radius:10px;padding:10px 14px;font-size:15px}
+.mg .use b{color:var(--g)}
+.mg .use ul{margin:4px 0 0;padding-left:18px}
+.mg .ex{background:var(--card);border-radius:18px;padding:22px 26px;margin:0 0 26px;box-shadow:var(--sh)}
+.mg .ex h3{margin:0 0 4px;font-size:24px;color:var(--g)}
+.mg .ex .lead{margin-bottom:12px}
+.mg{--g:var(--accent2);--g2:var(--panel2);--card:var(--panel);--mut:var(--ink-dim);--am:var(--accent)}
+.mg h2{margin-bottom:10px}.mg .lead{margin-bottom:14px}
+.mg pre{background:#0b1522;color:#e9f1fb;padding:14px;border-radius:8px;overflow-x:auto;font:12.5px/1.5 var(--mono);margin:8px 0}
+.mg code{font:.88em var(--mono);background:var(--panel2);padding:1px 6px;border-radius:4px;color:var(--accent)}
+.mg table.cm td:first-child code,.mg td code{color:var(--accent)}
+.mg .scroll{overflow-x:auto}
+.mg .key{border-left:2px dashed var(--accent);background:var(--panel);padding:11px 15px;border-radius:0 6px 6px 0;margin:10px 0;font-size:14.5px;color:var(--ink-dim)}
+.mg .key b{color:var(--accent)}
+.mg .ex,.mg .blk{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent2);border-radius:7px;padding:14px 18px;margin:8px 0;box-shadow:none}
+.mg .blk{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.mg .blk h3,.mg .ex h3{color:var(--accent2)}
+.mg ul,.mg ol{color:var(--ink-dim);font-size:14.5px;line-height:1.6;padding-left:20px;margin:4px 0}
+.mg .lab{background:var(--panel);border:1px dashed var(--accent2);border-radius:7px;padding:14px 18px;margin:10px 0}
+.mg .lab h4{font:600 13px var(--mono);color:var(--accent2);margin:12px 0 8px}.mg .lab h4:first-child{margin-top:0}
+.mg .lab button,.mg .bt button{background:var(--accent);color:var(--accent-ink);border:none;padding:7px 14px;border-radius:6px;font:600 13.5px var(--sans);cursor:pointer}
+.mg .lab button.gh{background:transparent;color:var(--accent2);border:1px solid var(--accent2)}
+.mg input,.mg select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font:13.5px var(--mono)}
+.mg .bt{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0;font-size:14px;color:var(--ink)}
+.mg .q{font-weight:600;color:var(--ink);font-size:14.5px;margin:6px 0}
+.mg .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mg .bar{height:14px;background:var(--panel2);border-radius:8px;overflow:hidden}.mg .bar i{display:block;height:100%;transition:width .2s}
+.mg .flow{display:flex;flex-wrap:wrap;gap:8px}.mg .flow span{flex:1;min-width:100px;text-align:center;padding:10px 6px;border:1px solid var(--line);border-radius:6px;font:600 12.5px var(--mono);color:var(--ink-dim)}
+.mg .flow span.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);transform:scale(1.05)}
+.mg table.cm td:first-child{font:12.5px/1.5 var(--mono);background:#0b1522;color:#e9f1fb;white-space:pre-wrap;width:46%}
+.mg table.cm td:last-child{font-size:14px}
+.mg .use{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0}.mg .use div{background:var(--panel2);border-radius:6px;padding:9px 13px;font-size:14px;color:var(--ink-dim)}.mg .use b{color:var(--accent2)}
+.mg .tl3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:8px 0}
+.mg .tl3 div{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:7px;padding:12px 14px;font-size:14.5px;color:var(--ink-dim)}
+.mg .tl3 b{display:block;font:600 16px var(--display);color:var(--accent2);margin-bottom:4px}
+.mg .fig{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:12px;margin:8px 0}
+.mg .fig svg{width:100%;max-height:52vh;height:auto;display:block}
+.mg .fig figcaption{text-align:center;font-size:12.5px;color:var(--ink-dim);margin-top:6px}
+.mg details{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:10px 14px;margin:8px 0;color:var(--ink)}
+.mg summary{cursor:pointer;font-weight:600;font-size:14.5px}.mg details p{margin:8px 0 0;color:var(--accent2)}
+.mg h3.sub{color:var(--accent2);font-size:19px;margin:10px 0 4px}
+.mg .tlh{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.mg .tlh div{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:7px;padding:12px;font-size:14px;color:var(--ink-dim)}
+.mg .tlh b{display:block;font:700 22px var(--display);color:var(--accent2)}
+@media(max-width:800px){.mg .blk,.mg .two,.mg .use,.mg .tl3,.mg .tlh{grid-template-columns:1fr}}
+
+
+.diag{background:var(--panel2);border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin:14px 0;}
+.diag svg{width:100%;height:auto;display:block;max-height:430px;}
+.diag figcaption{font-size:12.5px;color:var(--ink-dim);margin-top:6px;font-family:var(--mono);}
+.sv text{fill:var(--ink);font-size:13px;font-family:var(--sans);}
+.sv .sm{fill:var(--ink-dim);font-size:11.5px;}
+.sv .bx{fill:var(--panel);stroke:var(--line);stroke-width:1.5;}
+.sv .hl{fill:var(--panel);stroke:var(--accent2);stroke-width:2;}
+.sv .wr{fill:var(--panel);stroke:var(--accent);stroke-width:2;}
+.sv .ar{stroke:var(--accent2);stroke-width:2;fill:none;marker-end:url(#arr);}
+.sv .dash{stroke:var(--ink-dim);stroke-width:1.5;stroke-dasharray:5 4;fill:none;}
+.sv .axis{stroke:var(--ink-dim);stroke-width:1.2;fill:none;}
+.sv .dem{stroke:var(--accent);stroke-width:3;fill:none;}
+.sv .cap{stroke:var(--accent2);stroke-width:3;fill:none;}
+.sv .ok{fill:var(--good);}
+.sv .bad{fill:var(--bad);}
+.sv .cloudfill{fill:var(--accent2);fill-opacity:.12;stroke:var(--accent2);stroke-width:2;}
+.sv .tag{font-weight:700;}
+.sv .bigT{font-family:var(--display);font-size:16px;font-weight:700;}
+.rm td{font-size:13.5px}
+.rm td.y{color:var(--good);font-weight:700;text-align:center}
+.rm td.n{color:var(--ink-dim);text-align:center}
+.rm th{text-align:center}
+.rm th:first-child,.rm td:first-child{text-align:left}
+.ex-box{border-left:2px dashed var(--accent);background:var(--panel);padding:11px 15px;border-radius:0 6px 6px 0;margin-top:10px;}
+.ex-box b{color:var(--accent);font-family:var(--mono);}
+.note-box{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--radius);padding:12px 16px;margin-top:12px;font-size:14px;color:var(--ink-dim);}
+.note-box b{color:var(--ink);}
+details{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:10px 14px;margin:8px 0;}
+summary{cursor:pointer;color:var(--ink);font-weight:600;}
+details p{margin:8px 0 0;}
+.sl-x{font-size:14px}
+ul.tight{margin:0;padding-left:18px;font-size:15px;color:var(--ink-dim);line-height:1.6}
+ul.tight li{margin-bottom:6px}
+ul.tight b{color:var(--ink)}
+@media (max-width:700px){.slide{padding:22px 16px 80px}.grid.cols-3{grid-template-columns:1fr}}
+/* ---- Suite du chapitre (1.6 à 1.12) : démos alignées sur le simulateur et le TP ---- */
+.fml{font:600 14.5px/1.8 var(--mono);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:10px 16px;margin:10px 0}
+.fml span{color:var(--ink-dim);font-weight:400}
+.hosts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+.hostbox{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:8px 10px;min-height:88px}
+.hostbox.off{opacity:.45;border-style:dashed}
+.hostbox.down{border-color:var(--bad);background:rgba(255,111,101,.1)}
+.hostbox h5{margin:0 0 6px;font:600 12px var(--mono);color:var(--ink-dim);display:flex;justify-content:space-between}
+.hostbox .vms{display:flex;flex-wrap:wrap;gap:4px}
+.hostbox .vm{height:22px;border-radius:4px;font:700 10.5px/22px var(--mono);text-align:center;color:var(--accent-ink)}
+.lbrow{display:grid;grid-template-columns:96px 1fr 190px;gap:10px;align-items:center;margin:6px 0;font:12.5px var(--mono);color:var(--ink-dim)}
+.lbrow .track{height:20px}
+.lbrow .fill.over{background:var(--bad)}
+.kpis2{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+.kpis2 div{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:8px 14px;font:12px var(--mono);color:var(--ink-dim)}
+.kpis2 b{display:block;font:700 20px var(--display);color:var(--accent2)}
+.kpis2 b.badv{color:var(--bad)}
+.ctrls{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:10px;font-size:13px;color:var(--ink-dim)}
+a.btn{display:inline-block;text-decoration:none}
+
+/* ================= Vue vidéoprojecteur (scène 16:9 de 1600 × 900, mise à l'échelle) ================= */
+.fit{width:100%}
+body.proj .deck{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform:translate(-50%,-50%) scale(var(--ps,1));transform-origin:center center}
+body.proj .slide{padding:54px 84px 70px;overflow:hidden}
+body.proj .slide.scroll-fallback{overflow-y:auto}
+body.proj .slide[data-title="Titre"] .fit{margin:auto 0}
+:root[data-theme="light"] body.proj{--ink-dim:#2f4256;--line:#c3d0dc}
+body.proj .kicker{font-size:17px;margin-bottom:16px}
+body.proj h1{font-size:70px;margin-bottom:22px}
+body.proj h2{font-size:48px;margin-bottom:22px}
+body.proj h3{font-size:25px;margin-bottom:10px}
+body.proj p{font-size:23px;max-width:none}
+body.proj .lead{font-size:27px;max-width:62ch;margin-bottom:18px}
+body.proj .pill{font-size:17px;padding:8px 16px}
+body.proj .grid{gap:20px;margin-top:16px}
+body.proj .card{padding:20px 24px}
+body.proj .card p{font-size:21px}
+body.proj .card .n{font-size:16px}
+body.proj table{font-size:20px}
+body.proj th{font-size:16px;padding:12px 14px}
+body.proj td{padding:11px 14px}
+body.proj .rm td{font-size:20px}
+body.proj .note-box,body.proj .ex-box{font-size:21px;padding:14px 20px;margin-top:16px}
+body.proj ul.tight,body.proj .mg ul,body.proj .mg ol{font-size:21px}
+body.proj .diag{padding:14px;margin:16px 0}
+body.proj .diag svg{max-height:390px}
+body.proj .diag figcaption{font-size:16px}
+body.proj .fml{font-size:20px;padding:14px 20px}
+body.proj .demo{padding:20px 24px}
+body.proj .demo h4{font-size:17px}
+body.proj .demo .hint{font-size:18px}
+body.proj .status{font-size:20px;margin-top:12px}
+body.proj .btn{font-size:18px;padding:11px 20px}
+body.proj .switch button{font-size:17px;padding:10px 16px}
+body.proj .ctrls{font-size:18px}
+body.proj .mg select,body.proj .mg input{font-size:18px;padding:6px 10px}
+body.proj .slider-row .val{font-size:19px;min-width:170px}
+body.proj .kpis2 div{font-size:15px;padding:10px 18px}
+body.proj .kpis2 b{font-size:30px}
+body.proj .lbrow{font-size:17px;grid-template-columns:130px 1fr 280px}
+body.proj .lbrow .track{height:26px}
+body.proj .qline .lbl{width:110px;font-size:16px}
+body.proj .qline .time{width:80px;font-size:16px}
+body.proj .track{height:22px}
+body.proj .hostbox{min-height:110px;padding:10px 12px}
+body.proj .hostbox h5{font-size:15px}
+body.proj .hostbox .vm{height:28px;font-size:13px;line-height:28px}
+body.proj details{padding:12px 18px}
+body.proj summary{font-size:21px}
+body.proj details p{font-size:20px}
+body.proj .scorebox{font-size:19px;position:static}
+body.proj .qz-list{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+body.proj .quiz-q .qt{font-size:20px}
+body.proj .quiz-opt{font-size:18px}
+body.proj .quiz-q .status{font-size:17px}
+.num{right:186px}
+body.proj .num{font-size:15px;right:236px;top:calc(14px + env(safe-area-inset-top,0px) + 13px)}
+body.proj .nav button,body.proj .iconbtn{width:44px;height:44px;font-size:19px}
+.blackout{position:fixed;inset:0;background:#000;z-index:100;display:none;cursor:none}
+.blackout.on{display:block}
+.quiz-q .status{font-size:13.5px;color:var(--ink-dim)}
+@media(max-width:800px){.hosts{grid-template-columns:1fr 1fr}.lbrow{grid-template-columns:80px 1fr}.lbrow>span:last-child{grid-column:1/-1}}
 </style>
 </head>
 <body>
-
-<header class="top"><div class="wrap">
-  <button class="theme" type="button" id="th">Clair / sombre</button>
-  <div class="kicker">BDD NoSQL et Cloud Computing &middot; M2 ASD &middot; Chapitre 4</div>
-  <h1>Simuler le cloud : CloudSim</h1>
-  <p class="lead">Pourquoi on simule un datacenter au lieu d'en louer un, comment CloudSim représente
-  l'infrastructure, et ce que l'on mesure &mdash; placement des VM, ordonnancement, énergie, coût.</p>
-  <div class="meta">Universit&eacute; d'Alger 1 &middot; Pr. Izountar Yousra &middot; cours + TP</div>
-</div></header>
-
-<div class="wrap">
-
-<div class="toc">
-  <b>Plan du chapitre</b>
-  <ol>
-    <li><a href="#pourquoi">Pourquoi simuler</a></li>
-    <li><a href="#outils">Quel simulateur choisir</a></li>
-    <li><a href="#modele">Le modèle CloudSim</a></li>
-    <li><a href="#mips">MI, MIPS et temps d'exécution</a></li>
-    <li><a href="#sched">Time-shared ou space-shared</a></li>
-    <li><a href="#placement">Le placement des VM</a></li>
-    <li><a href="#mesures">Ce que l'on mesure</a></li>
-    <li><a href="#code">Une simulation complète</a></li>
-    <li><a href="#tp">Le TP, séance par séance</a></li>
-    <li><a href="#install">Installation et pièges</a></li>
-    <li><a href="#eval">Évaluation</a></li>
-    <li><a href="#refs">Références</a></li>
-  </ol>
+<div class="progress" id="progress"></div>
+<div class="deck" id="deck">
+<svg viewBox="0 0 10 10" width="0" height="0" style="position:absolute"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--accent2)"/></marker></defs></svg>
+<!-- 1 -->
+<section class="slide mg active" data-title="Titre"><div class="kicker">Chapitre 3 · BDD NoSQL et cloud / L3 ISIL / 2026-2027 · IZOUNTAR Yousra</div>
+<h1>Le traitement de données dans les systèmes clouds</h1>
+<p class="lead">Ce qu’est le cloud computing, comment il est architecturé, quels services il propose, et pourquoi il change la façon de stocker et de traiter les données.</p>
+<div class="pillrow"><span class="pill">1.1 Introduction</span><span class="pill">1.2 Cloud computing</span><span class="pill">1.3 Architecture</span><span class="pill">1.4 BDD dans le cloud</span><span class="pill">1.5 SGBD parallèles vs cloud</span><span class="pill">1.6 Virtualisation</span><span class="pill">1.7 Centre de données</span><span class="pill">1.8 Performance</span><span class="pill">1.9 Auto-scaling</span><span class="pill">1.10 Disponibilité</span><span class="pill">1.11 Coûts et énergie</span><span class="pill">1.12 Simulateur et TP</span></div></section>
+<!-- 2 -->
+<section class="slide mg" data-title="Plan du chapitre"><div class="kicker">Plan</div><h2>Plan du chapitre</h2>
+<div class="grid cols-3">
+<div class="card"><div class="n">1.1</div><h3>Introduction</h3><p style="margin:0">Données volumineuses, besoin de flexibilité.</p></div>
+<div class="card"><div class="n">1.2</div><h3>Qu’est-ce que le cloud ?</h3><p style="margin:0">Définition, caractéristiques, modèles de service.</p></div>
+<div class="card"><div class="n">1.3</div><h3>Architecture du cloud</h3><p style="margin:0">Front-end, back-end, composants clés.</p></div>
+<div class="card"><div class="n">1.4</div><h3>BDD dans le cloud</h3><p style="margin:0">Accessibilité, scalabilité, coûts, haute disponibilité, sécurité.</p></div>
+<div class="card"><div class="n">1.5</div><h3>SGBD parallèles vs cloud</h3><p style="margin:0">Définitions, comparaison, cas d’utilisation.</p></div>
+<div class="card"><div class="n">1.6</div><h3>Virtualisation</h3><p style="margin:0">Hyperviseur, machines virtuelles, conteneurs.</p></div>
+<div class="card"><div class="n">1.7</div><h3>Le centre de données</h3><p style="margin:0">Régions, zones, hôtes, placement des instances.</p></div>
+<div class="card"><div class="n">1.8</div><h3>Performance</h3><p style="margin:0">Capacité, utilisation, latence, répartition de charge.</p></div>
+<div class="card"><div class="n">1.9</div><h3>Élasticité et auto-scaling</h3><p style="margin:0">Politiques, paramètres, réaction à un pic.</p></div>
+<div class="card"><div class="n">1.10</div><h3>Disponibilité et pannes</h3><p style="margin:0">MTBF, MTTR, zones, SLA et SLO.</p></div>
+<div class="card"><div class="n">1.11</div><h3>Coûts et énergie</h3><p style="margin:0">À la demande, réservé, Spot ; PUE, consolidation.</p></div>
+<div class="card"><div class="n">1.12</div><h3>Le simulateur et le TP</h3><p style="margin:0">Où retrouver chaque notion, les 7 exercices.</p></div>
+</div></section>
+<!-- 3 -->
+<section class="slide mg" data-title="1.1 Introduction"><div class="kicker">1.1 Introduction</div><h2>1.1 Introduction : pourquoi le cloud ?</h2>
+<p class="lead">Les volumes de données augmentent, et les entreprises veulent des solutions plus flexibles et plus efficaces.</p>
+<div class="grid cols-2">
+<div class="card"><h3>Système traditionnel</h3><p style="margin:0">Serveurs achetés à l’avance, dimensionnés pour le pic, installés et maintenus sur place.</p></div>
+<div class="card"><h3>Plateforme cloud</h3><p style="margin:0">Ressources <b>élastiques</b> : on augmente ou on réduit selon le besoin, et le cloud prend en charge SQL (MySQL, PostgreSQL) comme NoSQL (MongoDB, DynamoDB).</p></div>
 </div>
-
-<h2 id="pourquoi">1 · Pourquoi simuler</h2>
-
-<p>La question se pose : pourquoi ne pas simplement ouvrir un compte AWS et travailler sur une vraie
-infrastructure ? Trois raisons rendent l'expérimentation réelle impraticable pour étudier les
-algorithmes du cloud.</p>
-
-<p><b>Le coût.</b> Évaluer une politique de consolidation demande des dizaines de machines pendant des
-heures, répétées pour chaque variante d'algorithme. La facture dépasse vite le budget d'un laboratoire
-de recherche, et à plus forte raison celui d'un TP.</p>
-
-<p><b>La reproductibilité.</b> C'est l'argument décisif. Sur une infrastructure réelle, deux exécutions
-du même test ne donnent jamais le même résultat : la charge des voisins, le réseau et les pannes
-varient. Impossible, alors, d'affirmer que l'algorithme A bat l'algorithme B &mdash; l'écart mesuré peut
-venir du bruit. Le simulateur est <b>déterministe</b> : même entrée, même sortie, toujours.</p>
-
-<p><b>L'observabilité.</b> Un fournisseur cloud ne vous dira pas sur quel serveur physique vos VM sont
-placées, ni combien d'énergie elles consomment. Or c'est précisément ce que l'on veut étudier. Dans le
-simulateur, toutes ces variables sont accessibles.</p>
-
-<div class="note"><b>À dire aux étudiants.</b> La simulation ne remplace pas le réel : elle remplace le
-réel <i>pour comparer des algorithmes</i>. Un résultat de simulation dit « cette politique place mieux
-les VM que l'autre sur cette charge », pas « votre application ira deux fois plus vite en production ».</div>
-
-<h2 id="outils">2 · Quel simulateur choisir</h2>
-
-<table>
-<tr><th style="width:22%">Outil</th><th style="width:40%">Domaine</th><th>Pour ce cours</th></tr>
-<tr><td><b>CloudSim 7.0.1</b></td><td>IaaS généraliste : datacenters, VM, tâches, énergie, coût</td>
-    <td><b>Le choix retenu.</b> Stable, Java 11+, très documenté, utilisé par la majorité des publications</td></tr>
-<tr><td>CloudSim Plus</td><td>Fork modernisé de CloudSim, code plus propre</td>
-    <td>Exige un JDK très récent (24+) : risqué en salle machine</td></tr>
-<tr><td>iFogSim2</td><td>Fog computing, Edge, IoT</td><td>Si vous ajoutez un chapitre Edge</td></tr>
-<tr><td>CloudAnalyst</td><td>Interface graphique, répartition géographique des requêtes</td>
-    <td>Bon pour une démonstration en cours, trop limité pour un TP</td></tr>
-<tr><td>GreenCloud</td><td>Consommation énergétique fine, basé sur NS2</td><td>Installation lourde</td></tr>
-<tr><td>SimGrid</td><td>HPC et systèmes distribués, C et Python</td><td>Autre philosophie, autre module</td></tr>
-<tr><td>WorkflowSim</td><td>Workflows scientifiques (graphes de tâches)</td><td>Extension possible du mini-projet</td></tr>
-</table>
-
-<div class="ok"><b>Décision.</b> <b>CloudSim 7.0.1</b>, en Java avec Maven. Vos étudiants connaissent déjà
-Java, l'obstacle technique est donc nul, et ils retrouveront cet outil dans les articles qu'ils liront
-en recherche.</div>
-
-<h2 id="modele">3 · Le modèle CloudSim</h2>
-
-<p>Tout CloudSim tient en huit objets. Les comprendre, c'est comprendre comment fonctionne une
-infrastructure IaaS &mdash; le simulateur n'est qu'une mise en équation de la réalité.</p>
-
-<div class="ent">
-  <div class="e"><b>Datacenter</b><span>Le centre de données. Porte les coûts : par seconde, par Mo de
-    mémoire, par Go de stockage, par Mo transféré.</span></div>
-  <div class="e"><b>Host</b><span>Une machine physique : une liste de cœurs, de la RAM, du stockage,
-    de la bande passante.</span></div>
-  <div class="e"><b>Pe</b><span><i>Processing Element</i> : un cœur, caractérisé par sa puissance
-    en <b style="display:inline">MIPS</b>.</span></div>
-  <div class="e"><b>Vm</b><span>Une machine virtuelle : MIPS demandés, nombre de cœurs, RAM, taille
-    disque, hyperviseur.</span></div>
-  <div class="e"><b>Cloudlet</b><span>Une tâche à exécuter : sa <b style="display:inline">longueur en
-    MI</b>, la taille de ses fichiers d'entrée et de sortie.</span></div>
-  <div class="e"><b>DatacenterBroker</b><span>Le client. Il demande des VM, soumet les tâches, et
-    décide quelle tâche va sur quelle VM.</span></div>
-  <div class="e"><b>VmAllocationPolicy</b><span>Quel <i>host</i> physique reçoit quelle VM. C'est ici
-    que se joue la consolidation.</span></div>
-  <div class="e"><b>VmScheduler<br>CloudletScheduler</b><span>Le partage de la puissance : host vers VM,
-    puis VM vers tâches.</span></div>
+<div class="note-box"><b>Idée clé :</b> le cloud n’est pas un type de base de données. C’est une <b>façon de fournir</b> des bases (et des serveurs, du stockage, des logiciels) via Internet.</div></section>
+<!-- 4 -->
+<section class="slide mg" data-title="1.2 Qu’est-ce que le cloud ?"><div class="kicker">1.2 Qu’est-ce que le cloud computing ?</div><h2>1.2 Qu’est-ce que le cloud computing ?</h2>
+<p class="lead">Accéder à des ressources informatiques (serveurs, stockage, bases de données, logiciels, services) <b>via Internet</b>, sans les posséder physiquement.</p>
+<figure class="diag"><svg viewBox="0 0 760 300" class="sv" role="img" aria-label="Accès au cloud via Internet">
+<rect class="bx" x="20" y="40" width="150" height="60" rx="8"/><text x="95" y="76" text-anchor="middle">💻 Ordinateur</text>
+<rect class="bx" x="20" y="120" width="150" height="60" rx="8"/><text x="95" y="156" text-anchor="middle">📱 Smartphone</text>
+<rect class="bx" x="20" y="200" width="150" height="60" rx="8"/><text x="95" y="236" text-anchor="middle">🖥 Tablette</text>
+<path class="ar" d="M170 70 L255 130"/><path class="ar" d="M170 150 L255 150"/><path class="ar" d="M170 230 L255 170"/>
+<path class="cloudfill" d="M300 150 q-40 -10 -20 -40 q10 -35 50 -25 q15 -35 60 -25 q40 0 40 35 q35 5 25 35 q-5 25 -40 20 z"/>
+<text x="345" y="165" text-anchor="middle" class="sm">Internet</text>
+<path class="ar" d="M420 150 L470 150"/>
+<rect class="hl" x="480" y="60" width="250" height="180" rx="10"/>
+<text x="605" y="95" text-anchor="middle" class="bigT">Centre de données distant</text>
+<text x="605" y="125" text-anchor="middle" class="sm">serveurs · stockage · BDD · logiciels</text>
+<text x="605" y="160" text-anchor="middle" class="sm">géré par AWS, Azure, Google Cloud…</text>
+<text x="605" y="200" text-anchor="middle" class="sm">aucun matériel chez vous</text>
+</svg><figcaption>Figure : vous utilisez les ressources depuis n’importe quel appareil, elles tournent dans des centres de données distants gérés par un fournisseur.</figcaption></figure>
+<div class="grid cols-2">
+<div class="card"><h3>Pourquoi “cloud” ?</h3><p style="margin:0">Dans les schémas informatiques, Internet est dessiné sous forme de nuage : une infrastructure décentralisée et invisible derrière les services.</p></div>
+<div class="card"><h3>Histoire</h3><p style="margin:0">Issu de l’évolution de la virtualisation et des réseaux, popularisé au début des années 2000.</p></div>
+</div></section>
+<!-- 5 -->
+<section class="slide mg" data-title="Caractéristiques clés"><div class="kicker">1.2 · Caractéristiques</div><h2>Caractéristiques clés du cloud</h2>
+<div class="grid cols-3">
+<div class="card"><h3>1. Accès à distance</h3><p style="margin:0 0 8px">Depuis n’importe quel appareil connecté. Favorise le travail collaboratif entre équipes dispersées.</p><div class="ex-box"><b>Exemple</b> consulter ses fichiers ou une application métier depuis un navigateur.</div></div>
+<div class="card"><h3>2. Élasticité</h3><p style="margin:0 0 8px">Augmenter ou réduire la capacité automatiquement et instantanément selon la demande.</p><div class="ex-box"><b>Exemple</b> un site e-commerce qui monte en charge pendant le Black Friday, puis redescend.</div></div>
+<div class="card"><h3>3. Paiement à l’usage</h3><p style="margin:0 0 8px">Modèle “pay-as-you-go” : on paie seulement ce qu’on consomme, sans gros investissement initial.</p><div class="ex-box"><b>Exemple</b> 1 To stocké = on paie 1 To ; si on passe à 2 To, la facture change.</div></div>
 </div>
-
-<h3>Comment ils s'emboîtent</h3>
-
-<div class="nest">
-  <div class="dc"><b>Datacenter</b> &mdash; coûts, politique d'allocation
-    <div class="ho"><b>Host</b> &mdash; 2 cœurs à 1000 MIPS, 8 Go RAM
-      <div class="vm"><b>Vm</b> &mdash; 1 cœur, 1000 MIPS demandés
-        <div class="cl"><b>Cloudlet</b> &mdash; 20 000 MI à exécuter</div>
-        <div class="cl"><b>Cloudlet</b> &mdash; 20 000 MI à exécuter</div>
-      </div>
-      <div class="vm"><b>Vm</b> &mdash; 1 cœur, 1000 MIPS demandés
-        <div class="cl"><b>Cloudlet</b> &mdash; 20 000 MI à exécuter</div>
-      </div>
-    </div>
-  </div>
+<div class="note-box">Ces trois caractéristiques rendent le cloud <b>flexible, économique et adapté aux besoins évolutifs</b>.</div></section>
+<!-- 6 -->
+<section class="slide mg" data-title="Élasticité"><div class="kicker">1.2 · Élasticité</div><h2>Élasticité : suivre la demande</h2>
+<p class="lead">La capacité (courbe bleue) suit la demande (courbe orange) : on paie la ressource quand on en a besoin, pas en permanence.</p>
+<figure class="diag"><svg viewBox="0 0 760 340" class="sv" role="img" aria-label="Élasticité : demande et capacité">
+<line class="axis" x1="70" y1="290" x2="720" y2="290"/><line class="axis" x1="70" y1="290" x2="70" y2="30"/>
+<text x="395" y="325" text-anchor="middle" class="sm">Temps</text>
+<text x="20" y="165" class="sm" transform="rotate(-90 20 165)" text-anchor="middle">Ressources (CPU, RAM, stockage)</text>
+<polyline class="dem" points="70,240 160,235 230,225 300,230 360,120 420,70 480,80 540,200 600,230 720,240"/>
+<polyline class="cap" points="70,250 230,250 230,215 350,215 350,110 440,110 440,95 540,95 540,215 620,215 620,250 720,250"/>
+<rect x="500" y="40" width="14" height="4" style="fill:var(--accent)"/><text x="522" y="48" class="sm">Demande (besoin réel)</text>
+<rect x="500" y="58" width="14" height="4" style="fill:var(--accent2)"/><text x="522" y="66" class="sm">Capacité fournie par le cloud</text>
+<text x="400" y="145" class="sm">pic de trafic (Black Friday)</text>
+<text x="80" y="275" class="sm">creux : on réduit les ressources</text>
+</svg><figcaption>Schéma pédagogique : sans élasticité, il faudrait acheter des serveurs pour le pic et les laisser inutilisés le reste du temps.</figcaption></figure>
+<div class="note-box"><b>Lecture :</b> quand la courbe bleue se superpose à l’orange, les ressources sont bien dimensionnées. Trop haut = coût inutile ; trop bas = service dégradé.</div></section>
+<!-- 7 -->
+<section class="slide mg" data-title="1.3 Architecture"><div class="kicker">1.3 Architecture du cloud</div><h2>1.3 Architecture : front-end et back-end</h2>
+<div class="grid cols-2">
+<div class="card"><h3>Front-end (interface)</h3><p style="margin:0">La partie visible par l’utilisateur final : navigateur, application, interface graphique.</p></div>
+<div class="card"><h3>Back-end (infrastructure)</h3><p style="margin:0">Gère les ressources, les services et les bases de données qui soutiennent les opérations.</p></div>
+</div><figure class="diag"><svg viewBox="0 0 780 400" class="sv" role="img" aria-label="Architecture cloud front-end back-end">
+<rect x="10" y="20" width="200" height="350" rx="10" class="hl" style="fill:var(--panel)"/>
+<text x="110" y="48" text-anchor="middle" class="bigT">FRONT-END</text>
+<text x="110" y="68" text-anchor="middle" class="sm">partie visible</text>
+<rect x="30" y="100" width="160" height="90" rx="8" class="bx"/>
+<text x="110" y="135" text-anchor="middle">Infrastructure client</text>
+<text x="110" y="158" text-anchor="middle" class="sm">interface graphique (GUI)</text>
+<text x="110" y="178" text-anchor="middle" class="sm">Gmail, Google Docs, Asana</text>
+<path class="ar" d="M110 190 L110 230"/>
+<text x="110" y="250" text-anchor="middle" class="sm">navigateur</text>
+<text x="110" y="268" text-anchor="middle" class="sm">via Internet</text>
+<path class="ar" d="M220 200 L290 200" style="stroke:var(--accent)"/>
+<text x="255" y="190" text-anchor="middle" class="sm">Internet</text>
+<rect x="300" y="20" width="470" height="350" rx="10" class="wr" style="fill:var(--panel)"/>
+<text x="535" y="48" text-anchor="middle" class="bigT">BACK-END</text>
+<text x="535" y="68" text-anchor="middle" class="sm">infrastructure qui fait le travail</text>
+<rect x="320" y="90" width="150" height="50" rx="8" class="bx"/><text x="395" y="120" text-anchor="middle">Application</text>
+<rect x="320" y="150" width="150" height="50" rx="8" class="bx"/><text x="395" y="180" text-anchor="middle">Runtime cloud</text>
+<rect x="320" y="210" width="150" height="50" rx="8" class="bx"/><text x="395" y="240" text-anchor="middle">Service</text>
+<rect x="320" y="270" width="150" height="50" rx="8" class="bx"/><text x="395" y="300" text-anchor="middle">Storage</text>
+<rect x="490" y="90" width="130" height="230" rx="8" class="hl" style="fill:var(--panel)"/><text x="555" y="200" text-anchor="middle">Infrastructure</text><text x="555" y="220" text-anchor="middle" class="sm">serveurs, réseaux,</text><text x="555" y="236" text-anchor="middle" class="sm">dispositifs de stockage</text>
+<rect x="640" y="90" width="115" height="110" rx="8" class="bx"/><text x="697" y="140" text-anchor="middle">Management</text><text x="697" y="158" text-anchor="middle" class="sm">coordonne</text>
+<rect x="640" y="210" width="115" height="110" rx="8" class="bx"/><text x="697" y="260" text-anchor="middle">Security</text><text x="697" y="278" text-anchor="middle" class="sm">pare-feu virtuels</text>
+</svg><figcaption>Architecture simplifiée : le front-end envoie les requêtes via Internet, le back-end les traite.</figcaption></figure><div class="note-box">Schéma à retenir : <b>Client → Internet → Back-end</b>. Le client ne voit que l’interface, pas les serveurs derrière.</div></section>
+<!-- 8 -->
+<section class="slide mg" data-title="Composants du back-end"><div class="kicker">1.3 · Composants</div><h2>Composants clés du back-end</h2>
+<table class="rm"><tr><th>Composant</th><th>Rôle</th><th>Exemple concret</th></tr>
+<tr><td><b>Application</b></td><td>Tout logiciel ou plateforme que l’utilisateur veut utiliser ; fournit les services en arrière-plan.</td><td>un site de réservation</td></tr>
+<tr><td><b>Service</b></td><td>Gère toutes les opérations sur la plateforme et organise les services selon les besoins.</td><td>l’orchestrateur qui répartit les tâches</td></tr>
+<tr><td><b>Runtime cloud</b></td><td>Environnement virtuel qui fait tourner plusieurs programmes sur le même serveur (virtualisation). Comparable à un OS dans le cloud.</td><td>plusieurs apps sur une même machine</td></tr>
+<tr><td><b>Storage</b></td><td>Espace évolutif pour stocker et gérer les données, avec accès simultané par plusieurs utilisateurs.</td><td>Amazon S3, Google Drive</td></tr>
+<tr><td><b>Infrastructure</b></td><td>Composants matériels et logiciels : serveurs, réseaux, dispositifs de stockage.</td><td>les data centers</td></tr>
+<tr><td><b>Management</b></td><td>Coordonne les éléments du cloud et garantit un fonctionnement fluide, y compris la sécurité.</td><td>supervision, monitoring</td></tr>
+<tr><td><b>Security</b></td><td>Protège les systèmes grâce à des pare-feu virtuels et d’autres mesures.</td><td>chiffrement, contrôle d’accès</td></tr>
+<tr><td><b>Internet</b></td><td>Le lien entre le front-end et le back-end.</td><td>HTTPS</td></tr>
+</table></section>
+<!-- 9 -->
+<section class="slide mg" data-title="Modèles SaaS, PaaS, IaaS"><div class="kicker">1.2 · Modèles de service</div><h2>Les trois modèles de service</h2>
+<p class="lead">Plus on monte dans la pile, plus le fournisseur gère de choses à votre place.</p><figure class="diag"><svg viewBox="0 0 760 330" class="sv" role="img" aria-label="SaaS PaaS IaaS">
+<rect class="wr" x="60" y="20" width="640" height="80" rx="10" style="fill:var(--panel)"/>
+<text x="90" y="55" class="bigT">SaaS : Software-as-a-Service</text><text x="90" y="80" class="sm">Vous utilisez un logiciel en ligne (navigateur, sans installation)</text>
+<rect class="hl" x="60" y="115" width="640" height="80" rx="10" style="fill:var(--panel)"/>
+<text x="90" y="150" class="bigT">PaaS : Platform-as-a-Service</text><text x="90" y="175" class="sm">Vous développez et déployez vos applications (outils, bibliothèques, runtime prêts)</text>
+<rect class="bx" x="60" y="210" width="640" height="80" rx="10"/>
+<text x="90" y="245" class="bigT">IaaS : Infrastructure-as-a-Service</text><text x="90" y="270" class="sm">Vous louez serveurs, stockage et réseau : “louer des machines au lieu de les acheter”</text>
+</svg><figcaption>Du bas vers le haut : vous gérez de moins en moins de couches techniques.</figcaption></figure>
+<div class="grid cols-3">
+<div class="card"><h3>SaaS</h3><p style="margin:0">Utiliser un logiciel en ligne.<br><b>Ex. :</b> Gmail, Zoom, Google Docs</p></div>
+<div class="card"><h3>PaaS</h3><p style="margin:0">Développer une application sans gérer l’infrastructure.<br><b>Ex. :</b> Heroku, Google App Engine</p></div>
+<div class="card"><h3>IaaS</h3><p style="margin:0">Louer une infrastructure complète pour héberger vos outils.<br><b>Ex. :</b> Amazon EC2</p></div>
+</div></section>
+<!-- 10 -->
+<section class="slide mg" data-title="Qui gère quoi ?"><div class="kicker">1.2 · Responsabilités</div><h2>Qui gère quoi ?</h2>
+<p class="lead">Tableau indicatif et généralisé : <b>✔</b> = géré par le fournisseur, <b>—</b> = à votre charge.</p>
+<div class="scroll"><table class="rm">
+<tr><th>Couche</th><th>Hébergement local</th><th>IaaS</th><th>PaaS</th><th>SaaS</th></tr>
+<tr><td>Application</td><td class="n">Vous</td><td class="n">Vous</td><td class="n">Vous</td><td class="y">Fournisseur</td></tr>
+<tr><td>Données</td><td class="n">Vous</td><td class="n">Vous</td><td class="n">Vous</td><td class="n">Vous (vos contenus)</td></tr>
+<tr><td>Runtime / middleware</td><td class="n">Vous</td><td class="n">Vous</td><td class="y">Fournisseur</td><td class="y">Fournisseur</td></tr>
+<tr><td>Système d’exploitation</td><td class="n">Vous</td><td class="n">Vous</td><td class="y">Fournisseur</td><td class="y">Fournisseur</td></tr>
+<tr><td>Virtualisation</td><td class="n">Vous</td><td class="y">Fournisseur</td><td class="y">Fournisseur</td><td class="y">Fournisseur</td></tr>
+<tr><td>Serveurs, stockage, réseau</td><td class="n">Vous</td><td class="y">Fournisseur</td><td class="y">Fournisseur</td><td class="y">Fournisseur</td></tr>
+</table></div>
+<div class="ex-box"><b>Lecture :</b> avec SaaS, vous n’avez plus qu’à utiliser le logiciel et gérer vos données.</div></section>
+<!-- 11 -->
+<section class="slide mg" data-title="1.4 BDD dans le cloud"><div class="kicker">1.4 Bases de données dans le cloud</div><h2>1.4 Une base de données “dans le cloud”</h2>
+<p class="lead">Une base hébergée sur des serveurs distants (AWS, Azure, Google Cloud), accessible via Internet ou un réseau privé sécurisé.</p><figure class="diag"><svg viewBox="0 0 760 300" class="sv" role="img" aria-label="Accès mondial aux données">
+<rect class="bx" x="20" y="120" width="170" height="60" rx="8"/><text x="105" y="155" text-anchor="middle">Équipe à Alger</text>
+<rect class="bx" x="20" y="210" width="170" height="60" rx="8"/><text x="105" y="245" text-anchor="middle">Équipe à Paris</text>
+<path class="ar" d="M190 150 L300 150"/><path class="ar" d="M190 240 L300 180"/>
+<rect class="hl" x="300" y="90" width="200" height="130" rx="10"/>
+<text x="400" y="122" text-anchor="middle" class="bigT">MongoDB Atlas</text>
+<text x="400" y="150" text-anchor="middle" class="sm">base hébergée chez le fournisseur</text>
+<text x="400" y="172" text-anchor="middle" class="sm">accès via navigateur ou MongoDB Compass</text>
+<path class="ar" d="M500 150 L560 150"/>
+<rect class="bx" x="570" y="110" width="170" height="80" rx="8"/><text x="655" y="145" text-anchor="middle">Navigateur /</text><text x="655" y="165" text-anchor="middle">Compass / appli</text>
+</svg><figcaption>Exemple : des équipes dans deux pays utilisent la même base hébergée sur Atlas.</figcaption></figure>
+<div class="grid cols-2">
+<div class="card"><h3>A/ Accessibilité mondiale</h3><p style="margin:0">Données accessibles de n’importe où avec Internet, travail collaboratif et accès en temps réel.</p></div>
+<div class="card"><h3>Avec MongoDB Atlas</h3><p style="margin:0">Connexion via navigateur ou MongoDB Compass depuis n’importe quel endroit connecté.</p></div>
+</div></section>
+<!-- 12 -->
+<section class="slide mg" data-title="Scalabilité"><div class="kicker">1.4 · Scalabilité</div><h2>Scalabilité : verticale ou horizontale ?</h2><figure class="diag"><svg viewBox="0 0 760 320" class="sv" role="img" aria-label="Scalabilité verticale et horizontale">
+<text x="190" y="30" text-anchor="middle" class="bigT">Verticale (scale up)</text>
+<rect class="hl" x="100" y="120" width="180" height="150" rx="8" style="fill:var(--panel)"/><text x="190" y="205" text-anchor="middle">Un serveur plus puissant</text><text x="190" y="225" text-anchor="middle" class="sm">+ RAM, + CPU</text>
+<text x="190" y="295" text-anchor="middle" class="sm">limité par la machine</text>
+<line class="axis" x1="380" y1="30" x2="380" y2="300"/>
+<text x="570" y="30" text-anchor="middle" class="bigT">Horizontale (scale out)</text>
+<rect class="bx" x="520" y="60" width="90" height="26" rx="5"/><text x="565" y="78" text-anchor="middle" class="sm">Serveur 1</text>
+<rect class="bx" x="520" y="100" width="90" height="26" rx="5"/><text x="565" y="118" text-anchor="middle" class="sm">Serveur 2</text>
+<rect class="bx" x="520" y="140" width="90" height="26" rx="5"/><text x="565" y="158" text-anchor="middle" class="sm">Serveur 3</text>
+<rect class="bx" x="520" y="180" width="90" height="26" rx="5"/><text x="565" y="198" text-anchor="middle" class="sm">Serveur N</text>
+<path class="ar" d="M470 150 L515 73"/><path class="ar" d="M470 150 L515 113"/><path class="ar" d="M470 150 L515 153"/><path class="ar" d="M470 150 L515 193"/>
+<rect class="wr" x="410" y="130" width="55" height="40" rx="6" style="fill:var(--panel)"/><text x="437" y="155" text-anchor="middle" class="sm">répart.</text>
+<text x="565" y="295" text-anchor="middle" class="sm">ajouter des machines : quasi illimité</text>
+</svg><figcaption>Deux manières d’absorber plus de charge.</figcaption></figure>
+<div class="grid cols-2">
+<div class="card"><h3>Horizontale</h3><p style="margin:0">Ajouter de nouveaux serveurs pour répartir la charge et gérer un volume croissant de données. <b>C’est la voie privilégiée du cloud et de NoSQL</b> (sharding).</p></div>
+<div class="card"><h3>Verticale</h3><p style="margin:0">Améliorer les performances d’un serveur existant (mémoire, processeur). Simple, mais limitée par la taille maximale de la machine.</p></div>
+</div></section>
+<!-- 13 -->
+<section class="slide mg" data-title="Coûts et haute disponibilité"><div class="kicker">1.4 · Coûts & disponibilité</div><h2>Réduction des coûts et haute disponibilité</h2>
+<div class="grid cols-2">
+<div class="card"><h3>C/ Réduction des coûts</h3><p style="margin:0 0 8px">Plus besoin d’acheter des serveurs physiques ni d’assurer leur maintenance. Le fournisseur gère infrastructure, mises à jour et réparations.</p><div class="ex-box"><b>Résultat :</b> dépenses d’infrastructure réduites, service performant.</div></div>
+<div class="card"><h3>D/ Haute disponibilité</h3><p style="margin:0 0 8px">Redondance sur plusieurs data centers : en cas de panne d’un serveur, les données restent accessibles ailleurs.</p></div>
+</div><figure class="diag"><svg viewBox="0 0 760 290" class="sv" role="img" aria-label="Haute disponibilité multi-régions">
+<rect class="hl" x="30" y="50" width="200" height="190" rx="10" style="fill:var(--panel)"/><text x="130" y="80" text-anchor="middle" class="bigT">Europe</text>
+<rect class="wr" x="60" y="100" width="140" height="40" rx="6" style="fill:var(--panel)"/><text x="130" y="125" text-anchor="middle" class="sm">Réplica (primaire)</text>
+<rect class="bx" x="60" y="160" width="140" height="40" rx="6"/><text x="130" y="185" text-anchor="middle" class="sm">Réplica secondaire</text>
+<rect class="hl" x="280" y="50" width="200" height="190" rx="10" style="fill:var(--panel)"/><text x="380" y="80" text-anchor="middle" class="bigT">Amérique du Nord</text>
+<rect class="bx" x="310" y="100" width="140" height="40" rx="6"/><text x="380" y="125" text-anchor="middle" class="sm">Réplica</text>
+<rect class="bx" x="310" y="160" width="140" height="40" rx="6"/><text x="380" y="185" text-anchor="middle" class="sm">Réplica</text>
+<rect class="hl" x="530" y="50" width="200" height="190" rx="10" style="fill:var(--panel)"/><text x="630" y="80" text-anchor="middle" class="bigT">Afrique du Nord</text>
+<rect class="bx" x="560" y="100" width="140" height="40" rx="6"/><text x="630" y="125" text-anchor="middle" class="sm">Réplica</text>
+<rect class="bx" x="560" y="160" width="140" height="40" rx="6"/><text x="630" y="185" text-anchor="middle" class="sm">Réplica</text>
+<path class="dash" d="M200 180 L280 180"/><path class="dash" d="M480 180 L530 180"/>
+<text x="380" y="270" text-anchor="middle" class="sm">Si la région Europe tombe en panne, les données restent accessibles depuis les autres régions.</text>
+</svg><figcaption>Schéma : les données sont répliquées dans plusieurs régions. Atlas en est un exemple (Europe et Amérique du Nord dans l’exemple du cours).</figcaption></figure></section>
+<!-- 14 -->
+<section class="slide mg" data-title="Sécurité dans le cloud"><div class="kicker">1.4 · Sécurité</div><h2>E/ Sécurité</h2>
+<p class="lead">Les fournisseurs proposent des solutions avancées pour protéger les données sensibles.</p>
+<div class="grid cols-3">
+<div class="card"><h3>Chiffrement</h3><p style="margin:0">Les données sont chiffrées <b>en transit</b> (réseau) et <b>au repos</b> (disque) : impossible à lire en cas de compromission.</p></div>
+<div class="card"><h3>Authentification forte</h3><p style="margin:0">Authentification multi-facteurs, clés API, identifiants robustes : seuls les utilisateurs autorisés accèdent à la base.</p></div>
+<div class="card"><h3>Règles IP</h3><p style="margin:0">Restreindre l’accès à certaines adresses IP pour bloquer les connexions non autorisées.</p></div>
 </div>
-
-<p>Deux décisions d'ordonnancement se superposent, et c'est la source principale de confusion :
-le <code>VmScheduler</code> partage les cœurs du <i>host</i> entre les <b>VM</b>, puis
-le <code>CloudletScheduler</code> partage la puissance de la VM entre ses <b>tâches</b>.</p>
-
-<h2 id="mips">4 · MI, MIPS et temps d'exécution</h2>
-
-<p>C'est la première chose à faire comprendre, et la plus souvent ratée. Une tâche a une
-<b>longueur</b>, exprimée en <b>MI</b> (millions d'instructions). Un cœur a une <b>vitesse</b>,
-exprimée en <b>MIPS</b> (millions d'instructions par seconde). Le temps d'exécution en découle :</p>
-
-<pre><code>temps (s)  =  longueur de la tâche (MI)  /  puissance allouée (MIPS)</code></pre>
-
-<div class="demo">
-  <h4>Essayez</h4>
-  <p class="hint">Déplacez les curseurs : le temps simulé se recalcule. C'est toute l'arithmétique de CloudSim.</p>
-  <div class="row">
-    <label>Longueur de la tâche — <span class="val" id="v-mi">40 000</span> MI
-      <input type="range" id="r-mi" min="1000" max="200000" step="1000" value="40000"></label>
-    <label>Puissance du cœur — <span class="val" id="v-mips">1 000</span> MIPS
-      <input type="range" id="r-mips" min="250" max="5000" step="250" value="1000"></label>
-  </div>
-  <div class="out">temps d'exécution = <b id="v-t">40</b> secondes simulées</div>
-  <p class="hint" id="v-note" style="margin-top:10px"></p>
+<div class="note-box"><b>Sauvegardes régulières</b> : elles évitent la perte de données, même si tout le reste échoue.</div></section>
+<!-- 15 -->
+<section class="slide mg" data-title="1.5 SGBD parallèles"><div class="kicker">1.5 Étude comparative · définitions</div><h2>1.5 SGBD parallèles et systèmes clouds</h2>
+<div class="grid cols-2">
+<div class="card"><h3>SGBD parallèles</h3><p style="margin:0">Plusieurs processeurs ou machines exécutent les tâches <b>en parallèle</b> pour traiter de très grandes quantités de données. Architecture souvent MPP (Massively Parallel Processing).</p></div>
+<div class="card"><h3>Systèmes clouds</h3><p style="margin:0">Environnements virtuels qui fournissent stockage et puissance de calcul via Internet. Exemples : MongoDB Atlas, Amazon DynamoDB.</p></div>
+</div><figure class="diag"><svg viewBox="0 0 760 300" class="sv" role="img" aria-label="Architecture MPP">
+<rect class="bx" x="20" y="120" width="130" height="60" rx="8"/><text x="85" y="155" text-anchor="middle">Requête</text>
+<path class="ar" d="M150 150 L200 150"/>
+<rect class="hl" x="205" y="30" width="530" height="240" rx="10" style="fill:var(--panel)"/>
+<text x="470" y="58" text-anchor="middle" class="sm">Plusieurs serveurs / processeurs travaillent en même temps (MPP)</text>
+<rect class="wr" x="230" y="90" width="110" height="150" rx="8" style="fill:var(--panel)"/><text x="285" y="120" text-anchor="middle" class="sm">Nœud 1</text><text x="285" y="150" text-anchor="middle" class="sm">CPU + disque</text><text x="285" y="180" text-anchor="middle" class="sm">1/4 des données</text>
+<rect class="wr" x="360" y="90" width="110" height="150" rx="8" style="fill:var(--panel)"/><text x="415" y="120" text-anchor="middle" class="sm">Nœud 2</text><text x="415" y="150" text-anchor="middle" class="sm">CPU + disque</text><text x="415" y="180" text-anchor="middle" class="sm">1/4 des données</text>
+<rect class="wr" x="490" y="90" width="110" height="150" rx="8" style="fill:var(--panel)"/><text x="545" y="120" text-anchor="middle" class="sm">Nœud 3</text><text x="545" y="150" text-anchor="middle" class="sm">CPU + disque</text><text x="545" y="180" text-anchor="middle" class="sm">1/4 des données</text>
+<rect class="wr" x="620" y="90" width="100" height="150" rx="8" style="fill:var(--panel)"/><text x="670" y="120" text-anchor="middle" class="sm">Nœud 4</text><text x="670" y="150" text-anchor="middle" class="sm">CPU + disque</text><text x="670" y="180" text-anchor="middle" class="sm">1/4 des données</text>
+</svg><figcaption>Principe MPP : la requête est découpée, chaque nœud traite sa part des données, puis les résultats sont rassemblés.</figcaption></figure>
+<div class="ex-box"><b>Exemples cités :</b> Teradata (fondé en 1979, entrepôts de données, MPP) et Greenplum (base parallèle open source basée sur PostgreSQL, pour le Big Data).</div></section>
+<!-- 16 -->
+<section class="slide mg" data-title="Comparaison parallèles vs cloud"><div class="kicker">1.5 Comparaison</div><h2>Comparaison selon plusieurs critères</h2>
+<div class="scroll"><table class="rm">
+<tr><th>Critère</th><th>SGBD parallèles</th><th>Systèmes cloud</th></tr>
+<tr><td><b>Architecture</b></td><td>Infrastructures internes à l’entreprise</td><td>Serveurs virtuels hébergés par des tiers</td></tr>
+<tr><td><b>Évolutivité</b></td><td>Limitée par le matériel interne (ajout complexe)</td><td>Scalabilité horizontale facile (ajout de serveurs à la demande)</td></tr>
+<tr><td><b>Coût</b></td><td>Investissement initial élevé (serveurs)</td><td>Paiement à l’usage, modèle flexible</td></tr>
+<tr><td><b>Accessibilité</b></td><td>Locale ou via des réseaux privés</td><td>Mondiale via Internet</td></tr>
+<tr><td><b>Maintenance</b></td><td>Interne, par une équipe spécialisée</td><td>Par le fournisseur cloud</td></tr>
+<tr><td><b>Sécurité</b></td><td>Contrôlée directement par l’entreprise</td><td>Dépend des mécanismes du fournisseur</td></tr>
+<tr><td><b>Disponibilité</b></td><td>Dépend des ressources internes et de la redondance locale</td><td>Élevée grâce à la redondance multi-régions</td></tr>
+</table></div></section>
+<!-- 17 -->
+<section class="slide mg" data-title="Cas d’utilisation et conclusion"><div class="kicker">1.5 Cas d’utilisation · Conclusion</div><h2>Quand utiliser quoi ?</h2>
+<div class="grid cols-2">
+<div class="card"><h3>SGBD parallèles</h3><p style="margin:0">Environnements où les performances locales sont cruciales : centres de données de banques, analyses scientifiques.</p></div>
+<div class="card"><h3>Systèmes cloud</h3><p style="margin:0">Applications à collaboration mondiale : SaaS (Zoom, Google Workspace), e-commerce (Amazon, eBay, Etsy, AliExpress).</p></div>
 </div>
-
-<div class="warn"><b>Le piège classique.</b> Un étudiant écrit une tâche de 400 000 MI sur un cœur à
-1000 MIPS : la simulation couvre 400 secondes de temps <i>simulé</i>. Elle s'exécute pourtant en
-quelques millisecondes de temps réel, puisque rien n'est réellement calculé. L'étudiant croit
-souvent que le programme a planté. Rappelez que l'horloge de CloudSim est <b>virtuelle</b> : elle
-n'avance que d'événement en événement.</div>
-
-<h2 id="sched">5 · Time-shared ou space-shared</h2>
-
-<p>Deux politiques, un seul paramètre à changer dans le code &mdash; et des résultats complètement
-différents. C'est la plus belle expérience du TP.</p>
-
-<p><b>Space-shared</b> : une tâche occupe le cœur jusqu'à la fin ; les suivantes attendent leur tour.
-C'est une file d'attente. <b>Time-shared</b> : toutes les tâches avancent en même temps, en se
-partageant la puissance. Chacune va donc moins vite.</p>
-
-<div class="demo">
-  <h4>Deux tâches de 10 000 MI sur une VM à 1 000 MIPS</h4>
-  <p class="hint">Même charge, même machine. Seule la politique change.</p>
-  <div class="seg">
-    <button type="button" id="b-ss" class="on">space-shared</button>
-    <button type="button" id="b-ts">time-shared</button>
-  </div>
-  <div class="tl" id="tl"></div>
-  <div class="out" id="sched-out"></div>
+<div class="note-box"><b>Conclusion :</b> SGBD parallèles et cloud ne sont pas concurrents mais <b>complémentaires</b>. Une solution <b>hybride</b> combine les deux, en profitant des points forts de chacun : performance et contrôle local, flexibilité et accessibilité du cloud.</div></section>
+<!-- 1.6 -->
+<section class="slide mg" data-title="1.6 Virtualisation"><div class="kicker">1.6 Virtualisation</div><h2>1.6 La virtualisation : plusieurs machines dans une seule</h2>
+<p class="lead">Le cloud repose sur la virtualisation : un serveur physique (l’<b>hôte</b>) est découpé en plusieurs <b>machines virtuelles</b> (VM) isolées, louées à des clients différents.</p>
+<figure class="diag"><svg viewBox="0 0 760 270" class="sv" role="img" aria-label="Hyperviseurs de type 1 et de type 2">
+<text x="185" y="20" text-anchor="middle" class="bigT">Type 1 (bare-metal)</text>
+<rect class="bx" x="25" y="35" width="100" height="62" rx="7"/><text x="75" y="62" text-anchor="middle">App</text><text x="75" y="82" text-anchor="middle" class="sm">OS invité</text>
+<rect class="bx" x="135" y="35" width="100" height="62" rx="7"/><text x="185" y="62" text-anchor="middle">App</text><text x="185" y="82" text-anchor="middle" class="sm">OS invité</text>
+<rect class="bx" x="245" y="35" width="100" height="62" rx="7"/><text x="295" y="62" text-anchor="middle">App</text><text x="295" y="82" text-anchor="middle" class="sm">OS invité</text>
+<rect class="wr" x="25" y="107" width="320" height="42" rx="7"/><text x="185" y="133" text-anchor="middle" class="tag">Hyperviseur</text>
+<rect class="hl" x="25" y="159" width="320" height="42" rx="7"/><text x="185" y="185" text-anchor="middle">Matériel (hôte physique)</text>
+<text x="185" y="228" text-anchor="middle" class="sm">KVM, Xen, Hyper-V, ESXi : utilisé dans le cloud</text>
+<line class="axis" x1="380" y1="10" x2="380" y2="250"/>
+<text x="575" y="20" text-anchor="middle" class="bigT">Type 2 (hébergé)</text>
+<rect class="bx" x="415" y="35" width="100" height="62" rx="7"/><text x="465" y="62" text-anchor="middle">App</text><text x="465" y="82" text-anchor="middle" class="sm">OS invité</text>
+<rect class="bx" x="525" y="35" width="100" height="62" rx="7"/><text x="575" y="62" text-anchor="middle">App</text><text x="575" y="82" text-anchor="middle" class="sm">OS invité</text>
+<rect class="bx" x="635" y="35" width="100" height="62" rx="7"/><text x="685" y="70" text-anchor="middle" class="sm">App de l’hôte</text>
+<rect class="wr" x="415" y="107" width="210" height="42" rx="7"/><text x="520" y="133" text-anchor="middle" class="tag">Hyperviseur</text>
+<rect class="bx" x="415" y="159" width="320" height="38" rx="7"/><text x="575" y="183" text-anchor="middle">OS de l’hôte (Windows, Linux)</text>
+<rect class="hl" x="415" y="205" width="320" height="38" rx="7"/><text x="575" y="229" text-anchor="middle">Matériel</text>
+<text x="575" y="262" text-anchor="middle" class="sm">VirtualBox, VMware Workstation : sur un PC</text>
+</svg><figcaption>Le type 1 s’installe directement sur le matériel : plus rapide et mieux isolé, c’est celui des fournisseurs cloud.</figcaption></figure>
+<div class="grid cols-3">
+<div class="card"><h3>Hyperviseur</h3><p style="margin:0">Logiciel qui partage le processeur, la mémoire et le disque de l’hôte entre les VM.</p></div>
+<div class="card"><h3>vCPU</h3><p style="margin:0">Processeur virtuel vu par la VM. Une instance <b>small</b> du simulateur a 2 vCPU et 4 Go de mémoire.</p></div>
+<div class="card"><h3>Isolation</h3><p style="margin:0">Chaque VM a son propre système : une panne ou une attaque dans une VM n’atteint pas les voisines.</p></div>
+</div></section>
+<!-- VM ou conteneur -->
+<section class="slide mg" data-title="VM ou conteneur ?"><div class="kicker">1.6 · Conteneurs</div><h2>Machine virtuelle ou conteneur ?</h2>
+<p class="lead">Un conteneur (Docker, Kubernetes) partage le noyau du système de l’hôte : il est plus léger et démarre beaucoup plus vite qu’une VM.</p>
+<div class="scroll"><table class="rm">
+<tr><th>Critère</th><th>Machine virtuelle</th><th>Conteneur</th></tr>
+<tr><td><b>Démarrage</b></td><td>de quelques dizaines de secondes à quelques minutes</td><td>moins d’une seconde à quelques secondes</td></tr>
+<tr><td><b>Isolation</b></td><td>forte (système complet séparé)</td><td>plus faible (noyau partagé)</td></tr>
+<tr><td><b>Taille</b></td><td>plusieurs Go</td><td>quelques dizaines de Mo</td></tr>
+<tr><td><b>Nombre par hôte</b></td><td>des dizaines</td><td>des centaines</td></tr>
+<tr><td><b>Dans le simulateur</b></td><td>« Machine virtuelle » : démarrage en 60 s</td><td>« Conteneur » : démarrage en 5 s</td></tr>
+</table></div>
+<div class="demo"><h4>DÉMO · la course au démarrage</h4><div class="hint">Accéléré 10 fois. Pendant un pic de trafic, une nouvelle instance n’aide qu’une fois démarrée.</div>
+<div class="btnrow"><button class="btn" id="bootGo" type="button">Démarrer les deux</button></div>
+<div class="queue">
+<div class="qline"><span class="lbl">VM</span><div class="track"><div class="fill" id="bootVm"></div></div><span class="time" id="bootVmT">–</span></div>
+<div class="qline"><span class="lbl">Conteneur</span><div class="track"><div class="fill" id="bootCt" style="background:var(--accent)"></div></div><span class="time" id="bootCtT">–</span></div>
 </div>
+<div class="status" id="bootSt"></div></div></section>
+<!-- 1.7 -->
+<section class="slide mg" data-title="1.7 Le centre de données"><div class="kicker">1.7 Le centre de données</div><h2>1.7 Régions, zones de disponibilité et hôtes</h2>
+<figure class="diag"><svg viewBox="0 0 760 290" class="sv" role="img" aria-label="Une région avec trois zones de disponibilité">
+<rect class="dash" x="6" y="6" width="748" height="278" rx="14"/>
+<text x="24" y="32" class="bigT">Région (par exemple Europe de l’Ouest)</text>
+<g>
+<rect class="hl" x="24" y="46" width="226" height="196" rx="10"/><text x="40" y="72" class="tag" style="fill:var(--accent2)">Zone A</text>
+<rect class="bx" x="40" y="86" width="92" height="62" rx="6"/><text x="86" y="114" text-anchor="middle">A1</text><text x="86" y="134" text-anchor="middle" class="sm">16 cœurs</text>
+<rect class="bx" x="142" y="86" width="92" height="62" rx="6"/><text x="188" y="114" text-anchor="middle">A2</text><text x="188" y="134" text-anchor="middle" class="sm">16 cœurs</text>
+<rect class="bx" x="40" y="160" width="92" height="62" rx="6"/><text x="86" y="188" text-anchor="middle">A3</text><text x="86" y="208" text-anchor="middle" class="sm">16 cœurs</text>
+<rect class="bx" x="142" y="160" width="92" height="62" rx="6"/><text x="188" y="188" text-anchor="middle">A4</text><text x="188" y="208" text-anchor="middle" class="sm">16 cœurs</text>
+</g>
+<g>
+<rect class="hl" x="267" y="46" width="226" height="196" rx="10"/><text x="283" y="72" class="tag" style="fill:var(--accent2)">Zone B</text>
+<rect class="bx" x="283" y="86" width="92" height="62" rx="6"/><text x="329" y="114" text-anchor="middle">B1</text><text x="329" y="134" text-anchor="middle" class="sm">16 cœurs</text>
+<rect class="bx" x="385" y="86" width="92" height="62" rx="6"/><text x="431" y="114" text-anchor="middle">B2</text><text x="431" y="134" text-anchor="middle" class="sm">16 cœurs</text>
+<rect class="bx" x="283" y="160" width="92" height="62" rx="6"/><text x="329" y="188" text-anchor="middle">B3</text><text x="329" y="208" text-anchor="middle" class="sm">16 cœurs</text>
+<rect class="bx" x="385" y="160" width="92" height="62" rx="6"/><text x="431" y="188" text-anchor="middle">B4</text><text x="431" y="208" text-anchor="middle" class="sm">16 cœurs</text>
+</g>
+<g>
+<rect class="hl" x="510" y="46" width="226" height="196" rx="10"/><text x="526" y="72" class="tag" style="fill:var(--accent2)">Zone C</text>
+<rect class="bx" x="526" y="86" width="92" height="62" rx="6"/><text x="572" y="114" text-anchor="middle">C1</text><text x="572" y="134" text-anchor="middle" class="sm">16 cœurs</text>
+<rect class="bx" x="628" y="86" width="92" height="62" rx="6"/><text x="674" y="114" text-anchor="middle">C2</text><text x="674" y="134" text-anchor="middle" class="sm">16 cœurs</text>
+<rect class="bx" x="526" y="160" width="92" height="62" rx="6"/><text x="572" y="188" text-anchor="middle">C3</text><text x="572" y="208" text-anchor="middle" class="sm">16 cœurs</text>
+<rect class="bx" x="628" y="160" width="92" height="62" rx="6"/><text x="674" y="188" text-anchor="middle">C4</text><text x="674" y="208" text-anchor="middle" class="sm">16 cœurs</text>
+</g>
+<text x="380" y="270" text-anchor="middle" class="sm">Les zones sont reliées par un réseau privé rapide, mais ont chacune leur alimentation et leur refroidissement.</text>
+</svg><figcaption>C’est exactement le centre de données du simulateur : 3 zones de 4 hôtes de 16 cœurs et 64 Go.</figcaption></figure>
+<div class="grid cols-3">
+<div class="card"><h3>Région</h3><p style="margin:0">Zone géographique. On la choisit proche des utilisateurs (latence) et selon la loi qui s’applique aux données.</p></div>
+<div class="card"><h3>Zone de disponibilité</h3><p style="margin:0">Un ou plusieurs bâtiments indépendants. Une coupure électrique dans une zone ne touche pas les autres.</p></div>
+<div class="card"><h3>Hôte</h3><p style="margin:0">Serveur physique qui exécute plusieurs instances. S’il tombe en panne, toutes ses instances tombent avec lui.</p></div>
+</div></section>
+<!-- Placement -->
+<section class="slide mg" data-title="Placement des instances"><div class="kicker">1.7 · Placement</div><h2>Sur quel hôte placer une nouvelle instance ?</h2>
+<div class="grid cols-2">
+<div class="card"><h3>Regrouper (consolider)</h3><p style="margin:0"><b>First Fit</b> : le premier hôte qui a de la place. <b>Best Fit</b> : l’hôte le plus rempli qui a encore de la place. Moins d’hôtes allumés, donc moins d’énergie.</p></div>
+<div class="card"><h3>Étaler</h3><p style="margin:0"><b>Worst Fit</b> : l’hôte le plus libre. <b>Équilibrage par zones</b> : la zone qui a le moins d’instances. Une panne touche peu d’instances, mais plus d’hôtes sont allumés.</p></div>
+</div>
+<div class="demo"><h4>DÉMO · placement sur 4 hôtes de 16 vCPU (2 zones)</h4><div class="hint">Ajoutez des instances, changez de politique, puis simulez la panne de l’hôte A1.</div>
+<div class="btnrow"><div class="switch" id="plPol"><button class="on" data-p="firstfit" type="button">First Fit</button><button data-p="bestfit" type="button">Best Fit</button><button data-p="worstfit" type="button">Worst Fit</button><button data-p="spread" type="button">Par zones</button></div></div>
+<div class="btnrow"><button class="btn ghost" data-add="2" type="button">+ small (2 vCPU)</button><button class="btn ghost" data-add="4" type="button">+ medium (4)</button><button class="btn ghost" data-add="8" type="button">+ large (8)</button><button class="btn ghost" id="plClear" type="button">Vider</button><button class="btn" id="plFail" type="button">Panne de A1</button></div>
+<div class="hosts" id="plHosts"></div>
+<div class="kpis2" id="plKpi"></div>
+<div class="status" id="plSt"></div></div>
+<div class="note-box"><b>Surallocation</b> : placer plus de vCPU que de cœurs physiques (paramètre « Surallocation CPU » du simulateur). Rentable si les instances ne sont pas toutes chargées en même temps. Sinon, elles se ralentissent mutuellement : c’est le « voisin bruyant ».</div></section>
+<!-- 1.8 -->
+<section class="slide mg" data-title="1.8 Capacité et latence"><div class="kicker">1.8 Performance</div><h2>1.8 Capacité, utilisation et latence</h2>
+<p class="lead">Dans le simulateur, une requête demande <b>50 ms</b> de calcul : un vCPU traite donc au plus <b>20 requêtes par seconde</b>.</p>
+<div class="grid cols-2">
+<div class="scroll"><table class="rm">
+<tr><th>Type</th><th>vCPU</th><th>Mémoire</th><th>Prix</th><th>Capacité</th></tr>
+<tr><td><b>small</b></td><td>2</td><td>4 Go</td><td>0,10 $/h</td><td>40 req/s</td></tr>
+<tr><td><b>medium</b></td><td>4</td><td>8 Go</td><td>0,20 $/h</td><td>80 req/s</td></tr>
+<tr><td><b>large</b></td><td>8</td><td>16 Go</td><td>0,40 $/h</td><td>160 req/s</td></tr>
+</table></div>
+<div class="fml">Utilisation : ρ = λ / capacité<br><span>λ = requêtes reçues par seconde</span><br>Instance small : P(attente) = 2ρ² / (1 + ρ)<br>Attente = P(attente) / (40 − λ)<br>Latence = 20 ms + 50 ms + attente<br><span>réseau + calcul + file d’attente</span></div>
+</div>
+<div class="note-box">La latence <b>explose</b> quand ρ approche 1 : on garde de la marge (50 à 70 % d’utilisation). Le TP mesure aussi le <b>p95</b>, la latence sous laquelle passent 95 % des requêtes : avec une small, il dépasse l’objectif de 300 ms dès ρ ≈ 0,6 (≈ 24 req/s). À utilisation égale, une large (8 vCPU) attend moins que 4 small : c’est la <b>mutualisation</b> (TP, exercice 2).</div></section>
+<!-- Démo latence -->
+<section class="slide mg" data-title="Démo : latence d’une instance"><div class="kicker">1.8 · Démonstration</div><h2>Une instance small qui se remplit</h2>
+<div class="demo"><h4>DÉMO · déplacez le curseur : la latence moyenne suit la formule du TP</h4>
+<div class="slider-row"><span style="font-size:13px;color:var(--ink-dim)">Requêtes reçues λ</span><input type="range" id="qL" min="0" max="39" step="1" value="20" aria-label="Débit reçu"><span class="val" id="qLv">20 req/s</span></div>
+<figure class="diag" style="margin:6px 0"><svg viewBox="0 0 720 250" class="sv" id="qSvg" role="img" aria-label="Latence moyenne en fonction du débit"></svg></figure>
+<div class="kpis2" id="qKpi"></div></div></section>
+<!-- Répartition de charge -->
+<section class="slide mg" data-title="Répartition de charge"><div class="kicker">1.8 · Répartiteur de charge</div><h2>Répartir les requêtes entre les instances</h2>
+<p class="lead">Le <b>répartiteur de charge</b> (<i>load balancer</i>) reçoit toutes les requêtes et choisit une instance pour chacune.</p>
+<div class="scroll"><table class="rm">
+<tr><th>Algorithme (nom dans le simulateur)</th><th>Principe</th><th>Point faible</th></tr>
+<tr><td><b>Tourniquet</b> (Round Robin)</td><td>chaque instance à son tour</td><td>ignore la taille des instances</td></tr>
+<tr><td><b>Tourniquet pondéré</b></td><td>proportionnel au nombre de vCPU</td><td>il faut connaître les poids</td></tr>
+<tr><td><b>Moins de connexions</b></td><td>vers l’instance la moins occupée</td><td>attire le trafic vers une instance morte (« trou noir »)</td></tr>
+<tr><td><b>Aléatoire</b></td><td>tirage au hasard</td><td>ignore la taille, déséquilibres ponctuels</td></tr>
+</table></div>
+<div class="demo"><h4>DÉMO · flotte hétérogène : 2 small + 1 large (TP, exercice 3)</h4>
+<div class="ctrls"><div class="switch" id="lbAlg"><button class="on" data-a="rr" type="button">Tourniquet</button><button data-a="wrr" type="button">Tourniquet pondéré</button></div>
+<span>Trafic</span><input type="range" id="lbL" min="60" max="240" step="10" value="170" style="width:200px" aria-label="Trafic total"><b id="lbLv" style="color:var(--accent2);font-family:var(--mono)">170 req/s</b></div>
+<div id="lbRows"></div>
+<div class="status" id="lbSt"></div></div>
+<div class="note-box"><b>Contrôles de santé</b> : le répartiteur teste les instances régulièrement. Une instance en panne n’est retirée qu’après sa <b>détection</b> (30 s dans le simulateur). Pendant ce temps, les requêtes qui lui sont envoyées échouent.</div></section>
+<!-- 1.9 -->
+<section class="slide mg" data-title="1.9 Auto-scaling"><div class="kicker">1.9 Élasticité et auto-scaling</div><h2>1.9 L’auto-scaling : une boucle automatique</h2>
+<p class="lead">L’élasticité vue au 1.2 est réalisée par un <b>groupe d’auto-scaling</b> : il mesure la charge, décide du nombre d’instances, puis en lance ou en arrête.</p>
+<figure class="diag"><svg viewBox="0 0 760 150" class="sv" role="img" aria-label="Boucle mesurer, décider, agir">
+<rect class="hl" x="30" y="40" width="190" height="66" rx="10"/><text x="125" y="68" text-anchor="middle" class="tag">1. Mesurer</text><text x="125" y="90" text-anchor="middle" class="sm">CPU moyen, requêtes/s</text>
+<path class="ar" d="M220 73 L282 73"/>
+<rect class="wr" x="285" y="40" width="190" height="66" rx="10"/><text x="380" y="68" text-anchor="middle" class="tag">2. Décider</text><text x="380" y="90" text-anchor="middle" class="sm">seuils ou cible</text>
+<path class="ar" d="M475 73 L537 73"/>
+<rect class="hl" x="540" y="40" width="190" height="66" rx="10"/><text x="635" y="68" text-anchor="middle" class="tag">3. Agir</text><text x="635" y="90" text-anchor="middle" class="sm">lancer ou arrêter</text>
+<path class="dash" d="M635 106 Q635 140 380 140 Q125 140 125 108"/>
+<text x="380" y="134" text-anchor="middle" class="sm">puis on recommence, toutes les 10 s</text>
+</svg></figure>
+<div class="grid cols-2">
+<div class="card"><h3>Politique par seuils</h3><p style="margin:0">CPU moyen &gt; 70 % → ajouter 2 instances ; CPU &lt; 30 % → en retirer 1. Simple et prévisible.</p></div>
+<div class="card"><h3>Suivi de cible</h3><p style="margin:0">Garder une métrique proche d’une cible : CPU à 60 %, ou 25 requêtes par seconde et par instance. Le groupe calcule lui-même le nombre d’instances.</p></div>
+</div></section>
+<!-- Paramètres et pièges -->
+<section class="slide mg" data-title="Paramètres et pièges de l’auto-scaling"><div class="kicker">1.9 · Paramètres</div><h2>Les réglages de l’auto-scaling, et leurs pièges</h2>
+<div class="scroll"><table class="rm">
+<tr><th>Paramètre du simulateur</th><th>Rôle</th><th>Valeur de l’exercice 4</th></tr>
+<tr><td><b>Instances min / max</b></td><td>bornes du groupe</td><td>3 / 24</td></tr>
+<tr><td><b>Période d’évaluation</b> et <b>fenêtre de mesure</b></td><td>fréquence de décision, durée de la moyenne</td><td>10 s, 60 s</td></tr>
+<tr><td><b>Instances ajoutées par action</b></td><td>taille de chaque ajout</td><td>2</td></tr>
+<tr><td><b>Refroidissement</b></td><td>temps minimal entre deux actions</td><td>120 s</td></tr>
+<tr><td><b>Temps de démarrage</b></td><td>délai avant qu’une instance serve</td><td>60 s (VM) ou 5 s (conteneur)</td></tr>
+</table></div>
+<div class="grid cols-3">
+<div class="card"><h3>1. Le retard</h3><p style="margin:0">Mesurer, attendre le refroidissement, démarrer : la capacité arrive après le pic. Entre-temps, des requêtes sont perdues.</p></div>
+<div class="card"><h3>2. Les oscillations</h3><p style="margin:0">Ajouter, retirer, ajouter… On l’évite avec des seuils bien écartés (70 % / 30 %) et un refroidissement.</p></div>
+<div class="card"><h3>3. Le CPU plafonne</h3><p style="margin:0">À 100 %, le CPU ne dit plus de combien on est surchargé. Compter les requêtes reçues par instance donne la vraie demande.</p></div>
+</div></section>
+<!-- Pic -->
+<section class="slide mg" data-title="Auto-scaling face à un pic"><div class="kicker">1.9 · Réagir à un pic</div><h2>Auto-scaling face à un pic de trafic</h2>
+<div class="demo" style="margin-top:0"><h4>DÉMO · 100 req/s, puis 500 req/s de 10 à 25 min (comme l’exercice 4)</h4><div class="hint">Modèle simplifié : instances small, seuils 70 % / 30 %, 3 instances au départ. Le simulateur du TP est plus détaillé.</div>
+<div class="ctrls">
+<label>Démarrage <select id="asBoot"><option value="60">VM (60 s)</option><option value="5">Conteneur (5 s)</option></select></label>
+<label>Ajout par action <select id="asStep"><option value="2">+2</option><option value="4">+4</option></select></label>
+<label>Refroidissement <select id="asCool"><option value="120">120 s</option><option value="30">30 s</option></select></label>
+<label>Politique <select id="asPol"><option value="auto">Seuils 70 % / 30 %</option><option value="fixed">Sans auto-scaling : 18 instances fixes</option></select></label>
+</div>
+<figure class="diag" style="margin:6px 0"><svg viewBox="0 0 720 265" class="sv" id="asSvg" role="img" aria-label="Demande et capacité pendant le pic"></svg></figure>
+<div class="kpis2" id="asKpi"></div></div></section>
+<!-- 1.10 -->
+<section class="slide mg" data-title="1.10 Disponibilité"><div class="kicker">1.10 Disponibilité et pannes</div><h2>1.10 Mesurer la disponibilité</h2>
+<div class="grid cols-2">
+<div>
+<div class="fml">Disponibilité = MTBF / (MTBF + MTTR)<br><span>MTBF : durée moyenne entre deux pannes</span><br><span>MTTR : durée moyenne de réparation</span><br>En série : A = A₁ × A₂<br>En parallèle : A = 1 − (1 − A₁)(1 − A₂)</div>
+<div class="scroll"><table class="rm">
+<tr><th>Disponibilité</th><th>Arrêt par an</th><th>Arrêt par mois</th></tr>
+<tr><td>99 %</td><td>3,65 jours</td><td>7,3 h</td></tr>
+<tr><td>99,9 %</td><td>8,76 h</td><td>43,8 min</td></tr>
+<tr><td>99,99 %</td><td>52,6 min</td><td>4,4 min</td></tr>
+</table></div>
+</div>
+<div class="demo" style="margin-top:0"><h4>DÉMO · répartiteur puis n instances en parallèle</h4>
+<div class="ctrls"><label>Une instance <select id="avA"><option value="0.99">99 %</option><option value="0.995" selected>99,5 %</option><option value="0.999">99,9 %</option></select></label></div>
+<div class="slider-row"><span style="font-size:13px;color:var(--ink-dim)">Instances n</span><input type="range" id="avN" min="1" max="6" value="2" aria-label="Nombre d’instances"><span class="val" id="avNv">2</span></div>
+<div class="kpis2" id="avKpi"></div>
+<div class="status" id="avSt"></div></div>
+</div>
+<div class="note-box">Ajouter des instances en parallèle augmente vite la disponibilité. Mais le répartiteur, qui est <b>en série</b>, limite le total : un système n’est jamais plus disponible que son maillon le plus faible.</div></section>
+<!-- Pannes -->
+<section class="slide mg" data-title="Pannes, zones et SLA"><div class="kicker">1.10 · Concevoir pour la panne</div><h2>Pannes, zones et engagements de service</h2>
+<div class="grid cols-2">
+<div class="card"><h3>Durée d’une panne (MTTR)</h3><p style="margin:0 0 8px">Dans le simulateur : 30 s pour <b>détecter</b> la panne + 60 s pour <b>démarrer</b> une remplaçante = <b>90 s</b>.</p><div class="ex-box"><b>1 seule instance</b> : tout le trafic est perdu pendant 90 s. <b>4 instances</b> : un quart du trafic est perdu pendant 30 s, puis les 3 autres absorbent la charge.</div></div>
+<div class="card"><h3>Rayon d’impact</h3><p style="margin:0 0 8px">Si toutes les instances sont sur le même hôte (First Fit), une panne de cet hôte arrête presque tout. Réparties sur 3 zones, une panne de zone n’en arrête qu’un tiers.</p><div class="ex-box"><b>Règle</b> : pour supporter la perte d’une zone sur 3, prévoir 1,5 fois la capacité nécessaire.</div></div>
+</div>
+<div class="grid cols-3">
+<div class="card"><h3>SLI : indicateur</h3><p style="margin:0">Ce qu’on mesure : part de requêtes réussies, latence p95.</p></div>
+<div class="card"><h3>SLO : objectif</h3><p style="margin:0">La cible : 99,9 % de réussite et p95 ≤ 300 ms (valeurs du simulateur).</p></div>
+<div class="card"><h3>SLA : contrat</h3><p style="margin:0">L’engagement envers le client, avec des pénalités si on ne le respecte pas.</p></div>
+</div>
+<div class="note-box"><b>Budget d’erreur</b> = 1 − SLO. Avec 99,9 % sur 1 million de requêtes, on a droit à 1 000 échecs. Le simulateur affiche la part de ce budget déjà consommée.</div></section>
+<!-- 1.11 Coûts -->
+<section class="slide mg" data-title="1.11 Coûts"><div class="kicker">1.11 Coûts</div><h2>1.11 Trois façons de payer la même instance</h2>
+<div class="scroll"><table class="rm">
+<tr><th>Modèle</th><th>Prix (dans le simulateur)</th><th>Engagement ou risque</th><th>Pour quoi ?</th></tr>
+<tr><td><b>À la demande</b></td><td>prix plein, facturé à la seconde</td><td>aucun</td><td>les pics, l’imprévu</td></tr>
+<tr><td><b>Réservé</b></td><td>−40 %</td><td>payé en permanence, même inutilisé (1 ou 3 ans)</td><td>la charge de base, toujours présente</td></tr>
+<tr><td><b>Spot</b></td><td>−70 %</td><td>peut être repris par le fournisseur (préavis de 2 min)</td><td>les tâches qui supportent une interruption</td></tr>
+</table></div>
+<div class="demo"><h4>DÉMO · coût mensuel d’une instance small (0,10 $/h, 730 h par mois)</h4>
+<div class="slider-row"><span style="font-size:13px;color:var(--ink-dim)">Elle tourne</span><input type="range" id="coU" min="0" max="100" value="50" aria-label="Taux d’utilisation"><span class="val" id="coUv">50 % du temps</span></div>
+<div id="coRows"></div>
+<div class="status" id="coSt"></div></div>
+<div class="note-box"><b>Règle</b> : réserver la base (ce qui tourne tout le temps), payer les pics à la demande, utiliser le Spot pour ce qui peut être interrompu. C’est ce que vous chercherez dans l’exercice 6 du TP.</div></section>
+<!-- Énergie -->
+<section class="slide mg" data-title="Énergie"><div class="kicker">1.11 · Énergie</div><h2>L’énergie d’un centre de données</h2>
+<div class="grid cols-2">
+<div>
+<div class="fml">PUE = énergie totale du site / énergie des serveurs<br><span>moyenne du secteur ≈ 1,5 ; meilleurs centres ≈ 1,1</span><br>Puissance d’un hôte = 150 W + 150 W × charge<br><span>hôte vide mis en veille : 10 W (modèle du simulateur)</span></div>
+<ul class="tight"><li>Un serveur allumé mais inactif consomme déjà environ la <b>moitié</b> de sa puissance maximale.</li><li>Regrouper les instances sur peu d’hôtes et mettre les autres en veille économise beaucoup d’énergie.</li></ul>
+</div>
+<figure class="diag" style="margin-top:0"><svg viewBox="0 0 420 260" class="sv" role="img" aria-label="Puissance en fonction de la charge">
+<line class="axis" x1="50" y1="220" x2="400" y2="220"/><line class="axis" x1="50" y1="220" x2="50" y2="20"/>
+<text x="400" y="244" text-anchor="end" class="sm">charge CPU</text><text x="56" y="28" class="sm">puissance (W)</text>
+<line x1="50" y1="120" x2="390" y2="40" class="dem"/>
+<line x1="50" y1="220" x2="390" y2="40" class="cap" style="stroke-dasharray:7 5"/>
+<text x="44" y="124" text-anchor="end" class="sm">150</text><text x="44" y="44" text-anchor="end" class="sm">300</text>
+<text x="210" y="70" class="sm" style="fill:var(--accent)">serveur réel</text>
+<text x="240" y="150" class="sm" style="fill:var(--accent2)">idéal proportionnel</text>
+</svg></figure>
+</div>
+<div class="ex-box"><b>TP, exercice 7</b> : 10 instances small à 150 req/s consomment ≈ 2,4 kWh par heure si elles sont étalées sur 10 hôtes, et ≈ 0,7 kWh si elles sont regroupées sur 2 hôtes. En contrepartie, la panne d’un hôte touche alors 8 instances.</div></section>
+<!-- 1.12 -->
+<section class="slide mg" data-title="1.12 Le simulateur et le TP"><div class="kicker">1.12 Mise en pratique</div><h2>1.12 Retrouver le cours dans le simulateur</h2>
+<p class="lead">Le TP se fait avec le simulateur. Chaque notion du chapitre y correspond à un réglage ou à une mesure.</p>
+<div class="scroll"><table class="rm">
+<tr><th>Notion du cours</th><th>Dans le simulateur</th><th>TP</th></tr>
+<tr><td>Capacité, utilisation, latence, p95</td><td>Trafic, Coût CPU d’une requête ; courbes Latence et CPU</td><td>Exo 1</td></tr>
+<tr><td>Scalabilité verticale ou horizontale, mutualisation</td><td>Type d’instance du groupe, Instances au départ</td><td>Exo 2</td></tr>
+<tr><td>Répartition de charge, contrôles de santé</td><td>Répartiteur de charge : algorithme, détection d’une panne</td><td>Exo 3</td></tr>
+<tr><td>Élasticité, auto-scaling, VM ou conteneur</td><td>Auto-scaling (politique, seuils, refroidissement), Unité de déploiement</td><td>Exo 4</td></tr>
+<tr><td>Pannes, zones, MTTR</td><td>Clic sur une instance ou un hôte, bouton Panne de zone, Placement</td><td>Exo 5</td></tr>
+<tr><td>À la demande, réservé, Spot</td><td>Tarification : instances réservées, extension en Spot</td><td>Exo 6</td></tr>
+<tr><td>Placement, surallocation, énergie</td><td>Placement des instances, Surallocation CPU, indicateur Énergie</td><td>Exo 7</td></tr>
+</table></div>
+<div class="btnrow" style="margin-top:14px"><a class="btn" href="simulateur.html" target="_blank">Ouvrir le simulateur</a><a class="btn ghost" href="tp.html" target="_blank">Énoncé du TP</a></div>
+<div class="note-box">Conseil : ouvrez le simulateur et l’énoncé côte à côte, et utilisez le bouton <b>Bilan pour le compte rendu</b> pour relever vos résultats.</div></section>
+<!-- 18 -->
+<section class="slide mg" data-title="Auto-évaluation"><div class="kicker">Révision</div><h2>Auto-évaluation</h2>
+<details><summary>1. Quelle est la différence entre front-end et back-end ?</summary><p>Le front-end est la partie visible par l’utilisateur (interface). Le back-end gère les ressources, services et bases de données.</p></details>
+<details><summary>2. Que signifie l’élasticité ?</summary><p>La capacité d’augmenter ou de réduire automatiquement les ressources selon la demande.</p></details>
+<details><summary>3. Quelle est la différence entre scalabilité horizontale et verticale ?</summary><p>Horizontale : ajouter des serveurs. Verticale : rendre un serveur plus puissant.</p></details>
+<details><summary>4. Dans quel modèle le fournisseur gère-t-il aussi l’OS et le runtime, mais pas votre application ?</summary><p>PaaS : vous développez et déployez, le fournisseur gère la plateforme.</p></details>
+<details><summary>5. Citez deux mesures de sécurité d’une base dans le cloud.</summary><p>Chiffrement (en transit et au repos), authentification multi-facteurs, règles IP, sauvegardes.</p></details>
+<details><summary>6. Pourquoi un conteneur absorbe-t-il mieux un pic soudain qu’une machine virtuelle ?</summary><p>Il démarre en quelques secondes (5 s dans le simulateur) au lieu d’environ une minute pour une VM : la nouvelle capacité arrive plus vite.</p></details>
+<details><summary>7. Une instance small (capacité 40 req/s) reçoit 30 req/s. Quelle est son utilisation, et que devient sa latence ?</summary><p>ρ = 30 / 40 = 0,75. P(attente) = 2 × 0,75² / 1,75 ≈ 0,64 ; attente ≈ 0,64 / (40 − 30) = 64 ms ; latence ≈ 20 + 50 + 64 ≈ 134 ms. Plus ρ approche 1, plus l’attente explose.</p></details>
+<details><summary>8. Avec 2 small + 1 large et 170 req/s, pourquoi le tourniquet échoue-t-il alors que le tourniquet pondéré réussit ?</summary><p>Le tourniquet donne 56,7 req/s à chacune : les small (40 req/s au maximum) saturent. Le pondéré (2 : 2 : 8 selon les vCPU) donne 28,3 / 28,3 / 113,3 req/s : chacune est à 71 %.</p></details>
+<details><summary>9. Dans le TP, combien de temps dure l’interruption d’une instance en panne avant qu’une remplaçante soit prête ?</summary><p>MTTR = 30 s de détection + 60 s de démarrage de la nouvelle VM = 90 s.</p></details>
+<details><summary>10. À partir de quel taux d’utilisation une instance réservée (−40 %) devient-elle rentable ?</summary><p>Quand l’instance tourne plus de 60 % du temps : 0,06 $/h payés en permanence contre 0,10 $/h seulement quand elle tourne.</p></details></section>
+<!-- Quiz -->
+<section class="slide mg" data-title="Quiz (1/2)"><div class="kicker">Révision · 1.6 à 1.11</div><h2>Quiz interactif (1/2)</h2>
+<div class="scorebox"><span>Score : <b class="qzScore">0</b> / <span class="qzTotal">0</span></span><button class="btn ghost qzReset" type="button">Recommencer</button></div>
+<div id="qzList" class="qz-list"></div></section>
+<section class="slide mg" data-title="Quiz (2/2)"><div class="kicker">Révision · 1.6 à 1.11</div><h2>Quiz interactif (2/2)</h2>
+<div class="scorebox"><span>Score : <b class="qzScore">0</b> / <span class="qzTotal">0</span></span><button class="btn ghost qzReset" type="button">Recommencer</button></div>
+<div id="qzList2" class="qz-list"></div></section>
+<!-- 19 -->
+<section class="slide mg" data-title="Ce qu’il faut retenir"><div class="kicker">Fin</div><h2>Ce qu’il faut retenir</h2>
+<div class="grid cols-2">
+<div class="card"><h3>Cloud</h3><p style="margin:0">Ressources via Internet, élastiques, paiement à l’usage, accessibles partout.</p></div>
+<div class="card"><h3>Services</h3><p style="margin:0">SaaS = utiliser · PaaS = développer · IaaS = louer l’infrastructure.</p></div>
+<div class="card"><h3>BDD cloud</h3><p style="margin:0">Scalabilité horizontale, haute disponibilité par réplication, chiffrement et contrôle d’accès.</p></div>
+<div class="card"><h3>Comparaison</h3><p style="margin:0">Parallèle = performance locale et contrôle ; cloud = flexibilité et accessibilité ; souvent les deux (hybride).</p></div>
+<div class="card"><h3>Virtualisation et centre de données</h3><p style="margin:0">Un hôte physique porte plusieurs VM ou conteneurs. Région → zones → hôtes. Consolider économise l’énergie ; étaler entre zones protège des pannes.</p></div>
+<div class="card"><h3>Performance</h3><p style="margin:0">Capacité = vCPU × 20 req/s. La latence explose quand l’utilisation approche 100 % : on garde de la marge. Le répartiteur doit tenir compte de la capacité de chaque instance.</p></div>
+<div class="card"><h3>Élasticité</h3><p style="margin:0">L’auto-scaling réagit avec retard : fenêtre de mesure, refroidissement, pas d’ajout et temps de démarrage déterminent les erreurs pendant un pic.</p></div>
+<div class="card"><h3>Disponibilité, coûts, énergie</h3><p style="margin:0">MTTR = détection + démarrage. Réserver la base, payer les pics à la demande, Spot pour l’interruptible. PUE et consolidation pour l’énergie.</p></div>
+</div></section>
 
-<div class="note"><b>La leçon.</b> Le <i>makespan</i> &mdash; la date de fin de la dernière tâche &mdash;
-est <b>identique</b> dans les deux cas : 20 secondes. Mais le <b>temps de réponse moyen</b> ne l'est
-pas : 15 s en space-shared, 20 s en time-shared. Conclusion à faire formuler par les étudiants :
-<b>le choix d'une métrique décide du vainqueur</b>. Un article qui ne compare que le makespan cache
-la moitié du problème.</div>
-
-<h2 id="placement">6 · Le placement des VM</h2>
-
-<p>Le <code>VmAllocationPolicy</code> répond à une question : <i>sur quel serveur physique poser cette
-VM ?</i> C'est un problème de <b>bin packing</b>, NP-difficile, que l'on traite par heuristiques.</p>
-
-<table>
-<tr><th style="width:22%">Politique</th><th style="width:40%">Règle</th><th>Conséquence</th></tr>
-<tr><td><b>First-fit</b></td><td>Le premier host qui a la place</td><td>Rapide, résultat moyen</td></tr>
-<tr><td><b>Best-fit</b></td><td>L'host dont la capacité restante est la plus <b>faible</b></td>
-    <td>Tasse les VM : moins de serveurs allumés, donc moins d'énergie, mais risque de saturation</td></tr>
-<tr><td><b>Worst-fit</b></td><td>L'host dont la capacité restante est la plus <b>grande</b></td>
-    <td>Étale la charge : performance plus stable, mais tous les serveurs restent allumés</td></tr>
-</table>
-
-<p>L'opposition best-fit / worst-fit résume tout le compromis du cloud : <b>consolider pour
-économiser de l'énergie</b>, ou <b>étaler pour garantir la performance</b>. Un serveur allumé mais
-inactif consomme déjà environ 60 % de sa puissance maximale : éteindre un serveur vaut mieux que de
-l'alléger. C'est ce qui justifie la consolidation et la migration à chaud.</p>
-
-<h2 id="mesures">7 · Ce que l'on mesure</h2>
-
-<table>
-<tr><th style="width:26%">Métrique</th><th>Définition</th><th style="width:26%">Ce qu'elle révèle</th></tr>
-<tr><td><b>Makespan</b></td><td>Date de fin de la dernière tâche</td><td>Débit global</td></tr>
-<tr><td><b>Temps de réponse moyen</b></td><td>Moyenne des durées par tâche</td><td>Qualité perçue par l'utilisateur</td></tr>
-<tr><td><b>Temps d'attente</b></td><td>Entre soumission et début d'exécution</td><td>Saturation</td></tr>
-<tr><td><b>Taux d'utilisation</b></td><td>Part de la capacité réellement employée</td><td>Gaspillage</td></tr>
-<tr><td><b>Nombre d'hosts actifs</b></td><td>Serveurs allumés</td><td>Qualité de la consolidation</td></tr>
-<tr><td><b>Énergie (kWh)</b></td><td>Intégrale de la puissance sur la durée</td><td>Coût écologique et financier</td></tr>
-<tr><td><b>Violations de SLA</b></td><td>Tâches servies en deçà de ce qui était promis</td><td>Limite de la consolidation</td></tr>
-<tr><td><b>Coût</b></td><td>Facturation : temps, mémoire, stockage, transfert</td><td>Le point de vue du client</td></tr>
-</table>
-
-<h2 id="code">8 · Une simulation complète</h2>
-
-<p>Le squelette minimal. L'ordre des étapes n'est pas permutable : rien n'existe avant
-<code>CloudSim.init</code>, et rien ne se passe avant <code>startSimulation</code>.</p>
-
-<pre><code>// 1. initialiser le noyau de simulation
-CloudSim.init(1, Calendar.getInstance(), false);
-
-// 2. l'infrastructure physique
-List&lt;Pe&gt; pes = new ArrayList&lt;&gt;();
-pes.add(new Pe(0, new PeProvisionerSimple(1000)));   // un cœur à 1000 MIPS
-pes.add(new Pe(1, new PeProvisionerSimple(1000)));
-
-Host host = new Host(0,
-    new RamProvisionerSimple(8192), new BwProvisionerSimple(10000),
-    1_000_000, pes, new VmSchedulerTimeShared(pes));
-
-Datacenter dc = createDatacenter("DC_1", List.of(host));
-
-// 3. le client
-DatacenterBroker broker = new DatacenterBroker("Broker");
-
-// 4. les machines virtuelles
-Vm vm = new Vm(0, broker.getId(), 1000, 1, 2048, 1000, 10000,
-               "Xen", new CloudletSchedulerSpaceShared());
-broker.submitVmList(List.of(vm));
-
-// 5. les tâches
-UtilizationModel full = new UtilizationModelFull();
-Cloudlet c = new Cloudlet(0, 40000, 1, 300, 300, full, full, full);  // 40 000 MI
-c.setUserId(broker.getId());
-broker.submitCloudletList(List.of(c));
-
-// 6. exécuter, puis lire les résultats
-CloudSim.startSimulation();
-CloudSim.stopSimulation();
-printResults(broker.getCloudletReceivedList());</code></pre>
-
-<p>La sortie est un tableau : identifiant de la tâche, statut, VM, durée, date de début, date de fin.
-<b>Tout le TP consiste à faire varier un paramètre et à expliquer la variation de ce tableau.</b></p>
-
-<h2 id="tp">9 · Le TP, séance par séance</h2>
-
-<table>
-<tr><th style="width:10%">Séance</th><th style="width:34%">Sujet</th><th>Ce que l'étudiant produit</th></tr>
-<tr><td><b>TP 1</b></td><td>Première simulation</td>
-    <td>Un datacenter, un host, une VM, une tâche. Il modifie les MIPS et vérifie que le temps varie
-    comme la formule le prédit. Objectif : savoir lire le tableau de sortie.</td></tr>
-<tr><td><b>TP 2</b></td><td>Passer à l'échelle, et comparer les ordonnanceurs</td>
-    <td>4 VM, 20 tâches. Même charge en space-shared puis en time-shared. Tableau comparatif :
-    makespan, temps moyen, temps d'attente. Il explique l'écart.</td></tr>
-<tr><td><b>TP 3</b></td><td>Écrire sa politique de placement</td>
-    <td>Il hérite de <code>VmAllocationPolicySimple</code> et implémente best-fit puis worst-fit.
-    Mesure : nombre d'hosts allumés et taux d'utilisation.</td></tr>
-<tr><td><b>TP 4</b></td><td>Écrire son ordonnanceur</td>
-    <td>Il étend le broker : round-robin, puis Min-Min. Comparaison des makespans sur la même charge.</td></tr>
-<tr><td><b>TP 5</b></td><td>Mini-projet</td>
-    <td>Deux algorithmes, une charge réaliste, un rapport : tableau de mesures, graphiques, conclusion
-    argumentée.</td></tr>
-</table>
-
-<h3>Les charges de travail</h3>
-<p>Trois niveaux de réalisme, à introduire progressivement : des tâches <b>synthétiques</b> que
-l'étudiant écrit lui-même (TP 1 et 2) ; les traces <b>PlanetLab</b> livrées avec les exemples de
-CloudSim, qui donnent des profils d'utilisation CPU réels (TP 3 et 4) ; et le <b>Parallel Workloads
-Archive</b> au format SWF, lu par <code>WorkloadFileReader</code>, pour le mini-projet.</p>
-
-<h2 id="install">10 · Installation et pièges</h2>
-
-<p>JDK 17 LTS, Maven, et IntelliJ IDEA Community. La dépendance tient en six lignes :</p>
-
-<pre><code>&lt;dependency&gt;
-  &lt;groupId&gt;org.cloudsimplus&lt;/groupId&gt;
-  &lt;artifactId&gt;cloudsim&lt;/artifactId&gt;
-  &lt;version&gt;7.0.1&lt;/version&gt;
-&lt;/dependency&gt;</code></pre>
-
-<div class="warn"><b>Le piège organisationnel.</b> Si trente étudiants téléchargent les dépendances
-Maven en même temps sur le réseau de la faculté, la séance est perdue. Faites installer <b>avant</b>
-la séance, ou préparez un dossier <code>.m2</code> pré-rempli sur clé USB.</div>
-
-<h3>Les erreurs que vous verrez</h3>
-<ul>
-<li><b>« Il ne se passe rien. »</b> L'étudiant a oublié <code>CloudSim.startSimulation()</code>, ou
-soumis les tâches après l'avoir appelé.</li>
-<li><b>Une tâche reste à l'état <code>FAILED</code>.</b> Aucune VM ne satisfait sa demande : RAM ou
-nombre de cœurs insuffisants. Faire afficher la liste des VM créées, qui est souvent plus courte que
-la liste demandée.</li>
-<li><b>Les résultats changent à chaque exécution.</b> Un <code>UtilizationModelStochastic</code> sans
-graine fixée. Toute comparaison d'algorithmes devient alors invalide &mdash; insistez sur ce point,
-c'est une faute de méthode scientifique, pas une faute de programmation.</li>
-<li><b><code>bindCloudletToVm</code> utilisé partout.</b> Cela force le mapping et désactive le broker :
-l'étudiant croit tester son algorithme alors qu'il a court-circuité l'algorithme.</li>
-</ul>
-
-<h2 id="eval">11 · Évaluation</h2>
-
-<p>Le risque de ce TP est l'étudiant qui exécute l'exemple fourni et rend la sortie console. Trois
-exigences l'évitent :</p>
-
-<ol>
-<li><b>Un tableau de mesures</b> : au moins deux configurations comparées sur les mêmes métriques.</li>
-<li><b>Un graphique</b> : la variation d'une métrique en fonction du paramètre modifié.</li>
-<li><b>Une phrase qui explique <i>pourquoi</i></b> l'algorithme A bat l'algorithme B sur cette charge
-&mdash; et dans quel cas il perdrait.</li>
-</ol>
-
-<div class="ok">C'est le même principe que le barème d'IHM : <b>on note le raisonnement, pas
-l'exécution</b>. Un code qui tourne sans analyse vaut moins qu'une analyse juste sur un code imparfait.</div>
-
-<h2 id="refs">12 · Références</h2>
-<ul>
-<li>CloudSim, dépôt officiel — <a href="https://github.com/Cloudslab/cloudsim">github.com/Cloudslab/cloudsim</a></li>
-<li>CloudSim 7G: An Integrated Toolkit for Modeling and Simulation of Future Generation Cloud Computing Environments — <a href="https://arxiv.org/abs/2408.13386">arXiv:2408.13386</a></li>
-<li>CloudSim Plus — <a href="https://cloudsimplus.org/">cloudsimplus.org</a></li>
-<li>Page du projet, CLOUDS Lab, Université de Melbourne — <a href="https://clouds.cis.unimelb.edu.au/cloudsim">clouds.cis.unimelb.edu.au/cloudsim</a></li>
-<li>Calheiros, Ranjan, Beloglazov, De Rose, Buyya, <i>CloudSim: a toolkit for modeling and simulation of
-cloud computing environments and evaluation of resource provisioning algorithms</i>,
-Software: Practice and Experience, 41(1), 2011.</li>
-</ul>
-
-<div class="foot">BDD NoSQL et Cloud Computing &middot; M2 ASD &middot; Université d'Alger 1 &mdash;
-Benyoucef Benkhedda &middot; 2026/2027</div>
-
+</div>
+<div class="num" id="num">1 / 19</div>
+<div class="topbtns">
+  <button class="iconbtn" id="projToggle" title="Vue vidéoprojecteur / vue normale (touche P)">🖥</button>
+  <button class="iconbtn" id="fsToggle" title="Plein écran (touche F)">⛶</button>
+  <button class="iconbtn" id="themeToggle" title="Mode clair / sombre">☀</button>
+  <button class="iconbtn" id="menuToggle" title="Aller à une section">☰</button>
+</div>
+<div class="blackout" id="blackout" title="Écran noir : touche B ou clic pour revenir"></div>
+<div class="nav">
+  <button id="prev" aria-label="Précédent">‹</button>
+  <button id="next" aria-label="Suivant">›</button>
+</div>
+<div class="menu-overlay" id="menuOverlay">
+  <div class="menu-panel"><h4>NAVIGATION</h4><div id="menuList"></div></div>
 </div>
 
 <script>
+const slides = document.querySelectorAll('.slide');
+const titles = Array.from(slides, s => s.dataset.title);   // le menu suit automatiquement les diapositives
+let i = 0;
+const store = { get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} } };
+
+/* Chaque diapositive reçoit un conteneur .fit, que l'on peut réduire s'il déborde de l'écran */
+slides.forEach(s => { const w = document.createElement('div'); w.className = 'fit'; while(s.firstChild) w.appendChild(s.firstChild); s.appendChild(w); });
+
+/* ---- Vue vidéoprojecteur : scène 16:9 de 1600 × 900 mise à l'échelle de l'écran ---- */
+function scaleStage(){ document.documentElement.style.setProperty('--ps', Math.min(innerWidth/1600, innerHeight/900)); }
+function fitSlide(s){
+  const w = s.querySelector('.fit'); if(!w) return;
+  w.style.zoom = ''; s.classList.remove('scroll-fallback');
+  if(!document.body.classList.contains('proj')) return;
+  let z = 1;
+  for(let k = 0; k < 6; k++){
+    const over = s.scrollHeight / s.clientHeight;
+    if(over <= 1.002) return;
+    z = Math.max(0.6, z / over * 0.995); w.style.zoom = z;
+    if(z === 0.6) break;
+  }
+  if(s.scrollHeight > s.clientHeight + 2) s.classList.add('scroll-fallback');   // dernier recours : défilement
+}
+const refit = () => requestAnimationFrame(() => fitSlide(slides[i]));
+function setProj(on){
+  document.body.classList.toggle('proj', on);
+  store.set('cloud-proj', on ? '1' : '0');
+  scaleStage(); refit();
+}
+
+function show(n){
+  slides[i].classList.remove('active');
+  i = (n + slides.length) % slides.length;
+  slides[i].classList.add('active');
+  slides[i].scrollTop = 0;
+  document.getElementById('num').textContent = (i+1) + ' / ' + slides.length;
+  document.getElementById('progress').style.width = (((i+1)/slides.length)*100) + '%';
+  renderMenu(); fitSlide(slides[i]);
+}
+document.getElementById('next').onclick = () => show(i+1);
+document.getElementById('prev').onclick = () => show(i-1);
+const blackout = document.getElementById('blackout');
+blackout.onclick = () => blackout.classList.remove('on');
+function toggleFs(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); else document.exitFullscreen(); }
+window.addEventListener('keydown', (e) => {
+  if(document.getElementById('menuOverlay').classList.contains('open')){ if(e.key === 'Escape') closeMenu(); return; }
+  if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+  const k = e.key;
+  if(blackout.classList.contains('on')){ blackout.classList.remove('on'); e.preventDefault(); return; }
+  if(['ArrowRight','ArrowDown','PageDown',' '].includes(k)){ e.preventDefault(); show(i+1); }       // télécommandes de présentation : PageDown / PageUp
+  else if(['ArrowLeft','ArrowUp','PageUp'].includes(k)){ e.preventDefault(); show(i-1); }
+  else if(k === 'Home') show(0);
+  else if(k === 'End') show(slides.length - 1);
+  else if(k === 'b' || k === 'B' || k === '.') blackout.classList.add('on');                     // bouton « écran noir » des télécommandes
+  else if(k === 'f' || k === 'F') toggleFs();
+  else if(k === 'p' || k === 'P') setProj(!document.body.classList.contains('proj'));
+  else if(k === 'Escape') closeMenu();
+});
+document.getElementById('fsToggle').onclick = toggleFs;
+document.getElementById('projToggle').onclick = () => setProj(!document.body.classList.contains('proj'));
+window.addEventListener('resize', () => { scaleStage(); refit(); });
+/* le contenu d'une démo ou d'une réponse dépliée peut grandir : on réajuste */
+['click','input','change'].forEach(t => document.getElementById('deck').addEventListener(t, refit));
+document.getElementById('deck').addEventListener('toggle', refit, true);
+let touchX = null;
+window.addEventListener('touchstart', e => touchX = e.touches[0].clientX);
+window.addEventListener('touchend', e => {
+  if(touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if(dx < -40) show(i+1);
+  if(dx > 40) show(i-1);
+  touchX = null;
+});
+const themeBtn = document.getElementById('themeToggle');
+/* Par défaut : vue vidéoprojecteur et thème clair (plus lisible dans une salle éclairée) */
+const savedProj = store.get('cloud-proj'), savedTheme = store.get('cloud-theme');
+let light = savedTheme ? savedTheme === 'light' : true;
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
+  themeBtn.textContent = light ? '☾' : '☀';
+}
+themeBtn.onclick = () => { light = !light; store.set('cloud-theme', light ? 'light' : 'dark'); applyTheme(); refit(); };
+applyTheme();
+setProj(savedProj === null ? true : savedProj === '1');
+const menuOverlay = document.getElementById('menuOverlay');
+const menuList = document.getElementById('menuList');
+function renderMenu(){
+  menuList.innerHTML = '';
+  titles.forEach((t, idx) => {
+    const item = document.createElement('div');
+    item.className = 'menu-item' + (idx === i ? ' current' : '');
+    item.innerHTML = '<span class="mi-n">' + (idx+1) + '</span><span>' + t + '</span>';
+    item.onclick = () => { show(idx); closeMenu(); };
+    menuList.appendChild(item);
+  });
+}
+function closeMenu(){ menuOverlay.classList.remove('open'); }
+document.getElementById('menuToggle').onclick = () => { renderMenu(); menuOverlay.classList.add('open'); };
+menuOverlay.addEventListener('click', (e) => { if(e.target === menuOverlay) closeMenu(); });
+renderMenu();
+document.getElementById('progress').style.width = (100/slides.length) + '%';
+document.getElementById('num').textContent = '1 / ' + slides.length;
+window.addEventListener('load', refit);
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
+</script>
+<script>
+/* ===== Démos des sections 1.6 à 1.12 (mêmes valeurs que le simulateur du TP) ===== */
 (function(){
-  var r=document.documentElement, b=document.getElementById('th');
-  b.onclick=function(){ r.setAttribute('data-theme', r.getAttribute('data-theme')==='dark'?'light':'dark'); };
+const $ = id => document.getElementById(id);
+const fr = (x, d = 0) => x.toLocaleString('fr-FR', {minimumFractionDigits: d, maximumFractionDigits: d});
 
-  /* --- MI / MIPS --- */
-  var mi=document.getElementById('r-mi'), mips=document.getElementById('r-mips'),
-      vmi=document.getElementById('v-mi'), vmips=document.getElementById('v-mips'),
-      vt=document.getElementById('v-t'), note=document.getElementById('v-note');
-  var fmt=function(n){ return n.toLocaleString('fr-FR').replace(/ | /g,' '); };
-  function calc(){
-    var L=+mi.value, S=+mips.value, t=L/S;
-    vmi.textContent=fmt(L); vmips.textContent=fmt(S);
-    vt.textContent = t>=10 ? Math.round(t) : Math.round(t*10)/10;
-    note.textContent = t>120
-      ? 'Plus de deux minutes simulées : correct, mais pensez que le temps réel d’exécution, lui, reste de quelques millisecondes.'
-      : (t<1 ? 'Moins d’une seconde : la tâche est trop courte pour que les écarts entre algorithmes soient visibles.'
-             : 'Bon ordre de grandeur pour un TP.');
+/* --- 1.6 Démarrage VM / conteneur (accéléré ×10) --- */
+let bootRaf = null;
+$('bootGo').onclick = () => {
+  cancelAnimationFrame(bootRaf);
+  const t0 = performance.now();
+  $('bootSt').textContent = '';
+  const step = now => {
+    const t = (now - t0) / 1000 * 10;
+    $('bootVm').style.width = Math.min(100, t / 60 * 100) + '%';
+    $('bootCt').style.width = Math.min(100, t / 5 * 100) + '%';
+    $('bootVmT').textContent = t >= 60 ? 'prête' : fr(t) + ' s';
+    $('bootCtT').textContent = t >= 5 ? 'prêt' : fr(t) + ' s';
+    if(t >= 5 && t < 60) $('bootSt').innerHTML = 'Le conteneur sert déjà des requêtes ; la VM démarre encore.';
+    if(t < 60) bootRaf = requestAnimationFrame(step);
+    else $('bootSt').innerHTML = 'Pendant un pic, chaque VM ajoutée n’aide qu’au bout d’<b>une minute</b>, un conteneur au bout de <b>5 secondes</b>.';
+  };
+  bootRaf = requestAnimationFrame(step);
+};
+
+/* --- 1.7 Placement (mêmes règles que le simulateur) --- */
+const HOSTS = [{id:'A1', z:'A'}, {id:'A2', z:'A'}, {id:'B1', z:'B'}, {id:'B2', z:'B'}];
+const PL = {vms:[2,2,2,2,2,2], pol:'firstfit', fail:false};
+const VMCOL = {2:'var(--accent2)', 4:'var(--accent)', 8:'var(--good)'}, VMNAME = {2:'small', 4:'medium', 8:'large'};
+function plPlace(){
+  const used = HOSTS.map(() => 0), cnt = {A:0, B:0}, where = [];
+  for(const v of PL.vms){
+    const cs = HOSTS.map((h,i) => ({i, fc:16 - used[i] - v})).filter(c => c.fc >= 0);
+    if(!cs.length){ where.push(-1); continue; }
+    let c;
+    if(PL.pol === 'firstfit') c = cs[0];
+    else if(PL.pol === 'bestfit') c = cs.reduce((a,b) => b.fc < a.fc ? b : a);
+    else if(PL.pol === 'worstfit') c = cs.reduce((a,b) => b.fc > a.fc ? b : a);
+    else c = cs.reduce((a,b) => { const ka = cnt[HOSTS[a.i].z], kb = cnt[HOSTS[b.i].z]; return (kb < ka || (kb === ka && b.fc > a.fc)) ? b : a; });
+    used[c.i] += v; cnt[HOSTS[c.i].z]++; where.push(c.i);
   }
-  mi.oninput=mips.oninput=calc; calc();
+  return {used, where};
+}
+function plRender(){
+  const {used, where} = plPlace();
+  $('plHosts').innerHTML = HOSTS.map((h,i) => {
+    const vms = PL.vms.map((v,k) => ({v,k})).filter(o => where[o.k] === i);
+    const down = PL.fail && i === 0;
+    return `<div class="hostbox${used[i] ? '' : ' off'}${down ? ' down' : ''}"><h5><span>${h.id} · zone ${h.z}</span><span>${used[i]}/16</span></h5><div class="vms">` +
+      vms.map(o => `<div class="vm" style="width:${o.v*9+12}px;background:${down ? 'var(--bad)' : VMCOL[o.v]}" title="${VMNAME[o.v]}">${o.k+1}</div>`).join('') + '</div></div>';
+  }).join('');
+  const on = used.filter(u => u > 0).length, placed = where.filter(w => w >= 0).length, onA1 = where.filter(w => w === 0).length, rej = where.length - placed;
+  $('plKpi').innerHTML = `<div><b>${on}</b>hôtes allumés</div><div><b>${fr(on*150*1.5)} W</b>au minimum (150 W à vide × PUE 1,5)</div>` +
+    `<div><b class="${PL.fail && onA1 ? 'badv' : ''}">${onA1} / ${placed}</b>instances sur A1</div>`;
+  $('plSt').innerHTML = (rej ? `<span style="color:var(--bad)">${rej} instance(s) refusée(s) : capacité insuffisante.</span> ` : '') +
+    (PL.fail ? (onA1 ? `Panne de A1 : <b>${onA1}</b> instance(s) perdue(s) sur ${placed}, soit ${fr(onA1/placed*100)} % de la capacité.` : 'Panne de A1 : aucune instance perdue.') : '');
+}
+$('plPol').querySelectorAll('button').forEach(b => b.onclick = () => {
+  PL.pol = b.dataset.p; $('plPol').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); plRender();
+});
+document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => { if(PL.vms.length < 24) PL.vms.push(+b.dataset.add); plRender(); });
+$('plClear').onclick = () => { PL.vms = []; PL.fail = false; $('plFail').textContent = 'Panne de A1'; plRender(); };
+$('plFail').onclick = () => { PL.fail = !PL.fail; $('plFail').textContent = PL.fail ? 'Réparer A1' : 'Panne de A1'; plRender(); };
+plRender();
 
-  /* --- space-shared vs time-shared --- */
-  var tl=document.getElementById('tl'), out=document.getElementById('sched-out'),
-      bss=document.getElementById('b-ss'), bts=document.getElementById('b-ts'), mode='ss';
-  var TOTAL=20, COL=['#0a83ab','#b96e0a'];
-  function draw(){
-    var runs = mode==='ss'
-      ? [[{s:0,e:10,l:'T1'}],[{s:10,e:20,l:'T2'}]]
-      : [[{s:0,e:20,l:'T1 (500 MIPS)'}],[{s:0,e:20,l:'T2 (500 MIPS)'}]];
-    var html='';
-    runs.forEach(function(lane,i){
-      html+='<div class="lane"><span class="nm">T'+(i+1)+'</span><div class="bar">';
-      lane.forEach(function(s){
-        html+='<span class="seg2" style="left:'+(s.s/TOTAL*100)+'%;width:'+((s.e-s.s)/TOTAL*100)+
-              '%;background:'+COL[i]+'">'+s.l+'</span>';
-      });
-      html+='</div></div>';
+/* --- 1.8 Latence d’une instance small (M/M/2, μ = 20 req/s par vCPU) --- */
+const latSmall = l => { const r = l / 40, C = 2*r*r / (1 + r), wq = C / (40 - l) * 1000; return {r, C, wq, T: 70 + wq}; };
+function qRender(){
+  const l = +$('qL').value, o = latSmall(l), X = v => 60 + v / 40 * 630, Y = v => 200 - Math.min(v, 600) / 600 * 180;
+  let h = '<line class="axis" x1="60" y1="200" x2="700" y2="200"/><line class="axis" x1="60" y1="200" x2="60" y2="15"/>';
+  for(const v of [0, 200, 400, 600]) h += `<text x="52" y="${Y(v)+4}" text-anchor="end" class="sm">${v}</text>`;
+  for(const v of [0, 10, 20, 30, 40]) h += `<text x="${X(v)}" y="220" text-anchor="middle" class="sm">${v}</text>`;
+  h += `<text x="380" y="242" text-anchor="middle" class="sm">requêtes reçues λ (req/s)</text><text x="66" y="22" class="sm">latence moyenne (ms)</text>`;
+  h += `<rect x="${X(0)}" y="15" width="${X(24)-X(0)}" height="185" style="fill:var(--good);fill-opacity:.07"/><text x="${X(12)}" y="40" text-anchor="middle" class="sm" style="fill:var(--good)">zone confortable (ρ ≤ 0,6)</text>`;
+  let d = ''; for(let v = 0; v <= 39.2; v += 0.4){ const p = latSmall(v); d += (v ? 'L' : 'M') + X(v).toFixed(1) + ' ' + Y(p.T).toFixed(1); }
+  h += `<path d="${d}" class="cap"/><line x1="${X(40)}" y1="15" x2="${X(40)}" y2="200" class="dash"/><text x="${X(40)-6}" y="192" text-anchor="end" class="sm">capacité 40 req/s</text>`;
+  h += `<circle cx="${X(l)}" cy="${Y(o.T)}" r="7" style="fill:var(--accent)"/>`;
+  $('qSvg').innerHTML = h; $('qLv').textContent = l + ' req/s';
+  $('qKpi').innerHTML = `<div><b class="${o.r > .6 ? 'badv' : ''}">${fr(o.r, 2)}</b>utilisation ρ</div><div><b>${fr(o.C, 2)}</b>P(attente)</div><div><b>${fr(o.wq)} ms</b>attente</div><div><b class="${o.T > 150 ? 'badv' : ''}">${fr(o.T)} ms</b>latence moyenne</div>`;
+}
+$('qL').oninput = qRender; qRender();
+
+/* --- 1.8 Répartiteur : 2 small + 1 large --- */
+const LBF = [{n:'small 1', cap:40, w:2}, {n:'small 2', cap:40, w:2}, {n:'large', cap:160, w:8}];
+let lbAlg = 'rr';
+function lbRender(){
+  const L = +$('lbL').value, W = LBF.reduce((a,b) => a + b.w, 0); let lost = 0;
+  $('lbLv').textContent = L + ' req/s';
+  $('lbRows').innerHTML = LBF.map(f => {
+    const load = lbAlg === 'rr' ? L / LBF.length : L * f.w / W, over = load > f.cap; lost += Math.max(0, load - f.cap);
+    return `<div class="lbrow"><span>${f.n}</span><div class="track"><div class="fill${over ? ' over' : ''}" style="width:${Math.min(100, load/f.cap*100)}%"></div></div><span>${fr(load, 1)} / ${f.cap} req/s ${over ? '✖' : '(' + fr(load/f.cap*100) + ' %)'}</span></div>`;
+  }).join('');
+  $('lbSt').innerHTML = lost > 0
+    ? `<span style="color:var(--bad)">${fr(lost, 1)} req/s rejetées</span>, soit ${fr(lost/L*100, 1)} % du trafic : les small reçoivent plus que leur capacité, alors que la large est sous-utilisée.`
+    : (lbAlg === 'wrr' ? 'Chaque instance reçoit une part proportionnelle à ses vCPU : toutes ont la même utilisation.' : 'Aucune instance saturée à ce débit.');
+}
+$('lbAlg').querySelectorAll('button').forEach(b => b.onclick = () => {
+  lbAlg = b.dataset.a; $('lbAlg').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); lbRender();
+});
+$('lbL').oninput = lbRender; lbRender();
+
+/* --- 1.9 Auto-scaling face à un pic (modèle simplifié du scénario Exo 4) --- */
+function asSim(o){
+  const T = 2400, dem = t => t < 600 ? 100 : t < 630 ? 100 + 400*(t-600)/30 : t < 1530 ? 500 : t < 1830 ? 500 - 400*(t-1530)/300 : 100;
+  let ready = o.fixed ? 18 : 3, boots = [], desired = ready, last = -1e9, lost = 0, total = 0, cost = 0, maxI = ready;
+  const cpu = [], capS = [], demS = [];
+  for(let t = 0; t < T; t++){
+    boots = boots.filter(b => { if(b <= t){ ready++; return false; } return true; });
+    const d = dem(t), cap = 40 * ready;
+    lost += Math.max(0, d - cap); total += d; cpu.push(cap ? Math.min(1, d / cap) : 1);
+    cost += (ready + boots.length) * 0.10 / 3600; maxI = Math.max(maxI, ready + boots.length);
+    capS.push(cap); demS.push(d);
+    if(!o.fixed && t > 0 && t % 10 === 0 && t - last >= o.cool){
+      const w = cpu.slice(-60), m = w.reduce((a,b) => a + b, 0) / w.length;
+      if(m > 0.7 && desired < 24){ const add = Math.min(o.step, 24 - desired); desired += add; for(let k = 0; k < add; k++) boots.push(t + o.boot); last = t; }
+      else if(m < 0.3 && desired > 3){ desired--; if(boots.length) boots.pop(); else ready--; last = t; }
+    }
+  }
+  return {lost, total, cost, maxI, capS, demS};
+}
+function asRender(){
+  const r = asSim({boot:+$('asBoot').value, step:+$('asStep').value, cool:+$('asCool').value, fixed:$('asPol').value === 'fixed'});
+  const X = t => 55 + t / 2400 * 650, Y = v => 210 - Math.min(v, 800) / 800 * 190;
+  let h = '<line class="axis" x1="55" y1="210" x2="705" y2="210"/><line class="axis" x1="55" y1="210" x2="55" y2="15"/>';
+  for(const v of [0, 200, 400, 600, 800]) h += `<text x="48" y="${Y(v)+4}" text-anchor="end" class="sm">${v}</text>`;
+  for(const m of [0, 10, 20, 30, 40]) h += `<text x="${X(m*60)}" y="230" text-anchor="middle" class="sm">${m} min</text>`;
+  const pts = s => s.filter((_,t) => t % 10 === 0).map((v,k) => X(k*10).toFixed(1) + ',' + Y(v).toFixed(1)).join(' ');
+  let loss = '';
+  for(let t = 0; t < 2400; t += 10) if(r.demS[t] > r.capS[t]) loss += `<rect x="${X(t).toFixed(1)}" y="${Y(r.demS[t]).toFixed(1)}" width="${(650/240).toFixed(2)}" height="${(Y(r.capS[t]) - Y(r.demS[t])).toFixed(1)}" style="fill:var(--bad);fill-opacity:.35"/>`;
+  h += loss + `<polyline class="dem" points="${pts(r.demS)}"/><polyline class="cap" points="${pts(r.capS)}"/>`;
+  h += `<rect x="60" y="250" width="14" height="4" style="fill:var(--accent)"/><text x="80" y="256" class="sm">demande (req/s)</text><rect x="240" y="250" width="14" height="4" style="fill:var(--accent2)"/><text x="260" y="256" class="sm">capacité des instances prêtes</text><rect x="500" y="246" width="14" height="10" style="fill:var(--bad);fill-opacity:.35"/><text x="520" y="256" class="sm">requêtes perdues</text>`;
+  $('asSvg').innerHTML = h;
+  const av = (r.total - r.lost) / r.total * 100;
+  $('asKpi').innerHTML = `<div><b class="${av < 99 ? 'badv' : ''}">${fr(av, 1)} %</b>requêtes servies</div><div><b>${fr(r.lost)}</b>requêtes perdues</div><div><b>${r.maxI}</b>instances au maximum</div><div><b>${fr(r.cost, 2)} $</b>coût sur 40 min</div>`;
+}
+['asBoot', 'asStep', 'asCool', 'asPol'].forEach(id => $(id).onchange = asRender); asRender();
+
+/* --- 1.10 Disponibilité --- */
+function avRender(){
+  const a = +$('avA').value, n = +$('avN').value, par = 1 - Math.pow(1 - a, n), tot = 0.9999 * par, min = (1 - tot) * 365 * 24 * 60;
+  $('avNv').textContent = n;
+  $('avKpi').innerHTML = `<div><b>99,99 %</b>répartiteur</div><div><b>${fr(par*100, par > 0.99999 ? 5 : 3)} %</b>${n} instance(s) en parallèle</div><div><b>${fr(tot*100, 3)} %</b>système complet</div>`;
+  $('avSt').innerHTML = `Soit environ <b>${min >= 120 ? fr(min/60, 1) + ' h' : fr(min) + ' min'}</b> d’arrêt par an.` + (n > 2 ? ' Au-delà de 2 ou 3 instances, c’est le répartiteur qui limite.' : '');
+}
+$('avA').onchange = avRender; $('avN').oninput = avRender; avRender();
+
+/* --- 1.11 Coûts : à la demande, réservé, Spot --- */
+function coRender(){
+  const u = +$('coU').value / 100, H = 730, rows = [['À la demande', 0.10*H*u, 'var(--accent2)'], ['Réservée', 0.06*H, 'var(--good)'], ['Spot', 0.03*H*u, 'var(--accent)']], mx = 0.10 * H;
+  $('coUv').textContent = Math.round(u*100) + ' % du temps';
+  $('coRows').innerHTML = rows.map(([n,v,c]) => `<div class="lbrow"><span>${n}</span><div class="track"><div class="fill" style="width:${v/mx*100}%;background:${c}"></div></div><span>${fr(v, 2)} $ / mois</span></div>`).join('');
+  $('coSt').innerHTML = u > 0.6 ? 'Au-delà de 60 % d’utilisation, la <b>réservée</b> coûte moins cher que l’à la demande.' : 'En dessous de 60 % d’utilisation, l’<b>à la demande</b> reste moins cher que la réservée (payée même quand elle ne sert pas).';
+}
+$('coU').oninput = coRender; coRender();
+
+/* --- Quiz --- */
+const QZ = [
+  ['Combien de temps met une machine virtuelle à démarrer dans le simulateur, contre un conteneur ?', ['60 s contre 5 s', '5 s contre 60 s', 'le même temps'], 0, 'Le conteneur partage le noyau de l’hôte : il démarre bien plus vite.'],
+  ['Quelle politique de placement allume le moins d’hôtes ?', ['Worst Fit', 'Équilibrage par zones', 'Best Fit'], 2, 'Best Fit (comme First Fit) remplit les hôtes déjà utilisés : moins d’énergie, mais une panne d’hôte touche plus d’instances.'],
+  ['Une instance small reçoit 36 req/s. Que se passe-t-il ?', ['Rien, elle est à 50 %', 'Son utilisation est de 90 % et la latence monte fortement', 'Elle rejette la moitié des requêtes'], 1, 'ρ = 36/40 = 0,9 : la file d’attente s’allonge, la latence moyenne dépasse 280 ms.'],
+  ['Avec 2 small + 1 large, quel algorithme évite de saturer les small ?', ['Tourniquet', 'Tourniquet pondéré', 'Aléatoire'], 1, 'Il donne à chaque instance une part proportionnelle à ses vCPU.'],
+  ['Face à un pic, qu’est-ce qui limite le plus souvent la vitesse de l’auto-scaling dans le TP ?', ['Le prix des instances', 'Le refroidissement et le nombre d’instances ajoutées par action', 'La mémoire des hôtes'], 1, 'Avec +2 instances toutes les 120 s, il faut de longues minutes pour rattraper un pic ×5.'],
+  ['Une instance tombe en panne : détection 30 s, démarrage 60 s. Quel est le MTTR ?', ['30 s', '60 s', '90 s'], 2, 'MTTR = détection + démarrage de la remplaçante.'],
+  ['Quand une instance réservée (−40 %) est-elle plus rentable qu’à la demande ?', ['Toujours', 'Si elle tourne plus de 60 % du temps', 'Jamais'], 1, '0,06 $/h en permanence contre 0,10 $/h seulement quand elle tourne.'],
+  ['Que mesure le PUE ?', ['La puissance d’un processeur', 'L’énergie totale du site divisée par l’énergie des serveurs', 'Le prix de l’électricité'], 1, 'Plus le PUE est proche de 1, moins on gaspille en refroidissement et en infrastructure.']
+];
+let qzScore = 0;
+const qzSet = (cls, v) => document.querySelectorAll(cls).forEach(e => e.textContent = v);
+function qzRender(){
+  qzScore = 0; qzSet('.qzScore', 0); qzSet('.qzTotal', QZ.length);
+  const half = Math.ceil(QZ.length / 2);
+  $('qzList').innerHTML = ''; $('qzList2').innerHTML = '';
+  QZ.forEach((q,k) => {
+    const L = k < half ? $('qzList') : $('qzList2');
+    const d = document.createElement('div'); d.className = 'quiz-q';
+    d.innerHTML = `<div class="qt">${k+1}. ${q[0]}</div><div class="quiz-opts"></div><div class="status" hidden></div>`;
+    const box = d.querySelector('.quiz-opts');
+    q[1].forEach((o,j) => {
+      const b = document.createElement('div'); b.className = 'quiz-opt'; b.textContent = o; b.tabIndex = 0; b.setAttribute('role', 'button');
+      b.onclick = () => {
+        box.querySelectorAll('.quiz-opt').forEach((x,m) => { x.classList.add('disabled'); if(m === q[2]) x.classList.add('correct'); });
+        if(j === q[2]) qzScore++; else b.classList.add('wrong');
+        const st = d.querySelector('.status'); st.hidden = false; st.innerHTML = (j === q[2] ? '✔ ' : '✘ ') + q[3];
+        qzSet('.qzScore', qzScore);
+      };
+      b.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); b.click(); } };
+      box.appendChild(b);
     });
-    html+='<div class="axis"><span>0 s</span><span>10 s</span><span>20 s</span></div>';
-    tl.innerHTML=html;
-    var fin = mode==='ss' ? [10,20] : [20,20];
-    var moy = (fin[0]+fin[1])/2;
-    out.innerHTML = 'fin T1 = <b>'+fin[0]+' s</b> &nbsp; fin T2 = <b>'+fin[1]+' s</b><br>'+
-      'makespan = <b>20 s</b> &nbsp;&middot;&nbsp; temps de réponse moyen = <b>'+moy+' s</b>';
-    bss.className = mode==='ss'?'on':''; bts.className = mode==='ts'?'on':'';
-  }
-  bss.onclick=function(){mode='ss';draw();};
-  bts.onclick=function(){mode='ts';draw();};
-  draw();
+    L.appendChild(d);
+  });
+}
+document.querySelectorAll('.qzReset').forEach(b => b.onclick = qzRender);
+qzRender();
 })();
 </script>
+<script src="../../assets/annotate.js" defer></script>
+
 </body>
 </html>
