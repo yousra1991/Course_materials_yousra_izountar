@@ -1,1 +1,204 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HCI – Lab 4 · Project: design a website, from users to a Figma prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f5f1;--ink:#14231c;--mut:#4f6158;--g:#1f7a4d;--g2:#dcebe1;--am:#e6a92b;--card:#fff;--line:#c9d8cf;--sh:0 8px 28px rgba(20,35,28,.12);--bad:#b3261e}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Source Serif 4",Georgia,serif}
+h1,h2,h3,summary,th,.top,button,label.l{font-family:"Bricolage Grotesque",system-ui,sans-serif}
+code{background:var(--g2);padding:1px 5px;border-radius:5px;font-size:.88em;font-family:ui-monospace,Consolas,monospace}
+a{color:var(--g)}
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px 80px}
+.top{position:sticky;top:0;z-index:20;background:var(--g);color:#fff;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:8px 20px;box-shadow:var(--sh)}
+.top .who{font-weight:700}.top .sp{flex:1}.top a{color:#fff;text-decoration:none;opacity:.9;font-size:14px}.top a:hover{opacity:1;text-decoration:underline}.top a.cur{font-weight:800;text-decoration:underline}
+.top .labs{display:flex;gap:10px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.16);border-radius:999px;padding:3px 12px;font-size:14px}
+.top button{border:0;border-radius:999px;padding:7px 16px;font-weight:700;cursor:pointer;font-size:15px;background:#fff;color:var(--g)}
+.inst{display:flex;gap:22px;align-items:flex-start;padding:22px 0 10px;border-bottom:1px solid var(--line)}
+.inst .logo{width:96px;height:96px;border-radius:50%;background:#fff;overflow:hidden;display:grid;place-items:center;font:800 26px "Bricolage Grotesque",sans-serif;color:var(--g);flex:none}
+.inst .logo img{width:100%;height:100%;object-fit:contain}
+.inst h2{margin:0;color:var(--g);font-size:22px}.inst p{margin:2px 0;color:var(--mut);font-size:15px}
+.inst dl{display:grid;grid-template-columns:auto 1fr;gap:2px 18px;margin:10px 0 0;font-size:15px}
+.inst dt{font:600 12px "Bricolage Grotesque",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);padding-top:3px}.inst dd{margin:0}
+.hero h1{font-size:44px;line-height:1.05;margin:26px 0 8px}
+.pill{display:inline-block;background:var(--g);color:#fff;border-radius:999px;padding:3px 12px;font:700 14px "Bricolage Grotesque",sans-serif;margin-right:6px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin:16px 0}
+table{border-collapse:collapse;width:100%}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top;font-size:15px}
+th{background:var(--g2)}
+.plan tr.tot td{font-weight:800;background:var(--g2);color:var(--g)}
+.part{margin-top:30px}
+details.step{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 24px;margin:20px 0;box-shadow:var(--sh)}
+details.step>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px}
+details.step>summary::-webkit-details-marker{display:none}
+.num{width:54px;height:54px;border-radius:14px;background:var(--g);color:#fff;display:grid;place-items:center;font:800 26px "Bricolage Grotesque",sans-serif;flex:none}
+details.step h3{margin:0;font-size:24px;line-height:1.15}
+.tm{display:inline-block;background:var(--g2);color:var(--g);border-radius:999px;padding:1px 10px;font:700 13px "Bricolage Grotesque",sans-serif}
+.bd .ok{display:inline-block;background:var(--g2);color:var(--g);border-radius:999px;padding:1px 10px;font:700 13px "Bricolage Grotesque",sans-serif;margin-left:6px}
+.goal{font-size:18px}
+.guide{background:#f6faf7;border-left:5px solid var(--g);border-radius:10px;padding:10px 18px}
+.guide h4,.sites h4,.ans h4{margin:4px 0;font:700 17px "Bricolage Grotesque",sans-serif}
+.guide li{margin:4px 0}
+.sites{margin-top:14px;border:1px solid var(--line);border-radius:12px;background:#fffaf0;padding:8px 14px}
+.sites td:first-child{white-space:nowrap;font-weight:600}
+.ans{margin-top:16px;border:1px solid var(--line);border-radius:12px;background:#fbfdfb;padding:10px 16px}
+.fld{margin:10px 0}
+label.l{display:block;font-weight:600;font-size:15px;margin-bottom:3px}
+.fld input[type=text],.fld select,.fld textarea{width:100%;font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fffef7;color:var(--ink)}
+.fld textarea{resize:vertical;overflow:hidden;min-height:76px}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:2px solid var(--g);background:#fff}
+.fld.chk label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.fld.chk input{width:22px;height:22px;accent-color:var(--g);flex:none;margin-top:3px}
+.grp{font:800 18px "Bricolage Grotesque",sans-serif;color:var(--g);margin:18px 0 0;border-top:1px dashed var(--line);padding-top:10px}
+.act{margin-top:18px}
+.act button{border:2px solid var(--g);background:#fff;color:var(--g);border-radius:10px;padding:8px 18px;font:700 16px "Bricolage Grotesque",sans-serif;cursor:pointer}
+.act button.on{background:var(--g);color:#fff}
+.btn{border:0;border-radius:12px;padding:12px 22px;font:700 17px "Bricolage Grotesque",sans-serif;cursor:pointer;background:var(--g);color:#fff;margin:4px 8px 4px 0}
+.btn.am{background:var(--am);color:#1d1606}
+.key{border-left:5px solid var(--am);background:var(--g2);padding:10px 14px;border-radius:0 10px 10px 0;margin:14px 0;font-size:16px}
+.msg{font:600 15px "Bricolage Grotesque",sans-serif;color:var(--g)}
+@media (max-width:700px){.hero h1{font-size:32px}.inst{flex-direction:column}}
+@media print{@page{size:A4;margin:14mm}body{background:#fff;font-size:11pt}.top,.act,.btn,.sites,.guide{display:none}.wrap{max-width:none;padding:0}details.step{box-shadow:none;break-inside:avoid-page}.fld input,.fld select,.fld textarea{border:1px solid #999;background:#fff}}
+</style>
+</head>
+<body>
+<div class="top"><span class="who">HCI · Project · Lab 4</span><span class="labs"><a href="../../index.html">Home</a><a href="lab3-1.html">Lab 3.1</a><a href="lab3-2.html">Lab 3.2</a><a href="lab4-project.html" class="cur">Lab 4</a></span><span class="sp"></span><span class="chip" id="prog">0 %</span><button type="button" onclick="window.print()">Print / PDF</button></div>
+<div class="wrap">
+<header class="inst">
+  <div class="logo"><img src="logo.png" alt="Université d'Alger 1 logo" onerror="this.parentNode.textContent='UA1'"></div>
+  <div>
+    <h2>Université d’Alger 1 – Benyoucef Benkhedda</h2>
+    <p>Faculty of Sciences · Computer Science Department</p>
+    <dl><dt>Module</dt><dd>Human-Computer Interaction (HCI)</dd><dt>Level</dt><dd>L3 – Semester 5 (ISIL – Alger 1, SI, ISIL – ESST)</dd><dt>Instructor</dt><dd>Dr. Izountar Yousra</dd><dt>Academic year</dt><dd>2026 / 2027</dd><dt>Lab</dt><dd>Lab 4 – Project: design a website, from users to a Figma prototype</dd><dt>Duration</dt><dd>3 hours · in groups</dd><dt>Tools</dt><dd>Browser · Figma · a recorder for the video</dd></dl>
+  </div>
+</header>
+<section class="hero">
+  <span class="pill">Lab 4</span><span class="pill">HCI · Project</span>
+  <h1>Design a website: from users to a Figma prototype</h1>
+  <p>In this lab your group designs a website with the full HCI process. Seven steps lead you from the benchmark of existing websites to the final <b>PDF</b> and the <b>presentation video</b>. For each step you get the work to do and the <b>sites to use</b>. <b>You decide how to do it</b>: write your results in the answer boxes. Everything you type is saved in your browser.</p>
+</section>
+<div class="box"><h3 style="margin-top:0">Deliverable (homework)</h3><p>One single <b>PDF</b> containing: context and objectives of the website · target users (personas) and their needs · wireframes (low-fidelity sketches) · final mockups of the main screens · the link to your interface prototype (Figma or another tool), shared and opening correctly · your design choices (colours, typography, navigation, accessibility) · the names of all group members. You also hand in a <b>presentation video (MP4)</b>.</p></div>
+<div class="box"><h3 style="margin-top:0">Session plan</h3><table class="plan" id="plan"></table></div>
+<div class="box" id="grp"><h3 style="margin-top:0">Your group</h3></div>
+<div class="box"><h3 style="margin-top:0">Sites to work with</h3><table id="alls"></table></div>
+<div class="part" id="parts"></div>
+<div class="key"><b>End of the lab.</b> Check the seven steps, build your PDF, upload the PDF and the video, and send the links with the form of your section.</div>
+<p style="color:var(--mut);font-size:14px">Human-Computer Interaction · Université d’Alger 1 · Your answers and ticks are saved in this browser only. Use <b>Save my answers</b> in step 7 to keep a copy.</p>
+</div>
+<script>
+(function(){
+'use strict';
+// Teacher: put the link of the submission form of each section here.
+const FORMS={'ISIL – Alger 1':'','SI':'','ISIL – ESST':''};
+const SEC=['ISIL – Alger 1','SI','ISIL – ESST'];
+const S={
+ figma:['Figma','https://www.figma.com','design, mockups and prototype'],
+ figjam:['FigJam','https://www.figma.com/figjam/','boards, personas, flows (free)'],
+ nng:['Nielsen Norman Group','https://www.nngroup.com/articles/','articles on usability, personas, navigation'],
+ aw:['Awwwards','https://www.awwwards.com','examples of well-designed websites'],
+ dr:['Dribbble','https://dribbble.com','visual inspiration for screens'],
+ xt:['Xtensio','https://xtensio.com','persona templates'],
+ un:['Unsplash','https://unsplash.com','free photos'],
+ bal:['Balsamiq','https://balsamiq.com','low-fidelity wireframes'],
+ exc:['Excalidraw','https://excalidraw.com','quick hand-drawn sketches in the browser'],
+ col:['Coolors','https://coolors.co','colour palettes'],
+ gf:['Google Fonts','https://fonts.google.com','fonts to compare'],
+ wc:['WebAIM Contrast Checker','https://webaim.org/resources/contrastchecker/','colour contrast ratio'],
+ wq:['WCAG quick reference','https://www.w3.org/WAI/WCAG22/quickref/','accessibility criteria'],
+ wave:['WAVE','https://wave.webaim.org','accessibility check of a live web page'],
+ fh:['Figma Help','https://help.figma.com','how Figma works'],
+ fc:['Figma Community','https://www.figma.com/community','free templates and UI kits'],
+ obs:['OBS Studio','https://obsproject.com','free screen and voice recording'],
+ dv:['Google Drive','https://drive.google.com','store the PDF and the video, share a link'],
+ yt:['YouTube (unlisted)','https://www.youtube.com','alternative for the video'],
+ gg:['Google Search','https://www.google.com','search for existing websites of the same kind'],
+ sw:['SimilarWeb','https://www.similarweb.com','find websites similar to a given one'],
+ heur:['Nielsen’s 10 usability heuristics','https://www.nngroup.com/articles/ten-usability-heuristics/','criteria to judge strengths and weaknesses'],
+ pen:['Penpot','https://penpot.app','free open-source alternative to Figma'],
+ co:['Coursera','https://www.coursera.org','example of a learning site'],
+ ab:['Airbnb','https://www.airbnb.com','example of a booking site'],
+ wk:['Wikipedia','https://www.wikipedia.org','example of an information site']
+};
+const pf=n=>[['p'+n+'n','Persona '+n+': name, age, job, city','t'],['p'+n+'g','Persona '+n+': goals','a'],['p'+n+'f','Persona '+n+': pain points','a'],['p'+n+'s','Persona '+n+': devices and level of digital proficiency','a'],['p'+n+'c','Persona '+n+': context of use','a'],['p'+n+'x','Persona '+n+': needs from the website','a']];
+const bm=n=>[['_','Existing website '+n,'g'],['b'+n+'u','Address (URL) of existing website '+n,'t'],['b'+n+'s','Strengths of website '+n,'a'],['b'+n+'w','Weaknesses of website '+n,'a']];
+const P=[
+{t:'Context, objectives and benchmark of existing websites',m:25,goal:'Define the project, then study what already exists before you design.',
+ steps:['Describe the context and the problem statement of your website.','Write the objectives: user objectives and objectives of the organisation.','Search for existing websites of the same kind (at least three).','For each existing website, analyse its strengths and its weaknesses (content, usability, navigation, visual design, accessibility).','Conclude the benchmark: what you keep, what you improve, what you add.'],
+ sites:['gg','sw','heur','co','ab','wk','aw','dr'],
+ f:[['title','Name of your website','t'],['kind','Type of website and organisation','t'],['ctx','Context','a'],['prob','Problem statement','a'],['obju','User objectives','a'],['objb','Objectives of the organisation','a'],...bm(1),...bm(2),...bm(3),['_','Benchmark conclusion','g'],['bc','What we keep, what we improve, what we add','a']]},
+{t:'Target users and personas',m:20,goal:'Define who will use the website and what they need.',
+ steps:['Identify the user groups and their context of use.','Create the personas from these user groups.','For each persona, write the goals, the pain points and the needs.'],
+ sites:['nng','figjam','xt','un'],
+ f:[['ug','User groups','a'],['_','Persona 1','g'],...pf(1),['_','Persona 2','g'],...pf(2),['pn','Summary of the user needs (functional needs and constraints)','a']]},
+{t:'Scenarios, links and wireframes',m:30,goal:'Describe how users reach their goals, then sketch the screens and their links.',
+ steps:['List the main screens of the website (screen inventory).','Write the user scenarios: for each persona, a task scenario from the entry screen to the goal.','Define the links between the screens (navigation links and site map).','Draw a low-fidelity wireframe of each screen.','Save an image of each wireframe for the PDF.'],
+ sites:['exc','bal','figma','figjam'],
+ f:[['wt','Tool or paper used for the wireframes','t'],['ws','Main screens and the purpose of each','a'],['sc1','User scenario 1 (persona, goal, steps in order)','a'],['sc2','User scenario 2 (persona, goal, steps in order)','a'],['wn','Links between the screens (for each screen: its links and the target screens)','a'],['wf','Names of the image files of your wireframes','a']]},
+{t:'Design choices',m:25,goal:'Choose and justify the look and the behaviour of the interface.',
+ steps:['Define the colour palette.','Define the typography.','Define the navigation system.','Define the accessibility measures and check them.'],
+ sites:['col','gf','wc','wq','wave','nng'],
+ f:[['_','Colours','g'],['c1','Colour palette (primary, secondary, accent, neutral: codes and role of each)','a'],['c2','Justification of the colours','a'],['_','Typography','g'],['t1','Typefaces, type scale and hierarchy (sizes of title, subtitle, body)','a'],['t2','Justification of the typography','a'],['_','Navigation','g'],['n1','Navigation system (type of menu, position, items, other aids)','a'],['n2','Justification of the navigation','a'],['_','Accessibility','g'],['a1','Accessibility measures and WCAG level targeted','a'],['a2','Checks done: contrast ratios measured and results','a']]},
+{t:'High-fidelity mockups and interactive prototype',m:45,goal:'Design the final screens and make them interactive, in Figma or another tool.',
+ steps:['Create the design file in Figma or another prototyping tool.','Design the high-fidelity mockups of the main screens, using your design choices.','Build the interactive prototype: link the screens (interactions, transitions) following your scenarios.','Share the prototype, then check the link in a private window and on a second device.','Run each scenario of step 3 in the prototype, from start to end.'],
+ sites:['figma','pen','fh','fc','un','dr'],
+ f:[['tool','Tool used (Figma or another tool)','t'],['fl','Link to your interface prototype','t'],['fa','Access rights of the link (for example: view only, no sign-in required)','t'],['ff','Screens designed (name and purpose of each)','a'],['fp','Interactions defined in the prototype','a'],['ft','Link test: who tested, on which browser and device, and when','t'],['fk1','The link opens in a private window, with no sign-in.','c'],['fk2','The link opens on a second device (phone or another computer).','c'],['fk3','The prototype starts on the home screen, and each link or button leads to the right screen.','c'],['fk4','I ran each scenario of step 3 from start to end without any error.','c'],['fk5','The mockups follow the design choices of step 4.','c']]},
+{t:'Presentation video (MP4)',m:20,goal:'Present your project in a short video.',
+ steps:['Plan the content of the video: project, users, demonstration of the scenarios, design choices.','Record the video.','Export it as an MP4 file.','Upload it and get a link that opens without signing in.'],
+ sites:['obs','dv','yt','figma'],
+ f:[['vo','Outline of the video: who presents what','a'],['vt','Tool used to record','t'],['vd','Duration of the video','t'],['vl','Link to the video (MP4)','t'],['vk','The video link opens without signing in.','c']]},
+{t:'Build the PDF and submit',m:15,goal:'Assemble your single PDF and hand in your work.',
+ steps:['Build one single PDF with all the required elements.','Check each element in the list below.','Upload the PDF and send the links with the form of your section.'],
+ sites:['dv'],
+ f:[['_','The PDF contains','g'],['k1','Context and objectives of the website','c'],['k2','Target users (personas) and their needs','c'],['k3','Wireframes (low-fidelity sketches)','c'],['k4','Final mockups of the main screens','c'],['k5','The link to the interface prototype (Figma or another tool), shared and tested','c'],['k6','Design choices (colours, typography, navigation, accessibility)','c'],['k7','Names of all group members','c'],['pdfl','Link to your PDF','t']],submit:true}
+];
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const K='hcilab-4',ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let V=ld(K+'-v',{}),DONE=new Set(ld(K+'-d',[]));
+const esc=t=>String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const LAB={};
+function fld(f){
+ if(f[2]==='g')return '<div class="grp">'+f[1]+'</div>';
+ LAB[f[0]]=f[1];const id='f_'+f[0],v=V[f[0]];
+ if(f[2]==='c')return '<div class="fld chk"><label><input type="checkbox" id="'+id+'" data-k="'+f[0]+'"'+(v?' checked':'')+'><span>'+f[1]+'</span></label></div>';
+ const inp=f[2]==='t'?'<input type="text" id="'+id+'" data-k="'+f[0]+'" value="'+esc(v)+'">':'<textarea id="'+id+'" data-k="'+f[0]+'" rows="3">'+esc(v)+'</textarea>';
+ return '<div class="fld"><label class="l" for="'+id+'">'+f[1]+'</label>'+inp+'</div>';
+}
+// group box
+$('#grp').insertAdjacentHTML('beforeend',[['gn','Group number or name','t'],['gm','Names of all group members (one per line, with student number)','a']].map(fld).join('')+'<div class="fld"><label class="l" for="f_sec">Your section</label><select id="f_sec" data-k="sec"><option value="">— choose —</option>'+SEC.map(s=>'<option'+(V.sec===s?' selected':'')+'>'+s+'</option>').join('')+'</select></div>');
+LAB.sec='Section';
+// plan + sites
+$('#plan').innerHTML='<tr><th>Step</th><th>Time</th></tr>'+P.map((p,i)=>'<tr><td><a href="#s'+(i+1)+'">'+(i+1)+'. '+p.t+'</a></td><td>'+p.m+' min</td></tr>').join('')+'<tr class="tot"><td>Total</td><td>'+P.reduce((a,p)=>a+p.m,0)+' min</td></tr>';
+const used=[...new Set(P.flatMap(p=>p.sites))];
+$('#alls').innerHTML='<tr><th>Site</th><th>Use it for</th></tr>'+used.map(k=>'<tr><td><a href="'+S[k][1]+'" target="_blank" rel="noopener">'+S[k][0]+' ↗</a></td><td>'+S[k][2]+'</td></tr>').join('');
+// parts
+$('#parts').innerHTML=P.map((p,i)=>{const n=i+1;
+ return '<details class="step" id="s'+n+'" open><summary><span class="num">'+n+'</span><div><h3>'+p.t+'</h3><span class="tm">⏱ '+p.m+' min</span> <span class="bd" id="bd'+n+'"></span></div></summary>'+
+ '<p class="goal">'+p.goal+'</p><div class="guide"><h4>Work to do</h4><ol>'+p.steps.map(s=>'<li>'+s+'</li>').join('')+'</ol></div>'+
+ '<div class="sites"><h4>Sites for this step</h4><table>'+p.sites.map(k=>'<tr><td><a href="'+S[k][1]+'" target="_blank" rel="noopener">'+S[k][0]+' ↗</a></td><td>'+S[k][2]+'</td></tr>').join('')+'</table></div>'+
+ '<div class="ans"><h4>Your answers</h4>'+p.f.map(fld).join('')+(p.submit?'<p><button class="btn" type="button" id="sv">Save my answers (.txt)</button><button class="btn am" type="button" onclick="window.print()">Print / save as PDF</button></p><p class="msg" id="sub"></p>':'')+'</div>'+
+ '<div class="act"><button type="button" data-d="'+n+'">✔ I’m done</button></div></details>';}).join('');
+function grow(e){if(e.tagName==='TEXTAREA'){e.style.height='auto';e.style.height=Math.max(e.scrollHeight+2,76)+'px'}}
+function prog(){
+ P.forEach((p,i)=>{const n=i+1,f=DONE.has(n),b=document.querySelector('[data-d="'+n+'"]');$('#bd'+n).innerHTML=f?'<span class="ok">✔ completed</span>':'';b.classList.toggle('on',f);b.textContent=f?'✔ Completed (undo)':'✔ I’m done'});
+ $('#prog').textContent=Math.round(100*DONE.size/P.length)+' % completed';
+ const s=$('#sub');if(s){const u=FORMS[V.sec];s.innerHTML=!V.sec?'Choose your section at the top of the page.':u?'Submission form of '+V.sec+': <a href="'+u+'" target="_blank" rel="noopener">open the form ↗</a>':'Your teacher will give you the submission form of '+V.sec+'.'}
+}
+document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.k;if(!k)return;V[k]=e.target.type==='checkbox'?e.target.checked:e.target.value;sv(K+'-v',V);grow(e.target);prog()});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;const n=+b.dataset.d;DONE.has(n)?DONE.delete(n):DONE.add(n);sv(K+'-d',[...DONE]);prog()});
+$$('.fld textarea').forEach(grow);
+addEventListener('beforeprint',()=>{$$('details').forEach(d=>d.open=true);$$('.fld textarea').forEach(grow)});
+$('#sv').onclick=()=>{
+ const t=Object.keys(LAB).map(k=>LAB[k]+':\n'+(typeof V[k]==='boolean'?(V[k]?'[x]':'[ ]'):(V[k]||''))+'\n').join('\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/plain;charset=utf-8'}));a.download='HCI_project_answers.txt';a.click();
+};
+prog();
+})();
+</script>
+</body>
+</html>
