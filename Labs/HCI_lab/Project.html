@@ -50,6 +50,7 @@ details.step h3{margin:0;font-size:24px;line-height:1.15}
 .ans{margin-top:16px;border:1px solid var(--line);border-radius:12px;background:#fbfdfb;padding:10px 16px}
 .fld{margin:10px 0}
 label.l{display:block;font-weight:600;font-size:15px;margin-bottom:3px}
+.fld input::placeholder,.fld textarea::placeholder{color:#66776d;font-style:italic;opacity:1}
 .fld input[type=text],.fld select,.fld textarea{width:100%;font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fffef7;color:var(--ink)}
 .fld textarea{resize:vertical;overflow:hidden;min-height:76px}
 .fld input:focus,.fld select:focus,.fld textarea:focus{outline:2px solid var(--g);background:#fff}
@@ -81,6 +82,7 @@ details.step{box-shadow:none;margin:12px 0;padding:12px 16px}
 details.step>summary{break-after:avoid}
 .fld,.grp{break-inside:avoid}
 .fld input,.fld select,.fld textarea{border:1px solid #999;background:#fff}
+.fld input::placeholder,.fld textarea::placeholder{color:transparent}
 }
 </style>
 </head>
@@ -102,7 +104,7 @@ details.step>summary{break-after:avoid}
 <section class="hero">
   <span class="pill">Lab 4</span><span class="pill">HCI · Project</span>
   <h1>Design a website: from users to a Figma prototype</h1>
-  <p>In this lab your group designs a website with the full HCI process. Seven steps lead you from the benchmark of existing websites to the final <b>PDF</b> and the <b>presentation video</b>. For each step you get the work to do and the <b>sites to use</b>. <b>You decide how to do it</b>: write your results in the answer boxes. Everything you type is saved in your browser.</p>
+  <p>In this lab your group designs a website with the full HCI process. Seven steps lead you from the benchmark of existing websites to the final <b>PDF</b> and the <b>presentation video</b>. For each step you get the work to do and the <b>sites to use</b>. <b>You decide how to do it</b>: write your results in the answer boxes. In each answer box, a grey <i>Example</i> about an imaginary university website shows the expected level of detail and disappears when you start typing: do not copy it, use your own project. Everything you type is saved in your browser.</p>
 </section>
 <div class="box"><h3 style="margin-top:0">Deliverable (homework)</h3><p>One single <b>PDF</b> containing: context and objectives of the website · target users (personas) and their needs · wireframes (low-fidelity sketches) · final mockups of the main screens · the link to your interface prototype (Figma or another tool), shared and opening correctly · your design choices (colours, typography, navigation) · the names of all group members. You also hand in a <b>presentation video (MP4)</b>.</p></div>
 <div class="box"><h3 style="margin-top:0">Session plan</h3><table class="plan" id="plan"></table></div>
@@ -139,37 +141,39 @@ const S={
  ab:['Airbnb','https://www.airbnb.com','example of a booking site'],
  wk:['Wikipedia','https://www.wikipedia.org','example of an information site']
 };
-const pf=n=>[['p'+n+'n','Persona '+n+': name, age, job, city','t'],['p'+n+'g','Persona '+n+': goals','a'],['p'+n+'f','Persona '+n+': pain points','a'],['p'+n+'s','Persona '+n+': devices and level of digital proficiency','a'],['p'+n+'c','Persona '+n+': context of use','a'],['p'+n+'x','Persona '+n+': needs from the website','a']];
-const bm=n=>[['_','Existing website '+n,'g'],['b'+n+'u','Address (URL) of existing website '+n,'t'],['b'+n+'s','Strengths of website '+n,'a'],['b'+n+'w','Weaknesses of website '+n,'a']];
+const E1=['Lina, 19, first-year student, Algiers','Find her timetable and room quickly, and get the official announcements','Does not know where to find the timetable; misses announcements posted on another page','Smartphone mostly, laptop at the library; very comfortable with apps','Between classes or on the bus, often with a weak mobile connection','Timetable on the home page, notifications for announcements, a layout that works on a phone'];
+const E2=['Dr Samir, 45, lecturer, Blida','Publish course materials and announcements for his groups','Too many steps to upload a file; no confirmation that students received it','Laptop at the office, smartphone sometimes; average digital level','At the office or at home in the evening, with several groups to manage','A simple upload form, a clear confirmation, a list of his groups'];
+const pf=n=>{const e=n===1?E1:E2;return [['p'+n+'n','Persona '+n+': name, age, job, city','t',e[0]],['p'+n+'g','Persona '+n+': goals','a',e[1]],['p'+n+'f','Persona '+n+': pain points','a',e[2]],['p'+n+'s','Persona '+n+': devices and level of digital proficiency','a',e[3]],['p'+n+'c','Persona '+n+': context of use','a',e[4]],['p'+n+'x','Persona '+n+': needs from the website','a',e[5]]]};
+const bm=n=>[['_','Existing website '+n,'g'],['b'+n+'u','Address (URL) of existing website '+n,'t','https://www.example-university.edu'],['b'+n+'s','Strengths of website '+n,'a','Clear menu by department; search bar on the home page; timetable one click away'],['b'+n+'w','Weaknesses of website '+n,'a','Outdated design; announcements buried in long lists; hard to use on a phone']];
 const P=[
 {t:'Context, objectives and benchmark of existing websites',m:25,goal:'Define the project, then study what already exists before you design.',
  steps:['Describe the context and the problem statement of your website.','Write the objectives: user objectives and objectives of the organisation.','Search for existing websites of the same kind (at least three).','For each existing website, analyse its strengths and its weaknesses (content, usability, navigation, visual design, accessibility).','Conclude the benchmark: what you keep, what you improve, what you add.'],
  sites:['sw','bs','co','ab','wk','aw'],
- f:[['title','Name of your website','t'],['kind','Type of website and organisation','t'],['ctx','Context','a'],['prob','Problem statement','a'],['obju','User objectives','a'],['objb','Objectives of the organisation','a'],...bm(1),...bm(2),...bm(3),['_','Benchmark conclusion','g'],['bc','What we keep, what we improve, what we add','a']]},
+ f:[['title','Name of your website','t','UniPortail – website of a university faculty'],['kind','Type of website and organisation','t','Information website of a university faculty'],['ctx','Context','a','Students look for timetables, announcements and course materials on several scattered pages and social media groups.'],['prob','Problem statement','a','The current faculty website is hard to navigate, so students miss announcements and cannot find their timetable quickly.'],['obju','User objectives','a','Find my timetable in less than a minute, read the latest announcements, download course materials.'],['objb','Objectives of the organisation','a','Reduce questions at the administration desk and make sure official announcements reach every student.'],...bm(1),...bm(2),...bm(3),['_','Benchmark conclusion','g'],['bc','What we keep, what we improve, what we add','a','Keep: the menu by department. Improve: phone layout and search. Add: a personal space with timetable and grades.']]},
 {t:'Target users and personas',m:20,goal:'Define who will use the website and what they need.',
  steps:['Identify the user groups and their context of use.','Create the personas from these user groups.','For each persona, write the goals, the pain points and the needs.'],
  sites:['xt','un'],
- f:[['ug','User groups','a'],['_','Persona 1','g'],...pf(1),['_','Persona 2','g'],...pf(2),['pn','Summary of the user needs (functional needs and constraints)','a']]},
+ f:[['ug','User groups','a','First-year students, final-year students, lecturers, administrative staff'],['_','Persona 1','g'],...pf(1),['_','Persona 2','g'],...pf(2),['pn','Summary of the user needs (functional needs and constraints)','a','Needs: timetable in one click, announcements by group, easy upload of course files. Constraints: weak mobile connection, many users during exam periods.']]},
 {t:'Scenarios, links and wireframes',m:30,goal:'Describe how users reach their goals, then sketch the screens and their links.',
  steps:['List the main screens of the website (screen inventory).','Write the user scenarios: for each persona, a task scenario from the entry screen to the goal.','Define the links between the screens (navigation links and site map).','Draw a low-fidelity wireframe of each screen.','Save an image of each wireframe for the PDF.'],
  sites:['exc','bal','figma'],
- f:[['wt','Tool or paper used for the wireframes','t'],['ws','Main screens and the purpose of each','a'],['sc1','User scenario 1 (persona, goal, steps in order)','a'],['sc2','User scenario 2 (persona, goal, steps in order)','a'],['wn','Links between the screens (for each screen: its links and the target screens)','a'],['wf','Names of the image files of your wireframes','a']]},
+ f:[['wt','Tool or paper used for the wireframes','t','Paper and pencil, then Balsamiq'],['ws','Main screens and the purpose of each','a','Home: announcements and quick links. Timetable: schedule by group. Course page: materials to download. Login: access to the personal space.'],['sc1','User scenario 1 (persona, goal, steps in order)','a','Lina wants her timetable: Home → clicks Timetable → chooses her group → sees the schedule of the week.'],['sc2','User scenario 2 (persona, goal, steps in order)','a','Dr Samir wants to share a course file: Home → Login → My courses → chooses the course → Upload file → Confirmation.'],['wn','Links between the screens (for each screen: its links and the target screens)','a','Home → Timetable, Courses, Login. Courses → Course page. Course page → Upload file (lecturers), back to Courses. Upload file → Confirmation.'],['wf','Names of the image files of your wireframes','a','wire-home.png, wire-timetable.png, wire-course.png']]},
 {t:'Design choices',m:25,goal:'Choose and justify the look and the behaviour of the interface.',
  steps:['Define the colour palette.','Define the typography.','Define the navigation system.'],
  sites:['col','gf'],
- f:[['_','Colours','g'],['c1','Colour palette (primary, secondary, accent, neutral: codes and role of each)','a'],['c2','Justification of the colours','a'],['_','Typography','g'],['t1','Typefaces, type scale and hierarchy (sizes of title, subtitle, body)','a'],['t2','Justification of the typography','a'],['_','Navigation','g'],['n1','Navigation system (type of menu, position, items, other aids)','a'],['n2','Justification of the navigation','a']]},
+ f:[['_','Colours','g'],['c1','Colour palette (primary, secondary, accent, neutral: codes and role of each)','a','Primary #1F4E79 (header and buttons), secondary #E8EEF5 (backgrounds), accent #E6A92B (urgent announcements), neutral #1B1B1B (text).'],['c2','Justification of the colours','a','Blue is calm and linked to trust and institutions; the accent colour makes urgent announcements stand out.'],['_','Typography','g'],['t1','Typefaces, type scale and hierarchy (sizes of title, subtitle, body)','a','Titles: Poppins Bold 32 px; subtitles: 22 px; body: Open Sans 18 px.'],['t2','Justification of the typography','a','A large body size is comfortable to read on every screen, and the titles stand out clearly from the text.'],['_','Navigation','g'],['n1','Navigation system (type of menu, position, items, other aids)','a','Top menu with 5 items (Home, Timetable, Courses, Announcements, Contact), a search bar and a breadcrumb.'],['n2','Justification of the navigation','a','A top menu is familiar to every student, and the search bar helps to find a page or a document quickly.']]},
 {t:'High-fidelity mockups and interactive prototype',m:45,goal:'Design the final screens and make them interactive, in Figma or another tool.',
  steps:['Create the design file in Figma or another prototyping tool.','Design the high-fidelity mockups of the main screens, using your design choices.','Build the interactive prototype: link the screens (interactions, transitions) following your scenarios.','Share the prototype, then check the link in a private window and on a second device.','Run each scenario of step 3 in the prototype, from start to end.'],
  sites:['figma','pen','fh','fc','un','dr'],
- f:[['tool','Tool used (Figma or another tool)','t'],['fl','Link to your interface prototype','t'],['fa','Access rights of the link (for example: view only, no sign-in required)','t'],['ff','Screens designed (name and purpose of each)','a'],['fp','Interactions defined in the prototype','a'],['ft','Link test: who tested, on which browser and device, and when','t'],['fk1','The link opens in a private window, with no sign-in.','c'],['fk2','The link opens on a second device (phone or another computer).','c'],['fk3','The prototype starts on the home screen, and each link or button leads to the right screen.','c'],['fk4','I ran each scenario of step 3 from start to end without any error.','c'],['fk5','The mockups follow the design choices of step 4.','c']]},
+ f:[['tool','Tool used (Figma or another tool)','t','Figma'],['fl','Link to your interface prototype','t','https://www.figma.com/proto/…'],['fa','Access rights of the link (for example: view only, no sign-in required)','t','Anyone with the link can view, no sign-in'],['ff','Screens designed (name and purpose of each)','a','Home, Timetable, Course page, Login'],['fp','Interactions defined in the prototype','a','Click on Timetable opens the schedule; choosing a group updates it; each menu item opens its screen.'],['ft','Link test: who tested, on which browser and device, and when','t','Amina – Chrome (laptop), Safari (phone) – 25/11'],['fk1','The link opens in a private window, with no sign-in.','c'],['fk2','The link opens on a second device (phone or another computer).','c'],['fk3','The prototype starts on the home screen, and each link or button leads to the right screen.','c'],['fk4','I ran each scenario of step 3 from start to end without any error.','c'],['fk5','The mockups follow the design choices of step 4.','c']]},
 {t:'Presentation video (MP4)',m:20,goal:'Present your project in a short video.',
  steps:['Plan the content of the video: project, users, demonstration of the scenarios, design choices.','Record the video.','Export it as an MP4 file.','Upload it and get a link that opens without signing in.'],
  sites:['obs','dv','yt','figma'],
- f:[['vo','Outline of the video: who presents what','a'],['vt','Tool used to record','t'],['vd','Duration of the video','t'],['vl','Link to the video (MP4)','t'],['vk','The video link opens without signing in.','c']]},
+ f:[['vo','Outline of the video: who presents what','a','Introduction and users (Amina, 1 min) → demo of scenario 1 (Karim, 2 min) → design choices (Amina, 1 min)'],['vt','Tool used to record','t','OBS Studio'],['vd','Duration of the video','t','4 minutes'],['vl','Link to the video (MP4)','t','https://drive.google.com/file/d/…'],['vk','The video link opens without signing in.','c']]},
 {t:'Build the PDF and submit',m:15,goal:'Assemble your single PDF and hand in your work.',
  steps:['Build one single PDF with all the required elements.','Check each element in the list below.','Upload the PDF and send the links with the form of your section.'],
  sites:['dv'],
- f:[['_','The PDF contains','g'],['k1','Context and objectives of the website','c'],['k2','Target users (personas) and their needs','c'],['k3','Wireframes (low-fidelity sketches)','c'],['k4','Final mockups of the main screens','c'],['k5','The link to the interface prototype (Figma or another tool), shared and tested','c'],['k6','Design choices (colours, typography, navigation)','c'],['k7','Names of all group members','c'],['pdfl','Link to your PDF','t']],submit:true}
+ f:[['_','The PDF contains','g'],['k1','Context and objectives of the website','c'],['k2','Target users (personas) and their needs','c'],['k3','Wireframes (low-fidelity sketches)','c'],['k4','Final mockups of the main screens','c'],['k5','The link to the interface prototype (Figma or another tool), shared and tested','c'],['k6','Design choices (colours, typography, navigation)','c'],['k7','Names of all group members','c'],['pdfl','Link to your PDF','t','https://drive.google.com/file/d/…']],submit:true}
 ];
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const K='hcilab-4',ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
@@ -180,16 +184,15 @@ function fld(f){
  if(f[2]==='g')return '<div class="grp">'+f[1]+'</div>';
  LAB[f[0]]=f[1];const id='f_'+f[0],v=V[f[0]];
  if(f[2]==='c')return '<div class="fld chk"><label><input type="checkbox" id="'+id+'" data-k="'+f[0]+'"'+(v?' checked':'')+'><span>'+f[1]+'</span></label></div>';
- const inp=f[2]==='t'?'<input type="text" id="'+id+'" data-k="'+f[0]+'" value="'+esc(v)+'">':'<textarea id="'+id+'" data-k="'+f[0]+'" rows="3">'+esc(v)+'</textarea>';
+ const ph=f[3]?' placeholder="Example: '+esc(f[3])+'"':'',mh=f[3]&&f[3].length>110?104:76;
+ const inp=f[2]==='t'?'<input type="text" id="'+id+'" data-k="'+f[0]+'"'+ph+' value="'+esc(v)+'">':'<textarea id="'+id+'" data-k="'+f[0]+'" data-min="'+mh+'" rows="3"'+ph+'>'+esc(v)+'</textarea>';
  return '<div class="fld"><label class="l" for="'+id+'">'+f[1]+'</label>'+inp+'</div>';
 }
 // group box
-$('#grp').insertAdjacentHTML('beforeend',[['gn','Group number or name','t'],['gm','Names of all group members (one per line, with student number)','a']].map(fld).join('')+'<div class="fld"><label class="l" for="f_sec">Your section</label><select id="f_sec" data-k="sec"><option value="">— choose —</option>'+SEC.map(s=>'<option'+(V.sec===s?' selected':'')+'>'+s+'</option>').join('')+'</select></div>');
+$('#grp').insertAdjacentHTML('beforeend',[['gn','Group number or name','t','Group 4'],['gm','Names of all group members (one per line, with student number)','a','Amina Benali – 202312345']].map(fld).join('')+'<div class="fld"><label class="l" for="f_sec">Your section</label><select id="f_sec" data-k="sec"><option value="">— choose —</option>'+SEC.map(s=>'<option'+(V.sec===s?' selected':'')+'>'+s+'</option>').join('')+'</select></div>');
 LAB.sec='Section';
 // plan + sites
 $('#plan').innerHTML='<tr><th>Step</th><th>Time</th></tr>'+P.map((p,i)=>'<tr><td><a href="#s'+(i+1)+'">'+(i+1)+'. '+p.t+'</a></td><td>'+p.m+' min</td></tr>').join('')+'<tr class="tot"><td>Total</td><td>'+P.reduce((a,p)=>a+p.m,0)+' min</td></tr>';
-const used=[...new Set(P.flatMap(p=>p.sites))];
-$('#alls').innerHTML='<tr><th>Site</th><th>Use it for</th></tr>'+used.map(k=>'<tr><td><a href="'+S[k][1]+'" target="_blank" rel="noopener">'+S[k][0]+' ↗</a></td><td>'+S[k][2]+'</td></tr>').join('');
 // parts
 $('#parts').innerHTML=P.map((p,i)=>{const n=i+1;
  return '<details class="step" id="s'+n+'" open><summary><span class="num">'+n+'</span><div><h3>'+p.t+'</h3><span class="tm">⏱ '+p.m+' min</span> <span class="bd" id="bd'+n+'"></span></div></summary>'+
@@ -197,7 +200,7 @@ $('#parts').innerHTML=P.map((p,i)=>{const n=i+1;
  '<div class="sites"><h4>Sites for this step</h4><table>'+p.sites.map(k=>'<tr><td><a href="'+S[k][1]+'" target="_blank" rel="noopener">'+S[k][0]+' ↗</a></td><td>'+S[k][2]+'</td></tr>').join('')+'</table></div>'+
  '<div class="ans"><h4>Your answers</h4>'+p.f.map(fld).join('')+(p.submit?'<p><button class="btn" type="button" id="sv">Save my answers (.txt)</button><button class="btn am" type="button" onclick="window.print()">Print / save as PDF</button></p><p class="msg" id="sub"></p>':'')+'</div>'+
  '<div class="act"><button type="button" data-d="'+n+'">✔ I’m done</button></div></details>';}).join('');
-function grow(e){if(e.tagName==='TEXTAREA'){e.style.height='auto';e.style.height=Math.max(e.scrollHeight+2,76)+'px'}}
+function grow(e){if(e.tagName==='TEXTAREA'){e.style.height='auto';e.style.height=Math.max(e.scrollHeight+2,+e.dataset.min||76)+'px'}}
 function prog(){
  P.forEach((p,i)=>{const n=i+1,f=DONE.has(n),b=document.querySelector('[data-d="'+n+'"]');$('#bd'+n).innerHTML=f?'<span class="ok">✔ completed</span>':'';b.classList.toggle('on',f);b.textContent=f?'✔ Completed (undo)':'✔ I’m done'});
  $('#prog').textContent=Math.round(100*DONE.size/P.length)+' % completed';
