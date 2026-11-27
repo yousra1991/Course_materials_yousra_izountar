@@ -1,95 +1,761 @@
-/* Cours 4 -> affichage "datashow" du cours 5 (en-tete + pastille, diapo plein écran, texte auto-ajusté, barre de progression).
-   Usage : copier ce fichier à côté du cours 4 et ajouter, juste avant </body> :
-   <script src="datashow-l4.js" defer></script>                                                    */
-(function(){
-'use strict';
-var D=document,R=D.documentElement,$=function(i){return D.getElementById(i)};
-R.classList.add('ds');
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bastien and Scapin - the 8 criteria</title>
+<style>
+:root{
+  --paper:#EAF0F3; --surface:#FFFFFF; --surface2:#F3F7F9; --ink:#0E1D2A; --muted:#44586A; --line:#C8D4DC;
+  --blue:#0B4F72; --blue-soft:#D6E7F1; --teal:#066A5F; --teal-soft:#D3EEE9;
+  --coral:#B8341F; --coral-soft:#F9D9D2; --green:#1B7544; --green-soft:#D3EEDD;
+  --amber:#8A5A00; --amber-soft:#FBECC8;
+  --u: 1vh;                     /* vertical unit, rescaled by JS fitter */
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0B1620; --surface:#12212E; --surface2:#182B3A; --ink:#E7EEF3; --muted:#A3B5C3; --line:#2A3F50;
+    --blue:#78BDE6; --blue-soft:#12354A; --teal:#56D3C1; --teal-soft:#0F3F3A;
+    --coral:#FF8A74; --coral-soft:#4A211B; --green:#6AD79A; --green-soft:#153D28;
+    --amber:#F6C453; --amber-soft:#443611;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0B1620; --surface:#12212E; --surface2:#182B3A; --ink:#E7EEF3; --muted:#A3B5C3; --line:#2A3F50;
+  --blue:#78BDE6; --blue-soft:#12354A; --teal:#56D3C1; --teal-soft:#0F3F3A;
+  --coral:#FF8A74; --coral-soft:#4A211B; --green:#6AD79A; --green-soft:#153D28;
+  --amber:#F6C453; --amber-soft:#443611;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--paper);color:var(--ink);
+  font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
 
-var css=
-':root{--hh:clamp(52px,8vh,78px);--fh:6px}'+
-'html.ds,html.ds body{height:100%;overflow:hidden}'+
-'html.ds .top,html.ds #deckbar{display:none}'+
-'html.ds main{padding:0}'+
-'html.ds .wrap{max-width:none;padding:0}'+
-'html.ds .slide{position:fixed;top:var(--hh);bottom:var(--fh);left:0;right:0;margin:0;padding:0;overflow:hidden}'+
-'html.ds .dsin{height:100%;overflow:auto;box-sizing:border-box;padding:22px 34px;zoom:1}'+
-'#dsHead{position:fixed;top:0;left:0;right:0;height:var(--hh);z-index:45;display:flex;align-items:center;gap:14px;'+
- 'padding:0 clamp(12px,2.2vw,32px);background:var(--surface);border-bottom:1px solid var(--line)}'+
-'#dsHead .dsn{flex:none;display:grid;place-items:center;width:calc(var(--hh)*.66);height:calc(var(--hh)*.66);border-radius:12px;'+
- 'background:var(--badge-bg);color:var(--badge-fg);font:800 clamp(1rem,2.4vh,1.6rem)/1 "Bricolage Grotesque",system-ui,sans-serif}'+
-'#dsHead .dst{min-width:0;flex:1}'+
-'#dsHead .dst b{display:block;font:800 clamp(1.05rem,2.9vh,1.9rem)/1.1 "Bricolage Grotesque",system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'+
-'#dsHead .dst span{display:block;color:var(--muted);font-size:clamp(.8rem,1.8vh,1.1rem);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'+
-'#dsHead .dsp{flex:none;text-align:right;color:var(--muted);font-size:clamp(.78rem,1.8vh,1.05rem);line-height:1.3}'+
-'#dsHead .dsp b{display:block;color:var(--ink);font-size:clamp(.95rem,2.4vh,1.4rem)}'+
-'#dsHead .dsb{flex:none;display:flex;gap:8px}'+
-'#dsHead .dsb button{border:1px solid var(--line);background:var(--surface2);color:var(--muted);border-radius:10px;'+
- 'padding:.45em .9em;font:inherit;font-size:clamp(.8rem,1.8vh,1.05rem);cursor:pointer}'+
-'#dsHead .dsb button:hover{background:var(--blue-soft);color:var(--blue)}'+
-'#dsFoot{position:fixed;left:0;right:0;bottom:0;height:var(--fh);background:var(--surface2);z-index:45}'+
-'#dsBar{height:100%;width:0;background:var(--badge-bg);transition:width .18s}'+
-'@media(max-width:760px){'+
- ':root{--hh:auto}'+
- '#dsHead{position:sticky;flex-wrap:wrap;padding:8px 12px;min-height:56px}'+
- '#dsHead .dsb{flex:1 1 100%}#dsHead .dsb button{flex:1}#dsHead #dsFs{display:none}'+
- 'html.ds .slide{top:112px;bottom:64px}'+
- 'html.ds #deckbar{display:block;bottom:6px}}';
-var st=D.createElement('style');st.textContent=css;D.head.appendChild(st);
+/* ---------- frame ---------- */
+#deck{position:fixed;inset:0;display:grid;grid-template-rows:auto 1fr auto}
 
-/* contenu de chaque diapo dans un conteneur que l'on peut agrandir */
-var slides=[].slice.call(D.querySelectorAll('.slide')),N=slides.length;
-slides.forEach(function(s){var d=D.createElement('div');d.className='dsin';while(s.firstChild)d.appendChild(s.firstChild);s.appendChild(d)});
+header{display:flex;align-items:center;gap:calc(var(--u)*1.6);
+  padding:calc(var(--u)*1.5) calc(var(--u)*2.6);background:var(--surface);
+  border-bottom:1px solid var(--line)}
+.cnum{flex:none;display:grid;place-items:center;width:calc(var(--u)*5.2);height:calc(var(--u)*5.2);
+  border-radius:calc(var(--u)*1.2);background:var(--blue);color:var(--surface);
+  font-weight:800;font-size:calc(var(--u)*2.5)}
+.htxt{min-width:0;flex:1}
+.hcrit{font-size:calc(var(--u)*2.7);font-weight:800;line-height:1.1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hsub{font-size:calc(var(--u)*1.7);color:var(--muted);line-height:1.2;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hpos{flex:none;text-align:right;font-size:calc(var(--u)*1.7);color:var(--muted);line-height:1.35}
+.hpos b{display:block;font-size:calc(var(--u)*2.2);color:var(--ink)}
+.hbtns{flex:none;display:flex;gap:calc(var(--u)*.8)}
+.hbtns button{border:1px solid var(--line);background:var(--surface2);color:var(--muted);
+  border-radius:calc(var(--u)*.9);padding:calc(var(--u)*.7) calc(var(--u)*1.2);
+  font-size:calc(var(--u)*1.6);cursor:pointer;font-family:inherit}
+.hbtns button:hover{background:var(--blue-soft);color:var(--blue)}
 
-/* en-tete + barre de progression */
-var head=D.createElement('header');head.id='dsHead';
-head.innerHTML='<span class="dsn" id="dsNum">·</span><span class="dst"><b id="dsTit"></b><span id="dsSub"></span></span>'+
- '<span class="dsp"><b id="dsStep"></b><span id="dsPart"></span></span>'+
- '<span class="dsb"><button type="button" id="dsAll">All slides</button><button type="button" id="dsFs">Full screen</button><button type="button" id="dsTh">Dark</button></span>';
-D.body.insertBefore(head,D.body.firstChild);
-var foot=D.createElement('div');foot.id='dsFoot';foot.innerHTML='<div id="dsBar"></div>';D.body.appendChild(foot);
+#stage{position:relative;min-height:0;overflow:hidden}
+.slide{position:absolute;inset:0;padding:calc(var(--u)*2.4) calc(var(--u)*2.6);
+  display:none;flex-direction:column;gap:calc(var(--u)*1.6);overflow:hidden}
+.slide.on{display:flex}
 
-var fsb=$('fsBtn');if(!fsb||fsb.hidden)$('dsFs').style.display='none';
-$('dsAll').onclick=function(){$('dMenuBtn').click()};
-$('dsFs').onclick=function(){fsb.click()};
-$('dsTh').onclick=function(){$('themeBtn').click()};
-D.addEventListener('keydown',function(e){
-  if(e.key!=='Escape'||e.defaultPrevented)return;
-  if($('dOutline').hidden&&$('lbx').hidden)$('dMenuBtn').click();
+footer{height:calc(var(--u)*.9);background:var(--surface2)}
+#bar{height:100%;background:var(--blue);width:0;transition:width .18s ease}
+
+/* ---------- shared blocks ---------- */
+h1{font-size:calc(var(--u)*7);line-height:1.14;font-weight:800;letter-spacing:-.01em}
+h2{font-size:calc(var(--u)*3.4);line-height:1.22;font-weight:800}
+.lead{font-size:calc(var(--u)*2.5);line-height:1.35;color:var(--muted);max-width:62ch}
+.chips{display:flex;flex-wrap:wrap;gap:calc(var(--u)*.9)}
+.chip{background:var(--blue-soft);color:var(--blue);font-weight:700;
+  font-size:calc(var(--u)*1.9);padding:calc(var(--u)*.6) calc(var(--u)*1.4);
+  border-radius:999px;white-space:nowrap}
+
+/* four-box criterion grid */
+.q4{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr;gap:calc(var(--u)*1.6)}
+.cell{min-height:0;overflow:hidden;background:var(--surface);border:1px solid var(--line);
+  border-radius:calc(var(--u)*1.6);padding:calc(var(--u)*1.7) calc(var(--u)*2);
+  display:flex;flex-direction:column;gap:calc(var(--u)*.8);border-left:calc(var(--u)*.7) solid var(--blue)}
+.cell.bad{border-left-color:var(--coral);background:var(--coral-soft)}
+.cell.goal{border-left-color:var(--green);background:var(--green-soft)}
+.cell.ask{border-left-color:var(--amber);background:var(--amber-soft)}
+.k{font-size:calc(var(--u)*1.6);font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.cell.bad .k{color:var(--coral)} .cell.goal .k{color:var(--green)} .cell.ask .k{color:var(--amber)}
+.v{font-size:calc(var(--u)*2.25);line-height:1.3}
+.v em{font-style:normal;font-weight:700}
+
+/* two-column example slide */
+.two{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*2.2)}
+.pane{min-height:0;display:flex;flex-direction:column;gap:calc(var(--u)*1.2);
+  border-radius:calc(var(--u)*1.8);padding:calc(var(--u)*1.8) calc(var(--u)*2);overflow:hidden}
+.pane.no{background:var(--coral-soft);border:calc(var(--u)*.35) dashed var(--coral)}
+.pane.yes{background:var(--green-soft);border:calc(var(--u)*.35) solid var(--green)}
+.tag{align-self:flex-start;font-size:calc(var(--u)*1.9);font-weight:800;letter-spacing:.1em;
+  padding:calc(var(--u)*.5) calc(var(--u)*1.4);border-radius:999px;color:#fff}
+.no .tag{background:var(--coral)} .yes .tag{background:var(--green)}
+.cap{font-size:calc(var(--u)*2.1);font-weight:700;line-height:1.25}
+.ui{flex:1;min-height:0;overflow:hidden;background:var(--surface);color:var(--ink);
+  border:1px solid var(--line);border-radius:calc(var(--u)*1.2);
+  padding:calc(var(--u)*1.6);font-size:calc(var(--u)*2);line-height:1.4;
+  display:flex;flex-direction:column;gap:calc(var(--u)*1.1);justify-content:center}
+.why{font-size:calc(var(--u)*1.9);line-height:1.3}
+.no .why{color:var(--coral)} .yes .why{color:var(--green)}
+.why b{font-weight:800}
+
+/* mini UI widgets inside .ui */
+.lbl{font-size:calc(var(--u)*1.7);color:var(--muted);font-weight:700}
+.fld{border:1px solid var(--line);border-radius:calc(var(--u)*.8);
+  padding:calc(var(--u)*1) calc(var(--u)*1.2);background:var(--surface2);color:var(--muted)}
+.bt{display:inline-block;background:var(--blue);color:#fff;font-weight:700;
+  border-radius:calc(var(--u)*.8);padding:calc(var(--u)*1) calc(var(--u)*1.8);text-align:center}
+.bt.grey{background:var(--muted)} .bt.red{background:var(--coral)}
+.row{display:flex;gap:calc(var(--u)*1);align-items:center;flex-wrap:wrap}
+.mono{font-family:Consolas,"Courier New",monospace}
+.note{font-size:calc(var(--u)*1.7);color:var(--muted)}
+.strike{text-decoration:line-through;opacity:.65}
+ul.t{list-style:none;display:flex;flex-direction:column;gap:calc(var(--u)*.7)}
+ul.t li{position:relative;padding-left:calc(var(--u)*2.4);font-size:calc(var(--u)*2)}
+ul.t li::before{content:"";position:absolute;left:0;top:calc(var(--u)*.75);
+  width:calc(var(--u)*1.1);height:calc(var(--u)*1.1);border-radius:50%;background:var(--blue)}
+
+/* bridge slide: the 4 levels */
+.levels{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*1.6)}
+.lv{min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:calc(var(--u)*1);
+  background:var(--surface);border:1px solid var(--line);border-radius:calc(var(--u)*1.6);
+  padding:calc(var(--u)*1.8);position:relative}
+.lv.hi{background:var(--blue);border-color:var(--blue)}
+.lv.hi *{color:#fff!important}
+.lvn{font-size:calc(var(--u)*1.6);font-weight:800;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.lvt{font-size:calc(var(--u)*2.7);font-weight:800;line-height:1.12}
+.lvd{font-size:calc(var(--u)*1.95);line-height:1.3;color:var(--muted)}
+.arrow{position:absolute;right:calc(var(--u)*-1.5);top:50%;transform:translateY(-50%);
+  font-size:calc(var(--u)*2.6);color:var(--line);z-index:2;font-weight:800}
+
+/* map slide */
+.map{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);
+  grid-template-rows:1fr 1fr;gap:calc(var(--u)*1.5)}
+.mc{min-height:0;overflow:hidden;background:var(--surface);border:1px solid var(--line);
+  border-top:calc(var(--u)*.7) solid var(--teal);border-radius:calc(var(--u)*1.4);
+  padding:calc(var(--u)*1.5);display:flex;flex-direction:column;gap:calc(var(--u)*.7)}
+/* text never gets squeezed by its flex parent: it overflows the box, so the fitter sees it */
+.k,.v,.lvn,.lvt,.lvd,.mn,.mt,.md,.cap,.why,.tag,h1,h2,.lead,.by,.kbd,.chips{flex:none}
+h1,h2,.lvt,.mt,.v,.lead,.cap{overflow-wrap:break-word}
+.mn{font-size:calc(var(--u)*1.7);font-weight:800;color:var(--teal)}
+.mt{font-size:calc(var(--u)*2.4);font-weight:800;line-height:1.12}
+.md{font-size:calc(var(--u)*1.8);line-height:1.28;color:var(--muted)}
+
+/* title slide */
+.title{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;
+  gap:calc(var(--u)*2.4)}
+.by{font-size:calc(var(--u)*2.2);color:var(--muted)}
+.kbd{font-size:calc(var(--u)*1.8);color:var(--muted)}
+.kbd span{display:inline-block;border:1px solid var(--line);border-radius:calc(var(--u)*.6);
+  padding:0 calc(var(--u)*.8);background:var(--surface);font-family:Consolas,monospace}
+
+/* divider slide */
+.divider{flex:1;min-height:0;display:flex;flex-direction:column;gap:calc(var(--u)*2.2)}
+.dtop{flex:none;display:flex;flex-direction:column;gap:calc(var(--u)*1.2)}
+.dn{font-size:calc(var(--u)*2);font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)}
+ol.dsubs{flex:1;min-height:0;list-style:none;display:grid;gap:calc(var(--u)*1.4);
+  grid-template-columns:repeat(3,1fr)}
+ol.dsubs.n1{grid-template-columns:1fr}
+ol.dsubs.n2{grid-template-columns:repeat(2,1fr)}
+ol.dsubs.n4{grid-template-columns:repeat(2,1fr)}
+ol.dsubs li{min-height:0;overflow:hidden;background:var(--surface);border:1px solid var(--line);
+  border-left:calc(var(--u)*.7) solid var(--teal);border-radius:calc(var(--u)*1.4);
+  padding:calc(var(--u)*1.6) calc(var(--u)*2);display:flex;flex-direction:column;
+  justify-content:center;gap:calc(var(--u)*.8)}
+ol.dsubs li b{flex:none;font-size:calc(var(--u)*2.4);font-weight:800;line-height:1.15}
+ol.dsubs li span{flex:none;font-size:calc(var(--u)*2);line-height:1.3;color:var(--muted)}
+.dcov{font-size:calc(var(--u)*1.8);font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--teal)}
+/* mini widgets used in the examples */
+.cols2{columns:2;font-size:calc(var(--u)*1.95);line-height:1.6}
+.cols2 span{display:block;break-inside:avoid}
+.grp{border:1px solid var(--line);border-radius:calc(var(--u)*.8);padding:calc(var(--u)*.8) calc(var(--u)*1.2);
+  font-size:calc(var(--u)*1.95)}
+.grp b{display:block;font-size:calc(var(--u)*1.6);color:var(--teal);text-transform:uppercase;letter-spacing:.06em}
+.pbar{height:calc(var(--u)*1.4);border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2)}
+.pbar i{display:block;height:100%;background:var(--blue)}
+.steps{display:flex;gap:calc(var(--u)*.8)}
+.steps i{display:grid;place-items:center;width:calc(var(--u)*3.4);height:calc(var(--u)*3.4);border-radius:50%;
+  background:var(--blue-soft);color:var(--blue);font-style:normal;font-weight:800;font-size:calc(var(--u)*1.8)}
+.dense{display:grid;grid-template-columns:repeat(7,1fr);gap:calc(var(--u)*.6)}
+.dense u{display:block;height:calc(var(--u)*1.4);background:var(--line);border-radius:calc(var(--u)*.3)}
+.win{border:1px solid var(--line);border-radius:calc(var(--u)*.8);overflow:hidden;display:flex;flex-direction:column;gap:0}
+.winbar{background:var(--surface2);padding:calc(var(--u)*.7) calc(var(--u)*1.1);font-size:calc(var(--u)*1.6);color:var(--muted)}
+.wintabs{display:flex;gap:calc(var(--u)*.6);padding:calc(var(--u)*.7) calc(var(--u)*1.1);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.wintabs span{background:var(--blue-soft);color:var(--blue);border-radius:calc(var(--u)*.6);
+  padding:calc(var(--u)*.4) calc(var(--u)*1);font-size:calc(var(--u)*1.7);font-weight:700}
+.win .note{padding:calc(var(--u)*.7) calc(var(--u)*1.1)}
+
+
+/* ============ PHONE: reading mode ============ */
+@media (max-width:760px){
+  :root{--u:clamp(6.2px,1.95vw,9px)}
+  header{flex-wrap:wrap;gap:calc(var(--u)*1) calc(var(--u)*1.4);padding:calc(var(--u)*1.4)}
+  .cnum{width:calc(var(--u)*5);height:calc(var(--u)*5);font-size:calc(var(--u)*2.4)}
+  .htxt{flex:1 1 60%;order:1}
+  .hcrit{font-size:calc(var(--u)*2.6);white-space:normal}
+  .hsub{font-size:calc(var(--u)*1.8);white-space:normal}
+  .hpos{order:2;flex:1 1 100%;text-align:left;display:flex;gap:calc(var(--u)*1.2);align-items:baseline}
+  .hpos b{display:inline;font-size:calc(var(--u)*2)}
+  .hbtns{order:3;flex:1 1 100%}
+  .hbtns button{flex:1;padding:calc(var(--u)*1.1) calc(var(--u)*1);font-size:calc(var(--u)*1.8)}
+  /* a slide becomes a scrollable page */
+  .slide{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+         padding:calc(var(--u)*2.2) calc(var(--u)*2.2) calc(var(--u)*5)}
+  .slide.on{display:flex}
+  /* everything in one column */
+  .q4,.two,.levels,.map,ol.dsubs,ol.dsubs.n1,ol.dsubs.n2,ol.dsubs.n3,ol.dsubs.n4{
+    display:grid!important;grid-template-columns:1fr!important;flex:none}
+  .q4,.two{gap:calc(var(--u)*1.8)}
+  .cell,.pane,.lv,.mc,.ui,ol.dsubs li{min-height:auto;overflow:visible}
+  .title,.divider{flex:none}
+  h1{font-size:calc(var(--u)*5.6)}
+  .lead{font-size:calc(var(--u)*2.3);max-width:none}
+  .v{font-size:calc(var(--u)*2.3)}
+  .two .ui{justify-content:flex-start}
+  .pane{padding:calc(var(--u)*2)}
+  /* bigger tap targets, and no accidental slide change while reading */
+  #b-fs{display:none}                      /* no full screen on a phone */
+  footer{height:calc(var(--u)*1.2)}
+  nav#pnav{display:flex}
+  .slide{padding-bottom:calc(var(--u)*9)}  /* room for the nav bar */
+}
+#pnav{display:none;position:fixed;left:0;right:0;bottom:calc(var(--u)*1.2);z-index:40;
+  gap:10px;padding:8px 10px;background:linear-gradient(to top,var(--paper) 70%,transparent)}
+#pnav button{flex:1;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:12px;padding:13px 10px;font:700 16px/1 inherit;font-family:inherit;cursor:pointer}
+#pnav button:disabled{opacity:.4}
+#pnav .mid{flex:0 0 auto;align-self:center;color:var(--muted);font-size:14px;font-weight:700}
+
+/* overview */
+#ov{position:fixed;inset:0;background:var(--paper);z-index:50;display:none;
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;padding:18px;
+  overflow:auto;align-content:start}
+#ov.on{display:grid}
+#ov button{text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:10px;padding:10px 12px;cursor:pointer;font-family:inherit;font-size:13px;line-height:1.3}
+#ov button:hover{border-color:var(--blue);background:var(--blue-soft)}
+#ov button i{display:block;font-style:normal;font-size:11px;color:var(--muted);margin-bottom:3px}
+#ov button b{font-weight:700}
+@media print{html,body{overflow:visible}.slide{position:relative;display:flex!important;
+  page-break-after:always;height:100vh}#ov,.hbtns{display:none}}
+</style>
+</head>
+<body>
+
+<div id="deck">
+  <header>
+    <span class="cnum" id="h-num">—</span>
+    <span class="htxt"><span class="hcrit" id="h-crit">Bastien and Scapin</span>
+      <span class="hsub" id="h-sub">The 8 ergonomic criteria</span></span>
+    <span class="hpos"><b id="h-step">1 / 19</b><span id="h-part">Opening</span></span>
+    <span class="hbtns">
+      <button type="button" id="b-ov" title="All slides (Esc)">All slides</button>
+      <button type="button" id="b-fs" title="Full screen (F)">Full screen</button>
+      <button type="button" id="b-th" title="Light / dark">Dark</button>
+    </span>
+  </header>
+
+  <div id="stage"><!-- slides injected --></div>
+
+  <nav id="pnav"><button type="button" id="pprev">&larr;</button>
+    <span class="mid" id="ppos">1 / 48</span>
+    <button type="button" id="pnext">&rarr;</button></nav>
+  <footer><div id="bar"></div></footer>
+</div>
+
+<div id="ov"></div>
+
+<script>
+/* ============ CONTENT ============ */
+/* 8 criteria, 18 sub-criteria. Each sub-criterion: an explanation and an example. */
+var CRIT = [
+{n:1, name:"Guidance", one:"Advise, orient, inform and lead the user.", subs:[
+ {t:"Prompting",
+  one:"Tell the user what to do now, and in which format.",
+  when:"On every screen where the user must act or type: forms, search boxes, empty pages, the first use of an app.",
+  ask:"Does the user know what to do now, and in which format?",
+  fail:"The user hesitates, types in the wrong format, or does not see the next step.",
+  goal:"Lead the user to the right action with format hints, examples and default values &mdash; without manipulating them.",
+  cap0:"A field with no hint",
+  ui0:'<div class="lbl">Date</div><div class="fld">&nbsp;</div><div class="row"><span class="bt">Continue</span></div>'+
+      '<div class="note" style="color:var(--coral)">The user types 10/11 &rarr; error, with no explanation.</div>',
+  why0:"No format, no example. The user guesses, then is punished for guessing wrong.",
+  cap1:"Label, format and example",
+  ui1:'<div class="lbl">Date of birth</div><div class="fld">dd / mm / yyyy</div>'+
+      '<div class="note">Example: 25/03/2001</div><div class="row"><span class="bt">Continue</span></div>',
+  why1:"The format is visible <b>before</b> the error, so the error does not happen."},
+ {t:"Grouping and distinction between items",
+  one:"Show at a glance what belongs together, and what does not.",
+  when:"When a screen shows many items: forms, menus, toolbars, settings pages, dashboards.",
+  ask:"Can the user see which items belong together, and which are different?",
+  fail:"Items are mixed, so the user searches for a long time or clicks the wrong one.",
+  goal:"Group related items by position and by format (boxes, spacing, colour) so the structure is visible at a glance. Groups must be named.",
+  cap0:"One flat list of ten fields",
+  ui0:'<div class="cols2"><span>Name</span><span>Expiry</span><span>Surname</span><span>Phone</span>'+
+      '<span>Street</span><span>Email</span><span>City</span><span>Postcode</span>'+
+      '<span>Card number</span><span>Country</span></div>',
+  why0:"Nothing shows that the card number is not part of the address. The eye has no structure to follow.",
+  cap1:"Three named groups",
+  ui1:'<div class="grp"><b>Identity</b> Name, Surname</div>'+
+      '<div class="grp"><b>Address</b> Street, City, Postcode, Country</div>'+
+      '<div class="grp"><b>Payment</b> Card number, Expiry</div>',
+  why1:"Position and format carry the meaning, and each group is correctly named."},
+ {t:"Immediate feedback",
+  one:"Answer every action, at once.",
+  when:"After every user action: a click, a key press, a submit, a long operation (upload, payment, download).",
+  ask:"After I act, does the system show at once that it received my action, and what is happening?",
+  fail:"The user does not know whether the action worked, so they click again or leave.",
+  goal:"Answer every action quickly: a state change, a message, a progress bar. Short wait &rarr; change the cursor. Long wait (&gt; 5 s) &rarr; show progress.",
+  cap0:"Nothing happens",
+  ui0:'<div class="row"><span class="bt">Pay 4 500 DA</span></div><div class="note">&nbsp;</div>'+
+      '<div class="note" style="color:var(--coral)">No message, no change. The user clicks again &mdash; and pays twice.</div>',
+  why0:"Silence is read as failure. The user repeats the action.",
+  cap1:"Received, in progress, done",
+  ui1:'<div class="row"><span class="bt grey">Paying&hellip;</span></div>'+
+      '<div class="pbar"><i style="width:64%"></i></div>'+
+      '<div class="note" style="color:var(--green)">&#10003; Paid. Receipt sent to your email.</div>',
+  why1:"The button changes state, the bar shows progress, a message confirms the end."},
+ {t:"Legibility",
+  one:"Make the text easy to read for everyone.",
+  when:"Wherever there is text to read: body text, labels, buttons, messages, small screens.",
+  ask:"Can every user read this easily &mdash; size, contrast, font, line length?",
+  fail:"The user strains to read, misreads, or gives up.",
+  goal:"Normal case, enough size, enough contrast (WCAG: at least 4.5:1 for normal text), clear sans-serif fonts, short lines.",
+  cap0:"Light grey, small, all capitals",
+  ui0:'<div style="color:#b9c2c9;font-size:calc(var(--u)*1.5);text-transform:uppercase;line-height:1.25">'+
+      'PLEASE READ THESE CONDITIONS CAREFULLY BEFORE YOU CONFIRM YOUR ORDER BECAUSE THEY APPLY TO EVERY PURCHASE</div>',
+  why0:"Capitals remove the word shape, the contrast is far below 4.5:1, and the line is too long.",
+  cap1:"Normal case, strong contrast",
+  ui1:'<div style="line-height:1.4">Please read these conditions before you confirm your order. '+
+      'They apply to every purchase.</div>',
+  why1:"Same message, read in one glance, by everyone."}
+]},
+{n:2, name:"Workload", one:"Reduce the perceptual and memory load; make the dialogue efficient.", subs:[
+ {t:"Brevity: concision",
+  one:"Say it in fewer words, and type fewer characters.",
+  when:"In all short texts and inputs: labels, menu items, buttons, codes the user must type.",
+  ask:"Are the texts and the inputs as short as possible while staying clear?",
+  fail:"The user reads too much or types too much, and misses what matters.",
+  goal:"Short labels, abbreviations only if they are already known, default values the user does not have to retype.",
+  cap0:"Forty words to say two things",
+  ui0:'<div class="note" style="font-size:calc(var(--u)*1.9);line-height:1.35">&ldquo;An error has unfortunately '+
+      'occurred while the system was attempting to carry out the operation that you requested, and as a result '+
+      'we are not able to proceed with saving your document at this time.&rdquo;</div>'+
+      '<div class="row"><span class="bt">Click here in order to validate your registration</span></div>',
+  why0:"A tooltip shows for about half a second. Nobody finishes this sentence.",
+  cap1:"Cause, then solution",
+  ui1:'<div class="v"><b>Save failed.</b> The disk is full.<br>Free some space and try again.</div>'+
+      '<div class="row"><span class="bt">Register</span></div>',
+  why1:"Eleven words, and the button says what it does."},
+ {t:"Brevity: minimal actions",
+  one:"Reach the same goal in fewer steps.",
+  when:"For the frequent tasks the user repeats: search, buy, send, log in, change a setting.",
+  ask:"How many steps, clicks or screens are needed to reach the goal? Can we remove some?",
+  fail:"The task takes too long, the user is tired, and abandons before the end.",
+  goal:"Reduce the number of actions to the minimum the goal really needs, and offer shortcuts.",
+  cap0:"Six screens to change a password",
+  ui0:'<div class="steps"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i></div>'+
+      '<div class="note">Menu &rarr; Account &rarr; Security &rarr; Password &rarr; Confirm identity &rarr; New password</div>',
+  why0:"Five of the six screens carry no decision. They only exist because of the menu structure.",
+  cap1:"Two steps, from anywhere",
+  ui1:'<div class="steps"><i>1</i><i>2</i></div>'+
+      '<div class="note">Account &rarr; Change password (and the same link in the settings search)</div>',
+  why1:"Count the actions for the same task. Fewer actions, same result."},
+ {t:"Information density",
+  one:"Show only what the task needs, where it is needed.",
+  when:"On screens with a lot of information: dashboards, home pages, tables, admin panels.",
+  ask:"Is there too much, or too little, on this screen? Is only the useful information shown?",
+  fail:"The user is overloaded and cannot find what matters, or has to open many screens to gather it.",
+  goal:"Show only what the task needs, close to where it is used. Limit the quantity, structure it, display it just in time.",
+  cap0:"Forty links and five banners",
+  ui0:'<div class="dense">'+Array(28).join(0).split('').map(function(){return '<u></u>';}).join('')+'</div>'+
+      '<div class="note" style="color:var(--coral)">Everything has the same weight, so nothing stands out.</div>',
+  why0:"Quantity without structure. The user scans, gives up, and uses the search box instead.",
+  cap1:"One task in front, the rest one click away",
+  ui1:'<div class="row"><span class="bt">Find a car</span></div>'+
+      '<div class="note">Three shortcuts: New &middot; Used &middot; By budget</div>'+
+      '<div class="note">Everything else lives in the menu, shown when it is needed.</div>',
+  why1:"Reduced and organised. The memory load drops with the number of items."}
+]},
+{n:3, name:"Explicit control", one:"The system processes only what the user asked for, and the user stays in charge.", subs:[
+ {t:"Explicit user actions",
+  one:"The system acts only when the user asks.",
+  when:"When the system does something that matters: send, save, delete, pay, change a setting.",
+  ask:"Does the system do only what the user explicitly asked, and nothing behind their back?",
+  fail:"The system acts on its own and surprises the user.",
+  goal:"Run an action only when it is explicitly asked for, through a clear Validate or Send button.",
+  cap0:"Choosing is treated as asking",
+  ui0:'<div class="lbl">Country</div><div class="fld">Algeria &#9662;</div>'+
+      '<div class="note" style="color:var(--coral)">The page reloaded and the form was sent.</div>',
+  why0:"The user was still reading the list. Pressing Enter in the first field sends everything.",
+  cap1:"One clear button starts it",
+  ui1:'<div class="lbl">Country</div><div class="row"><span class="fld" style="flex:1">Algeria &#9662;</span>'+
+      '<span class="bt">Search</span></div>'+
+      '<div class="note">Nothing happens until the user presses Search.</div>',
+  why1:"Selecting is not validating. The user decides when the action starts."},
+ {t:"User control",
+  one:"The user can stop, cancel, undo, go back.",
+  when:"In long or important tasks: downloads, installations, forms in several steps, automatic processes.",
+  ask:"Can the user stop, pause, cancel, go back, or move to another task?",
+  fail:"The user feels trapped, and loses work or time.",
+  goal:"Keep cancel, pause, undo and go back available &mdash; and never save automatically without permission.",
+  cap0:"No way out",
+  ui0:'<div class="v">Updating. Do not turn off your computer.</div><div class="pbar"><i style="width:35%"></i></div>'+
+      '<div class="note" style="color:var(--coral)">No Cancel. No Later. Auto-save overwrites your file every 30 s.</div>',
+  why0:"The machine decided. The user waits, and cannot return to the previous version.",
+  cap1:"The user decides",
+  ui1:'<div class="v">Updating.</div><div class="pbar"><i style="width:35%"></i></div>'+
+      '<div class="row"><span class="bt grey">Pause</span><span class="bt grey">Install tonight</span></div>'+
+      '<div class="note">Auto-save only if you turn it on &mdash; with version history.</div>',
+  why1:"Stop, postpone, switch task, go back: the user keeps control of their own machine."}
+]},
+{n:4, name:"Adaptability", one:"React to the context, and to the needs and the preferences of the users.", subs:[
+ {t:"Flexibility",
+  one:"Several routes to the same goal, and settings the user owns.",
+  when:"When users differ in habits, devices, or ways of working.",
+  ask:"Can the user reach the same goal in several ways, and adapt the interface to themselves?",
+  fail:"Users who do not fit the single planned way are blocked or slowed.",
+  goal:"Offer several routes to the same action (menu, right-click, toolbar, keyboard) and let users personalise layout, language and theme.",
+  cap0:"One route only",
+  ui0:'<div class="v">Copy is available <b>only</b> by right-click &rarr; menu.</div>'+
+      '<div class="note strike">Ctrl + C</div>'+
+      '<div class="note" style="color:var(--coral)">Fixed 1200 px layout: unusable on a phone.</div>',
+  why0:"A user without a mouse, or on a small screen, simply cannot do it.",
+  cap1:"Several routes, one goal",
+  ui1:'<div class="v">Copy: menu, right-click, toolbar, drag and drop, or <span class="mono">Ctrl + C</span>.</div>'+
+      '<div class="note">Responsive layout; colours, size and language in Settings.</div>',
+  why1:"Adapt to the audience, the screen and the taste. Several ways to do the same action."},
+ {t:"Taking the user's experience into account",
+  one:"Help the beginner, and let the expert go fast.",
+  when:"When the application has both beginners and experts &mdash; and when a beginner slowly becomes an expert.",
+  ask:"Does the interface help a beginner and still let an expert go fast?",
+  fail:"Beginners are lost, or experts are slowed by steps and messages meant for beginners.",
+  goal:"Guidance for beginners, shortcuts and advanced modes for experts. Adaptation = adaptability (the user controls the change) + adaptivity (the system controls it). Propose, do not impose.",
+  cap0:"The same path for everyone, for ever",
+  ui0:'<div class="v">The welcome tutorial opens at every launch.</div>'+
+      '<div class="note strike">Don\'t show again</div>'+
+      '<div class="note" style="color:var(--coral)">The menu rearranges itself to show &ldquo;what you use most&rdquo;.</div>',
+  why0:"The expert pays the beginner\'s price daily, and a menu that moves on its own destroys learning.",
+  cap1:"Grows with the user",
+  ui1:'<div class="row"><span class="bt">Show tips</span><span class="bt grey">Don\'t show again</span></div>'+
+      '<div class="note">Every menu entry displays its keyboard shortcut, so the beginner learns the expert route.</div>',
+  why1:"Adaptability, not adaptivity: the user controls the change, and the interface stays predictable."}
+]},
+{n:5, name:"Error management", one:"Avoid errors, reduce them, and let the user correct them.", subs:[
+ {t:"Protection against errors",
+  one:"Prevent the error before it can happen.",
+  when:"Before risky or irreversible actions, and in every data input: deleting, paying, typing dates or numbers.",
+  ask:"Which errors can the user make here, and does the design prevent them before they happen?",
+  fail:"The user makes an error that the design could have avoided.",
+  goal:"Constrain the input, disable impossible commands, announce irreversible ones. Match the level of protection to the danger: do not under-protect, do not over-protect.",
+  cap0:"Both at once",
+  ui0:'<div class="row"><span class="bt red">Delete account</span><span class="note">one click, no warning</span></div>'+
+      '<div class="note" style="color:var(--coral)">Rename a file: &ldquo;Are you sure? &mdash; Are you really sure?&rdquo;</div>',
+  why0:"Under-protected where it is dangerous, over-protected where it is harmless. Users stop reading warnings.",
+  cap1:"Protection matches the danger",
+  ui1:'<div class="note">Rename: instant, and can be undone.</div>'+
+      '<div class="row"><span class="bt red">Delete account</span><span class="note">type the account name to confirm</span></div>'+
+      '<div class="lbl">Phone</div><div class="fld">digits only, 10 maximum</div>',
+  why1:"Inform in advance, disable what is unavailable, limit the input, check it."},
+ {t:"Quality of error messages",
+  one:"Name the cause, and propose the fix.",
+  when:"Every time an error message is shown.",
+  ask:"Does the message say what is wrong, where, and how to fix it &mdash; in the user's words, politely?",
+  fail:"The user does not understand the error, so cannot fix it, and blames themselves or the software.",
+  goal:"Short, polite, precise, in the user's language, naming the cause and proposing the solution.",
+  cap0:"A code, and nothing else",
+  ui0:'<div class="v mono" style="font-size:calc(var(--u)*2.4)">Error 0x80070057</div>'+
+      '<div class="note" style="color:var(--coral)">&ldquo;Invalid input.&rdquo; &mdash; Which field? Why? What now?</div>',
+  why0:"The message is written for the developer, not for the person sitting in front of the screen.",
+  cap1:"Cause and solution, in their words",
+  ui1:'<div class="v">The date must be in the past.</div>'+
+      '<div class="note">You typed 25/03/2031. Did you mean 2001?</div>'+
+      '<div class="row"><span class="bt">Use 2001</span><span class="bt grey">Edit</span></div>',
+  why1:"Informative, constructive, understandable, friendly &mdash; and it offers the fix."},
+ {t:"Error correction",
+  one:"Keep the work; repair only the fault.",
+  when:"After an error has happened.",
+  ask:"Can the user correct it easily, without starting again?",
+  fail:"The user loses the work already done and has to redo everything.",
+  goal:"Signal the error early, in the area concerned, with the cursor on the faulty input; keep the data already entered; allow undo.",
+  cap0:"Everything cleared",
+  ui0:'<div class="note" style="color:var(--coral)">One field was wrong, so the form was emptied.</div>'+
+      '<div class="fld">&nbsp;</div><div class="fld">&nbsp;</div><div class="fld">&nbsp;</div>'+
+      '<div class="note">Twelve answers lost. The user leaves.</div>',
+  why0:"The cost of a small mistake is the whole task.",
+  cap1:"Only the faulty field",
+  ui1:'<div class="fld">Ahmed Benali</div>'+
+      '<div class="lbl">Phone</div><div class="fld" style="border-color:var(--coral)">06 12 34</div>'+
+      '<div class="note" style="color:var(--coral)">Too short: a phone number has 10 digits.</div>'+
+      '<div class="note">Everything else is kept. <span class="mono">Ctrl + Z</span> undoes the last change.</div>',
+  why1:"Marked, placed on the field, corrected in one gesture, and nothing else is lost."}
+]},
+{n:6, name:"Consistency", one:"The same design choices in the same contexts &mdash; different ones only when the context differs.",
+ parts:[{t:"Interface",one:"Appearance, position and wording of the components."},
+        {t:"Interaction",one:"The way the elements behave when you use them."},
+        {t:"Between applications",one:"Inside a suite, and with the other software: follow the style guides."},
+        {t:"Between versions",one:"Support the change, and be careful when a command moves."}],
+ subs:[
+ {t:"Consistency (homogeneity)",
+  one:"Same context, same choices &mdash; everywhere, every version.",
+  when:"Across all screens of the same application, between the applications of a suite, and between versions.",
+  ask:"Are the same things placed, named and styled the same way everywhere?",
+  fail:"The user has to relearn every screen, hesitates, and clicks the wrong button.",
+  goal:"Keep codes, names, formats and procedures identical in identical contexts &mdash; appearance, position, wording, and behaviour. Follow the style guides, and be careful when a version moves a command.",
+  cap0:"Three screens, three habits",
+  ui0:'<div class="note">Page 1</div><div class="row"><span class="bt">Valider</span><span class="bt grey">Annuler</span></div>'+
+      '<div class="note">Page 2</div><div class="row"><span class="bt grey">Cancel</span><span class="bt">OK</span></div>'+
+      '<div class="note">Page 3</div><div class="row"><span class="bt">Save</span><span class="bt grey">Quit</span></div>',
+  why0:"Wording, order and language all change. Labels are also aligned differently in each form.",
+  cap1:"One rule, every screen",
+  ui1:'<div class="note">Page 1</div><div class="row" style="justify-content:flex-end"><span class="bt grey">Cancel</span><span class="bt">OK</span></div>'+
+      '<div class="note">Page 2</div><div class="row" style="justify-content:flex-end"><span class="bt grey">Cancel</span><span class="bt">OK</span></div>'+
+      '<div class="note">Same words, same order, bottom right &mdash; and the same grid, spacing and alignment.</div>',
+  why1:"The user learns once. Homogeneity is between several elements; coherence is between one thing and another."}
+]},
+{n:7, name:"Significance of codes and names", one:"The sign must match what it refers to, for the user.",
+ parts:[{t:"Codes",one:"Icons, illustrations, abbreviations, colours."},
+        {t:"Names",one:"Terms and vocabulary, in the users' own language."}],
+ subs:[
+ {t:"Significance of codes and names",
+  one:"The sign must mean what it does, for the user.",
+  when:"For every name, icon, colour, abbreviation or code the user has to interpret.",
+  ask:"Does this name, icon or colour mean to the user what it means to us?",
+  fail:"The user misreads the screen and chooses the wrong action, confidently.",
+  goal:"Use the users' own vocabulary, recognisable icons and logical colours &mdash; codes (icons, illustrations, abbreviations, colours) and names (terms, vocabulary) must match their referent.",
+  cap0:"Codes only the developer knows",
+  ui0:'<div class="row"><span class="bt">&#9003;</span><span class="bt">&#8862;</span><span class="bt">&#9784;</span></div>'+
+      '<div class="note mono">F3 = Delete &nbsp;&nbsp; F7 = Save</div>'+
+      '<div class="row"><span class="bt" style="background:var(--green)">Delete</span><span class="bt red">Keep</span></div>',
+  why0:"Unreadable icons, arbitrary keys, and colours that say the opposite of the action.",
+  cap1:"Words and colours that match",
+  ui1:'<div class="row"><span class="bt">Delete</span><span class="bt grey">Save</span></div>'+
+      '<div class="note mono">Del = Delete &nbsp;&nbsp; Ctrl + S = Save</div>'+
+      '<div class="row"><span class="bt red">Delete</span><span class="bt" style="background:var(--green)">Keep</span></div>',
+  why1:"An icon with its word, the usual keys, red to destroy and green to keep."}
+]},
+{n:8, name:"Compatibility", one:"Agreement between the users, their task, and the application.", subs:[
+ {t:"Adaptation to the users and the task",
+  one:"Their words, their formats, their real procedure.",
+  when:"When the interface meets the real users: their language, their culture, their habits, their real work.",
+  ask:"Does the user have to translate between their world and this interface?",
+  fail:"The user converts dates, reverses text, or invents a procedure the software did not plan.",
+  goal:"Match memory, perception, habits, skills, age and expectations: their vocabulary, reading direction, formats, documents and real procedures. Consider age, disability, level of technology and language.",
+  cap0:"The user adapts to the software",
+  ui0:'<div class="lbl">&#1575;&#1604;&#1575;&#1587;&#1605;</div>'+
+      '<div class="fld" dir="ltr" style="text-align:left">&#1583;&#1605;&#1581;&#1571;</div>'+
+      '<div class="note mono">Date: 03/25/2001 (MM/DD/YYYY)</div>'+
+      '<div class="note" style="color:var(--coral)">The paper form asks Name then ID. The screen asks ID then Name.</div>',
+  why0:"Wrong writing direction, foreign date format, and an order that fights the procedure already in use.",
+  cap1:"The software adapts to the user",
+  ui1:'<div class="lbl">&#1575;&#1604;&#1575;&#1587;&#1605;</div>'+
+      '<div class="fld" dir="rtl" style="text-align:right">&#1571;&#1581;&#1605;&#1583;</div>'+
+      '<div class="note mono">Date: 25/03/2001 (JJ/MM/AAAA)</div>'+
+      '<div class="note">Same order as the paper form the office already uses.</div>',
+  why1:"Their script, their format, their procedure. Nothing to translate."},
+ {t:"Compatibility between applications",
+  one:"Behave like the software sitting next to it.",
+  when:"When your application lives next to the others the user already knows.",
+  ask:"Does it behave like the other software on this machine, and like its own previous version?",
+  fail:"The user applies a habit learned elsewhere, and it fails here.",
+  goal:"Follow the platform style guides: same place for the same thing, same shortcuts, same order of buttons, same vocabulary.",
+  cap0:"Its own private rules",
+  ui0:'<div class="win"><div class="winbar">Status: ready &mdash; 1248 x 860</div>'+
+      '<div class="wintabs"><span>File</span><span>Edit</span><span>Image</span></div>'+
+      '<div class="note">Save = <span class="mono">Ctrl + G</span></div></div>',
+  why0:"The status bar sits above the tools, and Save is on an invented shortcut.",
+  cap1:"Like every other application",
+  ui1:'<div class="win"><div class="wintabs"><span>File</span><span>Edit</span><span>Image</span></div>'+
+      '<div class="note">Save = <span class="mono">Ctrl + S</span></div>'+
+      '<div class="winbar">Status: ready &mdash; 1248 x 860</div></div>',
+  why1:"Status bar at the bottom, full width; the standard shortcut. Theory, style guide and criterion all agree."}
+]}
+];
+
+/* ============ SLIDE BUILDING ============ */
+var S=[];   /* {part, num, crit, sub, html} */
+var TOTSUB=0; CRIT.forEach(function(c){TOTSUB+=c.subs.length;});
+
+S.push({part:"Opening", num:"", crit:"Bastien and Scapin", sub:"8 criteria, 18 sub-criteria",
+ html:'<div class="title">'+
+   '<h1>The 8 ergonomic criteria<br>of Bastien and Scapin</h1>'+
+   '<div class="lead">A synthesis of more than 800 ergonomic recommendations (INRIA). '+
+   'We use them to judge an interface with criteria instead of personal taste.</div>'+
+   '<div class="by">Human Computer Interaction &middot; Universit&eacute; Alger 1 &middot; Prof. Izountar Yousra</div>'+
+   '<div class="kbd"><span>&larr;</span> <span>&rarr;</span> move &middot; <span>Esc</span> all slides &middot; '+
+   '<span>F</span> full screen</div></div>'});
+
+S.push({part:"Bastien and Scapin", num:"", crit:"Bastien and Scapin's criteria",
+ sub:"Who they are, and what the criteria are for",
+ html:'<h2>Bastien and Scapin\'s criteria</h2>'+
+  '<div class="lead">Christian Bastien and Dominique Scapin, researchers at <b>INRIA</b> (France), '+
+  'collected more than <b>800 ergonomic recommendations</b> and organised them into '+
+  '<b>8 criteria</b> and <b>18 sub-criteria</b>. It is the set we use in this course to audit an interface.</div>'+
+  '<div class="levels">'+
+   '<div class="lv"><div class="lvn">What it is</div><div class="lvt">A synthesis</div>'+
+    '<div class="lvd">More than 800 scattered recommendations, grouped and arbitrated into one short, '+
+    'usable list.</div></div>'+
+   '<div class="lv hi"><div class="lvn">What it contains</div><div class="lvt">8 criteria<br>18 sub-criteria</div>'+
+    '<div class="lvd">Each one names a precise quality of the interface, with a question you can ask about '+
+    'any screen.</div></div>'+
+   '<div class="lv"><div class="lvn">What it is for</div><div class="lvt">Judging with criteria</div>'+
+    '<div class="lvd">An ergonomic audit, not a matter of taste: you go through the criteria screen by '+
+    'screen and name the one that is broken.</div></div>'+
+   '<div class="lv"><div class="lvn">Why it helps</div><div class="lvt">A shared vocabulary</div>'+
+    '<div class="lvd">The whole team says &ldquo;this breaks guidance&rdquo; instead of &ldquo;I don\'t like '+
+    'it&rdquo;, so the problem can be discussed and fixed.</div></div></div>'+
+  '<div class="note" style="font-size:calc(var(--u)*2)">A finding without a criterion is an opinion. '+
+  'A finding with a criterion is an argument.</div>'});
+
+S.push({part:"Map", num:"", crit:"The 8 criteria at a glance", sub:"8 criteria, "+TOTSUB+" sub-criteria",
+ html:'<h2>The 8 criteria &mdash; '+TOTSUB+' sub-criteria</h2><div class="map">'+
+  CRIT.map(function(c){return '<div class="mc"><div class="mn">CRITERION '+c.n+'</div>'+
+    '<div class="mt">'+c.name+'</div><div class="md">'+
+    c.subs.map(function(s){return s.t;}).join(' &middot; ')+'</div></div>';}).join('')+'</div>'});
+
+CRIT.forEach(function(c){
+  var m=c.subs.length;
+  /* section divider */
+  S.push({part:"Criterion "+c.n, num:c.n, crit:c.name,
+   sub:(m>1? m+" sub-criteria" : "1 sub-criterion"),
+   html:(function(){
+     var list = c.parts || c.subs, numbered = !c.parts && list.length>1;
+     return '<div class="divider"><div class="dtop"><div class="dn">Criterion '+c.n+' of 8</div>'+
+       '<h1 style="font-size:calc(var(--u)*5.6)">'+c.name+'</h1>'+
+       '<div class="lead">'+c.one+'</div>'+
+       (c.parts?'<div class="dcov">What this criterion covers</div>':'')+'</div>'+
+       '<ol class="dsubs n'+list.length+'">'+list.map(function(s,j){
+          return '<li><b>'+(numbered?(j+1)+' &middot; ':'')+s.t+'</b><span>'+s.one+'</span></li>';
+        }).join('')+'</ol></div>';
+   })()});
+
+  c.subs.forEach(function(s,j){
+    var tag = m>1 ? (c.n+'.'+(j+1)) : String(c.n);
+    var pos = m>1 ? ('Criterion '+c.n+' &middot; sub-criterion '+(j+1)+' of '+m) : ('Criterion '+c.n);
+    S.push({part:"Criterion "+c.n+(m>1?' · '+(j+1)+'/'+m:''), num:tag, crit:s.t, sub:c.name+' — '+pos.replace(/&middot;/g,'·').replace(/&mdash;/g,'—'),
+     html:'<div class="q4">'+
+       '<div class="cell"><div class="k">1 &middot; When it applies</div><div class="v">'+s.when+'</div></div>'+
+       '<div class="cell ask"><div class="k">2 &middot; Question to ask</div><div class="v"><em>'+s.ask+'</em></div></div>'+
+       '<div class="cell bad"><div class="k">3 &middot; If it fails</div><div class="v">'+s.fail+'</div></div>'+
+       '<div class="cell goal"><div class="k">4 &middot; Goal</div><div class="v">'+s.goal+'</div></div></div>'});
+    S.push({part:"Criterion "+c.n+(m>1?' · '+(j+1)+'/'+m:''), num:tag, crit:s.t, sub:'Bad example and good example',
+     html:'<div class="two">'+
+       '<div class="pane no"><span class="tag">DON\'T</span><div class="cap">'+s.cap0+'</div>'+
+         '<div class="ui">'+s.ui0+'</div><div class="why"><b>Why it fails.</b> '+s.why0+'</div></div>'+
+       '<div class="pane yes"><span class="tag">DO</span><div class="cap">'+s.cap1+'</div>'+
+         '<div class="ui">'+s.ui1+'</div><div class="why"><b>Why it works.</b> '+s.why1+'</div></div></div>'});
+  });
 });
 
-/* texte le plus grand possible sans déborder (comme le cours 5) */
-function fit(s){
-  var d=s.firstElementChild;
-  if(matchMedia('(max-width:760px)').matches){d.style.zoom=1;d.style.overflow='auto';return}
-  var z=1.7;d.style.overflow='hidden';
-  for(;z>0.6;z-=0.05){
-    d.style.zoom=z;
-    if(d.scrollHeight<=d.clientHeight+2&&d.scrollWidth<=d.clientWidth+2)break;
+S.push({part:"Closing", num:"", crit:"Using the criteria", sub:"How to write an ergonomic finding",
+ html:'<h2>In an audit, name the criterion</h2>'+
+  '<div class="lead">A finding is not &ldquo;I don\'t like it&rdquo;. It has five parts, and the criterion is what '+
+  'turns an opinion into an argument.</div>'+
+  '<div class="q4">'+
+   '<div class="cell"><div class="k">1 &middot; Situation</div><div class="v">Which screen, which user, which task.</div></div>'+
+   '<div class="cell bad"><div class="k">2 &middot; Problem</div><div class="v">What the user sees or does, stated as a fact.</div></div>'+
+   '<div class="cell ask"><div class="k">3 &middot; Criterion</div><div class="v"><em>Which of the 8, and which sub-criterion.</em></div></div>'+
+   '<div class="cell goal"><div class="k">4 &middot; Risk, then 5 &middot; Solution</div>'+
+    '<div class="v">What it costs the user (Meinadier), then one concrete change to the interface.</div></div></div>'});
+
+/* ============ ENGINE ============ */
+var stage=document.getElementById('stage'), i=0;
+S.forEach(function(s,k){
+  var d=document.createElement('section');
+  d.className='slide'; d.id='sl'+k; d.innerHTML=s.html; stage.appendChild(d);
+});
+var EL=[].slice.call(stage.children);
+
+var hNum=document.getElementById('h-num'), hCrit=document.getElementById('h-crit'),
+    hSub=document.getElementById('h-sub'), hStep=document.getElementById('h-step'),
+    hPart=document.getElementById('h-part'), bar=document.getElementById('bar');
+
+function fit(el){
+  /* Largest type size at which the slide still fits. Scanning down from the top
+     matters: a text block can report a phantom 1-3px overflow at one size and
+     none at the next, so growing upward used to stop at the first false alarm. */
+  var MIN=0.45, MAX=2.80, STEP=0.04;
+  /* only the boxes that really clip (overflow:hidden); text overflow shows up on them */
+  var kids=el.querySelectorAll('.cell,.ui,.mc,.lv,.pane,.win,.grp,.dsubs li');
+  function over(){
+    if(el.scrollHeight>el.clientHeight+2 || el.scrollWidth>el.clientWidth+2) return true;
+    for(var n=0;n<kids.length;n++){
+      if(kids[n].scrollHeight>kids[n].clientHeight+2) return true;
+      if(kids[n].scrollWidth >kids[n].clientWidth +2) return true;
+    }
+    return false;
   }
-  d.style.zoom=z;d.style.overflow='auto'; /* si ça déborde encore au minimum : défilement */
-}
-var last=-1;
-function upd(force){
-  var i=0;for(;i<N;i++)if(slides[i].classList.contains('on'))break;
-  if(i>=N)return;
-  var s=slides[i];
-  if(i!==last||force){
-    var m=s.dataset.mod||'',k=m?m.slice(1):'',a=m?D.querySelector('#nav a[data-m="'+m+'"]'):null;
-    $('dsNum').textContent=k||'·';
-    $('dsTit').textContent=s.dataset.title||'';
-    $('dsSub').textContent=a?a.lastChild.textContent:(i===N-1?'Credits':'Interfaces & Interactions with Mock-ups');
-    $('dsStep').textContent=(i+1)+' / '+N;
-    $('dsPart').textContent=k?('Module '+k):(i===N-1?'Closing':'Opening');
-    $('dsBar').style.width=((i+1)/N*100)+'%';
-    s.firstElementChild.scrollTop=0;
+  if(window.matchMedia('(max-width:760px)').matches){   /* phone: CSS sizes the type, the slide scrolls */
+    el.style.removeProperty('--u'); el.scrollTop=0; return;
   }
-  last=i;fit(s);
+  var u=MAX, t=0;
+  el.style.setProperty('--u', u+'vh');
+  while(t<70 && u>MIN && over()){ u-=STEP; el.style.setProperty('--u', u+'vh'); t++; }
 }
-var mo=new MutationObserver(function(){upd(false)});
-slides.forEach(function(s){mo.observe(s,{attributes:true,attributeFilter:['class']})});
-var t;window.addEventListener('resize',function(){clearTimeout(t);t=setTimeout(function(){upd(true)},120)});
-window.addEventListener('load',function(){upd(true)});
-if(D.fonts&&D.fonts.ready)D.fonts.ready.then(function(){upd(true)});
-upd(true);
-})();
+
+function show(k){
+  i=Math.max(0, Math.min(S.length-1, k));
+  EL.forEach(function(e,n){ e.classList.toggle('on', n===i); });
+  var s=S[i];
+  hNum.textContent = s.num===''? '·' : s.num;
+  hNum.style.background = s.num===''? 'var(--muted)' : 'var(--blue)';
+  hCrit.textContent=s.crit; hSub.textContent=s.sub;
+  hStep.textContent=(i+1)+' / '+S.length; hPart.textContent=s.part;
+  bar.style.width=((i+1)/S.length*100)+'%';
+  var pp=document.getElementById('ppos'); if(pp) pp.textContent=(i+1)+' / '+S.length;
+  var pb=document.getElementById('pprev'), pn=document.getElementById('pnext');
+  if(pb) pb.disabled = i===0; if(pn) pn.disabled = i===S.length-1;
+  fit(EL[i]);
+  try{ location.hash='s'+(i+1); }catch(e){}
+}
+function go(d){ show(i+d); }
+
+document.addEventListener('keydown', function(e){
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ e.preventDefault(); go(1); }
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); go(-1); }
+  else if(e.key==='Home'){ show(0); } else if(e.key==='End'){ show(S.length-1); }
+  else if(e.key==='Escape'){ ov.classList.toggle('on'); }
+  else if(e.key==='f'||e.key==='F'){ fsToggle(); }
+});
+stage.addEventListener('click', function(e){
+  if(window.matchMedia('(max-width:760px)').matches) return;  /* phone: tap scrolls, swipe moves */
+  go(e.clientX < window.innerWidth*0.25 ? -1 : 1);
+});
+var tx=null;
+stage.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
+stage.addEventListener('touchend',function(e){
+  if(tx===null)return; var dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>40) go(dx<0?1:-1); tx=null;
+},{passive:true});
+
+function fsToggle(){
+  if(!document.fullscreenElement){ document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); }
+  else { document.exitFullscreen&&document.exitFullscreen(); }
+}
+document.getElementById('b-fs').onclick=function(e){e.stopPropagation();fsToggle();};
+document.getElementById('b-th').onclick=function(e){e.stopPropagation();
+  var r=document.documentElement, cur=r.getAttribute('data-theme');
+  r.setAttribute('data-theme', cur==='dark'?'light':'dark'); setTimeout(function(){fit(EL[i]);},30);
+};
+
+var ov=document.getElementById('ov');
+ov.innerHTML=S.map(function(s,k){
+  return '<button type="button" data-k="'+k+'"><i>'+(k+1)+' · '+s.part+'</i><b>'+s.crit+'</b></button>';
+}).join('');
+ov.addEventListener('click',function(e){
+  var b=e.target.closest('button'); if(!b)return;
+  ov.classList.remove('on'); show(+b.dataset.k);
+});
+document.getElementById('b-ov').onclick=function(e){e.stopPropagation();ov.classList.toggle('on');};
+document.getElementById('pprev').onclick=function(e){e.stopPropagation();go(-1);};
+document.getElementById('pnext').onclick=function(e){e.stopPropagation();go(1);};
+
+window.addEventListener('resize', function(){ fit(EL[i]); });
+var start=0; try{ var m=/^#s(\d+)$/.exec(location.hash); if(m) start=+m[1]-1; }catch(e){}
+show(start);
+</script>
+</body></html>
