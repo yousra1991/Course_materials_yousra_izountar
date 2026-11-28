@@ -1089,8 +1089,10 @@ html.pj .pj-hide{display:none!important}
 @media (max-width:760px){
   #pj-track{height:calc(var(--u)*4.4);padding:0 calc(var(--u)*1.4);gap:calc(var(--u)*.8)}
   .trk-k{display:none}
-  .trk-seg{padding:0}
-  .trk-seg:not(.cur) .trk-l{visibility:hidden}
+  .trk-seg{padding:0;justify-content:center}
+  .trk-seg:not(.cur) .trk-t{display:none}
+  .trk-seg:not(.cur) .trk-l b{margin:0}
+  .trk-seg.cur{justify-content:flex-start}
   .trk-seg.cur{flex-grow:6;padding:0 calc(var(--u)*.8)}
   .pjc{width:auto!important;height:auto;grid-template-columns:1fr;transform:none!important;border-radius:18px}
   .pjc-l{padding:24px 22px}.pjc-r{padding:22px}
@@ -2178,7 +2180,7 @@ window.PJTrack=function(segs,N,go,host,before){
   var el=document.createElement('div'); el.id='pj-track'; el.setAttribute('role','navigation'); el.setAttribute('aria-label','Progress in the lecture');
   el.innerHTML='<span class="trk-k">Progress</span><div class="trk-segs">'+segs.map(function(s,j){
       return '<button type="button" class="trk-seg" data-j="'+j+'" title="'+esc(s.full)+'"><i class="trk-f"></i>'+
-             '<span class="trk-l"><b>'+esc(s.n)+'</b>'+esc(s.label)+'</span></button>';}).join('')+
+             '<span class="trk-l"><b>'+esc(s.n)+'</b><span class="trk-t">'+esc(s.label)+'</span></span></button>';}).join('')+
     '</div><span class="trk-p">0%</span>';
   (host||document.body).insertBefore(el, before||(host||document.body).firstChild);
   el.addEventListener('click',function(e){ var b=e.target.closest('.trk-seg'); if(!b) return; e.stopPropagation(); go(segs[+b.dataset.j].start); });
@@ -2209,7 +2211,8 @@ var head=$('pj-head'), hNum=$('pj-num'), hCrit=$('pj-crit'), hSub=$('pj-sub'), h
 var phone=matchMedia('(max-width:760px)');
 
 /* lecture title and module names come from the page itself */
-var LTITLE=(document.title||'').replace(/\s*\|.*$/,'');
+var cvh=document.querySelector('.pjc h1');
+var LTITLE=cvh? cvh.textContent.trim() : (document.title||'').replace(/\s*\|.*$/,'');   /* same title as the cover */
 var LN=/lecture(\d+)/i.exec(location.pathname); var LSUB='Human–Computer Interaction'+(LN?' · Lecture '+LN[1]:'');
 var MODS={};
 S.forEach(function(s){var m=s.dataset.mod, t=s.dataset.title||''; var r=/^Module\s+(\d+)\s*:\s*(.*)$/.exec(t);
