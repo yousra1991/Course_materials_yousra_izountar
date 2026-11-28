@@ -202,14 +202,10 @@ function evaluationOf(mat) {
     if (mc < 0) continue;
     for (var r = 1; r < v.length; r++) {
       if (digits(v[r][mc]) !== mat) continue;
-      var sessions = [], fields = [], seen = {};
+      var sessions = [], fields = [];
       head.forEach(function (h, c) {
         if (!h || /^(matricule|nom|pr[ée]nom)$/i.test(h)) return;
-        if (/^\d{1,2}\/\d{1,2}(\/\d{2,4})?$/.test(h)) {
-          if (seen[h]) return;              /* a date written twice: the first column counts */
-          seen[h] = true;
-          sessions.push({ date: h, status: v[r][c] });
-        }
+        if (/^\d{1,2}\/\d{1,2}(\/\d{2,4})?$/.test(h)) sessions.push({ date: h, status: v[r][c] });
         else fields.push({ label: h, value: v[r][c] });
       });
       return { tab: tabs[i], sessions: sessions, fields: fields };
