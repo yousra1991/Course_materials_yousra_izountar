@@ -118,8 +118,7 @@ const DATA = [
             { t: "Lab 4 – Final Project", f: "Labs/HCI_lab/Project.html" }
         ],
         swing: [
-          { t: "Support Java Swing (PDF) – Google Drive", f: "https://drive.google.com/file/d/13fvrieYtwKb06LTlw7XCjRwnxUUkykae/view?usp=drivesdk" },
-          { t: "Support Java Swing (PDF) – download a copy", f: "Labs/HCI_lab/Java_Swing_Support_HCI.pdf" }
+          { t: "Support Java Swing – the notions of the labs and how to use them (save as PDF)", f: "Labs/HCI_lab/swing-support.html" }
         ],
         tutorials: [
           { t: "Tutorial 1 – Introduction and History of HCI", f: "Tutos/HCI/Tuto1.html" },
@@ -138,7 +137,7 @@ const TYPES = [
   { key: "lectures",  label: "Lectures",  hint: "Lecture notes",      color: "var(--course)" },
   { key: "labs",      label: "Labs",      hint: "Practical work",     color: "var(--tp)" },
   { key: "tutorials", label: "Tutorials", hint: "Tutorial exercises", color: "var(--td)" },
-  { key: "swing",     label: "Support Java Swing (PDF)", hint: "Course handout for the Swing labs", color: "var(--sup)" }
+  { key: "swing",     label: "Support Java Swing (PDF)", hint: "All the notions of the labs, one page to read or save as PDF", color: "var(--sup)" }
 ];
 const typesOf = m => TYPES.map((x,i) => [x,i]).filter(([x]) => m[x.key] !== undefined);
 
