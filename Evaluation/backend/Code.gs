@@ -7,7 +7,7 @@
  * Published as a web app: Deploy > New deployment > Web app,
  * execute as me, access: anyone.
  *
- * A student signs in with matricule + registration number (UN1601...).
+ * A student signs in with their matricule (8 digits, as in the official list).
  * The server sends back ONLY that student's row, their claims and their absence notes.
  * The teacher key, the other students and the Drive files never leave Google.
  */
@@ -171,16 +171,16 @@ function findStudent(token) {
 }
 
 function sLogin(b) {
-  var mat = digits(b.matricule), ins = norm(b.inscription);
-  if (!mat || !ins) return { ok: false, error: 'Write your matricule and your registration number.' };
-  /* slow down guessing: 6 wrong tries for one matricule = wait 15 minutes */
-  var cache = CacheService.getScriptCache(), ck = 'fail_' + mat, fails = Number(cache.get(ck) || 0);
-  if (fails >= 6) return { ok: false, error: 'Too many tries. Wait 15 minutes, then try again.' };
+  var mat = digits(b.matricule);
+  if (!mat) return { ok: false, error: 'Write your matricule.' };
+  /* slow down people who try many matricules: 30 unknown ones in 15 minutes = wait */
+  var cache = CacheService.getScriptCache(), fails = Number(cache.get('fail_all') || 0);
+  if (fails >= 30) return { ok: false, error: 'Too many tries. Wait 15 minutes, then try again.' };
   var st = rows(SH.ST).filter(function (r) { return digits(r.Matricule) === mat; })[0];
-  if (!st || norm(st.Inscription) !== ins) {
-    cache.put(ck, String(fails + 1), 900);
-    log(mat, 'wrong sign-in');
-    return { ok: false, error: 'This matricule and this registration number do not match. Check both on your student card.' };
+  if (!st) {
+    cache.put('fail_all', String(fails + 1), 900);
+    log(mat, 'unknown matricule');
+    return { ok: false, error: 'This matricule is not on the list. Check it on your student card.' };
   }
   return withLock(function () {
     var token = st.Token;

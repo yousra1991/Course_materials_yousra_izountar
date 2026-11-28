@@ -19,9 +19,8 @@ GitHub never sees the teacher key, the marks or the documents.
 
 ## How a student signs in
 
-**Matricule + registration number** (the `UN1601…` number of the official list, on the student card).
-The server checks both against the **Students** tab. After 6 wrong tries for one matricule,
-it waits 15 minutes. A student who reloads the page stays signed in on that device.
+**Matricule only** (8 digits, as in the official list). The server checks it against the **Students** tab.
+After 30 unknown matricules in 15 minutes, it waits 15 minutes. A student who reloads the page stays signed in on that device.
 
 ## What the server reads
 
@@ -70,5 +69,5 @@ Forgetting this is the usual reason "nothing changed".
   named `group - matricule - name - kind - date`. Only you can open them.
 - Five students of the official list are in no evaluation tab yet. They can sign in; their page says
   that their marks are not in the table yet and lets them send a claim.
-- The registration number protects the page as long as students do not share it. If one student
-  shares it, only their own record is exposed.
+- Sign-in uses the matricule only: a student who knows a classmate's matricule can open that classmate's page.
+  The Inscription column stays in the Students tab, so a stronger sign-in can come back later.

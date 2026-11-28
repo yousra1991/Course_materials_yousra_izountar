@@ -99,9 +99,7 @@ footer{color:var(--muted);font-size:13px;text-align:center;padding:24px 0 36px}
     <form id="fLogin" autocomplete="on">
       <label for="mat">Matricule</label>
       <input id="mat" inputmode="numeric" autocomplete="username" placeholder="e.g. 31353414" required>
-      <label for="ins">Registration number</label>
-      <input id="ins" autocomplete="current-password" placeholder="UN1601…" required>
-      <p class="hint">Both are on your student card. The registration number starts with <b>UN1601</b>.</p>
+      <p class="hint">Your matricule has 8 digits. It is on your student card.</p>
       <button class="btn" type="submit" style="margin-top:14px;width:100%">Sign in</button>
       <div class="msg" id="mLogin"></div>
     </form>
@@ -191,7 +189,7 @@ function setToken(t){ try { t ? localStorage.setItem(KEY, t) : localStorage.remo
 $('fLogin').addEventListener('submit', function(e){
   e.preventDefault();
   var m = $('mLogin'); m.className = 'msg'; m.textContent = 'Checking…';
-  call('login', {matricule: $('mat').value, inscription: $('ins').value}).then(function(r){
+  call('login', {matricule: $('mat').value}).then(function(r){
     if (!r.ok){ m.className = 'msg bad'; m.textContent = r.error; return; }
     setToken(r.token); m.textContent = ''; load();
   }).catch(function(){ m.className = 'msg bad'; m.textContent = 'No connection. Try again.'; });
