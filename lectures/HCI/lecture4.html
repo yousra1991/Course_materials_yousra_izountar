@@ -940,6 +940,87 @@ details.orig{margin:12px 0}
 @media(max-width:560px){.pz .pzc{display:block;margin:6px 4px}}
 .slimg.full img{max-height:none}
 
+
+/* ===== projector mode (full-screen slides, same frame as lecture 5) ===== */
+html.pj{--u:1vh}
+html.pj,html.pj body{height:100%;overflow:hidden}
+html.pj body{background:var(--paper)}
+html.pj header.top,html.pj #deckbar,html.pj #dOutline,html.pj .skip,html.pj .donebar,html.pj #fsBtn{display:none!important}
+html.pj main{padding:0}
+html.pj .slide.on{position:fixed;left:0;top:0;margin:0;transform-origin:0 0;box-sizing:border-box;z-index:5;will-change:transform}
+html.pj .slide.on>:first-child{margin-top:0}
+html.pj .slide.on>:last-child{margin-bottom:0}
+html.pj .module{padding:0;margin:0;border:0}
+
+#pj-head{position:fixed;left:0;right:0;top:0;z-index:30;display:flex;align-items:center;gap:calc(var(--u)*1.6);
+  height:calc(var(--u)*8.2);padding:0 calc(var(--u)*2.6);background:var(--surface);border-bottom:1px solid var(--line);
+  font-family:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;color:var(--ink)}
+#pj-num{flex:none;display:grid;place-items:center;width:calc(var(--u)*5.2);height:calc(var(--u)*5.2);
+  border-radius:calc(var(--u)*1.2);background:var(--blue);color:var(--surface);font-weight:800;font-size:calc(var(--u)*2.5)}
+#pj-num.off{background:var(--muted)}
+.pj-txt{min-width:0;flex:1;display:flex;flex-direction:column}
+#pj-crit{font-family:'Bricolage Grotesque','Atkinson Hyperlegible',system-ui,sans-serif;font-size:calc(var(--u)*2.7);
+  font-weight:800;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pj-sub{font-size:calc(var(--u)*1.7);color:var(--muted);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pj-pos{flex:none;text-align:right;font-size:calc(var(--u)*1.7);color:var(--muted);line-height:1.35}
+.pj-pos b{display:block;font-size:calc(var(--u)*2.2);color:var(--ink)}
+.pj-btns{flex:none;display:flex;gap:calc(var(--u)*.8)}
+.pj-btns button{border:1px solid var(--line);background:var(--surface2);color:var(--muted);border-radius:calc(var(--u)*.9);
+  padding:calc(var(--u)*.7) calc(var(--u)*1.2);font-size:calc(var(--u)*1.6);cursor:pointer;font-family:inherit}
+.pj-btns button:hover{background:var(--blue-soft);color:var(--blue)}
+#pj-foot{position:fixed;left:0;right:0;bottom:0;height:calc(var(--u)*.9);background:var(--surface2);z-index:30}
+#pj-bar{height:100%;width:0;background:var(--blue);transition:width .18s ease}
+#pj-more{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--u)*2);z-index:31;display:none;
+  background:var(--blue);color:#fff;border-radius:999px;padding:calc(var(--u)*.6) calc(var(--u)*1.4);
+  font:700 calc(var(--u)*1.6)/1.2 'Atkinson Hyperlegible',system-ui,sans-serif;pointer-events:none;opacity:.9}
+#pj-more.on{display:block}
+
+#pj-ov{position:fixed;inset:0;background:var(--paper);z-index:60;display:none;
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;padding:18px;overflow:auto;align-content:start;
+  font-family:'Atkinson Hyperlegible',system-ui,sans-serif}
+#pj-ov.on{display:grid}
+#pj-ov h3{grid-column:1/-1;margin:10px 0 0;font-size:15px;color:var(--teal);letter-spacing:.06em;text-transform:uppercase}
+#pj-ov button{text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:10px;padding:10px 12px;cursor:pointer;font-family:inherit;font-size:13px;line-height:1.3}
+#pj-ov button:hover,#pj-ov button.sel{border-color:var(--blue);background:var(--blue-soft)}
+#pj-ov button i{display:block;font-style:normal;font-size:11px;color:var(--muted);margin-bottom:3px}
+#pj-ov button b{font-weight:700}
+
+#pj-pnav{display:none}
+
+/* ============ PHONE: reading mode (the slide scrolls) ============ */
+@media (max-width:760px){
+  html.pj{--u:clamp(6.2px,1.95vw,9px)}
+  #pj-head{height:auto;flex-wrap:wrap;gap:calc(var(--u)*1) calc(var(--u)*1.4);padding:calc(var(--u)*1.4)}
+  #pj-crit{font-size:calc(var(--u)*2.6);white-space:normal}
+  #pj-sub{font-size:calc(var(--u)*1.8);white-space:normal}
+  .pj-pos{order:2;flex:1 1 100%;text-align:left;display:flex;gap:calc(var(--u)*1.2);align-items:baseline}
+  .pj-pos b{display:inline;font-size:calc(var(--u)*2)}
+  .pj-btns{order:3;flex:1 1 100%}
+  .pj-btns button{flex:1;padding:calc(var(--u)*1.1) calc(var(--u)*1);font-size:calc(var(--u)*1.8)}
+  #pj-fs{display:none}
+  html.pj .slide.on{transform:none!important;width:auto!important;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;padding:16px 16px 96px;top:var(--pj-top,140px)}
+  #pj-pnav{display:flex;position:fixed;left:0;right:0;bottom:calc(var(--u)*1.2);z-index:40;gap:10px;padding:8px 10px;
+    background:linear-gradient(to top,var(--paper) 70%,transparent)}
+  #pj-pnav button{flex:1;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;
+    padding:13px 10px;font:700 16px/1 inherit;font-family:inherit;cursor:pointer}
+  #pj-pnav button:disabled{opacity:.4}
+  #pj-pnav .mid{flex:0 0 auto;align-self:center;color:var(--muted);font-size:14px;font-weight:700}
+  #pj-more{display:none!important}
+}
+@media print{
+  html.pj,html.pj body{height:auto;overflow:visible}
+  html.pj .slide{display:block!important;position:static!important;transform:none!important;width:auto!important;
+    page-break-after:always;break-after:page}
+  html.pj section.module,html.pj section.hero,html.pj .endwrap{display:block!important}
+  #pj-head,#pj-foot,#pj-ov,#pj-pnav,#pj-more{display:none!important}
+}
+html.pj .pj-hide{display:none!important}
+html.pj #an-dock{right:8px;bottom:12px}
+html.pj #an-toggle{padding:6px 12px;font-size:12px;opacity:.55}
+html.pj #an-toggle:hover,html.pj #an-toggle:focus-visible,html.pj #an-toggle[aria-expanded=true]{opacity:1}
+@media (max-width:760px){ html.pj #an-dock{bottom:86px} }
 </style>
 </head>
 <body>
@@ -1318,87 +1399,6 @@ details.orig{margin:12px 0}
 <footer><div class="wrap"><p>HCI course material, University of Algiers 1. Keep designing for everyone: inclusive, ethical and user-centered design matters.</p></div></footer>
 </div></section>
 </main>
-<div id="dOutline" hidden role="dialog" aria-modal="true" aria-label="All slides"><div class="dpanel"><div class="dhead"><b>All slides</b><button type="button" id="dClose" class="btn small">Close</button></div>
-<p class="dmod">Cover</p>
-<button type="button" class="ditem" data-go="0"><i>1</i><span>Cover: Interfaces and Interactions with Mock-ups</span></button>
-<button type="button" class="ditem" data-go="1"><i>2</i><span>Learning goals and roadmap</span></button>
-<p class="dmod">Module 1: Introduction</p>
-<button type="button" class="ditem" data-go="2"><i>3</i><span>Module 1: Introduction</span></button>
-<button type="button" class="ditem" data-go="3"><i>4</i><span>Where are we in the course?</span></button>
-<button type="button" class="ditem" data-go="4"><i>5</i><span>Reminder: design methods</span></button>
-<button type="button" class="ditem" data-go="5"><i>6</i><span>Mock-ups: why, for whom, when?</span></button>
-<p class="dmod">Module 2: Screens</p>
-<button type="button" class="ditem" data-go="6"><i>7</i><span>Module 2: Screens</span></button>
-<button type="button" class="ditem" data-go="7"><i>8</i><span>Devices and screen sizes</span></button>
-<button type="button" class="ditem" data-go="8"><i>9</i><span>Mock-up in width or in depth</span></button>
-<p class="dmod">Module 3: Windows</p>
-<button type="button" class="ditem" data-go="9"><i>10</i><span>Module 3: Windows</span></button>
-<button type="button" class="ditem" data-go="10"><i>11</i><span>Graphical widgets and WIMP</span></button>
-<button type="button" class="ditem" data-go="11"><i>12</i><span>Window vocabulary</span></button>
-<button type="button" class="ditem" data-go="12"><i>13</i><span>Active window and multi-windowing</span></button>
-<button type="button" class="ditem" data-go="13"><i>14</i><span>Application and document windows</span></button>
-<button type="button" class="ditem" data-go="14"><i>15</i><span>Utility windows</span></button>
-<button type="button" class="ditem" data-go="15"><i>16</i><span>Dialog windows</span></button>
-<p class="dmod">Module 4: Icons, menus and cursors</p>
-<button type="button" class="ditem" data-go="16"><i>17</i><span>Module 4: Icons, menus, cursors</span></button>
-<button type="button" class="ditem" data-go="17"><i>18</i><span>Icons</span></button>
-<button type="button" class="ditem" data-go="18"><i>19</i><span>Menus</span></button>
-<button type="button" class="ditem" data-go="19"><i>20</i><span>Menu characteristics</span></button>
-<button type="button" class="ditem" data-go="20"><i>21</i><span>Cursors</span></button>
-<p class="dmod">Module 5: Buttons, lists and groups</p>
-<button type="button" class="ditem" data-go="21"><i>22</i><span>Module 5: Buttons, lists, groups</span></button>
-<button type="button" class="ditem" data-go="22"><i>23</i><span>Buttons to execute an action</span></button>
-<button type="button" class="ditem" data-go="23"><i>24</i><span>Buttons to make a choice</span></button>
-<button type="button" class="ditem" data-go="24"><i>25</i><span>Lists</span></button>
-<button type="button" class="ditem" data-go="25"><i>26</i><span>Groups</span></button>
-<p class="dmod">Module 6: Text zones and other widgets</p>
-<button type="button" class="ditem" data-go="26"><i>27</i><span>Module 6: Text and more</span></button>
-<button type="button" class="ditem" data-go="27"><i>28</i><span>Text zones</span></button>
-<button type="button" class="ditem" data-go="28"><i>29</i><span>Spinners and selectors</span></button>
-<button type="button" class="ditem" data-go="29"><i>30</i><span>Other components</span></button>
-<button type="button" class="ditem" data-go="30"><i>31</i><span>Form</span></button>
-<button type="button" class="ditem" data-go="31"><i>32</i><span>Scrollbar</span></button>
-<button type="button" class="ditem" data-go="32"><i>33</i><span>Which widget?</span></button>
-<p class="dmod">Module 7: Mock-ups and how to present them</p>
-<button type="button" class="ditem" data-go="33"><i>34</i><span>Module 7: Mock-ups</span></button>
-<button type="button" class="ditem" data-go="34"><i>35</i><span>Types of mock-ups</span></button>
-<button type="button" class="ditem" data-go="35"><i>36</i><span>Mock-up tools</span></button>
-<button type="button" class="ditem" data-go="36"><i>37</i><span>Quant-UX: interface, components, properties</span></button>
-<button type="button" class="ditem" data-go="37"><i>38</i><span>Quant-UX workspace</span></button>
-<button type="button" class="ditem" data-go="38"><i>39</i><span>Screen captures</span></button>
-<button type="button" class="ditem" data-go="39"><i>40</i><span>Integrating screens in a report</span></button>
-<button type="button" class="ditem" data-go="40"><i>41</i><span>Adapting the captures</span></button>
-<button type="button" class="ditem" data-go="41"><i>42</i><span>Annotating mock-ups</span></button>
-<p class="dmod">Module 8: Events and event-driven programming</p>
-<button type="button" class="ditem" data-go="42"><i>43</i><span>Module 8: Events</span></button>
-<button type="button" class="ditem" data-go="43"><i>44</i><span>Directive dialogue</span></button>
-<button type="button" class="ditem" data-go="44"><i>45</i><span>Reactive dialogue</span></button>
-<button type="button" class="ditem" data-go="45"><i>46</i><span>Event-driven programming</span></button>
-<button type="button" class="ditem" data-go="46"><i>47</i><span>The event queue</span></button>
-<button type="button" class="ditem" data-go="47"><i>48</i><span>Events: triggers</span></button>
-<p class="dmod">Module 9: Interaction types and tasks</p>
-<button type="button" class="ditem" data-go="48"><i>49</i><span>Module 9: Interactions</span></button>
-<button type="button" class="ditem" data-go="49"><i>50</i><span>Interaction types</span></button>
-<button type="button" class="ditem" data-go="50"><i>51</i><span>Graphical interaction tasks</span></button>
-<button type="button" class="ditem" data-go="51"><i>52</i><span>Triggering task</span></button>
-<button type="button" class="ditem" data-go="52"><i>53</i><span>Input task</span></button>
-<button type="button" class="ditem" data-go="53"><i>54</i><span>Selection task</span></button>
-<button type="button" class="ditem" data-go="54"><i>55</i><span>Specification task</span></button>
-<button type="button" class="ditem" data-go="55"><i>56</i><span>Transformation task</span></button>
-<p class="dmod">Module 10: Interactive mock-ups</p>
-<button type="button" class="ditem" data-go="56"><i>57</i><span>Module 10: Interactive mock-ups</span></button>
-<button type="button" class="ditem" data-go="57"><i>58</i><span>Principle</span></button>
-<button type="button" class="ditem" data-go="58"><i>59</i><span>Four building blocks</span></button>
-<button type="button" class="ditem" data-go="59"><i>60</i><span>Try the Restau'IHM prototype</span></button>
-<p class="dmod">Module 11: Demonstration video</p>
-<button type="button" class="ditem" data-go="60"><i>61</i><span>Module 11: Demo video</span></button>
-<button type="button" class="ditem" data-go="61"><i>62</i><span>Advice for a demo video</span></button>
-<p class="dmod">Module 12: Self-assessment</p>
-<button type="button" class="ditem" data-go="62"><i>63</i><span>Module 12: Self-assessment</span></button>
-<p class="dmod">Credits</p>
-<button type="button" class="ditem" data-go="63"><i>64</i><span>Credits</span></button>
-</div></div>
-<nav id="deckbar" aria-label="Slides"><div class="in"><button type="button" class="btn small" id="dPrev" aria-label="Previous slide">&#8249;<span class="lbl"> Previous</span></button><button type="button" class="btn small" id="dMenuBtn" aria-haspopup="dialog" aria-label="All slides"><span id="dNum">1 / 64</span><span class="lbl">&nbsp; All slides</span></button><button type="button" class="btn small primary" id="dNext" aria-label="Next slide"><span class="lbl">Next </span>&#8250;</button></div></nav>
 <div id="lbx" hidden role="dialog" aria-modal="true" aria-label="Enlarged image">
   <div class="lbx-bar">
     <span id="lbxCap"></span>
@@ -2101,92 +2101,256 @@ host.addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b)return;
 
 })();
 </script>
+<script src="../../assets/annotate.js" defer></script>
+<!-- projector:chrome -->
+<div id="pj-head">
+  <span id="pj-num">·</span>
+  <span class="pj-txt"><span id="pj-crit"></span><span id="pj-sub"></span></span>
+  <span class="pj-pos"><b id="pj-step">1 / 1</b><span id="pj-part"></span></span>
+  <span class="pj-btns">
+    <button type="button" id="pj-ovb" title="All slides (Esc)">All slides</button>
+    <button type="button" id="pj-fs" title="Full screen (F)">Full screen</button>
+    <button type="button" id="pj-th" title="Light / dark">Dark</button>
+  </span>
+</div>
+<div id="pj-more" aria-hidden="true">&#8595; more</div>
+<nav id="pj-pnav"><button type="button" id="pj-pprev" aria-label="Previous slide">&larr;</button><span class="mid" id="pj-ppos"></span><button type="button" id="pj-pnext" aria-label="Next slide">&rarr;</button></nav>
+<div id="pj-foot"><div id="pj-bar"></div></div>
+<div id="pj-ov" role="dialog" aria-label="All slides"></div>
 <script>
+/* ===== projector mode: one slide at a time, scaled to fill the screen (datashow) ===== */
 (function(){
 'use strict';
-var root=document.documentElement; root.classList.add('deck-on');
-var S=[].slice.call(document.querySelectorAll('.slide')), N=S.length;
-var $=function(i){return document.getElementById(i)}, num=$('dNum'), prev=$('dPrev'), next=$('dNext'), menu=$('dOutline');
-var holders=S.map(function(s){return s.closest('section')}), cur=-1;
-var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-function show(n){
-  n=Math.max(0,Math.min(N-1,n)); if(n===cur) return; cur=n;
-  S.forEach(function(s,k){s.classList.toggle('on',k===n)});
-  holders.forEach(function(h){h.classList.toggle('cur',h===holders[n])});
-  var m=S[n].dataset.mod; [].forEach.call(document.querySelectorAll('#nav a'),function(a){a.classList.toggle('on',!!m&&a.dataset.m===m)});
-  num.textContent=(n+1)+' / '+N; prev.disabled=n===0; next.disabled=n===N-1;
-  try{history.replaceState(null,'','#slide-'+(n+1))}catch(e){}
-  window.scrollTo(0,0);
+var root=document.documentElement; root.classList.add('deck-on','pj');
+var S=[].slice.call(document.querySelectorAll('.slide')), N=S.length, cur=-1;
+var holders=S.map(function(s){return s.closest('section')});
+var $=function(i){return document.getElementById(i)};
+var head=$('pj-head'), hNum=$('pj-num'), hCrit=$('pj-crit'), hSub=$('pj-sub'), hStep=$('pj-step'), hPart=$('pj-part'),
+    bar=$('pj-bar'), ov=$('pj-ov'), more=$('pj-more');
+var phone=matchMedia('(max-width:760px)');
+
+/* lecture title and module names come from the page itself */
+var LTITLE=(document.title||'').replace(/\s*\|.*$/,'');
+var LN=/lecture(\d+)/i.exec(location.pathname); var LSUB='Human–Computer Interaction'+(LN?' · Lecture '+LN[1]:'');
+var MODS={};
+S.forEach(function(s){var m=s.dataset.mod, t=s.dataset.title||''; var r=/^Module\s+(\d+)\s*:\s*(.*)$/.exec(t);
+  if(m&&r&&!MODS[m]) MODS[m]={n:r[1],name:r[2]};});
+[].forEach.call(document.querySelectorAll('#nav a[data-m]'),function(a){ var m=a.dataset.m;
+  if(!MODS[m]){ var i=a.querySelector('i'); var n=i?i.textContent.trim():''; var t=a.textContent.replace(n,'').trim();
+    var h=document.getElementById(m+'h'); if(h) t=h.textContent.replace(/^\s*\d+\s*/,'').trim()||t; MODS[m]={n:n,name:t}; } });
+var FIRSTMOD=N; S.some(function(s,k){ if(s.dataset.mod){FIRSTMOD=k;return true;} });
+function info(k){
+  var s=S[k], m=s.dataset.mod, t=s.dataset.title||'';
+  if(m&&MODS[m]) return {num:MODS[m].n, crit:MODS[m].name, part:'Module '+MODS[m].n, title:t};
+  return {num:'', crit:LTITLE, part:(k<FIRSTMOD?'Opening':'Closing'), title:t};
 }
-function target(id){
+
+/* ---------- fitting: largest scale at which the whole slide is visible ---------- */
+var WIDTHS=[760,860,940,1020,1100,1200,1320,1460], SMAX=2.6, SMIN=0.5, off=0, last=null, PG=[];
+function box(){
+  var hh=head.offsetHeight, fb=$('pj-foot').offsetHeight, vh=innerHeight, vw=innerWidth;
+  var px=Math.round(vw*0.025), py=Math.round(vh*0.03);
+  return {x:px, y:hh+py, w:vw-2*px, h:vh-hh-fb-2*py};
+}
+function measure(el,B){
+  var best=null; el.style.transform='none';
+  for(var n=0;n<WIDTHS.length;n++){
+    var w=WIDTHS[n]; el.style.width=w+'px';
+    var h=el.scrollHeight, s=Math.min(B.w/w, B.h/h);
+    if(!best||s>best.s+0.004) best={w:w,h:h,s:s};
+  }
+  el.style.width=best.w+'px'; best.h=el.scrollHeight; return best;
+}
+/* a slide too dense for the screen is shown in parts. The title stays; the blocks
+   under it (and, inside a block too big alone, its repeated items: quiz questions,
+   exercises, cards) are grouped into pages that each fit. Nothing is removed. */
+function target(B){ return 0.95*B.h/610; }
+var WIDGET='[id^="w-"],.panel,.xdemo,figure,form,svg,canvas,table';
+function vis(x){ return x.classList.contains('pj-hide')||getComputedStyle(x).display!=='none'; }
+function repeated(u){
+  var H=u.getBoundingClientRect().height, top=null;
+  [u].concat([].slice.call(u.querySelectorAll('*'))).forEach(function(c){
+    if(c.children.length<3||c.closest('svg')) return;
+    var inW=!!c.closest(WIDGET), g={};
+    [].forEach.call(c.children,function(x){ if(!vis(x)) return;
+      var k=x.tagName+'.'+String(x.className).replace(/\bpj-hide\b/,'').trim(); (g[k]=g[k]||[]).push(x); });
+    for(var k in g){ var a=g[k]; if(a.length<3) continue;
+      if(inW&&!/^(FIELDSET|DIV\.q)\b/.test(k)) continue;         /* never cut an interactive figure apart */
+      var t=1e9,b=-1e9; a.forEach(function(x){var r=x.getBoundingClientRect(); t=Math.min(t,r.top); b=Math.max(b,r.bottom);});
+      if(b-t>=0.4*H&&(!top||b-t>top.sc)) top={c:c,sc:b-t}; }
+  });
+  return top&&[].filter.call(top.c.children,vis);
+}
+function showOnly(items,a,b){ items.forEach(function(x,j){ x.classList.toggle('pj-hide', j<a||j>=b); }); }
+function setPage(k,p){ var P=PG[k]; if(!P) return; P.p=p; showOnly(P.items,P.pages[p][0],P.pages[p][1]); }
+function paginate(k,B){
+  var el=S[k], old=PG[k]; if(old) old.items.forEach(function(x){x.classList.remove('pj-hide')});
+  PG[k]=null; var t=target(B);
+  if(measure(el,B).s>=t) return;
+  var kids=[].filter.call(el.children,vis);
+  if(kids.length&&(/^H[1-4]$/.test(kids[0].tagName)||kids[0].classList.contains('mh'))) kids.shift();  /* the title stays on every page */
+  /* expand any block that does not fit alone into its repeated items */
+  var items=[], guard=0;
+  (function expand(list){
+    list.forEach(function(u){
+      if(guard++>200){ items.push(u); return; }
+      var all=items.concat(list); showOnly(all,1e9,1e9); u.classList.remove('pj-hide');
+      var fits=measure(el,B).s>=t; all.forEach(function(x){x.classList.remove('pj-hide')});
+      var r=fits?null:repeated(u);
+      if(r&&r.length>1) expand(r); else items.push(u);
+    });
+  })(kids);
+  items.forEach(function(x){x.classList.remove('pj-hide')});
+  var n=items.length; if(n<2) return;
+  /* a short paragraph or a heading never ends a page on its own: it goes with what follows */
+  var small=items.map(function(x){ return /^H[2-6]$/.test(x.tagName)||x.offsetHeight<0.16*B.h/t; });
+  var pages=[], a=0;
+  while(a<n){
+    var b=a+1; showOnly(items,a,b);
+    while(b<n){
+      var lead=true; for(var j=a;j<b;j++) if(!small[j]) lead=false;
+      showOnly(items,a,b+1);
+      if(lead||measure(el,B).s>=t) b++; else break;
+    }
+    while(b-1>a&&/^H[2-6]$/.test(items[b-1].tagName)) b--;
+    pages.push([a,b]); a=b;
+  }
+  if(pages.length<2){ items.forEach(function(x){x.classList.remove('pj-hide')}); return; }
+  /* even the pages out when that still fits */
+  var P=pages.length, size=Math.ceil(n/P), even=[], ok=true;
+  for(a=0;a<n;a+=size) even.push([a,Math.min(n,a+size)]);
+  if(even.length===P){ for(var q=0;q<P&&ok;q++){ var e=even[q]; ok=!/^H[2-6]$/.test(items[e[1]-1].tagName)||e[1]===n;
+      if(ok){ showOnly(items,e[0],e[1]); ok=measure(el,B).s>=t; } } if(ok) pages=even; }
+  PG[k]={items:items,pages:pages,p:0};
+  setPage(k,0);
+}
+function fit(repage){
+  var el=S[cur]; if(!el) return;
+  if(phone.matches){
+    if(PG[cur]){ PG[cur].items.forEach(function(x){x.classList.remove('pj-hide')}); PG[cur]=null; }
+    el.style.width=''; el.style.transform=''; root.style.setProperty('--pj-top',head.offsetHeight+'px');
+    more.classList.remove('on'); pos(); return; }
+  var B=box();
+  if(repage){ var keep=PG[cur]?PG[cur].p:0; paginate(cur,B); if(PG[cur]) setPage(cur,Math.min(keep,PG[cur].pages.length-1)); }
+  var best=measure(el,B);
+  var h=best.h, s=Math.min(best.s,SMAX), lo=Math.max(SMIN,0.8*target(B)); if(s<lo) s=lo;   /* below this the text is too small to read: the slide scrolls instead */
+  var tall=h*s>B.h+2, maxOff=tall? h*s-B.h : 0; off=Math.max(0,Math.min(off,maxOff));
+  var x=B.x+(B.w-best.w*s)/2;
+  var centre=el.closest('.hero')||el.closest('.endwrap')||/^Module\s+\d+\s*:/.test(el.dataset.title||'');
+  var y=tall? B.y-off : (centre? B.y+(B.h-h*s)/2 : B.y);
+  el.style.transform='translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px) scale('+s.toFixed(4)+')';
+  last={el:el,w:best.w,h:h,s:s,maxOff:maxOff};
+  more.classList.toggle('on', tall && off<maxOff-2);
+  pos();
+}
+function pos(){
+  var P=PG[cur], I=info(cur);
+  hPart.textContent=I.part+(P?' · part '+(P.p+1)+' of '+P.pages.length:'');
+  var a=(cur+(P?(P.p+1)/P.pages.length:1))/N; bar.style.width=(a*100)+'%';
+}
+var fitT=0; function refit(rp){ clearTimeout(fitT); fitT=setTimeout(function(){fit(rp)},40); }
+var rsT=0;
+if(window.ResizeObserver){
+  var ro=new ResizeObserver(function(){ if(last&&last.el===S[cur]&&Math.abs(S[cur].scrollHeight-last.h)>3) refit(); });
+  S.forEach(function(s){ro.observe(s)});
+}
+document.addEventListener('load',function(e){ if(e.target.tagName==='IMG'&&S[cur]&&S[cur].contains(e.target)) refit(true); },true);
+addEventListener('resize',function(){refit(true)});
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){refit(true)});
+
+/* a slide that is still too tall after scaling scrolls with the wheel or the up / down arrows */
+function scrollBy(d){ if(!last||last.maxOff<=0||phone.matches) return false; off+=d; fit(); return true; }
+addEventListener('wheel',function(e){ if(ov.classList.contains('on')||phone.matches) return;
+  if(last&&last.maxOff>0){ e.preventDefault(); scrollBy(e.deltaY); } },{passive:false});
+
+/* ---------- navigation ---------- */
+function show(n,lastPage){
+  n=Math.max(0,Math.min(N-1,n)); if(n===cur) return; cur=n; off=0;
+  S.forEach(function(s,k){ s.classList.toggle('on',k===n); if(k!==n){s.style.transform='';s.style.width='';} });
+  holders.forEach(function(h){h.classList.toggle('cur',h===holders[n])});
+  var I=info(n);
+  hNum.textContent=I.num===''?'·':I.num; hNum.classList.toggle('off',I.num==='');
+  hCrit.textContent=I.crit; hSub.textContent=LSUB;
+  hStep.textContent=(n+1)+' / '+N; hPart.textContent=I.part;
+  var pp=$('pj-ppos'); if(pp) pp.textContent=(n+1)+' / '+N;
+  $('pj-pprev').disabled=n===0; $('pj-pnext').disabled=n===N-1;
+  try{history.replaceState(null,'','#slide-'+(n+1))}catch(e){}
+  S[n].scrollTop=0; fit(true);
+  if(lastPage&&PG[n]){ setPage(n,PG[n].pages.length-1); fit(false); }
+  setTimeout(function(){ if(cur===n) fit(false); },80);
+}
+function go(d){
+  var P=PG[cur];
+  if(P&&!phone.matches){ var q=P.p+d; if(q>=0&&q<P.pages.length){ setPage(cur,q); off=0; fit(false); return; } }
+  show(cur+d, d<0);
+}
+function targetId(id){
   var t=document.getElementById(id); if(!t) return false;
   var s=t.closest('.slide')||t.querySelector('.slide'); if(!s) return false;
-  show(S.indexOf(s));
-  if(t!==s&&!t.classList.contains('module')&&!t.classList.contains('endwrap')) setTimeout(function(){t.scrollIntoView({block:'start',behavior:reduce?'auto':'smooth'})},40);
-  return true;
+  show(S.indexOf(s)); return true;
 }
 function fromHash(){
-  var h=location.hash.slice(1), m=h.match(/^slide-(\d+)$/);
-  if(m) show(+m[1]-1); else if(!h||!target(h)) show(cur<0?0:cur);
+  var h=location.hash.slice(1), m=h.match(/^(?:slide-|s)(\d+)$/);
+  if(m) show(+m[1]-1); else if(!h||!targetId(h)) show(cur<0?0:cur);
 }
-prev.addEventListener('click',function(){show(cur-1)});
-next.addEventListener('click',function(){show(cur+1)});
-function openMenu(){menu.hidden=false; var b=menu.querySelector('.ditem.sel'); if(b)b.classList.remove('sel'); var c=menu.querySelector('[data-go="'+cur+'"]'); if(c){c.classList.add('sel');c.focus();c.scrollIntoView({block:'center'})}}
-function closeMenu(){menu.hidden=true; $('dMenuBtn').focus()}
-$('dMenuBtn').addEventListener('click',openMenu); $('dClose').addEventListener('click',closeMenu);
-menu.addEventListener('click',function(e){var b=e.target.closest('[data-go]'); if(b){show(+b.dataset.go); menu.hidden=true} else if(e.target===menu) closeMenu()});
 document.addEventListener('click',function(e){
   var a=e.target.closest('a[href^="#"]'); if(!a) return;
   var id=a.getAttribute('href').slice(1); if(!id||id==='main'||id==='top') return;
-  if(target(id)) e.preventDefault();
+  if(targetId(id)) e.preventDefault();
 });
+function typing(t){ return t&&t.closest&&t.closest('input,select,textarea,[contenteditable],.mk'); }
+function onCtl(t){ return t&&t.closest&&t.closest('button,a,summary,label,[role=button],[tabindex]'); }
 document.addEventListener('keydown',function(e){
   if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey) return;
-  if(!menu.hidden){ if(e.key==='Escape') closeMenu(); return; }
-  if(e.target.closest&&e.target.closest('input,select,textarea,[contenteditable],.mk')) return;
   var k=e.key;
-  if(k==='ArrowRight'){show(cur+1);e.preventDefault()} else if(k==='ArrowLeft'){show(cur-1);e.preventDefault()}
-  else if(k==='Home'){show(0);e.preventDefault()} else if(k==='End'){show(N-1);e.preventDefault()}
+  if(ov.classList.contains('on')){ if(k==='Escape'){ov.classList.remove('on');e.preventDefault();} return; }
+  if(typing(e.target)) return;
+  if(k==='ArrowRight'||k==='PageDown'){ go(1); e.preventDefault(); }
+  else if(k==='ArrowLeft'||k==='PageUp'){ go(-1); e.preventDefault(); }
+  else if(k===' '&&!onCtl(e.target)){ go(e.shiftKey?-1:1); e.preventDefault(); }
+  else if(k==='ArrowDown'){ if(scrollBy(innerHeight*0.25)) e.preventDefault(); }
+  else if(k==='ArrowUp'){ if(scrollBy(-innerHeight*0.25)) e.preventDefault(); }
+  else if(k==='Home'){ show(0); e.preventDefault(); } else if(k==='End'){ show(N-1); e.preventDefault(); }
+  else if(k==='Escape'){ openOv(); }
+  else if(k==='f'||k==='F'){ fsToggle(); }
 });
-window.addEventListener('hashchange',fromHash);
+var tx=null, ty=null;
+document.addEventListener('touchstart',function(e){ if(!e.target.closest('.slide.on')) return; tx=e.touches[0].clientX; ty=e.touches[0].clientY; },{passive:true});
+document.addEventListener('touchend',function(e){
+  if(tx===null) return; var dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5&&!e.target.closest('.scroll,.hscroll,input,canvas,svg')) go(dx<0?1:-1); tx=null;
+},{passive:true});
+
+function fsToggle(){
+  var d=document, r=d.documentElement;
+  if(!(d.fullscreenElement||d.webkitFullscreenElement)){ var q=r.requestFullscreen||r.webkitRequestFullscreen; if(q){ var p=q.call(r); if(p&&p.catch)p.catch(function(){}); } }
+  else { var x=d.exitFullscreen||d.webkitExitFullscreen; if(x) x.call(d); }
+}
+$('pj-fs').onclick=fsToggle;
+var thb=$('pj-th');
+function thLabel(){ var dark=root.dataset.theme? root.dataset.theme==='dark' : matchMedia('(prefers-color-scheme: dark)').matches; thb.textContent=dark?'Light':'Dark'; }
+thb.onclick=function(){
+  var t=document.getElementById('themeBtn');
+  if(t) t.click(); else { var dark=root.dataset.theme? root.dataset.theme==='dark' : matchMedia('(prefers-color-scheme: dark)').matches; root.dataset.theme=dark?'light':'dark'; }
+  thLabel(); refit();
+};
+thLabel();
+
+/* ---------- all slides ---------- */
+var html='', lastPart=null;
+S.forEach(function(s,k){ var I=info(k), p=I.part+(I.num?' · '+I.crit:'');
+  if(p!==lastPart){ html+='<h3>'+p.replace(/</g,'&lt;')+'</h3>'; lastPart=p; }
+  html+='<button type="button" data-k="'+k+'"><i>'+(k+1)+' · '+I.part+'</i><b>'+(s.dataset.title||'').replace(/</g,'&lt;')+'</b></button>'; });
+ov.innerHTML=html;
+function openOv(){ ov.classList.add('on'); [].forEach.call(ov.querySelectorAll('button'),function(b){b.classList.toggle('sel',+b.dataset.k===cur)});
+  var c=ov.querySelector('button.sel'); if(c){ c.focus(); c.scrollIntoView({block:'center'}); } }
+ov.addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; ov.classList.remove('on'); show(+b.dataset.k); });
+$('pj-ovb').onclick=function(){ ov.classList.contains('on')?ov.classList.remove('on'):openOv(); };
+$('pj-pprev').onclick=function(){go(-1)}; $('pj-pnext').onclick=function(){go(1)};
+
+addEventListener('hashchange',fromHash);
 fromHash();
 })();
 </script>
-<script>
-/* Full-screen mode: header button or key F; Esc leaves (browser default). */
-(function(){
-'use strict';
-var root=document.documentElement, btn=document.getElementById('fsBtn');
-if(!btn) return;
-var req=root.requestFullscreen||root.webkitRequestFullscreen||root.msRequestFullscreen;
-var leave=document.exitFullscreen||document.webkitExitFullscreen||document.msExitFullscreen;
-var allowed=document.fullscreenEnabled!==undefined?document.fullscreenEnabled:(document.webkitFullscreenEnabled!==undefined?document.webkitFullscreenEnabled:document.msFullscreenEnabled);
-if(!req||!leave||allowed===false){btn.hidden=true;return;} /* e.g. iPhone Safari has no full-screen API */
-function active(){return !!(document.fullscreenElement||document.webkitFullscreenElement||document.msFullscreenElement)}
-function sync(){
-  var on=active();
-  root.classList.toggle('is-fs',on);
-  btn.setAttribute('aria-pressed',on?'true':'false');
-  btn.setAttribute('aria-label',on?'Exit full screen':'Enter full screen');
-  btn.title=on?'Exit full screen (Esc)':'Full screen (F)';
-}
-function toggle(){
-  try{
-    var p=active()?leave.call(document):req.call(root);
-    if(p&&typeof p.catch==='function') p.catch(function(){});
-  }catch(e){}
-}
-btn.addEventListener('click',toggle);
-['fullscreenchange','webkitfullscreenchange','msfullscreenchange'].forEach(function(n){document.addEventListener(n,sync)});
-document.addEventListener('keydown',function(e){
-  if(e.defaultPrevented||e.repeat||e.altKey||e.ctrlKey||e.metaKey||e.shiftKey) return;
-  if(e.key!=='f'&&e.key!=='F') return;
-  if(e.target.closest&&e.target.closest('input,select,textarea,[contenteditable],.mk')) return;
-  e.preventDefault(); toggle();
-});
-sync();
-})();
-</script>
-<script src="../../assets/annotate.js" defer></script>
 </body>
 </html>
