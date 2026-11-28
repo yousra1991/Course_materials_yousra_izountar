@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My continuous evaluation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#EAF0F3;--surface:#fff;--surface2:#F3F7F9;--ink:#0E1D2A;--muted:#44586A;--line:#C8D4DC;
+  --blue:#0B4F72;--blue-soft:#D6E7F1;--teal:#066A5F;--teal-soft:#D3EEE9;--coral:#B8341F;--coral-soft:#F9D9D2;
+  --amber:#8A5A00;--amber-soft:#FBECC8;--green:#1B7544;--green-soft:#D3EEDD}
+@media (prefers-color-scheme:dark){:root{--paper:#0B1620;--surface:#12212E;--surface2:#182B3A;--ink:#E7EEF3;--muted:#A3B5C3;
+  --line:#2A3F50;--blue:#78BDE6;--blue-soft:#12354A;--teal:#56D3C1;--teal-soft:#0F3F3A;--coral:#FF8A74;--coral-soft:#4A211B;
+  --amber:#F6C453;--amber-soft:#443611;--green:#6AD79A;--green-soft:#153D28}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Arial,sans-serif}
+h1,h2,h3{font-family:'Bricolage Grotesque','Atkinson Hyperlegible',system-ui,sans-serif;margin:0;letter-spacing:-.01em}
+button,input,select,textarea{font:inherit}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+.top{background:linear-gradient(155deg,#0B4F72 0%,#083a54 60%,#066A5F 100%);color:#fff;padding:22px 0 26px}
+.uni{font-size:13px;opacity:.85;letter-spacing:.04em}
+.top h1{font-size:clamp(24px,5vw,34px);margin-top:6px;line-height:1.15}
+.who{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:14px;font-size:15px}
+.who b{font-size:17px}.who span{opacity:.85}
+.who button{margin-left:auto;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55);border-radius:999px;padding:6px 14px;cursor:pointer}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:16px 0}
+.card h2{font-size:21px;margin-bottom:10px}
+.muted{color:var(--muted)}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:10px;padding:11px 20px;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.gh{background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
+:root .btn{color:var(--surface)} .btn.gh{color:var(--blue)}
+label{display:block;font-weight:700;font-size:14px;color:var(--muted);margin:12px 0 5px}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+textarea{min-height:110px;resize:vertical}
+.msg{min-height:22px;margin-top:10px;font-weight:700}.msg.bad{color:var(--coral)}.msg.ok{color:var(--green)}
+.login{max-width:460px;margin:7vh auto}
+.hint{font-size:14px;color:var(--muted);margin-top:6px}
+/* marks */
+.final{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.big{font:800 54px/1 'Bricolage Grotesque',sans-serif;color:var(--blue)}
+.big small{font-size:22px;color:var(--muted)}
+.parts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.part{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.part b{display:block;font-size:22px;font-family:'Bricolage Grotesque',sans-serif}
+.part span{font-size:13px;color:var(--muted)}
+.plus{font-size:14px;color:var(--muted);margin-top:8px}
+/* attendance */
+.sessions{display:flex;flex-wrap:wrap;gap:8px}
+.ses{border-radius:12px;padding:8px 12px;min-width:92px;border:1px solid var(--line);background:var(--surface2)}
+.ses b{display:block;font-size:15px}.ses span{font-size:13px;font-weight:700}
+.ses.P{background:var(--green-soft);border-color:transparent}.ses.P span{color:var(--green)}
+.ses.A{background:var(--coral-soft);border-color:transparent}.ses.A span{color:var(--coral)}
+.ses button{display:block;margin-top:6px;border:0;background:var(--surface);color:var(--coral);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border-radius:999px;padding:5px 12px;font-weight:700;font-size:14px;background:var(--surface2);border:1px solid var(--line)}
+.chip.yes{background:var(--green-soft);color:var(--green);border-color:transparent}
+.chip.no{background:var(--coral-soft);color:var(--coral);border-color:transparent}
+table.kv{width:100%;border-collapse:collapse}
+table.kv td{padding:7px 4px;border-top:1px solid var(--line)}table.kv td:last-child{text-align:right;font-weight:700}
+/* requests */
+.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:999px;padding:7px 14px;font-weight:700;cursor:pointer}
+.tabs button.on{background:var(--blue);border-color:var(--blue);color:var(--surface)}
+.req{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0;background:var(--surface2)}
+.req .h{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;font-weight:700}
+.req p{margin:6px 0;white-space:pre-wrap}
+.st{border-radius:999px;padding:2px 10px;font-size:13px;font-weight:700}
+.st.Pending{background:var(--amber-soft);color:var(--amber)}.st.Accepted{background:var(--green-soft);color:var(--green)}.st.Refused{background:var(--coral-soft);color:var(--coral)}
+.reply{border-left:4px solid var(--teal);background:var(--teal-soft);border-radius:0 8px 8px 0;padding:8px 12px;margin-top:8px}
+.notice{border-left:4px solid var(--amber);background:var(--amber-soft);border-radius:0 10px 10px 0;padding:10px 14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.hide{display:none!important}
+footer{color:var(--muted);font-size:13px;text-align:center;padding:24px 0 36px}
+@media (max-width:720px){.parts{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:1fr}.big{font-size:46px}}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <div class="uni">University of Algiers 1 &middot; Faculty of Sciences &middot; Computer Science</div>
+  <h1 id="title">My continuous evaluation</h1>
+  <div class="who hide" id="who"><b id="wName"></b><span id="wMat"></span><span id="wGroup"></span>
+    <button type="button" id="logout">Sign out</button></div>
+</div></header>
+
+<main class="wrap">
+  <!-- not open yet -->
+  <section class="card login hide" id="closed">
+    <h2>Not open yet</h2>
+    <p class="muted">The evaluation platform is not open yet. Come back later.</p>
+  </section>
+
+  <!-- sign in -->
+  <section class="card login hide" id="login">
+    <h2>Sign in</h2>
+    <p class="muted">See your marks and your attendance, send a claim or an absence note.</p>
+    <form id="fLogin" autocomplete="on">
+      <label for="mat">Matricule</label>
+      <input id="mat" inputmode="numeric" autocomplete="username" placeholder="e.g. 31353414" required>
+      <label for="ins">Registration number</label>
+      <input id="ins" autocomplete="current-password" placeholder="UN1601…" required>
+      <p class="hint">Both are on your student card. The registration number starts with <b>UN1601</b>.</p>
+      <button class="btn" type="submit" style="margin-top:14px;width:100%">Sign in</button>
+      <div class="msg" id="mLogin"></div>
+    </form>
+  </section>
+
+  <!-- the student's evaluation -->
+  <div id="app" class="hide">
+    <section class="card">
+      <h2>My mark</h2>
+      <div class="final"><div class="big" id="final">–<small> / 20</small></div>
+        <div class="muted" id="finalTxt">Continuous evaluation mark</div></div>
+      <div class="parts" id="parts"></div>
+      <p class="plus" id="formula"></p>
+    </section>
+
+    <div class="grid2">
+      <section class="card">
+        <h2>Attendance</h2>
+        <p class="muted" id="absTxt"></p>
+        <div class="sessions" id="sessions"></div>
+      </section>
+      <section class="card">
+        <h2>Lab reports</h2>
+        <div class="chips" id="reports"></div>
+        <table class="kv" id="others" style="margin-top:12px"></table>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Claims and absence notes</h2>
+      <div class="notice hide" id="deadline"></div>
+      <div class="notice hide" id="closedReq">Claims and absence notes are closed. You can still read your answers below.</div>
+      <div class="tabs" id="reqTabs">
+        <button type="button" data-t="list" class="on">My requests</button>
+        <button type="button" data-t="claim">New claim</button>
+        <button type="button" data-t="absence">Justify an absence</button>
+      </div>
+
+      <div id="tList"><div id="reqList"></div></div>
+
+      <form id="tClaim" class="hide">
+        <label for="cTopic">Topic</label>
+        <select id="cTopic" required>
+          <option value="">Choose…</option>
+          <option>Attendance</option><option>Lab reports</option><option>Test mark</option>
+          <option>Bonus</option><option>Final mark</option><option>Other</option>
+        </select>
+        <label for="cMsg">Your claim</label>
+        <textarea id="cMsg" maxlength="2000" placeholder="Explain what is wrong and what you expect." required></textarea>
+        <label for="cFile">Document (optional): PDF, JPG or PNG</label>
+        <input id="cFile" type="file" accept="application/pdf,image/jpeg,image/png">
+        <button class="btn" type="submit" style="margin-top:14px">Send the claim</button>
+        <div class="msg" id="mClaim"></div>
+      </form>
+
+      <form id="tAbsence" class="hide">
+        <label for="aSes">Session</label>
+        <select id="aSes" required></select>
+        <label for="aReason">Reason</label>
+        <textarea id="aReason" maxlength="1000" placeholder="e.g. medical appointment" required></textarea>
+        <label for="aFile">Justification (required): PDF, JPG or PNG</label>
+        <input id="aFile" type="file" accept="application/pdf,image/jpeg,image/png">
+        <button class="btn" type="submit" style="margin-top:14px">Send the absence note</button>
+        <div class="msg" id="mAbs"></div>
+      </form>
+    </section>
+  </div>
+</main>
+<footer>Human&ndash;Computer Interaction &amp; NoSQL &middot; Prof. Izountar Yousra &middot; University of Algiers 1</footer>
+
+<script src="evaluation-config.js?v=1"></script>
+<script>
+(function(){
+'use strict';
+var API = window.EVAL_API || '', KEY = 'eval:token', ME = null, maxMB = 5;
+var $ = function(id){ return document.getElementById(id); };
+function show(id, on){ $(id).classList.toggle('hide', !on); }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function call(action, data){
+  return fetch(API, {method:'POST', body: JSON.stringify(Object.assign({action: action}, data || {}))})
+    .then(function(r){ return r.json(); });
+}
+function token(){ try { return localStorage.getItem(KEY) || ''; } catch(e){ return ''; } }
+function setToken(t){ try { t ? localStorage.setItem(KEY, t) : localStorage.removeItem(KEY); } catch(e){} }
+
+/* ---------- sign in ---------- */
+$('fLogin').addEventListener('submit', function(e){
+  e.preventDefault();
+  var m = $('mLogin'); m.className = 'msg'; m.textContent = 'Checking…';
+  call('login', {matricule: $('mat').value, inscription: $('ins').value}).then(function(r){
+    if (!r.ok){ m.className = 'msg bad'; m.textContent = r.error; return; }
+    setToken(r.token); m.textContent = ''; load();
+  }).catch(function(){ m.className = 'msg bad'; m.textContent = 'No connection. Try again.'; });
+});
+$('logout').addEventListener('click', function(){ setToken(''); ME = null; start(); });
+
+/* ---------- the evaluation ---------- */
+function find(fields, re){ for (var i = 0; i < fields.length; i++) if (re.test(fields[i].label)) return fields[i]; return null; }
+function mark(v){ v = String(v == null ? '' : v).trim(); return v === '' ? '–' : (/^abs$/i.test(v) ? 'Absent' : v); }
+
+function render(d){
+  ME = d; maxMB = d.settings.maxFileMB || 5;
+  if (d.settings.title) { $('title').textContent = d.settings.title; document.title = d.settings.title; }
+  $('wName').textContent = d.student.lastName + ' ' + d.student.firstName;
+  $('wMat').textContent = 'Matricule ' + d.student.matricule;
+  $('wGroup').textContent = d.student.group || '';
+  show('who', true);
+  var ev = d.evaluation, f = ev ? ev.fields : [];
+  if (!ev){
+    $('final').innerHTML = '–<small> / 20</small>';
+    $('finalTxt').textContent = 'Your marks are not in the table yet. Send a claim if you think this is a mistake.';
+  }
+  var used = [];
+  function take(re){ var x = find(f, re); if (x) used.push(x); return x; }
+  var fin = take(/^note\s*\/?\s*20/i), test = take(/contr[oô]le/i), rep = take(/rapport/i),
+      pres = take(/pr[ée]sence/i), bonus = take(/bonus/i), nabs = take(/absence/i);
+  if (ev){
+    $('final').innerHTML = esc(mark(fin && fin.value)) + '<small> / 20</small>';
+    $('finalTxt').textContent = 'Continuous evaluation mark';
+  }
+  var parts = [[rep, 'Lab reports', '/ 3'], [pres, 'Attendance', '/ 2'], [bonus, 'Bonus', ''], [test, 'Test', '/ 15']];
+  $('parts').innerHTML = parts.map(function(p){
+    return '<div class="part"><b>' + esc(mark(p[0] && p[0].value)) + ' <small class="muted" style="font-size:13px">' + p[2] +
+      '</small></b><span>' + p[1] + '</span></div>';
+  }).join('');
+  $('formula').textContent = ev ? 'Mark / 20 = lab reports + attendance + bonus + test.' : '';
+  /* attendance */
+  var ses = ev ? ev.sessions : [], absent = ses.filter(function(s){ return /^a/i.test(s.status); });
+  $('absTxt').textContent = ev ? (absent.length ? absent.length + ' absence' + (absent.length > 1 ? 's' : '') + ' recorded' +
+    '. You can justify an absence with a document.' : 'No absence. Well done.') : '';
+  $('sessions').innerHTML = ses.map(function(s){
+    var st = String(s.status || '').trim().toUpperCase(), cls = st.charAt(0) === 'P' ? 'P' : st.charAt(0) === 'A' ? 'A' : '';
+    var lab = cls === 'P' ? 'Present' : cls === 'A' ? 'Absent' : (st || 'Not recorded');
+    return '<div class="ses ' + cls + '"><b>' + esc(s.date) + '</b><span>' + esc(lab) + '</span>' +
+      (cls === 'A' && d.settings.claimsOpen ? '<button type="button" data-j="' + esc(s.date) + '">Justify</button>' : '') + '</div>';
+  }).join('');
+  /* reports and other values */
+  var reps = f.filter(function(x){ return /^rap\s*\d/i.test(x.label); }); used = used.concat(reps);
+  $('reports').innerHTML = reps.length ? reps.map(function(x){
+    var yes = /^(oui|yes|1|ok)$/i.test(String(x.value).trim()), no = /^(non|no|0)$/i.test(String(x.value).trim());
+    return '<span class="chip ' + (yes ? 'yes' : no ? 'no' : '') + '">' + esc(x.label.replace(/^rap\s*/i, 'Report ')) + ': ' +
+      esc(yes ? 'handed in' : no ? 'missing' : (x.value || '–')) + '</span>';
+  }).join('') : '<span class="muted">No report recorded.</span>';
+  var rest = f.filter(function(x){ return used.indexOf(x) < 0 && String(x.value).trim() !== ''; });
+  $('others').innerHTML = rest.map(function(x){ return '<tr><td>' + esc(x.label) + '</td><td>' + esc(mark(x.value)) + '</td></tr>'; }).join('');
+  /* requests */
+  var open = d.settings.claimsOpen;
+  show('closedReq', !open);
+  [].forEach.call(document.querySelectorAll('#reqTabs [data-t="claim"],#reqTabs [data-t="absence"]'), function(b){ b.classList.toggle('hide', !open); });
+  if (!open) tab('list');
+  show('deadline', !!(open && d.settings.deadline)); $('deadline').textContent = d.settings.deadline || '';
+  var opts = absent.map(function(s){ return '<option>' + esc(s.date) + '</option>'; }).join('');
+  $('aSes').innerHTML = '<option value="">Choose…</option>' + opts + '<option value="Other date">Another date</option>';
+  var all = d.claims.map(function(c){ c.kind = 'Claim'; return c; }).concat(d.absences.map(function(a){ a.kind = 'Absence note'; return a; }))
+    .sort(function(a, b){ return String(b.time).localeCompare(String(a.time)); });
+  $('reqList').innerHTML = all.length ? all.map(function(r){
+    return '<div class="req"><div class="h"><span>' + esc(r.kind) + ' &middot; ' + esc(r.kind === 'Claim' ? r.topic : 'session ' + r.session) +
+      '</span><span class="st ' + esc(r.status) + '">' + esc(r.status) + '</span></div>' +
+      '<div class="muted" style="font-size:13px">' + esc(r.time) + (r.fileName ? ' &middot; document sent' : '') + '</div>' +
+      '<p>' + esc(r.message) + '</p>' +
+      (r.reply ? '<div class="reply"><b>Answer:</b> ' + esc(r.reply) + '</div>' : '') + '</div>';
+  }).join('') : '<p class="muted">You have not sent any request.</p>';
+}
+
+$('sessions').addEventListener('click', function(e){
+  var b = e.target.closest('[data-j]'); if (!b) return;
+  tab('absence'); $('aSes').value = b.getAttribute('data-j');
+  $('tAbsence').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+function tab(t){
+  [].forEach.call(document.querySelectorAll('#reqTabs button'), function(b){ b.classList.toggle('on', b.getAttribute('data-t') === t); });
+  show('tList', t === 'list'); show('tClaim', t === 'claim'); show('tAbsence', t === 'absence');
+}
+$('reqTabs').addEventListener('click', function(e){ var b = e.target.closest('button'); if (b) tab(b.getAttribute('data-t')); });
+
+/* ---------- files ---------- */
+function readFile(input){
+  return new Promise(function(res, rej){
+    var f = input.files && input.files[0]; if (!f) return res(null);
+    if (['application/pdf','image/jpeg','image/png'].indexOf(f.type) < 0) return rej(new Error('Send a PDF, JPG or PNG file.'));
+    if (f.size > maxMB * 1024 * 1024) return rej(new Error('The file is larger than ' + maxMB + ' MB.'));
+    var r = new FileReader();
+    r.onload = function(){ res({name: f.name, type: f.type, data: String(r.result).split(',')[1]}); };
+    r.onerror = function(){ rej(new Error('The file could not be read.')); };
+    r.readAsDataURL(f);
+  });
+}
+function send(form, msgId, action, data, fileInput, required){
+  var m = $(msgId), btn = form.querySelector('button[type=submit]');
+  m.className = 'msg'; m.textContent = 'Sending…'; btn.disabled = true;
+  readFile(fileInput).then(function(file){
+    if (required && !file) throw new Error('Add the document that justifies the absence.');
+    return call(action, Object.assign({token: token(), file: file}, data));
+  }).then(function(r){
+    if (!r.ok){ if (r.error === 'signed-out') return start(); throw new Error(r.error); }
+    form.reset(); m.className = 'msg ok'; m.textContent = 'Sent. You will see the answer in "My requests".';
+    return load(true);
+  }).catch(function(err){ m.className = 'msg bad'; m.textContent = err.message || 'No connection. Try again.'; })
+    .then(function(){ btn.disabled = false; });
+}
+$('tClaim').addEventListener('submit', function(e){
+  e.preventDefault();
+  send(this, 'mClaim', 'claim', {topic: $('cTopic').value, message: $('cMsg').value}, $('cFile'), false);
+});
+$('tAbsence').addEventListener('submit', function(e){
+  e.preventDefault();
+  send(this, 'mAbs', 'absence', {session: $('aSes').value, reason: $('aReason').value}, $('aFile'), true);
+});
+
+/* ---------- start ---------- */
+function load(keepTab){
+  return call('me', {token: token()}).then(function(r){
+    if (!r.ok){ setToken(''); return start(); }
+    show('login', false); show('app', true); render(r);
+    if (!keepTab) tab('list');
+  }).catch(function(){ show('login', true); $('mLogin').className = 'msg bad'; $('mLogin').textContent = 'No connection. Try again.'; });
+}
+function start(){
+  show('app', false); show('who', false); show('closed', false);
+  if (!API){ show('login', false); show('closed', true); return; }
+  if (token()) { show('login', false); load(); } else show('login', true);
+}
+start();
+})();
+</script>
+</body>
+</html>
